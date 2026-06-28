@@ -11,6 +11,7 @@ function hostIsAdmin(host: string): boolean {
   const h = host.toLowerCase();
   return (
     h.startsWith('chat-admin.') ||
+    h.startsWith('qhub-admin.') ||
     h.startsWith('dashboard3') ||
     h.startsWith('admin.')
   );
