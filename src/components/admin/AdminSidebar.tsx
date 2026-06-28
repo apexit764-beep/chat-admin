@@ -11,6 +11,7 @@ import {
   LogOut,
   HelpCircle,
   ExternalLink,
+  Eye,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { clientDashboardUrl } from '@/utils/mode';
@@ -25,6 +26,7 @@ const items = [
   { to: '/finance', label: 'المالية', icon: Banknote },
   { to: '/payments', label: 'بوابة الدفع', icon: CreditCard },
   { to: '/reports', label: 'التقارير', icon: BarChart3 },
+  { to: '/preview', label: 'معاينة', icon: Eye },
 ];
 
 export function AdminSidebar(): JSX.Element {

@@ -30,6 +30,7 @@ const AdminFinance = lazy(() => import('@pages/admin/Finance'));
 const AdminPayments = lazy(() => import('@pages/admin/Payments'));
 const AdminReports = lazy(() => import('@pages/admin/Reports'));
 const AdminSettings = lazy(() => import('@pages/admin/Settings'));
+const AdminDashboardPreview = lazy(() => import('@pages/admin/DashboardPreview'));
 
 function PageLoader(): JSX.Element {
   return (
@@ -62,6 +63,7 @@ export default function App(): JSX.Element {
             <Route path="/payments" element={<AdminPayments />} />
             <Route path="/reports" element={<AdminReports />} />
             <Route path="/settings" element={<AdminSettings />} />
+            <Route path="/preview" element={<AdminDashboardPreview />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Route>
         </Routes>
