@@ -591,3 +591,59 @@ export const satisfactionStats = {
     { month: 'مايو', avg: 4.3 },
   ],
 };
+
+// =====================================================================
+// Activity Log
+// =====================================================================
+export type ActivityAction =
+  | 'client_created'
+  | 'client_suspended'
+  | 'client_reactivated'
+  | 'client_deleted'
+  | 'plan_created'
+  | 'plan_updated'
+  | 'plan_deleted'
+  | 'subscription_created'
+  | 'subscription_cancelled'
+  | 'invoice_refunded'
+  | 'payment_received'
+  | 'admin_login'
+  | 'admin_logout'
+  | 'admin_user_added'
+  | 'admin_user_removed'
+  | 'settings_updated'
+  | 'paymob_updated';
+
+export interface ActivityEntry {
+  id: string;
+  action: ActivityAction;
+  actor: string;
+  actorEmail: string;
+  target?: string;
+  details?: string;
+  timestamp: string;
+  ip?: string;
+}
+
+export const activityLog: ActivityEntry[] = [
+  { id: 'act_1', action: 'admin_login', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', timestamp: nowMinus(2), ip: '185.69.144.12' },
+  { id: 'act_2', action: 'client_created', actor: 'Sara Ahmed', actorEmail: 'sara@apexes.click', target: 'صالون لمسة جمال', details: 'تسجيل عميل جديد — البحرين', timestamp: nowMinus(15) },
+  { id: 'act_3', action: 'payment_received', actor: 'النظام', actorEmail: 'system', target: 'Royal Auto Kuwait', details: '77 د.ك — باقة المؤسسات', timestamp: nowMinus(45) },
+  { id: 'act_4', action: 'subscription_created', actor: 'Sara Ahmed', actorEmail: 'sara@apexes.click', target: 'عيادة الحياة الطبية', details: 'باقة الاحترافي — شهري', timestamp: nowMinus(90) },
+  { id: 'act_5', action: 'client_suspended', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', target: 'مكتبة المعرفة', details: 'دفع متأخر 10 أيام', timestamp: nowMinus(180) },
+  { id: 'act_6', action: 'invoice_refunded', actor: 'Layla Khalid', actorEmail: 'layla@apexes.click', target: 'TechFlow Egypt', details: '978 ج.م — فاتورة INV-2026-00601', timestamp: nowMinus(300) },
+  { id: 'act_7', action: 'plan_updated', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', target: 'الاحترافي', details: 'تحديث حدود المحادثات: 5,000 → 10,000', timestamp: nowMinus(420) },
+  { id: 'act_8', action: 'admin_user_added', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', target: 'Layla Khalid', details: 'دور: مالية', timestamp: nowMinus(600) },
+  { id: 'act_9', action: 'paymob_updated', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', details: 'تحديث مفتاح API وتفعيل الوضع الحي', timestamp: nowMinus(720) },
+  { id: 'act_10', action: 'settings_updated', actor: 'Sara Ahmed', actorEmail: 'sara@apexes.click', details: 'تحديث بيانات الدعم الفني', timestamp: nowMinus(960) },
+  { id: 'act_11', action: 'client_reactivated', actor: 'علي السالم', actorEmail: 'ali@apexes.click', target: 'مزرعة البركة', details: 'تم استلام الدفعة المتأخرة', timestamp: nowMinus(1200) },
+  { id: 'act_12', action: 'admin_login', actor: 'Sara Ahmed', actorEmail: 'sara@apexes.click', timestamp: nowMinus(1440), ip: '91.74.32.55' },
+  { id: 'act_13', action: 'payment_received', actor: 'النظام', actorEmail: 'system', target: 'Dubai Real Estate Co.', details: '363 د.إ — باقة الأعمال', timestamp: nowMinus(1500) },
+  { id: 'act_14', action: 'client_created', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', target: 'مدرسة الفجر الذهبي', details: 'تسجيل عميل جديد — السعودية', timestamp: nowMinus(1800) },
+  { id: 'act_15', action: 'subscription_cancelled', actor: 'النظام', actorEmail: 'system', target: 'مزرعة البركة', details: 'إلغاء تلقائي — عدم الدفع', timestamp: nowMinus(2400) },
+  { id: 'act_16', action: 'admin_login', actor: 'علي السالم', actorEmail: 'ali@apexes.click', timestamp: nowMinus(2880), ip: '185.69.144.15' },
+  { id: 'act_17', action: 'plan_created', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', target: 'المؤسسات', details: 'باقة جديدة — $249/شهر', timestamp: nowMinus(3600) },
+  { id: 'act_18', action: 'client_deleted', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', target: 'شركة تجريبية', details: 'حذف حساب تجريبي منتهي', timestamp: nowMinus(4320) },
+  { id: 'act_19', action: 'admin_logout', actor: 'Layla Khalid', actorEmail: 'layla@apexes.click', timestamp: nowMinus(5000) },
+  { id: 'act_20', action: 'payment_received', actor: 'النظام', actorEmail: 'system', target: 'Qatar Logistics Group', details: '360 ر.ق — باقة الأعمال', timestamp: nowMinus(5760) },
+];

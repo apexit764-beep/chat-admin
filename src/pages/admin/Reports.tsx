@@ -5,6 +5,10 @@ import {
   Users,
   Globe2,
   Download,
+  HeartPulse,
+  AlertTriangle,
+  CheckCircle2,
+  Clock,
 } from 'lucide-react';
 import { StatCard } from '@components/ui';
 import { LineChart } from '@components/charts/LineChart';
@@ -12,6 +16,7 @@ import { DoughnutChart } from '@components/charts/DoughnutChart';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
 import { approxUSD } from '@/utils/money';
+import { timeAgo } from '@/utils/format';
 import { downloadCsv } from '@/utils/csv';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -100,6 +105,27 @@ export default function AdminReports(): JSX.Element {
 
   // LTV (rough: ARPU / churn rate, assuming 5% monthly churn baseline)
   const ltv = arpu * 20;
+
+  const clientHealthScores = useMemo(() => {
+    return clients
+      .filter((c) => c.status !== 'cancelled')
+      .map((c) => {
+        const plan = plans.find((p) => p.id === c.planId);
+        const limit = plan?.limits.conversations ?? 1000;
+        const usagePercent = limit > 0 ? Math.min(100, Math.round((c.conversationCount / limit) * 100)) : 0;
+        const daysSinceActive = Math.round((Date.now() - new Date(c.lastActiveAt).getTime()) / 86400000);
+        let score = 100;
+        if (c.status === 'suspended') score -= 50;
+        else if (c.status === 'past_due') score -= 30;
+        else if (c.status === 'trial') score -= 10;
+        if (daysSinceActive > 7) score -= Math.min(30, daysSinceActive * 2);
+        if (usagePercent < 10) score -= 15;
+        else if (usagePercent > 80) score += 5;
+        score = Math.max(0, Math.min(100, score));
+        return { client: c, usagePercent, score };
+      })
+      .sort((a, b) => a.score - b.score);
+  }, [clients, plans]);
 
   const exportSummary = (): void => {
     downloadCsv(`reports-${new Date().toISOString().slice(0, 10)}.csv`, [
@@ -252,6 +278,92 @@ export default function AdminReports(): JSX.Element {
           <FunnelStep label="تجارب جديدة" value={183} color="bg-primary" share={4.3} />
           <FunnelStep label="نشطوا الحساب" value={142} color="bg-violet-500" share={3.3} />
           <FunnelStep label="اشتراك مدفوع" value={paidCount} color="bg-success" share={(paidCount / 4280) * 100} />
+        </CardContent>
+      </Card>
+
+      {/* Client Health Scores */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <HeartPulse className="h-5 w-5 text-primary" />
+                صحة العملاء
+              </CardTitle>
+              <CardDescription>تقييم شامل لنشاط وصحة حسابات العملاء</CardDescription>
+            </div>
+            <div className="flex items-center gap-3 text-xs">
+              <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full bg-emerald-500" /> ممتاز</span>
+              <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full bg-amber-500" /> متوسط</span>
+              <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full bg-red-500" /> خطر</span>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted">
+                <TableHead className="text-start">العميل</TableHead>
+                <TableHead className="text-start">الحالة</TableHead>
+                <TableHead className="text-start">النشاط</TableHead>
+                <TableHead className="text-start">الاستخدام</TableHead>
+                <TableHead className="text-start">درجة الصحة</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {clientHealthScores.map((h) => (
+                <TableRow key={h.client.id}>
+                  <TableCell>
+                    <div>
+                      <p className="font-semibold text-sm">{h.client.companyName}</p>
+                      <p className="text-xs text-muted-foreground">{h.client.contactName}</p>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <span className={cn(
+                      'inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full',
+                      h.client.status === 'active' ? 'bg-emerald-500/10 text-emerald-600' :
+                      h.client.status === 'trial' ? 'bg-blue-500/10 text-blue-600' :
+                      h.client.status === 'past_due' ? 'bg-amber-500/10 text-amber-600' :
+                      h.client.status === 'suspended' ? 'bg-red-500/10 text-red-600' :
+                      'bg-slate-500/10 text-slate-600'
+                    )}>
+                      {h.client.status === 'active' ? 'نشط' : h.client.status === 'trial' ? 'تجريبي' : h.client.status === 'past_due' ? 'متأخر' : h.client.status === 'suspended' ? 'موقوف' : 'ملغي'}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-1.5">
+                      <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span className="text-xs text-muted-foreground">{timeAgo(h.client.lastActiveAt)}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Progress value={h.usagePercent} className="flex-1 h-1.5 max-w-24" />
+                      <span className="text-xs text-muted-foreground font-medium">{h.usagePercent}%</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      {h.score >= 70 ? (
+                        <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                      ) : h.score >= 40 ? (
+                        <AlertTriangle className="h-4 w-4 text-amber-500" />
+                      ) : (
+                        <AlertTriangle className="h-4 w-4 text-red-500" />
+                      )}
+                      <span className={cn(
+                        'text-sm font-bold',
+                        h.score >= 70 ? 'text-emerald-600' : h.score >= 40 ? 'text-amber-600' : 'text-red-600'
+                      )}>
+                        {h.score}
+                      </span>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
     </div>

@@ -34,6 +34,7 @@ const titleMap: Record<string, string> = {
   '/finance': 'المالية',
   '/payments': 'بوابة الدفع',
   '/reports': 'التقارير',
+  '/activity': 'سجل النشاط',
   '/settings': 'الإعدادات',
   '/preview': 'معاينة',
 };
@@ -45,6 +46,7 @@ const subtitleMap: Record<string, string> = {
   '/finance': 'المعاملات المالية والفواتير',
   '/payments': 'إعدادات بوابة الدفع',
   '/reports': 'تقارير وإحصائيات مفصلة',
+  '/activity': 'تتبع إجراءات فريق الإدارة',
   '/settings': 'إعدادات النظام',
   '/preview': 'معاينة واجهة العميل',
 };
