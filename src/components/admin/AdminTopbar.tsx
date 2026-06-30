@@ -91,13 +91,13 @@ export function AdminTopbar(): JSX.Element {
         {/* Spacer */}
         <div className="flex-1" />
 
-        {/* Search */}
+        {/* Search - centered */}
         <Button
           variant="outline"
           onClick={() => setCmdOpen(true)}
           className={cn(
             'h-9 gap-2 text-muted-foreground font-normal rounded-xl border-border/60 bg-background/60 backdrop-blur-sm',
-            'hidden md:inline-flex w-64 justify-start'
+            'hidden md:inline-flex w-80 justify-start'
           )}
         >
           <Search className="h-4 w-4 flex-shrink-0" />
@@ -106,6 +106,9 @@ export function AdminTopbar(): JSX.Element {
             ⌘K
           </kbd>
         </Button>
+
+        {/* Spacer */}
+        <div className="flex-1" />
 
         {/* Actions */}
         <div className="flex items-center gap-1">

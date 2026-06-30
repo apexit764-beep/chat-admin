@@ -8,11 +8,10 @@ import {
   Banknote,
   BarChart3,
   Settings,
-  LogOut,
   HelpCircle,
   Eye,
-  ChevronLeft,
-  ChevronRight,
+  PanelRightClose,
+  PanelRightOpen,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { HelpDrawer } from '@components/layout/HelpDrawer';
@@ -50,13 +49,27 @@ function getInitials(name: string): string {
 }
 
 export function AdminSidebar(): JSX.Element {
-  const logout = useAuthStore((s) => s.logout);
   const user = useAuthStore((s) => s.user);
   const location = useLocation();
   const [helpOpen, setHelpOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
 
   const sidebarWidth = collapsed ? 'w-[68px]' : 'w-[240px]';
+
+  const toggleBtn = (
+    <button
+      onClick={() => setCollapsed((v) => !v)}
+      className={cn(
+        'h-8 w-8 rounded-lg bg-white/8 hover:bg-white/15 flex items-center justify-center text-white/60 hover:text-white transition-all flex-shrink-0'
+      )}
+    >
+      {collapsed ? (
+        <PanelRightClose className="h-4 w-4" />
+      ) : (
+        <PanelRightOpen className="h-4 w-4" />
+      )}
+    </button>
+  );
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -70,7 +83,7 @@ export function AdminSidebar(): JSX.Element {
           background: 'linear-gradient(180deg, #0A1E3D 0%, #0D2B52 40%, #113B6E 70%, #1565A0 100%)',
         }}
       >
-        {/* Logo area */}
+        {/* Logo area + collapse toggle */}
         <div className={cn(
           'flex items-center gap-3 pt-6 pb-4',
           collapsed ? 'justify-center px-3' : 'px-5'
@@ -79,19 +92,23 @@ export function AdminSidebar(): JSX.Element {
             <img src="/qhub-icon.png" alt="Qhub" className="h-10 w-10" />
           </NavLink>
           {!collapsed && (
-            <div className="flex flex-col min-w-0">
-              <span className="text-sm font-bold text-white tracking-wide">Qhub</span>
-              <span className="text-[10px] text-white/50">لوحة التحكم</span>
-            </div>
+            <>
+              <div className="flex flex-col min-w-0 flex-1">
+                <span className="text-sm font-bold text-white tracking-wide">Qhub</span>
+                <span className="text-[10px] text-white/50">لوحة التحكم</span>
+              </div>
+              {toggleBtn}
+            </>
+          )}
+          {collapsed && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                {toggleBtn}
+              </TooltipTrigger>
+              <TooltipContent side="left" className="font-medium">توسيع القائمة</TooltipContent>
+            </Tooltip>
           )}
         </div>
-
-        {/* Section label */}
-        {!collapsed && (
-          <div className="px-5 mb-2">
-            <span className="text-[10px] font-semibold text-white/40 uppercase tracking-widest">القائمة</span>
-          </div>
-        )}
 
         {/* Main nav items */}
         <ScrollArea className="flex-1 px-3">
@@ -121,7 +138,7 @@ export function AdminSidebar(): JSX.Element {
                 return (
                   <Tooltip key={item.to}>
                     <TooltipTrigger asChild>{linkEl}</TooltipTrigger>
-                    <TooltipContent side="right" className="font-medium">{item.label}</TooltipContent>
+                    <TooltipContent side="left" className="font-medium">{item.label}</TooltipContent>
                   </Tooltip>
                 );
               }
@@ -131,15 +148,7 @@ export function AdminSidebar(): JSX.Element {
           </nav>
         </ScrollArea>
 
-        {/* Divider */}
-        <div className="mx-4 my-2 h-px bg-white/10" />
-
         {/* Bottom items */}
-        {!collapsed && (
-          <div className="px-5 mb-2">
-            <span className="text-[10px] font-semibold text-white/40 uppercase tracking-widest">أدوات</span>
-          </div>
-        )}
         <div className="flex flex-col gap-1 px-3 pb-2">
           {bottomItems.map((item) => {
             const Icon = item.icon;
@@ -166,7 +175,7 @@ export function AdminSidebar(): JSX.Element {
                 return (
                   <Tooltip key={item.label}>
                     <TooltipTrigger asChild>{link}</TooltipTrigger>
-                    <TooltipContent side="right" className="font-medium">{item.label}</TooltipContent>
+                    <TooltipContent side="left" className="font-medium">{item.label}</TooltipContent>
                   </Tooltip>
                 );
               }
@@ -191,7 +200,7 @@ export function AdminSidebar(): JSX.Element {
                 return (
                   <Tooltip key={item.label}>
                     <TooltipTrigger asChild>{btn}</TooltipTrigger>
-                    <TooltipContent side="right" className="font-medium">{item.label}</TooltipContent>
+                    <TooltipContent side="left" className="font-medium">{item.label}</TooltipContent>
                   </Tooltip>
                 );
               }
@@ -200,37 +209,9 @@ export function AdminSidebar(): JSX.Element {
 
             return null;
           })}
-
-          {/* Logout */}
-          {(() => {
-            const logoutBtn = (
-              <button
-                onClick={logout}
-                className={cn(
-                  'flex items-center gap-3 rounded-xl text-sm font-medium text-red-400/80 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200',
-                  collapsed ? 'h-10 w-10 justify-center mx-auto' : 'h-10 px-3 w-full'
-                )}
-              >
-                <LogOut className="h-[18px] w-[18px] flex-shrink-0" />
-                {!collapsed && <span className="truncate">تسجيل الخروج</span>}
-              </button>
-            );
-            if (collapsed) {
-              return (
-                <Tooltip>
-                  <TooltipTrigger asChild>{logoutBtn}</TooltipTrigger>
-                  <TooltipContent side="left" className="font-medium">تسجيل الخروج</TooltipContent>
-                </Tooltip>
-              );
-            }
-            return logoutBtn;
-          })()}
         </div>
 
-        {/* Divider */}
-        <div className="mx-4 my-1 h-px bg-white/10" />
-
-        {/* User section + collapse toggle */}
+        {/* User section */}
         <div className={cn('p-3 flex items-center', collapsed ? 'justify-center' : 'gap-3')}>
           {user && !collapsed && (
             <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -250,35 +231,10 @@ export function AdminSidebar(): JSX.Element {
                   <span className="text-xs font-bold text-white">{getInitials(user.name)}</span>
                 </div>
               </TooltipTrigger>
-              <TooltipContent side="right" className="font-medium">{user.name}</TooltipContent>
+              <TooltipContent side="left" className="font-medium">{user.name}</TooltipContent>
             </Tooltip>
-          )}
-          {!collapsed && (
-            <button
-              onClick={() => setCollapsed(true)}
-              className="h-8 w-8 rounded-lg bg-white/8 hover:bg-white/15 flex items-center justify-center text-white/60 hover:text-white transition-all flex-shrink-0"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
           )}
         </div>
-
-        {/* Expand button when collapsed */}
-        {collapsed && (
-          <div className="p-3 pt-0 flex justify-center">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={() => setCollapsed(false)}
-                  className="h-8 w-8 rounded-lg bg-white/8 hover:bg-white/15 flex items-center justify-center text-white/60 hover:text-white transition-all"
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent side="right">توسيع القائمة</TooltipContent>
-            </Tooltip>
-          </div>
-        )}
       </aside>
 
       <HelpDrawer open={helpOpen} onClose={() => setHelpOpen(false)} />
