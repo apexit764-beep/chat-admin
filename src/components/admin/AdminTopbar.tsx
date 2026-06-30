@@ -1,13 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Bell, Moon, Search, Sun, HelpCircle } from 'lucide-react';
+import { Bell, Moon, Search, Sun } from 'lucide-react';
 import { useThemeStore } from '@/store/useThemeStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { CommandPalette } from '@components/ui';
-import { HelpDrawer } from '@components/layout/HelpDrawer';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import {
   Avatar,
   AvatarFallback,
@@ -32,9 +30,21 @@ const titleMap: Record<string, string> = {
   '/clients': 'العملاء',
   '/plans': 'الباقات',
   '/finance': 'المالية',
-  '/payments': 'بوابة الدفع (Paymob)',
+  '/payments': 'بوابة الدفع',
   '/reports': 'التقارير',
   '/settings': 'الإعدادات',
+  '/preview': 'معاينة',
+};
+
+const subtitleMap: Record<string, string> = {
+  '/dashboard': 'نظرة عامة على أداء النظام',
+  '/clients': 'إدارة حسابات العملاء',
+  '/plans': 'إدارة الباقات والاشتراكات',
+  '/finance': 'المعاملات المالية والفواتير',
+  '/payments': 'إعدادات بوابة الدفع',
+  '/reports': 'تقارير وإحصائيات مفصلة',
+  '/settings': 'إعدادات النظام',
+  '/preview': 'معاينة واجهة العميل',
 };
 
 function getInitials(name: string): string {
@@ -52,9 +62,9 @@ export function AdminTopbar(): JSX.Element {
   const toggleTheme = useThemeStore((s) => s.toggle);
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
-  const title = titleMap[location.pathname] ?? 'Apex Solutions';
+  const title = titleMap[location.pathname] ?? 'لوحة التحكم';
+  const subtitle = subtitleMap[location.pathname] ?? '';
   const [cmdOpen, setCmdOpen] = useState(false);
-  const [helpOpen, setHelpOpen] = useState(false);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent): void => {
@@ -69,39 +79,42 @@ export function AdminTopbar(): JSX.Element {
 
   return (
     <TooltipProvider delayDuration={300}>
-      <header className="h-14 bg-card border-b border-border sticky top-0 z-10 flex items-center px-4 lg:px-6 gap-3">
-        {/* Title + Admin badge */}
-        <div className="flex items-center gap-3 flex-shrink-0">
-          <h1 className="text-lg font-bold text-foreground">{title}</h1>
-          <Badge variant="secondary" className="hidden md:inline-flex text-[10px] uppercase tracking-wider">
-            Admin
-          </Badge>
+      <header className="sticky top-0 z-10 px-6 py-4 flex items-center gap-4">
+        {/* Title area */}
+        <div className="flex flex-col min-w-0">
+          <h1 className="text-xl font-bold text-foreground">{title}</h1>
+          {subtitle && (
+            <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>
+          )}
         </div>
 
-        {/* Search / Command Palette trigger */}
-        <div className="flex-1 max-w-md hidden md:block mx-4">
-          <Button
-            variant="outline"
-            onClick={() => setCmdOpen(true)}
-            className="w-full h-9 justify-start gap-2 text-muted-foreground font-normal rounded-lg"
-          >
-            <Search className="h-4 w-4 flex-shrink-0" />
-            <span className="flex-1 text-start truncate">ابحث في العملاء، الفواتير، الباقات...</span>
-            <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] bg-muted border border-border font-mono pointer-events-none">
-              ⌘K
-            </kbd>
-          </Button>
-        </div>
+        {/* Spacer */}
+        <div className="flex-1" />
+
+        {/* Search */}
+        <Button
+          variant="outline"
+          onClick={() => setCmdOpen(true)}
+          className={cn(
+            'h-9 gap-2 text-muted-foreground font-normal rounded-xl border-border/60 bg-background/60 backdrop-blur-sm',
+            'hidden md:inline-flex w-64 justify-start'
+          )}
+        >
+          <Search className="h-4 w-4 flex-shrink-0" />
+          <span className="flex-1 text-start truncate text-xs">بحث...</span>
+          <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] bg-muted border border-border/50 font-mono">
+            ⌘K
+          </kbd>
+        </Button>
 
         {/* Actions */}
-        <div className="flex items-center gap-1 ms-auto">
-          {/* Mobile search */}
+        <div className="flex items-center gap-1">
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
-                className="md:hidden h-9 w-9"
+                className="md:hidden h-9 w-9 rounded-xl"
                 onClick={() => setCmdOpen(true)}
               >
                 <Search className="h-4 w-4" />
@@ -110,28 +123,12 @@ export function AdminTopbar(): JSX.Element {
             <TooltipContent>بحث</TooltipContent>
           </Tooltip>
 
-          {/* Help */}
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
-                className="hidden sm:inline-flex h-9 w-9"
-                onClick={() => setHelpOpen(true)}
-              >
-                <HelpCircle className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>المساعدة</TooltipContent>
-          </Tooltip>
-
-          {/* Theme toggle */}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-9 w-9"
+                className="h-9 w-9 rounded-xl"
                 onClick={toggleTheme}
               >
                 {theme === 'dark' ? (
@@ -144,31 +141,29 @@ export function AdminTopbar(): JSX.Element {
             <TooltipContent>تبديل الوضع</TooltipContent>
           </Tooltip>
 
-          {/* Notifications */}
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-9 w-9 relative">
+              <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl relative">
                 <Bell className="h-4 w-4" />
-                <span className="absolute top-1.5 end-1.5 h-2 w-2 bg-destructive rounded-full" />
+                <span className="absolute top-1.5 end-1.5 h-2 w-2 bg-destructive rounded-full ring-2 ring-background" />
               </Button>
             </TooltipTrigger>
             <TooltipContent>الإشعارات</TooltipContent>
           </Tooltip>
 
-          {/* User profile dropdown */}
+          {/* User */}
           {user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="gap-2 ms-1 h-9 px-2 rounded-lg"
+                  className="gap-2 ms-1 h-9 px-2 rounded-xl"
                 >
-                  <Avatar className="h-7 w-7">
-                    <AvatarFallback className="text-xs bg-primary/10 text-primary">
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback className="text-xs bg-primary/10 text-primary font-bold">
                       {getInitials(user.name)}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="text-sm font-medium hidden sm:block">{user.name}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
@@ -192,7 +187,6 @@ export function AdminTopbar(): JSX.Element {
       </header>
 
       <CommandPalette open={cmdOpen} onClose={() => setCmdOpen(false)} />
-      <HelpDrawer open={helpOpen} onClose={() => setHelpOpen(false)} />
     </TooltipProvider>
   );
 }

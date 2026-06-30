@@ -7,11 +7,14 @@ import { Toast } from '@components/ui';
 export function AdminShell(): JSX.Element {
   const location = useLocation();
   return (
-    <div className="flex min-h-screen bg-background text-foreground text-sm">
-      <AdminSidebar />
+    <div className="flex min-h-screen bg-muted/40 text-foreground text-sm">
+      {/* Sidebar wrapper with padding for floating effect */}
+      <div className="flex-shrink-0 p-3 pe-0">
+        <AdminSidebar />
+      </div>
       <div className="flex-1 flex flex-col min-w-0">
         <AdminTopbar />
-        <main className="flex-1 overflow-x-hidden bg-muted/30">
+        <main className="flex-1 overflow-x-hidden">
           <AnimatePresence mode="wait">
             <motion.div
               key={location.pathname}

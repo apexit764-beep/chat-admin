@@ -12,33 +12,19 @@ import {
   HelpCircle,
   ExternalLink,
   Eye,
-  PanelRightClose,
-  PanelRightOpen,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { clientDashboardUrl } from '@/utils/mode';
 import { HelpDrawer } from '@components/layout/HelpDrawer';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import {
-  Avatar,
-  AvatarFallback,
-} from '@/components/ui/avatar';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 const navItems = [
@@ -71,252 +57,259 @@ export function AdminSidebar(): JSX.Element {
   const user = useAuthStore((s) => s.user);
   const location = useLocation();
   const [helpOpen, setHelpOpen] = useState(false);
-  const [collapsed, setCollapsed] = useState(true);
+  const [collapsed, setCollapsed] = useState(false);
 
-  const sidebarWidth = collapsed ? 'w-14' : 'w-60';
+  const sidebarWidth = collapsed ? 'w-[68px]' : 'w-[240px]';
 
   return (
     <TooltipProvider delayDuration={0}>
       <aside
         className={cn(
-          'flex-shrink-0 h-screen sticky top-0 bg-card border-s border-border flex flex-col z-30 transition-[width] duration-200 ease-in-out',
+          'h-[calc(100vh-24px)] sticky top-3 rounded-2xl flex flex-col z-30 transition-[width] duration-300 ease-in-out overflow-hidden',
           sidebarWidth
         )}
+        style={{
+          background: 'linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
+        }}
       >
-        {/* Logo + collapse toggle */}
-        <div className={cn('flex items-center h-14 px-2', collapsed ? 'justify-center' : 'justify-between px-3')}>
-          <NavLink
-            to="/dashboard"
-            className="h-9 w-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-extrabold text-base shadow-sm flex-shrink-0"
-          >
-            S
-          </NavLink>
+        {/* Logo area */}
+        <div className={cn(
+          'flex items-center gap-3 pt-6 pb-4',
+          collapsed ? 'justify-center px-3' : 'px-5'
+        )}>
+          <div className="h-10 w-10 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center flex-shrink-0 ring-1 ring-white/20">
+            <NavLink to="/dashboard" className="font-extrabold text-lg text-white">
+              S
+            </NavLink>
+          </div>
           {!collapsed && (
-            <span className="text-sm font-bold text-foreground truncate mx-2">Sekaa</span>
+            <div className="flex flex-col min-w-0">
+              <span className="text-sm font-bold text-white tracking-wide">Sekaa</span>
+              <span className="text-[10px] text-white/50">Admin Panel</span>
+            </div>
           )}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className={cn('h-8 w-8 flex-shrink-0', collapsed && 'hidden')}
-                onClick={() => setCollapsed((v) => !v)}
-              >
-                <PanelRightOpen className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="left">طي القائمة</TooltipContent>
-          </Tooltip>
         </div>
 
-        {/* Expand button when collapsed */}
-        {collapsed && (
-          <div className="flex justify-center px-2 mb-1">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => setCollapsed(false)}
-                >
-                  <PanelRightClose className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="left">توسيع القائمة</TooltipContent>
-            </Tooltip>
+        {/* Section label */}
+        {!collapsed && (
+          <div className="px-5 mb-2">
+            <span className="text-[10px] font-semibold text-white/40 uppercase tracking-widest">القائمة</span>
           </div>
         )}
 
-        <Separator />
-
         {/* Main nav items */}
-        <ScrollArea className="flex-1 py-2">
-          <nav className={cn('flex flex-col gap-1', collapsed ? 'items-center px-2' : 'px-2')}>
+        <ScrollArea className="flex-1 px-3">
+          <nav className="flex flex-col gap-1">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.to || location.pathname.startsWith(item.to + '/');
 
-              const linkContent = (
-                <Button
-                  variant="ghost"
-                  asChild
+              const linkEl = (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
                   className={cn(
-                    'transition-colors',
-                    collapsed ? 'h-9 w-9 p-0' : 'w-full justify-start gap-3 h-9 px-3',
-                    isActive &&
-                      'bg-sidebar-accent text-sidebar-accent-foreground bg-accent text-accent-foreground font-medium'
+                    'flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-200',
+                    collapsed ? 'h-10 w-10 justify-center mx-auto' : 'h-10 px-3',
+                    isActive
+                      ? 'bg-white/15 text-white shadow-lg shadow-black/10 backdrop-blur-sm'
+                      : 'text-white/60 hover:text-white hover:bg-white/8'
                   )}
                 >
-                  <NavLink to={item.to}>
-                    <Icon className="h-4 w-4 flex-shrink-0" />
-                    {!collapsed && <span className="truncate">{item.label}</span>}
-                  </NavLink>
-                </Button>
+                  <Icon className="h-[18px] w-[18px] flex-shrink-0" />
+                  {!collapsed && <span className="truncate">{item.label}</span>}
+                </NavLink>
               );
 
               if (collapsed) {
                 return (
                   <Tooltip key={item.to}>
-                    <TooltipTrigger asChild>{linkContent}</TooltipTrigger>
-                    <TooltipContent side="left">{item.label}</TooltipContent>
+                    <TooltipTrigger asChild>{linkEl}</TooltipTrigger>
+                    <TooltipContent side="left" className="font-medium">{item.label}</TooltipContent>
                   </Tooltip>
                 );
               }
 
-              return <div key={item.to}>{linkContent}</div>;
+              return linkEl;
             })}
           </nav>
         </ScrollArea>
 
-        <Separator />
+        {/* Divider */}
+        <div className="mx-4 my-2 h-px bg-white/10" />
 
         {/* Bottom items */}
-        <div className={cn('flex flex-col gap-1 py-2', collapsed ? 'items-center px-2' : 'px-2')}>
+        {!collapsed && (
+          <div className="px-5 mb-2">
+            <span className="text-[10px] font-semibold text-white/40 uppercase tracking-widest">أدوات</span>
+          </div>
+        )}
+        <div className="flex flex-col gap-1 px-3 pb-2">
           {bottomItems.map((item) => {
             const Icon = item.icon;
 
             if (item.type === 'external') {
               const link = (
-                <Button variant="ghost" asChild className={cn(collapsed ? 'h-9 w-9 p-0' : 'w-full justify-start gap-3 h-9 px-3')}>
-                  <a href={clientDashboardUrl()} target="_blank" rel="noreferrer">
-                    <Icon className="h-4 w-4 flex-shrink-0" />
-                    {!collapsed && <span className="truncate">{item.label}</span>}
-                  </a>
-                </Button>
+                <a
+                  key={item.label}
+                  href={clientDashboardUrl()}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={cn(
+                    'flex items-center gap-3 rounded-xl text-sm font-medium text-white/60 hover:text-white hover:bg-white/8 transition-all duration-200',
+                    collapsed ? 'h-10 w-10 justify-center mx-auto' : 'h-10 px-3'
+                  )}
+                >
+                  <Icon className="h-[18px] w-[18px] flex-shrink-0" />
+                  {!collapsed && <span className="truncate">{item.label}</span>}
+                </a>
               );
               if (collapsed) {
                 return (
                   <Tooltip key={item.label}>
                     <TooltipTrigger asChild>{link}</TooltipTrigger>
-                    <TooltipContent side="left">{item.label}</TooltipContent>
+                    <TooltipContent side="left" className="font-medium">{item.label}</TooltipContent>
                   </Tooltip>
                 );
               }
-              return <div key={item.label}>{link}</div>;
+              return link;
             }
 
             if (item.type === 'link' && item.to) {
               const isActive = location.pathname === item.to;
               const link = (
-                <Button
-                  variant="ghost"
-                  asChild
+                <NavLink
+                  key={item.label}
+                  to={item.to}
                   className={cn(
-                    collapsed ? 'h-9 w-9 p-0' : 'w-full justify-start gap-3 h-9 px-3',
-                    isActive && 'bg-accent text-accent-foreground font-medium'
+                    'flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-200',
+                    collapsed ? 'h-10 w-10 justify-center mx-auto' : 'h-10 px-3',
+                    isActive
+                      ? 'bg-white/15 text-white shadow-lg shadow-black/10'
+                      : 'text-white/60 hover:text-white hover:bg-white/8'
                   )}
                 >
-                  <NavLink to={item.to}>
-                    <Icon className="h-4 w-4 flex-shrink-0" />
-                    {!collapsed && <span className="truncate">{item.label}</span>}
-                  </NavLink>
-                </Button>
+                  <Icon className="h-[18px] w-[18px] flex-shrink-0" />
+                  {!collapsed && <span className="truncate">{item.label}</span>}
+                </NavLink>
               );
               if (collapsed) {
                 return (
                   <Tooltip key={item.label}>
                     <TooltipTrigger asChild>{link}</TooltipTrigger>
-                    <TooltipContent side="left">{item.label}</TooltipContent>
+                    <TooltipContent side="left" className="font-medium">{item.label}</TooltipContent>
                   </Tooltip>
                 );
               }
-              return <div key={item.label}>{link}</div>;
+              return link;
             }
 
             if (item.type === 'action' && item.action === 'help') {
               const btn = (
-                <Button
-                  variant="ghost"
-                  className={cn(collapsed ? 'h-9 w-9 p-0' : 'w-full justify-start gap-3 h-9 px-3')}
+                <button
+                  key={item.label}
                   onClick={() => setHelpOpen(true)}
+                  className={cn(
+                    'flex items-center gap-3 rounded-xl text-sm font-medium text-white/60 hover:text-white hover:bg-white/8 transition-all duration-200',
+                    collapsed ? 'h-10 w-10 justify-center mx-auto' : 'h-10 px-3 w-full'
+                  )}
                 >
-                  <Icon className="h-4 w-4 flex-shrink-0" />
+                  <Icon className="h-[18px] w-[18px] flex-shrink-0" />
                   {!collapsed && <span className="truncate">{item.label}</span>}
-                </Button>
+                </button>
               );
               if (collapsed) {
                 return (
                   <Tooltip key={item.label}>
                     <TooltipTrigger asChild>{btn}</TooltipTrigger>
-                    <TooltipContent side="left">{item.label}</TooltipContent>
+                    <TooltipContent side="left" className="font-medium">{item.label}</TooltipContent>
                   </Tooltip>
                 );
               }
-              return <div key={item.label}>{btn}</div>;
+              return btn;
             }
 
             return null;
           })}
+
+          {/* Logout */}
+          {(() => {
+            const logoutBtn = (
+              <button
+                onClick={logout}
+                className={cn(
+                  'flex items-center gap-3 rounded-xl text-sm font-medium text-red-400/80 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200',
+                  collapsed ? 'h-10 w-10 justify-center mx-auto' : 'h-10 px-3 w-full'
+                )}
+              >
+                <LogOut className="h-[18px] w-[18px] flex-shrink-0" />
+                {!collapsed && <span className="truncate">تسجيل الخروج</span>}
+              </button>
+            );
+            if (collapsed) {
+              return (
+                <Tooltip>
+                  <TooltipTrigger asChild>{logoutBtn}</TooltipTrigger>
+                  <TooltipContent side="left" className="font-medium">تسجيل الخروج</TooltipContent>
+                </Tooltip>
+              );
+            }
+            return logoutBtn;
+          })()}
         </div>
 
-        <Separator />
+        {/* Divider */}
+        <div className="mx-4 my-1 h-px bg-white/10" />
 
-        {/* User section */}
-        <div className={cn('p-2', collapsed ? 'flex flex-col items-center' : '')}>
-          {user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className={cn(
-                    'gap-3',
-                    collapsed ? 'h-9 w-9 p-0' : 'w-full justify-start h-10 px-2'
-                  )}
-                >
-                  <Avatar className="h-7 w-7 flex-shrink-0">
-                    <AvatarFallback className="text-xs bg-primary/10 text-primary">
-                      {getInitials(user.name)}
-                    </AvatarFallback>
-                  </Avatar>
-                  {!collapsed && (
-                    <div className="flex flex-col items-start text-start min-w-0">
-                      <span className="text-sm font-medium truncate w-full">{user.name}</span>
-                      <span className="text-xs text-muted-foreground truncate w-full">مدير</span>
-                    </div>
-                  )}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side="top" align="end" className="w-48">
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col gap-1">
-                    <p className="text-sm font-medium">{user.name}</p>
-                    <p className="text-xs text-muted-foreground">مدير النظام</p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <NavLink to="/settings" className="cursor-pointer">
-                    <Settings className="h-4 w-4 me-2" />
-                    الإعدادات
-                  </NavLink>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  className="text-destructive focus:text-destructive cursor-pointer"
-                  onClick={logout}
-                >
-                  <LogOut className="h-4 w-4 me-2" />
-                  تسجيل الخروج
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
+        {/* User section + collapse toggle */}
+        <div className={cn('p-3 flex items-center', collapsed ? 'justify-center' : 'gap-3')}>
+          {user && !collapsed && (
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <div className="h-9 w-9 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 ring-1 ring-white/20">
+                <span className="text-xs font-bold text-white">{getInitials(user.name)}</span>
+              </div>
+              <div className="flex flex-col min-w-0">
+                <span className="text-sm font-medium text-white truncate">{user.name}</span>
+                <span className="text-[10px] text-white/50">مدير النظام</span>
+              </div>
+            </div>
+          )}
+          {user && collapsed && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-9 w-9 text-destructive hover:text-destructive hover:bg-destructive/10"
-                  onClick={logout}
-                >
-                  <LogOut className="h-4 w-4" />
-                </Button>
+                <div className="h-9 w-9 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 ring-1 ring-white/20 cursor-default">
+                  <span className="text-xs font-bold text-white">{getInitials(user.name)}</span>
+                </div>
               </TooltipTrigger>
-              <TooltipContent side="left">تسجيل الخروج</TooltipContent>
+              <TooltipContent side="left" className="font-medium">{user.name}</TooltipContent>
             </Tooltip>
           )}
+          {!collapsed && (
+            <button
+              onClick={() => setCollapsed(true)}
+              className="h-8 w-8 rounded-lg bg-white/8 hover:bg-white/15 flex items-center justify-center text-white/60 hover:text-white transition-all flex-shrink-0"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          )}
         </div>
+
+        {/* Expand button when collapsed */}
+        {collapsed && (
+          <div className="p-3 pt-0 flex justify-center">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => setCollapsed(false)}
+                  className="h-8 w-8 rounded-lg bg-white/8 hover:bg-white/15 flex items-center justify-center text-white/60 hover:text-white transition-all"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="left">توسيع القائمة</TooltipContent>
+            </Tooltip>
+          </div>
+        )}
       </aside>
 
       <HelpDrawer open={helpOpen} onClose={() => setHelpOpen(false)} />
