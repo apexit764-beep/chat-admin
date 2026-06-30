@@ -79,7 +79,7 @@ export function AdminTopbar(): JSX.Element {
 
   return (
     <TooltipProvider delayDuration={300}>
-      <header className="sticky top-0 z-10 px-6 py-4 flex items-center gap-4">
+      <header className="sticky top-0 z-10 px-6 py-4 flex items-center gap-4 bg-background/80 backdrop-blur-sm border-b border-border/40">
         {/* Title area */}
         <div className="flex flex-col min-w-0">
           <h1 className="text-xl font-bold text-foreground">{title}</h1>
