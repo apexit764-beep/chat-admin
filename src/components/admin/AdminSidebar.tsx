@@ -61,6 +61,7 @@ export function AdminSidebar(): JSX.Element {
   return (
     <TooltipProvider delayDuration={0}>
       <aside
+        dir="rtl"
         className={cn(
           'h-[calc(100vh-24px)] sticky top-3 rounded-2xl flex flex-col z-30 transition-[width] duration-300 ease-in-out overflow-hidden',
           sidebarWidth
@@ -120,7 +121,7 @@ export function AdminSidebar(): JSX.Element {
                 return (
                   <Tooltip key={item.to}>
                     <TooltipTrigger asChild>{linkEl}</TooltipTrigger>
-                    <TooltipContent side="left" className="font-medium">{item.label}</TooltipContent>
+                    <TooltipContent side="right" className="font-medium">{item.label}</TooltipContent>
                   </Tooltip>
                 );
               }
@@ -165,7 +166,7 @@ export function AdminSidebar(): JSX.Element {
                 return (
                   <Tooltip key={item.label}>
                     <TooltipTrigger asChild>{link}</TooltipTrigger>
-                    <TooltipContent side="left" className="font-medium">{item.label}</TooltipContent>
+                    <TooltipContent side="right" className="font-medium">{item.label}</TooltipContent>
                   </Tooltip>
                 );
               }
@@ -190,7 +191,7 @@ export function AdminSidebar(): JSX.Element {
                 return (
                   <Tooltip key={item.label}>
                     <TooltipTrigger asChild>{btn}</TooltipTrigger>
-                    <TooltipContent side="left" className="font-medium">{item.label}</TooltipContent>
+                    <TooltipContent side="right" className="font-medium">{item.label}</TooltipContent>
                   </Tooltip>
                 );
               }
@@ -249,7 +250,7 @@ export function AdminSidebar(): JSX.Element {
                   <span className="text-xs font-bold text-white">{getInitials(user.name)}</span>
                 </div>
               </TooltipTrigger>
-              <TooltipContent side="left" className="font-medium">{user.name}</TooltipContent>
+              <TooltipContent side="right" className="font-medium">{user.name}</TooltipContent>
             </Tooltip>
           )}
           {!collapsed && (
@@ -257,7 +258,7 @@ export function AdminSidebar(): JSX.Element {
               onClick={() => setCollapsed(true)}
               className="h-8 w-8 rounded-lg bg-white/8 hover:bg-white/15 flex items-center justify-center text-white/60 hover:text-white transition-all flex-shrink-0"
             >
-              <ChevronRight className="h-4 w-4" />
+              <ChevronLeft className="h-4 w-4" />
             </button>
           )}
         </div>
@@ -271,10 +272,10 @@ export function AdminSidebar(): JSX.Element {
                   onClick={() => setCollapsed(false)}
                   className="h-8 w-8 rounded-lg bg-white/8 hover:bg-white/15 flex items-center justify-center text-white/60 hover:text-white transition-all"
                 >
-                  <ChevronLeft className="h-4 w-4" />
+                  <ChevronRight className="h-4 w-4" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="left">توسيع القائمة</TooltipContent>
+              <TooltipContent side="right">توسيع القائمة</TooltipContent>
             </Tooltip>
           </div>
         )}
