@@ -66,7 +66,7 @@ export function AdminSidebar(): JSX.Element {
           sidebarWidth
         )}
         style={{
-          background: 'linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
+          background: 'linear-gradient(180deg, #0A1E3D 0%, #0D2B52 40%, #113B6E 70%, #1565A0 100%)',
         }}
       >
         {/* Logo area */}
