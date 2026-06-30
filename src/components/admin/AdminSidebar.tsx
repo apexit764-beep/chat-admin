@@ -75,7 +75,7 @@ export function AdminSidebar(): JSX.Element {
           collapsed ? 'justify-center px-3' : 'px-5'
         )}>
           <NavLink to="/dashboard" className="h-10 w-10 flex-shrink-0">
-            <img src="/qhub-icon.svg" alt="Qhub" className="h-10 w-10" />
+            <img src="/qhub-icon.png" alt="Qhub" className="h-10 w-10" />
           </NavLink>
           {!collapsed && (
             <div className="flex flex-col min-w-0">
