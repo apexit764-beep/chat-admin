@@ -3,8 +3,29 @@ import { useLocation } from 'react-router-dom';
 import { Bell, Moon, Search, Sun, HelpCircle } from 'lucide-react';
 import { useThemeStore } from '@/store/useThemeStore';
 import { useAuthStore } from '@/store/useAuthStore';
-import { Avatar, CommandPalette } from '@components/ui';
+import { CommandPalette } from '@components/ui';
 import { HelpDrawer } from '@components/layout/HelpDrawer';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import {
+  Avatar,
+  AvatarFallback,
+} from '@/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 const titleMap: Record<string, string> = {
   '/dashboard': 'لوحة التحكم',
@@ -16,11 +37,21 @@ const titleMap: Record<string, string> = {
   '/settings': 'الإعدادات',
 };
 
+function getInitials(name: string): string {
+  return name
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
+}
+
 export function AdminTopbar(): JSX.Element {
   const location = useLocation();
   const theme = useThemeStore((s) => s.theme);
   const toggleTheme = useThemeStore((s) => s.toggle);
   const user = useAuthStore((s) => s.user);
+  const logout = useAuthStore((s) => s.logout);
   const title = titleMap[location.pathname] ?? 'Apex Solutions';
   const [cmdOpen, setCmdOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
@@ -37,56 +68,131 @@ export function AdminTopbar(): JSX.Element {
   }, []);
 
   return (
-    <>
-      <header className="h-[56px] bg-white dark:bg-surface-dark border-b border-border-light dark:border-border-dark sticky top-0 z-10 flex items-center px-4 lg:px-6 gap-3">
+    <TooltipProvider delayDuration={300}>
+      <header className="h-14 bg-card border-b border-border sticky top-0 z-10 flex items-center px-4 lg:px-6 gap-3">
+        {/* Title + Admin badge */}
         <div className="flex items-center gap-3 flex-shrink-0">
-          <h1 className="text-h2 font-bold">{title}</h1>
-          <span className="hidden md:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-semibold uppercase tracking-wider">
+          <h1 className="text-lg font-bold text-foreground">{title}</h1>
+          <Badge variant="secondary" className="hidden md:inline-flex text-[10px] uppercase tracking-wider">
             Admin
-          </span>
+          </Badge>
         </div>
 
+        {/* Search / Command Palette trigger */}
         <div className="flex-1 max-w-md hidden md:block mx-4">
-          <button
+          <Button
+            variant="outline"
             onClick={() => setCmdOpen(true)}
-            className="w-full h-9 ps-3 pe-2 rounded-full bg-bg-light dark:bg-bg-dark border border-transparent text-small text-muted-light dark:text-muted-dark hover:border-border-light dark:hover:border-border-dark focus:outline-none focus:border-primary transition-all flex items-center gap-2"
+            className="w-full h-9 justify-start gap-2 text-muted-foreground font-normal rounded-lg"
           >
             <Search className="h-4 w-4 flex-shrink-0" />
             <span className="flex-1 text-start truncate">ابحث في العملاء، الفواتير، الباقات...</span>
-            <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark font-mono">⌘K</kbd>
-          </button>
+            <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] bg-muted border border-border font-mono pointer-events-none">
+              ⌘K
+            </kbd>
+          </Button>
         </div>
 
+        {/* Actions */}
         <div className="flex items-center gap-1 ms-auto">
-          <button
-            onClick={() => setHelpOpen(true)}
-            className="p-2 rounded-full text-muted-light dark:text-muted-dark hover:bg-bg-light dark:hover:bg-bg-dark hover:text-current transition-colors hidden sm:flex"
-            aria-label="المساعدة"
-            title="المساعدة"
-          >
-            <HelpCircle className="h-[18px] w-[18px]" />
-          </button>
-          <button
-            onClick={toggleTheme}
-            className="p-2 rounded-full text-muted-light dark:text-muted-dark hover:bg-bg-light dark:hover:bg-bg-dark hover:text-current transition-colors"
-            aria-label="تبديل الوضع"
-          >
-            {theme === 'dark' ? <Sun className="h-[18px] w-[18px]" /> : <Moon className="h-[18px] w-[18px]" />}
-          </button>
-          <button className="p-2 rounded-full text-muted-light dark:text-muted-dark hover:bg-bg-light dark:hover:bg-bg-dark hover:text-current transition-colors relative" aria-label="الإشعارات">
-            <Bell className="h-[18px] w-[18px]" />
-            <span className="absolute top-1 end-1 h-2 w-2 bg-danger rounded-full" />
-          </button>
+          {/* Mobile search */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden h-9 w-9"
+                onClick={() => setCmdOpen(true)}
+              >
+                <Search className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>بحث</TooltipContent>
+          </Tooltip>
+
+          {/* Help */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hidden sm:inline-flex h-9 w-9"
+                onClick={() => setHelpOpen(true)}
+              >
+                <HelpCircle className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>المساعدة</TooltipContent>
+          </Tooltip>
+
+          {/* Theme toggle */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9"
+                onClick={toggleTheme}
+              >
+                {theme === 'dark' ? (
+                  <Sun className="h-4 w-4" />
+                ) : (
+                  <Moon className="h-4 w-4" />
+                )}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>تبديل الوضع</TooltipContent>
+          </Tooltip>
+
+          {/* Notifications */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-9 w-9 relative">
+                <Bell className="h-4 w-4" />
+                <span className="absolute top-1.5 end-1.5 h-2 w-2 bg-destructive rounded-full" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>الإشعارات</TooltipContent>
+          </Tooltip>
+
+          {/* User profile dropdown */}
           {user && (
-            <div className="flex items-center gap-2 ms-2 px-2 py-1 rounded-full hover:bg-bg-light dark:hover:bg-bg-dark cursor-pointer">
-              <Avatar name={user.name} size="xs" />
-              <span className="text-small font-medium hidden sm:block">{user.name}</span>
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="gap-2 ms-1 h-9 px-2 rounded-lg"
+                >
+                  <Avatar className="h-7 w-7">
+                    <AvatarFallback className="text-xs bg-primary/10 text-primary">
+                      {getInitials(user.name)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="text-sm font-medium hidden sm:block">{user.name}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col gap-1">
+                    <p className="text-sm font-medium">{user.name}</p>
+                    <p className="text-xs text-muted-foreground">مدير النظام</p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="text-destructive focus:text-destructive cursor-pointer"
+                  onClick={logout}
+                >
+                  تسجيل الخروج
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
         </div>
       </header>
+
       <CommandPalette open={cmdOpen} onClose={() => setCmdOpen(false)} />
       <HelpDrawer open={helpOpen} onClose={() => setHelpOpen(false)} />
-    </>
+    </TooltipProvider>
   );
 }
