@@ -4,23 +4,14 @@ import { AnimatePresence, motion } from 'framer-motion';
 import {
   Search,
   Users,
-  MessageSquare,
   Package,
   CreditCard,
   Building2,
   Settings,
-  Inbox,
   BarChart3,
-  Smartphone,
-  Sparkles,
-  FileText,
   ArrowRight,
-  Globe,
 } from 'lucide-react';
-import { useDataStore } from '@/store/useDataStore';
 import { useAdminStore } from '@/store/useAdminStore';
-import { useInboxStore } from '@/store/useInboxStore';
-import { getAppMode } from '@/utils/mode';
 import { cn } from '@/utils/cn';
 
 interface CommandPaletteProps {
@@ -40,19 +31,10 @@ interface Item {
 
 export function CommandPalette({ open, onClose }: CommandPaletteProps): JSX.Element {
   const navigate = useNavigate();
-  const mode = getAppMode();
-  const isAdmin = mode === 'admin';
   const [query, setQuery] = useState('');
   const [active, setActive] = useState(0);
   const listRef = useRef<HTMLDivElement>(null);
 
-  // Client data
-  const conversations = useDataStore((s) => s.conversations);
-  const contacts = useDataStore((s) => s.contacts);
-  const channels = useDataStore((s) => s.channels);
-  const setSelectedId = useInboxStore((s) => s.setSelectedId);
-
-  // Admin data
   const adminClients = useAdminStore((s) => s.clients);
   const adminPlans = useAdminStore((s) => s.plans);
 
@@ -64,106 +46,42 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps): JSX.Elem
       keywords: `${label} ${hint ?? ''}`.toLowerCase(),
     });
 
-    if (isAdmin) {
-      result.push(
-        nav('/dashboard', 'لوحة التحكم', <BarChart3 className="h-4 w-4" />, 'نظرة عامة على المنصة'),
-        nav('/clients', 'العملاء', <Users className="h-4 w-4" />, 'إدارة العملاء'),
-        nav('/plans', 'الباقات', <Package className="h-4 w-4" />, 'الباقات والأسعار'),
-        nav('/finance', 'المالية', <CreditCard className="h-4 w-4" />, 'الفواتير والمعاملات'),
-        nav('/payments', 'بوابة الدفع', <CreditCard className="h-4 w-4" />, 'إعدادات Paymob'),
-        nav('/reports', 'التقارير', <BarChart3 className="h-4 w-4" />, 'تحليلات المنصة'),
-        nav('/settings', 'الإعدادات', <Settings className="h-4 w-4" />, 'إعدادات النظام'),
-      );
+    result.push(
+      nav('/dashboard', 'لوحة التحكم', <BarChart3 className="h-4 w-4" />, 'نظرة عامة على المنصة'),
+      nav('/clients', 'العملاء', <Users className="h-4 w-4" />, 'إدارة العملاء'),
+      nav('/plans', 'الباقات', <Package className="h-4 w-4" />, 'الباقات والأسعار'),
+      nav('/finance', 'المالية', <CreditCard className="h-4 w-4" />, 'الفواتير والمعاملات'),
+      nav('/payments', 'بوابة الدفع', <CreditCard className="h-4 w-4" />, 'إعدادات Paymob'),
+      nav('/reports', 'التقارير', <BarChart3 className="h-4 w-4" />, 'تحليلات المنصة'),
+      nav('/settings', 'الإعدادات', <Settings className="h-4 w-4" />, 'إعدادات النظام'),
+    );
 
-      // Clients (admin search)
-      adminClients.forEach((c) => {
-        result.push({
-          id: `client-${c.id}`,
-          label: c.companyName,
-          hint: `${c.contactName} · ${c.email}`,
-          icon: <Building2 className="h-4 w-4" />,
-          section: 'العملاء',
-          action: () => { navigate('/clients'); onClose(); },
-          keywords: `${c.companyName} ${c.contactName} ${c.email} ${c.phone}`.toLowerCase(),
-        });
+    adminClients.forEach((c) => {
+      result.push({
+        id: `client-${c.id}`,
+        label: c.companyName,
+        hint: `${c.contactName} · ${c.email}`,
+        icon: <Building2 className="h-4 w-4" />,
+        section: 'العملاء',
+        action: () => { navigate('/clients'); onClose(); },
+        keywords: `${c.companyName} ${c.contactName} ${c.email} ${c.phone}`.toLowerCase(),
       });
+    });
 
-      // Plans (admin search)
-      adminPlans.forEach((p) => {
-        result.push({
-          id: `plan-${p.id}`,
-          label: p.nameAr,
-          hint: p.tagline,
-          icon: <Package className="h-4 w-4" />,
-          section: 'الباقات',
-          action: () => { navigate('/plans'); onClose(); },
-          keywords: `${p.nameAr} ${p.name} ${p.tagline}`.toLowerCase(),
-        });
+    adminPlans.forEach((p) => {
+      result.push({
+        id: `plan-${p.id}`,
+        label: p.nameAr,
+        hint: p.tagline,
+        icon: <Package className="h-4 w-4" />,
+        section: 'الباقات',
+        action: () => { navigate('/plans'); onClose(); },
+        keywords: `${p.nameAr} ${p.name} ${p.tagline}`.toLowerCase(),
       });
-    } else {
-      result.push(
-        nav('/inbox', 'صندوق الوارد', <Inbox className="h-4 w-4" />, 'كل المحادثات'),
-        nav('/contacts', 'جهات الاتصال', <Users className="h-4 w-4" />, 'قاعدة العملاء'),
-        nav('/channels', 'القنوات', <Smartphone className="h-4 w-4" />, 'أرقام وقنوات'),
-        nav('/departments', 'الأقسام', <Building2 className="h-4 w-4" />, 'فرق العمل'),
-        nav('/campaigns', 'الحملات', <FileText className="h-4 w-4" />, 'إرسال جماعي'),
-        nav('/saved-replies', 'الردود المحفوظة', <FileText className="h-4 w-4" />, 'قوالب جاهزة'),
-        nav('/team', 'الفريق', <Users className="h-4 w-4" />, 'الموظفون'),
-        nav('/integrations', 'التكاملات', <Sparkles className="h-4 w-4" />, 'Messenger, Instagram...'),
-        nav('/widget', 'Live Chat Widget', <Globe className="h-4 w-4" />, 'شات الموقع'),
-        nav('/reports', 'التقارير', <BarChart3 className="h-4 w-4" />, 'تحليلات الأداء'),
-        nav('/billing', 'الفوترة', <CreditCard className="h-4 w-4" />, 'الاشتراك والفواتير'),
-        nav('/subscribe', 'الباقات', <Package className="h-4 w-4" />, 'ترقية الاشتراك'),
-        nav('/settings', 'الإعدادات', <Settings className="h-4 w-4" />, 'إعدادات الحساب'),
-      );
+    });
 
-      // Recent conversations
-      conversations.slice(0, 20).forEach((conv) => {
-        const contact = contacts.find((c) => c.id === conv.contactId);
-        if (!contact) return;
-        result.push({
-          id: `conv-${conv.id}`,
-          label: contact.name,
-          hint: conv.lastMessage,
-          icon: <MessageSquare className="h-4 w-4" />,
-          section: 'المحادثات',
-          action: () => {
-            setSelectedId(conv.id);
-            navigate('/inbox');
-            onClose();
-          },
-          keywords: `${contact.name} ${contact.phone} ${conv.lastMessage}`.toLowerCase(),
-        });
-      });
-
-      // Contacts
-      contacts.slice(0, 30).forEach((c) => {
-        result.push({
-          id: `contact-${c.id}`,
-          label: c.name,
-          hint: c.phone,
-          icon: <Users className="h-4 w-4" />,
-          section: 'جهات الاتصال',
-          action: () => { navigate('/contacts'); onClose(); },
-          keywords: `${c.name} ${c.phone}`.toLowerCase(),
-        });
-      });
-
-      // Channels
-      channels.forEach((ch) => {
-        result.push({
-          id: `channel-${ch.id}`,
-          label: ch.name,
-          hint: ch.identifier,
-          icon: <Smartphone className="h-4 w-4" />,
-          section: 'القنوات',
-          action: () => { navigate('/channels'); onClose(); },
-          keywords: `${ch.name} ${ch.identifier} ${ch.type}`.toLowerCase(),
-        });
-      });
-    }
     return result;
-  }, [isAdmin, navigate, onClose, adminClients, adminPlans, conversations, contacts, channels, setSelectedId]);
+  }, [navigate, onClose, adminClients, adminPlans]);
 
   const filtered = useMemo(() => {
     if (!query.trim()) return items;
@@ -175,7 +93,6 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps): JSX.Elem
     );
   }, [items, query]);
 
-  // Group by section
   const grouped = useMemo(() => {
     const map = new Map<string, Item[]>();
     filtered.forEach((it) => {
@@ -186,7 +103,6 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps): JSX.Elem
     return Array.from(map.entries());
   }, [filtered]);
 
-  // Reset active when query changes
   useEffect(() => { setActive(0); }, [query]);
   useEffect(() => { if (open) setQuery(''); }, [open]);
 
@@ -242,7 +158,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps): JSX.Elem
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder={isAdmin ? 'ابحث في العملاء، الباقات، الفواتير...' : 'ابحث في المحادثات، جهات الاتصال، الصفحات...'}
+                placeholder="ابحث في العملاء، الباقات، الفواتير..."
                 className="flex-1 bg-transparent text-body focus:outline-none placeholder-muted-light dark:placeholder-muted-dark"
               />
               <kbd className="px-1.5 py-0.5 rounded text-[10px] bg-bg-light dark:bg-bg-dark text-muted-light dark:text-muted-dark border border-border-light dark:border-border-dark">ESC</kbd>

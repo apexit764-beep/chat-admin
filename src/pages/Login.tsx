@@ -8,17 +8,14 @@ import {
   Shield,
   Sparkles,
   CheckCircle2,
-  MessageSquare,
-  BarChart3,
-  Globe,
   Users,
   CreditCard,
-  Zap,
+  BarChart3,
+  Globe,
   ArrowRight,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuthStore } from '@/store/useAuthStore';
-import { getAppMode } from '@/utils/mode';
 import { Modal, useConfirm } from '@components/ui';
 import { cn } from '@/utils/cn';
 
@@ -27,14 +24,10 @@ export default function Login(): JSX.Element {
   const login = useAuthStore((s) => s.login);
   const navigate = useNavigate();
   const location = useLocation();
-  const mode = getAppMode();
-  const isAdmin = mode === 'admin';
 
-  const from =
-    (location.state as { from?: string } | null)?.from ?? (isAdmin ? '/dashboard' : '/inbox');
+  const from = (location.state as { from?: string } | null)?.from ?? '/dashboard';
 
-  const defaultEmail = isAdmin ? 'admin@apexes.click' : 'admin@qhub.com';
-  const [email, setEmail] = useState(defaultEmail);
+  const [email, setEmail] = useState('admin@apexes.click');
   const [password, setPassword] = useState('admin123');
   const [showPwd, setShowPwd] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -85,7 +78,6 @@ export default function Login(): JSX.Element {
       alert({ title: 'بريد غير صالح', message: 'أدخل بريداً إلكترونياً صحيحاً', variant: 'warning' });
       return;
     }
-    // Simulate sending reset email
     setTimeout(() => setResetSent(true), 500);
   };
 
@@ -96,31 +88,18 @@ export default function Login(): JSX.Element {
         {/* Logo / brand */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div
-              className={cn(
-                'h-9 w-9 rounded-lg flex items-center justify-center text-white font-extrabold text-base',
-                isAdmin
-                  ? 'bg-gradient-to-br from-primary to-primary-dark shadow-md shadow-primary/30'
-                  : 'bg-primary shadow-md shadow-primary/20'
-              )}
-            >
-              {isAdmin ? 'A' : 'س'}
+            <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-primary to-primary-dark shadow-md shadow-primary/30 flex items-center justify-center text-white font-extrabold text-base">
+              A
             </div>
             <div>
-              <p className="font-extrabold text-lg leading-tight">
-                {isAdmin ? 'Apex Solutions' : 'Qhub'}
-              </p>
-              <p className="text-[10px] text-muted-light dark:text-muted-dark leading-tight">
-                {isAdmin ? 'Admin Console' : 'WhatsApp CRM'}
-              </p>
+              <p className="font-extrabold text-lg leading-tight">Apex Solutions</p>
+              <p className="text-[10px] text-muted-light dark:text-muted-dark leading-tight">Admin Console</p>
             </div>
           </div>
-          {isAdmin && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-danger/10 text-danger text-[10px] font-bold uppercase tracking-wider">
-              <Shield className="h-3 w-3" />
-              للموظفين فقط
-            </span>
-          )}
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-danger/10 text-danger text-[10px] font-bold uppercase tracking-wider">
+            <Shield className="h-3 w-3" />
+            للموظفين فقط
+          </span>
         </div>
 
         {/* Form */}
@@ -130,20 +109,14 @@ export default function Login(): JSX.Element {
           transition={{ duration: 0.3 }}
           className="my-auto max-w-md w-full mx-auto"
         >
-          <h1 className="text-display font-extrabold mb-2">
-            {isAdmin ? 'مرحباً بعودتك 👋' : 'مرحباً بعودتك 👋'}
-          </h1>
+          <h1 className="text-display font-extrabold mb-2">مرحباً بعودتك 👋</h1>
           <p className="text-body text-muted-light dark:text-muted-dark mb-8">
-            {isAdmin
-              ? 'سجّل دخولك للوصول إلى لوحة إدارة Apex Solutions'
-              : 'سجّل دخولك لإدارة محادثاتك في Qhub'}
+            سجّل دخولك للوصول إلى لوحة إدارة Apex Solutions
           </p>
 
           <form onSubmit={onSubmit} className="space-y-4">
             <div className="space-y-1.5">
-              <label className="text-small font-semibold text-[#374151] dark:text-[#D1D5DB]">
-                البريد الإلكتروني
-              </label>
+              <label className="text-small font-semibold text-[#374151] dark:text-[#D1D5DB]">البريد الإلكتروني</label>
               <div className="relative">
                 <Mail className="h-4 w-4 absolute end-3 top-1/2 -translate-y-1/2 text-muted-light dark:text-muted-dark" />
                 <input
@@ -165,9 +138,7 @@ export default function Login(): JSX.Element {
 
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <label className="text-small font-semibold text-[#374151] dark:text-[#D1D5DB]">
-                  كلمة المرور
-                </label>
+                <label className="text-small font-semibold text-[#374151] dark:text-[#D1D5DB]">كلمة المرور</label>
                 <button type="button" onClick={() => { setResetEmail(email); setResetSent(false); setForgotOpen(true); }} className="text-small text-primary font-medium hover:underline">
                   نسيت كلمة المرور؟
                 </button>
@@ -223,14 +194,7 @@ export default function Login(): JSX.Element {
             <button
               type="submit"
               disabled={loading}
-              className={cn(
-                'w-full h-12 rounded-xl text-white text-body font-semibold flex items-center justify-center gap-2 transition-all',
-                'shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30',
-                'disabled:opacity-50 disabled:cursor-not-allowed',
-                isAdmin
-                  ? 'bg-gradient-to-r from-primary to-primary-dark hover:from-primary-dark hover:to-primary'
-                  : 'bg-primary hover:bg-primary-dark'
-              )}
+              className="w-full h-12 rounded-xl text-white text-body font-semibold flex items-center justify-center gap-2 transition-all bg-gradient-to-r from-primary to-primary-dark hover:from-primary-dark hover:to-primary shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <span className="h-5 w-5 rounded-full border-2 border-white border-t-transparent animate-spin" />
@@ -250,27 +214,10 @@ export default function Login(): JSX.Element {
                 بيانات تجريبية
               </p>
               <div className="space-y-0.5 text-small font-mono">
-                <p>
-                  <span className="text-muted-light dark:text-muted-dark">📧</span> {defaultEmail}
-                </p>
-                <p>
-                  <span className="text-muted-light dark:text-muted-dark">🔑</span> admin123
-                </p>
+                <p><span className="text-muted-light dark:text-muted-dark">📧</span> admin@apexes.click</p>
+                <p><span className="text-muted-light dark:text-muted-dark">🔑</span> admin123</p>
               </div>
             </div>
-          </div>
-
-          {/* Cross-link to other portal */}
-          <div className="mt-5 text-center">
-            <p className="text-small text-muted-light dark:text-muted-dark">
-              {isAdmin ? 'هل أنت عميل؟' : 'هل تبحث عن لوحة الإدارة؟'}{' '}
-              <a
-                href={isAdmin ? '/client' : 'https://chat-admin.apexes.click'}
-                className="text-primary font-semibold hover:underline"
-              >
-                {isAdmin ? 'دخول العملاء →' : 'لوحة الإدارة →'}
-              </a>
-            </p>
           </div>
         </motion.div>
 
@@ -325,7 +272,7 @@ export default function Login(): JSX.Element {
 
         {/* Footer */}
         <div className="flex items-center justify-between text-small text-muted-light dark:text-muted-dark">
-          <p>© 2026 {isAdmin ? 'Apex Solutions' : 'Qhub'}</p>
+          <p>© 2026 Apex Solutions</p>
           <div className="flex items-center gap-3">
             <a href="#" className="hover:text-current">الخصوصية</a>
             <a href="#" className="hover:text-current">الشروط</a>
@@ -336,30 +283,28 @@ export default function Login(): JSX.Element {
 
       {/* Right: hero column */}
       <div className="hidden lg:flex flex-1 relative overflow-hidden">
-        <HeroPanel isAdmin={isAdmin} />
+        <HeroPanel />
       </div>
     </div>
   );
 }
 
-function HeroPanel({ isAdmin }: { isAdmin: boolean }): JSX.Element {
+function HeroPanel(): JSX.Element {
+  const features = [
+    { icon: <Users className="h-5 w-5" />, title: 'إدارة العملاء', desc: '12 عميل عبر 8 دول' },
+    { icon: <CreditCard className="h-5 w-5" />, title: 'Paymob متصل', desc: 'دفع Visa آمن' },
+    { icon: <BarChart3 className="h-5 w-5" />, title: 'تحليلات لحظية', desc: 'MRR · ARPU · LTV' },
+    { icon: <Globe className="h-5 w-5" />, title: 'متعدد الدول', desc: '8 عملات مدعومة' },
+  ];
+
   return (
-    <div
-      className={cn(
-        'flex-1 relative text-white p-12 flex flex-col justify-between',
-        isAdmin
-          ? 'bg-gradient-to-br from-[#1e3a8a] via-primary-dark to-[#2563EB]'
-          : 'bg-gradient-to-br from-primary via-primary-dark to-[#1e40af]'
-      )}
-    >
-      {/* Decorative blobs */}
+    <div className="flex-1 relative text-white p-12 flex flex-col justify-between bg-gradient-to-br from-[#1e3a8a] via-primary-dark to-[#2563EB]">
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-32 -end-32 h-96 w-96 rounded-full bg-white/10 blur-3xl" />
         <div className="absolute -bottom-32 -start-32 h-96 w-96 rounded-full bg-white/5 blur-3xl" />
         <div className="absolute top-1/3 start-1/4 h-64 w-64 rounded-full bg-white/5 blur-3xl" />
       </div>
 
-      {/* Top quote */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -368,39 +313,23 @@ function HeroPanel({ isAdmin }: { isAdmin: boolean }): JSX.Element {
       >
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur text-[10px] font-bold uppercase tracking-wider mb-4">
           <Sparkles className="h-3 w-3" />
-          {isAdmin ? 'Admin Console v2.0' : 'Qhub CRM v2.0'}
+          Admin Console v2.0
         </div>
         <h2 className="text-h1 lg:text-display font-extrabold leading-tight mb-3">
-          {isAdmin ? 'منصّة إدارة منتج SaaS متكاملة' : 'تواصل أفضل، عملاء أسعد'}
+          منصّة إدارة منتج SaaS متكاملة
         </h2>
         <p className="text-body lg:text-base opacity-90 max-w-md">
-          {isAdmin
-            ? 'تابع عملاءك، أرباحك، واشتراكاتك من مكان واحد. كل ما تحتاجه لإدارة SaaS احترافي'
-            : 'صندوق وارد موحّد لكل أرقام الواتساب، التواصل المتعدد القنوات، وإدارة فريق متكاملة'}
+          تابع عملاءك، أرباحك، واشتراكاتك من مكان واحد. كل ما تحتاجه لإدارة SaaS احترافي
         </p>
       </motion.div>
 
-      {/* Middle: feature cards */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.2 }}
         className="relative grid grid-cols-2 gap-3 max-w-md"
       >
-        {(isAdmin
-          ? [
-              { icon: <Users className="h-5 w-5" />, title: 'إدارة العملاء', desc: '12 عميل عبر 8 دول' },
-              { icon: <CreditCard className="h-5 w-5" />, title: 'Paymob متصل', desc: 'دفع Visa آمن' },
-              { icon: <BarChart3 className="h-5 w-5" />, title: 'تحليلات لحظية', desc: 'MRR · ARPU · LTV' },
-              { icon: <Globe className="h-5 w-5" />, title: 'متعدد الدول', desc: '8 عملات مدعومة' },
-            ]
-          : [
-              { icon: <MessageSquare className="h-5 w-5" />, title: 'صندوق موحّد', desc: 'كل القنوات' },
-              { icon: <Users className="h-5 w-5" />, title: 'فريق متعاون', desc: 'حتى 5 موظفين' },
-              { icon: <Zap className="h-5 w-5" />, title: 'ردود سريعة', desc: 'قوالب جاهزة' },
-              { icon: <BarChart3 className="h-5 w-5" />, title: 'تقارير حية', desc: 'أداء كل موظف' },
-            ]
-        ).map((f, i) => (
+        {features.map((f, i) => (
           <motion.div
             key={i}
             initial={{ opacity: 0, y: 8 }}
@@ -417,47 +346,29 @@ function HeroPanel({ isAdmin }: { isAdmin: boolean }): JSX.Element {
         ))}
       </motion.div>
 
-      {/* Bottom: testimonial / stats */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.5 }}
         className="relative"
       >
-        {isAdmin ? (
-          <div className="grid grid-cols-3 gap-6 max-w-lg">
-            <div>
-              <p className="text-display font-extrabold leading-none">12+</p>
-              <p className="text-small opacity-80 mt-1">عميل نشط</p>
-            </div>
-            <div>
-              <p className="text-display font-extrabold leading-none">$3K</p>
-              <p className="text-small opacity-80 mt-1">MRR شهري</p>
-            </div>
-            <div>
-              <p className="text-display font-extrabold leading-none">+18%</p>
-              <p className="text-small opacity-80 mt-1">نمو شهري</p>
-            </div>
+        <div className="grid grid-cols-3 gap-6 max-w-lg">
+          <div>
+            <p className="text-display font-extrabold leading-none">12+</p>
+            <p className="text-small opacity-80 mt-1">عميل نشط</p>
           </div>
-        ) : (
-          <blockquote className="max-w-md">
-            <p className="text-body italic opacity-95 leading-relaxed mb-3">
-              "Qhub وفّرت علينا ساعات يومياً. كل الفريق يشتغل على نفس الصندوق، ومحدّ بيضيع منا عميل. أفضل قرار خذيناه السنة"
-            </p>
-            <div className="flex items-center gap-2">
-              <div className="h-9 w-9 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-base font-bold">
-                س
-              </div>
-              <div>
-                <p className="text-small font-semibold">سالم الرواحي</p>
-                <p className="text-[10px] opacity-75">مدير، Qhub</p>
-              </div>
-            </div>
-          </blockquote>
-        )}
+          <div>
+            <p className="text-display font-extrabold leading-none">$3K</p>
+            <p className="text-small opacity-80 mt-1">MRR شهري</p>
+          </div>
+          <div>
+            <p className="text-display font-extrabold leading-none">+18%</p>
+            <p className="text-small opacity-80 mt-1">نمو شهري</p>
+          </div>
+        </div>
         <div className="flex items-center gap-2 mt-5 pt-5 border-t border-white/15 text-small opacity-90">
           <CheckCircle2 className="h-4 w-4" />
-          <span>{isAdmin ? 'SSO + 2FA · SOC 2 Type II' : 'تشفير end-to-end · جاهز للمؤسسات'}</span>
+          <span>SSO + 2FA · SOC 2 Type II</span>
         </div>
       </motion.div>
     </div>
