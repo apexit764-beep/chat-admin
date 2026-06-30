@@ -14,13 +14,7 @@ import {
   Globe,
 } from 'lucide-react';
 import {
-  Avatar,
-  Card,
   DataTable,
-  Drawer,
-  Input,
-  Modal,
-  Select,
   StatCard,
   useConfirm,
   type Column,
@@ -30,7 +24,40 @@ import { useUIStore } from '@/store/useUIStore';
 import { formatMoney } from '@/utils/money';
 import { formatDate, timeAgo } from '@/utils/format';
 import { downloadCsv } from '@/utils/csv';
-import { cn } from '@/utils/cn';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu';
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
 import type { Client, ClientStatus } from '@/types';
 
 const statusLabel: Record<ClientStatus, string> = {
@@ -41,13 +68,22 @@ const statusLabel: Record<ClientStatus, string> = {
   cancelled: 'ملغي',
 };
 
-const statusClass: Record<ClientStatus, string> = {
-  trial: 'bg-info/15 text-info',
-  active: 'bg-success/15 text-success',
-  past_due: 'bg-warning/15 text-warning',
-  suspended: 'bg-danger/15 text-danger',
-  cancelled: 'bg-bg-light dark:bg-bg-dark text-muted-light dark:text-muted-dark',
+const statusBadgeClass: Record<ClientStatus, string> = {
+  trial: 'bg-info/15 text-info border-transparent',
+  active: 'bg-success/15 text-success border-transparent',
+  past_due: 'bg-warning/15 text-warning border-transparent',
+  suspended: 'bg-danger/15 text-danger border-transparent',
+  cancelled: 'bg-muted text-muted-foreground border-transparent',
 };
+
+function getInitials(name: string): string {
+  return name
+    .split(/\s+/)
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+}
 
 export default function AdminClients(): JSX.Element {
   const clients = useAdminStore((s) => s.clients);
@@ -65,7 +101,6 @@ export default function AdminClients(): JSX.Element {
   const [statusFilter, setStatusFilter] = useState<'all' | ClientStatus>('all');
   const [countryFilter, setCountryFilter] = useState<'all' | string>('all');
   const [planFilter, setPlanFilter] = useState<'all' | string>('all');
-  const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Client | null>(null);
   const [drawer, setDrawer] = useState<Client | null>(null);
@@ -121,7 +156,6 @@ export default function AdminClients(): JSX.Element {
     });
     setErrors({});
     setModalOpen(true);
-    setOpenMenu(null);
   };
 
   const submit = (): void => {
@@ -171,7 +205,6 @@ export default function AdminClients(): JSX.Element {
       deleteClient(c.id);
       showToast('تم حذف العميل', 'success');
       setDrawer(null);
-      setOpenMenu(null);
     }
   };
 
@@ -185,7 +218,6 @@ export default function AdminClients(): JSX.Element {
     if (ok) {
       suspendClient(c.id);
       showToast('تم إيقاف العميل', 'success');
-      setOpenMenu(null);
     }
   };
 
@@ -219,10 +251,12 @@ export default function AdminClients(): JSX.Element {
       key: 'company', header: 'العميل', accessor: (r) => r.companyName,
       cell: (r) => (
         <div className="flex items-center gap-3 min-w-0">
-          <Avatar name={r.companyName} size="sm" />
+          <Avatar className="h-8 w-8">
+            <AvatarFallback className="text-xs">{getInitials(r.companyName)}</AvatarFallback>
+          </Avatar>
           <div className="min-w-0">
             <p className="font-semibold truncate">{r.companyName}</p>
-            <p className="text-small text-muted-light dark:text-muted-dark truncate">{r.email}</p>
+            <p className="text-small text-muted-foreground truncate">{r.email}</p>
           </div>
         </div>
       ),
@@ -239,58 +273,76 @@ export default function AdminClients(): JSX.Element {
         );
       },
     },
-    { key: 'industry', header: 'القطاع', accessor: (r) => r.industry, hideOn: 'lg', cell: (r) => <span className="text-muted-light dark:text-muted-dark text-small">{r.industry}</span> },
+    { key: 'industry', header: 'القطاع', accessor: (r) => r.industry, hideOn: 'lg', cell: (r) => <span className="text-muted-foreground text-small">{r.industry}</span> },
     {
       key: 'plan', header: 'الباقة', accessor: (r) => r.planId ?? '',
       cell: (r) => {
         const plan = plans.find((p) => p.id === r.planId);
-        return plan ? <span className="text-small font-medium">{plan.nameAr}</span> : <span className="text-small text-muted-light dark:text-muted-dark italic">بدون باقة</span>;
+        return plan ? <span className="text-small font-medium">{plan.nameAr}</span> : <span className="text-small text-muted-foreground italic">بدون باقة</span>;
       },
     },
     {
       key: 'mrr', header: 'MRR', accessor: (r) => r.mrr,
-      cell: (r) => r.mrr > 0 ? <span className="font-semibold">{formatMoney(r.mrr, r.currency)}</span> : <span className="text-muted-light dark:text-muted-dark">—</span>,
+      cell: (r) => r.mrr > 0 ? <span className="font-semibold">{formatMoney(r.mrr, r.currency)}</span> : <span className="text-muted-foreground">—</span>,
     },
-    { key: 'last', header: 'آخر نشاط', accessor: (r) => r.lastActiveAt, hideOn: 'lg', cell: (r) => <span className="text-muted-light dark:text-muted-dark text-small">{timeAgo(r.lastActiveAt)}</span> },
+    { key: 'last', header: 'آخر نشاط', accessor: (r) => r.lastActiveAt, hideOn: 'lg', cell: (r) => <span className="text-muted-foreground text-small">{timeAgo(r.lastActiveAt)}</span> },
     {
       key: 'status', header: 'الحالة', accessor: (r) => r.status,
-      cell: (r) => <span className={cn('inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold', statusClass[r.status])}>{statusLabel[r.status]}</span>,
+      cell: (r) => (
+        <Badge className={cn('text-[10px] font-semibold', statusBadgeClass[r.status])}>
+          {statusLabel[r.status]}
+        </Badge>
+      ),
     },
     {
       key: 'actions', header: '', sortable: false, width: '100px', align: 'end',
       cell: (r) => (
         <div className="flex items-center gap-1 justify-end" onClick={(e) => e.stopPropagation()}>
-          <a href={r.dashboardUrl} target="_blank" rel="noreferrer" title="فتح داشبورد العميل" className="h-8 w-8 rounded-full hover:bg-primary/10 text-muted-light dark:text-muted-dark hover:text-primary flex items-center justify-center">
-            <ExternalLink className="h-4 w-4" />
-          </a>
-          <div className="relative">
-            <button onClick={() => setOpenMenu(openMenu === r.id ? null : r.id)} className="h-8 w-8 rounded-full hover:bg-bg-light dark:hover:bg-bg-dark text-muted-light dark:text-muted-dark flex items-center justify-center" aria-label="المزيد">
-              <MoreHorizontal className="h-4 w-4" />
-            </button>
-            {openMenu === r.id && (
-              <>
-                <div className="fixed inset-0 z-10" onClick={() => setOpenMenu(null)} />
-                <div className="absolute end-0 mt-1 w-48 bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-card shadow-card-hover py-1 z-20">
-                  <MenuItem icon={<Eye className="h-4 w-4" />} label="عرض التفاصيل" onClick={() => { setDrawer(r); setOpenMenu(null); }} />
-                  <MenuItem icon={<Edit2 className="h-4 w-4" />} label="تعديل" onClick={() => openEdit(r)} />
-                  {r.status === 'suspended' ? (
-                    <MenuItem icon={<PlayCircle className="h-4 w-4" />} label="إعادة تفعيل" onClick={() => { reactivateClient(r.id); showToast('تم التفعيل', 'success'); setOpenMenu(null); }} />
-                  ) : (
-                    <MenuItem icon={<PauseCircle className="h-4 w-4" />} label="إيقاف" onClick={() => handleSuspend(r)} />
-                  )}
-                  <div className="h-px bg-border-light dark:bg-border-dark my-1" />
-                  <MenuItem icon={<Trash2 className="h-4 w-4" />} label="حذف" danger onClick={() => remove(r)} />
-                </div>
-              </>
-            )}
-          </div>
+          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:text-primary" asChild>
+            <a href={r.dashboardUrl} target="_blank" rel="noreferrer" title="فتح داشبورد العميل">
+              <ExternalLink className="h-4 w-4" />
+            </a>
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground" aria-label="المزيد">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={() => setDrawer(r)}>
+                <Eye className="h-4 w-4 me-2" />
+                عرض التفاصيل
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => openEdit(r)}>
+                <Edit2 className="h-4 w-4 me-2" />
+                تعديل
+              </DropdownMenuItem>
+              {r.status === 'suspended' ? (
+                <DropdownMenuItem onClick={() => { reactivateClient(r.id); showToast('تم التفعيل', 'success'); }}>
+                  <PlayCircle className="h-4 w-4 me-2" />
+                  إعادة تفعيل
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem onClick={() => handleSuspend(r)}>
+                  <PauseCircle className="h-4 w-4 me-2" />
+                  إيقاف
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="text-danger focus:text-danger" onClick={() => remove(r)}>
+                <Trash2 className="h-4 w-4 me-2" />
+                حذف
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       ),
     },
   ];
 
   return (
-    <div className="p-4 lg:p-6 space-y-5 page-fade">
+    <div className="p-4 lg:p-6 space-y-5">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="إجمالي العملاء" value={stats.total} icon={<Globe className="h-5 w-5" />} iconBg="bg-primary/15" iconColor="text-primary" />
         <StatCard label="نشطون" value={stats.active} icon={<PlayCircle className="h-5 w-5" />} iconBg="bg-success/15" iconColor="text-success" />
@@ -308,14 +360,14 @@ export default function AdminClients(): JSX.Element {
         selectable
         bulkActions={(selected, clear) => (
           <>
-            <button onClick={() => { handleExport(selected); clear(); }} className="h-8 px-3 rounded-full bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark text-small font-medium hover:bg-bg-light dark:hover:bg-bg-dark flex items-center gap-1.5">
-              <Download className="h-3.5 w-3.5" /> تصدير المحدّد
-            </button>
+            <Button variant="outline" size="sm" className="rounded-full" onClick={() => { handleExport(selected); clear(); }}>
+              <Download className="h-3.5 w-3.5 me-1.5" /> تصدير المحدّد
+            </Button>
           </>
         )}
         toolbar={
           <>
-            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as 'all' | ClientStatus)} className="h-9 px-3 rounded-full bg-bg-light dark:bg-bg-dark border border-transparent text-small focus:outline-none focus:border-primary">
+            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as 'all' | ClientStatus)} className="h-9 px-3 rounded-full bg-muted border border-transparent text-small focus:outline-none focus:border-primary">
               <option value="all">كل الحالات</option>
               <option value="trial">تجريبي</option>
               <option value="active">نشط</option>
@@ -323,62 +375,146 @@ export default function AdminClients(): JSX.Element {
               <option value="suspended">موقوف</option>
               <option value="cancelled">ملغي</option>
             </select>
-            <select value={countryFilter} onChange={(e) => setCountryFilter(e.target.value)} className="h-9 px-3 rounded-full bg-bg-light dark:bg-bg-dark border border-transparent text-small focus:outline-none focus:border-primary">
+            <select value={countryFilter} onChange={(e) => setCountryFilter(e.target.value)} className="h-9 px-3 rounded-full bg-muted border border-transparent text-small focus:outline-none focus:border-primary">
               <option value="all">كل الدول</option>
               {countries.map((c) => <option key={c.code} value={c.code}>{c.flag} {c.nameAr}</option>)}
             </select>
-            <select value={planFilter} onChange={(e) => setPlanFilter(e.target.value)} className="h-9 px-3 rounded-full bg-bg-light dark:bg-bg-dark border border-transparent text-small focus:outline-none focus:border-primary">
+            <select value={planFilter} onChange={(e) => setPlanFilter(e.target.value)} className="h-9 px-3 rounded-full bg-muted border border-transparent text-small focus:outline-none focus:border-primary">
               <option value="all">كل الباقات</option>
               {plans.map((p) => <option key={p.id} value={p.id}>{p.nameAr}</option>)}
             </select>
-            <button onClick={() => handleExport(filtered)} className="h-9 px-4 rounded-full border border-border-light dark:border-border-dark text-small font-medium hover:bg-bg-light dark:hover:bg-bg-dark flex items-center gap-2">
-              <Download className="h-4 w-4" /> CSV
-            </button>
-            <button onClick={openCreate} className="h-9 px-4 rounded-full bg-primary hover:bg-primary-dark text-white text-small font-medium flex items-center gap-2">
-              <Plus className="h-4 w-4" /> إضافة عميل
-            </button>
+            <Button variant="outline" size="sm" className="h-9 rounded-full" onClick={() => handleExport(filtered)}>
+              <Download className="h-4 w-4 me-2" /> CSV
+            </Button>
+            <Button size="sm" className="h-9 rounded-full" onClick={openCreate}>
+              <Plus className="h-4 w-4 me-2" /> إضافة عميل
+            </Button>
           </>
         }
       />
 
-      <Modal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        title={editing ? `تعديل ${editing.companyName}` : 'إضافة عميل جديد'}
-        size="lg"
-        footer={
-          <>
-            <button onClick={() => setModalOpen(false)} className="h-10 px-5 rounded-full border border-border-light dark:border-border-dark text-small font-medium hover:bg-bg-light dark:hover:bg-bg-dark">إلغاء</button>
-            <button onClick={submit} className="h-10 px-5 rounded-full bg-primary hover:bg-primary-dark text-white text-small font-medium">{editing ? 'حفظ' : 'إضافة'}</button>
-          </>
-        }
-      >
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <Input label="اسم الشركة" value={form.companyName} onChange={(e) => { setForm({ ...form, companyName: e.target.value }); setErrors({ ...errors, companyName: undefined }); }} placeholder="مثال: سكة" error={errors.companyName ?? undefined} />
-          <Input label="جهة الاتصال" value={form.contactName} onChange={(e) => { setForm({ ...form, contactName: e.target.value }); setErrors({ ...errors, contactName: undefined }); }} placeholder="الاسم الكامل" error={errors.contactName ?? undefined} />
-          <Input label="البريد الإلكتروني" type="email" value={form.email} onChange={(e) => { setForm({ ...form, email: e.target.value }); setErrors({ ...errors, email: undefined }); }} icon={<Mail className="h-4 w-4" />} error={errors.email ?? undefined} />
-          <Input label="رقم الجوال" value={form.phone} onChange={(e) => { setForm({ ...form, phone: e.target.value }); setErrors({ ...errors, phone: undefined }); }} icon={<Phone className="h-4 w-4" />} error={errors.phone ?? undefined} />
-          <Select label="الدولة" value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })}>
-            {countries.map((c) => (<option key={c.code} value={c.code}>{c.flag} {c.nameAr} ({c.currency})</option>))}
-          </Select>
-          <Input label="القطاع" value={form.industry} onChange={(e) => setForm({ ...form, industry: e.target.value })} placeholder="مثلاً: عقارات، تجزئة..." />
-          <Select label="الحالة" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value as ClientStatus })}>
-            <option value="trial">فترة تجريبية</option>
-            <option value="active">نشط</option>
-            <option value="past_due">متأخر</option>
-            <option value="suspended">موقوف</option>
-            <option value="cancelled">ملغي</option>
-          </Select>
-          <Select label="الباقة" value={form.planId} onChange={(e) => setForm({ ...form, planId: e.target.value })}>
-            <option value="">بدون باقة</option>
-            {plans.map((p) => (<option key={p.id} value={p.id}>{p.nameAr} — {formatMoney(p.pricesPerCountry[form.country]?.monthly ?? 0, countries.find((c) => c.code === form.country)?.currency ?? 'USD')}/شهر</option>))}
-          </Select>
-        </div>
-      </Modal>
+      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{editing ? `تعديل ${editing.companyName}` : 'إضافة عميل جديد'}</DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="companyName">اسم الشركة</Label>
+              <Input
+                id="companyName"
+                value={form.companyName}
+                onChange={(e) => { setForm({ ...form, companyName: e.target.value }); setErrors({ ...errors, companyName: undefined }); }}
+                placeholder="مثال: سكة"
+              />
+              {errors.companyName && <p className="text-sm text-destructive">{errors.companyName}</p>}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="contactName">جهة الاتصال</Label>
+              <Input
+                id="contactName"
+                value={form.contactName}
+                onChange={(e) => { setForm({ ...form, contactName: e.target.value }); setErrors({ ...errors, contactName: undefined }); }}
+                placeholder="الاسم الكامل"
+              />
+              {errors.contactName && <p className="text-sm text-destructive">{errors.contactName}</p>}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">البريد الإلكتروني</Label>
+              <div className="relative">
+                <Mail className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="email"
+                  type="email"
+                  className="ps-9"
+                  value={form.email}
+                  onChange={(e) => { setForm({ ...form, email: e.target.value }); setErrors({ ...errors, email: undefined }); }}
+                />
+              </div>
+              {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="phone">رقم الجوال</Label>
+              <div className="relative">
+                <Phone className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="phone"
+                  className="ps-9"
+                  value={form.phone}
+                  onChange={(e) => { setForm({ ...form, phone: e.target.value }); setErrors({ ...errors, phone: undefined }); }}
+                />
+              </div>
+              {errors.phone && <p className="text-sm text-destructive">{errors.phone}</p>}
+            </div>
+            <div className="space-y-2">
+              <Label>الدولة</Label>
+              <Select value={form.country} onValueChange={(v) => setForm({ ...form, country: v })}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {countries.map((c) => (
+                    <SelectItem key={c.code} value={c.code}>{c.flag} {c.nameAr} ({c.currency})</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="industry">القطاع</Label>
+              <Input
+                id="industry"
+                value={form.industry}
+                onChange={(e) => setForm({ ...form, industry: e.target.value })}
+                placeholder="مثلاً: عقارات، تجزئة..."
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>الحالة</Label>
+              <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v as ClientStatus })}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="trial">فترة تجريبية</SelectItem>
+                  <SelectItem value="active">نشط</SelectItem>
+                  <SelectItem value="past_due">متأخر</SelectItem>
+                  <SelectItem value="suspended">موقوف</SelectItem>
+                  <SelectItem value="cancelled">ملغي</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>الباقة</Label>
+              <Select value={form.planId || '__none__'} onValueChange={(v) => setForm({ ...form, planId: v === '__none__' ? '' : v })}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">بدون باقة</SelectItem>
+                  {plans.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.nameAr} — {formatMoney(p.pricesPerCountry[form.country]?.monthly ?? 0, countries.find((c) => c.code === form.country)?.currency ?? 'USD')}/شهر
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setModalOpen(false)}>إلغاء</Button>
+            <Button onClick={submit}>{editing ? 'حفظ' : 'إضافة'}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-      <Drawer open={!!drawer} onClose={() => setDrawer(null)} title="تفاصيل العميل" side="end" width="w-[460px]">
-        {drawer && <ClientDrawerBody client={drawer} onEdit={() => { openEdit(drawer); setDrawer(null); }} onDelete={() => remove(drawer)} />}
-      </Drawer>
+      <Sheet open={!!drawer} onOpenChange={(open) => !open && setDrawer(null)}>
+        <SheetContent side="left" className="w-[460px] sm:max-w-[460px] overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>تفاصيل العميل</SheetTitle>
+          </SheetHeader>
+          {drawer && <ClientDrawerBody client={drawer} onEdit={() => { openEdit(drawer); setDrawer(null); }} onDelete={() => remove(drawer)} />}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
@@ -394,54 +530,58 @@ function ClientDrawerBody({ client, onEdit, onDelete }: { client: Client; onEdit
   const country = countries.find((c) => c.code === client.country);
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 pt-4">
       <div className="text-center">
-        <Avatar name={client.companyName} size="lg" className="mx-auto" />
-        <p className="text-h2 font-bold mt-3">{client.companyName} <span className="text-xl">{country?.flag}</span></p>
-        <p className="text-small text-muted-light dark:text-muted-dark">{client.contactName}</p>
-        <span className={cn('inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold mt-2', statusClass[client.status])}>
+        <Avatar className="h-16 w-16 mx-auto">
+          <AvatarFallback className="text-lg">{getInitials(client.companyName)}</AvatarFallback>
+        </Avatar>
+        <p className="text-xl font-bold mt-3">{client.companyName} <span className="text-xl">{country?.flag}</span></p>
+        <p className="text-small text-muted-foreground">{client.contactName}</p>
+        <Badge className={cn('mt-2 text-[10px] font-semibold', statusBadgeClass[client.status])}>
           {statusLabel[client.status]}
-        </span>
+        </Badge>
       </div>
 
-      <a href={client.dashboardUrl} target="_blank" rel="noreferrer" className="w-full h-11 rounded-full bg-primary hover:bg-primary-dark text-white text-body font-semibold flex items-center justify-center gap-2 transition-colors">
-        <ExternalLink className="h-4 w-4" />
-        فتح داشبورد {client.companyName}
-      </a>
+      <Button className="w-full" asChild>
+        <a href={client.dashboardUrl} target="_blank" rel="noreferrer">
+          <ExternalLink className="h-4 w-4 me-2" />
+          فتح داشبورد {client.companyName}
+        </a>
+      </Button>
 
       <div className="grid grid-cols-3 gap-3 text-center">
-        <div className="p-3 rounded-card bg-bg-light dark:bg-bg-dark">
-          <p className="text-h3 font-bold">{client.agentCount}</p>
-          <p className="text-small text-muted-light dark:text-muted-dark">موظفون</p>
+        <div className="p-3 rounded-lg bg-muted">
+          <p className="text-lg font-bold">{client.agentCount}</p>
+          <p className="text-small text-muted-foreground">موظفون</p>
         </div>
-        <div className="p-3 rounded-card bg-bg-light dark:bg-bg-dark">
-          <p className="text-h3 font-bold">{client.channelCount}</p>
-          <p className="text-small text-muted-light dark:text-muted-dark">قنوات</p>
+        <div className="p-3 rounded-lg bg-muted">
+          <p className="text-lg font-bold">{client.channelCount}</p>
+          <p className="text-small text-muted-foreground">قنوات</p>
         </div>
-        <div className="p-3 rounded-card bg-bg-light dark:bg-bg-dark">
-          <p className="text-h3 font-bold">{client.conversationCount}</p>
-          <p className="text-small text-muted-light dark:text-muted-dark">محادثات</p>
+        <div className="p-3 rounded-lg bg-muted">
+          <p className="text-lg font-bold">{client.conversationCount}</p>
+          <p className="text-small text-muted-foreground">محادثات</p>
         </div>
       </div>
 
       <div>
         <p className="text-small font-semibold mb-2">معلومات الاتصال</p>
         <div className="space-y-1.5 text-small">
-          <div className="flex items-center gap-2"><Mail className="h-3.5 w-3.5 text-muted-light dark:text-muted-dark" /> {client.email}</div>
-          <div className="flex items-center gap-2"><Phone className="h-3.5 w-3.5 text-muted-light dark:text-muted-dark" /> {client.phone}</div>
-          <div className="flex items-center gap-2"><Globe className="h-3.5 w-3.5 text-muted-light dark:text-muted-dark" /> <a href={client.dashboardUrl} className="text-primary hover:underline" target="_blank" rel="noreferrer">{client.dashboardUrl}</a></div>
+          <div className="flex items-center gap-2"><Mail className="h-3.5 w-3.5 text-muted-foreground" /> {client.email}</div>
+          <div className="flex items-center gap-2"><Phone className="h-3.5 w-3.5 text-muted-foreground" /> {client.phone}</div>
+          <div className="flex items-center gap-2"><Globe className="h-3.5 w-3.5 text-muted-foreground" /> <a href={client.dashboardUrl} className="text-primary hover:underline" target="_blank" rel="noreferrer">{client.dashboardUrl}</a></div>
         </div>
       </div>
 
       {plan && sub && (
         <div>
           <p className="text-small font-semibold mb-2">الاشتراك</p>
-          <div className="p-3 rounded-card bg-primary/5 border border-primary/20 space-y-1.5 text-small">
-            <div className="flex justify-between"><span className="text-muted-light dark:text-muted-dark">الباقة</span><span className="font-semibold">{plan.nameAr}</span></div>
-            <div className="flex justify-between"><span className="text-muted-light dark:text-muted-dark">قيمة الاشتراك</span><span className="font-semibold">{formatMoney(sub.amount, sub.currency)} / شهر</span></div>
-            <div className="flex justify-between"><span className="text-muted-light dark:text-muted-dark">يتجدد في</span><span>{formatDate(sub.currentPeriodEnd)}</span></div>
+          <div className="p-3 rounded-lg bg-primary/5 border border-primary/20 space-y-1.5 text-small">
+            <div className="flex justify-between"><span className="text-muted-foreground">الباقة</span><span className="font-semibold">{plan.nameAr}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">قيمة الاشتراك</span><span className="font-semibold">{formatMoney(sub.amount, sub.currency)} / شهر</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">يتجدد في</span><span>{formatDate(sub.currentPeriodEnd)}</span></div>
             {sub.paymentMethod && (
-              <div className="flex justify-between"><span className="text-muted-light dark:text-muted-dark">طريقة الدفع</span><span className="font-mono">VISA •••• {sub.paymentMethod.last4}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">طريقة الدفع</span><span className="font-mono">VISA {sub.paymentMethod.last4}</span></div>
             )}
           </div>
         </div>
@@ -452,10 +592,10 @@ function ClientDrawerBody({ client, onEdit, onDelete }: { client: Client; onEdit
           <p className="text-small font-semibold mb-2">آخر الفواتير</p>
           <div className="space-y-1.5">
             {clientInvoices.slice(0, 4).map((inv) => (
-              <div key={inv.id} className="p-2.5 rounded-lg bg-bg-light dark:bg-bg-dark flex items-center justify-between text-small">
+              <div key={inv.id} className="p-2.5 rounded-lg bg-muted flex items-center justify-between text-small">
                 <div className="min-w-0">
                   <p className="font-medium font-mono">{inv.number}</p>
-                  <p className="text-[10px] text-muted-light dark:text-muted-dark">{formatDate(inv.dueDate)}</p>
+                  <p className="text-[10px] text-muted-foreground">{formatDate(inv.dueDate)}</p>
                 </div>
                 <div className="text-end">
                   <p className="font-semibold">{formatMoney(inv.total, inv.currency)}</p>
@@ -463,7 +603,7 @@ function ClientDrawerBody({ client, onEdit, onDelete }: { client: Client; onEdit
                     inv.status === 'paid' && 'text-success',
                     inv.status === 'failed' && 'text-danger',
                     inv.status === 'pending' && 'text-warning',
-                    inv.status === 'refunded' && 'text-muted-light dark:text-muted-dark'
+                    inv.status === 'refunded' && 'text-muted-foreground'
                   )}>{inv.status === 'paid' ? 'مدفوعة' : inv.status === 'failed' ? 'فشلت' : inv.status === 'pending' ? 'معلّقة' : 'مرتجعة'}</span>
                 </div>
               </div>
@@ -472,23 +612,16 @@ function ClientDrawerBody({ client, onEdit, onDelete }: { client: Client; onEdit
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-2 pt-3 border-t border-border-light dark:border-border-dark">
-        <button onClick={onEdit} className="h-10 px-4 rounded-full border border-border-light dark:border-border-dark text-small font-medium hover:bg-bg-light dark:hover:bg-bg-dark flex items-center justify-center gap-2">
-          <Edit2 className="h-4 w-4" /> تعديل
-        </button>
-        <button onClick={onDelete} className="h-10 px-4 rounded-full bg-danger/10 text-danger text-small font-medium hover:bg-danger/15 flex items-center justify-center gap-2">
-          <Trash2 className="h-4 w-4" /> حذف
-        </button>
+      <Separator />
+
+      <div className="grid grid-cols-2 gap-2">
+        <Button variant="outline" onClick={onEdit}>
+          <Edit2 className="h-4 w-4 me-2" /> تعديل
+        </Button>
+        <Button variant="destructive" onClick={onDelete}>
+          <Trash2 className="h-4 w-4 me-2" /> حذف
+        </Button>
       </div>
     </div>
-  );
-}
-
-function MenuItem({ icon, label, onClick, danger }: { icon: React.ReactNode; label: string; onClick: () => void; danger?: boolean }): JSX.Element {
-  return (
-    <button onClick={onClick} className={cn('w-full flex items-center gap-2.5 px-3 py-2 text-body hover:bg-bg-light dark:hover:bg-bg-dark text-start', danger ? 'text-danger' : '')}>
-      <span className={danger ? 'text-danger' : 'text-muted-light dark:text-muted-dark'}>{icon}</span>
-      {label}
-    </button>
   );
 }

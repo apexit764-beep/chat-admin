@@ -12,8 +12,16 @@ import {
   MousePointer,
   Eye,
 } from 'lucide-react';
-import { Card } from '@components/ui';
-import { cn } from '@/utils/cn';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+  TooltipProvider,
+} from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
 import AdminDashboard from './Dashboard';
 
 type DevicePreset = 'desktop' | 'tablet' | 'mobile';
@@ -86,134 +94,164 @@ export default function DashboardPreview(): JSX.Element {
   }, []);
 
   return (
-    <div className="flex flex-col h-[calc(100vh-56px)] page-fade">
-      {/* Toolbar */}
-      <div className="flex items-center justify-between px-4 py-2.5 border-b border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark flex-shrink-0">
-        <div className="flex items-center gap-2">
-          <Eye className="h-4 w-4 text-primary" />
-          <h1 className="text-body font-bold">معاينة لوحة التحكم</h1>
+    <TooltipProvider delayDuration={300}>
+      <div className="flex flex-col h-[calc(100vh-56px)]">
+        {/* Toolbar */}
+        <div className="flex items-center justify-between px-4 py-2.5 border-b bg-card flex-shrink-0">
+          <div className="flex items-center gap-2">
+            <Eye className="h-4 w-4 text-primary" />
+            <h1 className="text-body font-bold">معاينة لوحة التحكم</h1>
+          </div>
+
+          {/* Device presets */}
+          <div className="flex items-center gap-1">
+            {([
+              { key: 'desktop', Icon: Monitor, tooltip: 'سطح المكتب' },
+              { key: 'tablet', Icon: Tablet, tooltip: 'جهاز لوحي' },
+              { key: 'mobile', Icon: Smartphone, tooltip: 'هاتف' },
+            ] as const).map(({ key, Icon, tooltip }) => (
+              <Tooltip key={key}>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant={device === key ? 'default' : 'ghost'}
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => { setDevice(key); setPan({ x: 0, y: 0 }); }}
+                  >
+                    <Icon className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>{tooltip}</TooltipContent>
+              </Tooltip>
+            ))}
+          </div>
+
+          {/* Zoom controls */}
+          <div className="flex items-center gap-1">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant={isPanning ? 'default' : 'ghost'}
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={() => setIsPanning(!isPanning)}
+                >
+                  {isPanning ? <Move className="h-4 w-4" /> : <MousePointer className="h-4 w-4" />}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{isPanning ? 'وضع المؤشر' : 'وضع السحب'}</TooltipContent>
+            </Tooltip>
+
+            <Separator orientation="vertical" className="mx-1 h-5" />
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={zoomOut}>
+                  <ZoomOut className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>تصغير</TooltipContent>
+            </Tooltip>
+
+            <span className="text-small font-mono font-semibold w-12 text-center tabular-nums">
+              {Math.round(zoom * 100)}%
+            </span>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={zoomIn}>
+                  <ZoomIn className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>تكبير</TooltipContent>
+            </Tooltip>
+
+            <Separator orientation="vertical" className="mx-1 h-5" />
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={fitToScreen}>
+                  <Maximize2 className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>ملائمة</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={resetView}>
+                  <RotateCcw className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>إعادة تعيين</TooltipContent>
+            </Tooltip>
+          </div>
         </div>
 
-        {/* Device presets */}
-        <div className="flex items-center gap-1">
-          {([
-            { key: 'desktop', Icon: Monitor },
-            { key: 'tablet', Icon: Tablet },
-            { key: 'mobile', Icon: Smartphone },
-          ] as const).map(({ key, Icon }) => (
-            <button
-              key={key}
-              onClick={() => { setDevice(key); setPan({ x: 0, y: 0 }); }}
-              title={key}
-              className={cn(
-                'h-8 w-8 rounded-lg flex items-center justify-center transition-colors',
-                device === key
-                  ? 'bg-primary text-white'
-                  : 'text-muted-light dark:text-muted-dark hover:bg-bg-light dark:hover:bg-bg-dark'
-              )}
+        {/* Canvas area */}
+        <div
+          ref={containerRef}
+          className={cn(
+            'flex-1 overflow-hidden bg-[#f0f0f0] dark:bg-[#1a1a1a] relative',
+            isPanning ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'
+          )}
+          style={{
+            backgroundImage: 'radial-gradient(circle, #d1d5db 1px, transparent 1px)',
+            backgroundSize: '24px 24px',
+          }}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+        >
+          <div className="absolute inset-0 flex items-center justify-center">
+            <motion.div
+              animate={{ x: pan.x, y: pan.y }}
+              transition={{ type: 'tween', duration: 0.1 }}
             >
-              <Icon className="h-4 w-4" />
-            </button>
-          ))}
-        </div>
-
-        {/* Zoom controls */}
-        <div className="flex items-center gap-1">
-          <button
-            onClick={() => setIsPanning(!isPanning)}
-            title={isPanning ? 'وضع المؤشر' : 'وضع السحب'}
-            className={cn(
-              'h-8 w-8 rounded-lg flex items-center justify-center transition-colors',
-              isPanning
-                ? 'bg-primary text-white'
-                : 'text-muted-light dark:text-muted-dark hover:bg-bg-light dark:hover:bg-bg-dark'
-            )}
-          >
-            {isPanning ? <Move className="h-4 w-4" /> : <MousePointer className="h-4 w-4" />}
-          </button>
-
-          <div className="h-5 w-px bg-border-light dark:bg-border-dark mx-1" />
-
-          <button onClick={zoomOut} title="تصغير" className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-light dark:text-muted-dark hover:bg-bg-light dark:hover:bg-bg-dark transition-colors">
-            <ZoomOut className="h-4 w-4" />
-          </button>
-          <span className="text-small font-mono font-semibold w-12 text-center tabular-nums">{Math.round(zoom * 100)}%</span>
-          <button onClick={zoomIn} title="تكبير" className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-light dark:text-muted-dark hover:bg-bg-light dark:hover:bg-bg-dark transition-colors">
-            <ZoomIn className="h-4 w-4" />
-          </button>
-
-          <div className="h-5 w-px bg-border-light dark:bg-border-dark mx-1" />
-
-          <button onClick={fitToScreen} title="ملائمة" className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-light dark:text-muted-dark hover:bg-bg-light dark:hover:bg-bg-dark transition-colors">
-            <Maximize2 className="h-4 w-4" />
-          </button>
-          <button onClick={resetView} title="إعادة تعيين" className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-light dark:text-muted-dark hover:bg-bg-light dark:hover:bg-bg-dark transition-colors">
-            <RotateCcw className="h-4 w-4" />
-          </button>
-        </div>
-      </div>
-
-      {/* Canvas area */}
-      <div
-        ref={containerRef}
-        className={cn(
-          'flex-1 overflow-hidden bg-[#f0f0f0] dark:bg-[#1a1a1a] relative',
-          isPanning ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'
-        )}
-        style={{
-          backgroundImage: 'radial-gradient(circle, #d1d5db 1px, transparent 1px)',
-          backgroundSize: '24px 24px',
-        }}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-      >
-        <div className="absolute inset-0 flex items-center justify-center">
-          <motion.div
-            animate={{ x: pan.x, y: pan.y }}
-            transition={{ type: 'tween', duration: 0.1 }}
-          >
-            {/* Device frame */}
-            <div
-              className="relative overflow-hidden"
-              style={{
-                width: w * zoom,
-                height: h * zoom,
-              }}
-            >
-              {/* Frame chrome */}
-              <div className="absolute -inset-[2px] rounded-xl border-2 border-border-light dark:border-border-dark/60 shadow-2xl pointer-events-none z-10" />
-
-              {/* Dimension label */}
-              <div className="absolute -bottom-7 left-1/2 -translate-x-1/2 text-[10px] font-mono text-muted-light dark:text-muted-dark bg-white/80 dark:bg-black/50 px-2 py-0.5 rounded whitespace-nowrap z-10">
-                {label} · {Math.round(zoom * 100)}%
-              </div>
-
-              {/* Scaled dashboard content */}
+              {/* Device frame */}
               <div
-                className="origin-top-left bg-white dark:bg-[#0f172a] rounded-lg overflow-hidden absolute top-0 left-0"
+                className="relative overflow-hidden"
                 style={{
-                  width: w,
-                  height: h,
-                  transform: `scale(${zoom})`,
-                  transformOrigin: 'top left',
+                  width: w * zoom,
+                  height: h * zoom,
                 }}
               >
-                <div className="w-full h-full overflow-auto" dir="rtl">
-                  <AdminDashboard />
+                {/* Frame chrome */}
+                <div className="absolute -inset-[2px] rounded-xl border-2 border-border shadow-2xl pointer-events-none z-10" />
+
+                {/* Dimension label */}
+                <div className="absolute -bottom-7 left-1/2 -translate-x-1/2 z-10">
+                  <Badge variant="secondary" className="text-[10px] font-mono whitespace-nowrap">
+                    {label} · {Math.round(zoom * 100)}%
+                  </Badge>
+                </div>
+
+                {/* Scaled dashboard content */}
+                <div
+                  className="origin-top-left bg-white dark:bg-[#0f172a] rounded-lg overflow-hidden absolute top-0 left-0"
+                  style={{
+                    width: w,
+                    height: h,
+                    transform: `scale(${zoom})`,
+                    transformOrigin: 'top left',
+                  }}
+                >
+                  <div className="w-full h-full overflow-auto" dir="rtl">
+                    <AdminDashboard />
+                  </div>
                 </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Status bar */}
+        <div className="flex items-center justify-between px-4 py-1.5 border-t bg-card text-[10px] text-muted-foreground flex-shrink-0">
+          <span>لوحة الإدارة · {device === 'desktop' ? 'سطح المكتب' : device === 'tablet' ? 'جهاز لوحي' : 'هاتف'}</span>
+          <span>معاينة مباشرة</span>
         </div>
       </div>
-
-      {/* Status bar */}
-      <div className="flex items-center justify-between px-4 py-1.5 border-t border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-[10px] text-muted-light dark:text-muted-dark flex-shrink-0">
-        <span>لوحة الإدارة · {device === 'desktop' ? 'سطح المكتب' : device === 'tablet' ? 'جهاز لوحي' : 'هاتف'}</span>
-        <span>معاينة مباشرة</span>
-      </div>
-    </div>
+    </TooltipProvider>
   );
 }

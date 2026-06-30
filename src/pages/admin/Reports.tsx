@@ -3,20 +3,34 @@ import {
   TrendingUp,
   TrendingDown,
   Users,
-  UserX,
   Globe2,
-  Calendar,
   Download,
 } from 'lucide-react';
-import { Card, StatCard, Avatar } from '@components/ui';
+import { StatCard } from '@components/ui';
 import { LineChart } from '@components/charts/LineChart';
-import { BarChart } from '@components/charts/BarChart';
 import { DoughnutChart } from '@components/charts/DoughnutChart';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
 import { approxUSD } from '@/utils/money';
 import { downloadCsv } from '@/utils/csv';
-import { cn } from '@/utils/cn';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+} from '@/components/ui/table';
+import { Progress } from '@/components/ui/progress';
 
 type Range = 'week' | 'month' | 'quarter' | 'year';
 
@@ -66,7 +80,7 @@ export default function AdminReports(): JSX.Element {
     .filter((x) => x.count > 0)
     .sort((a, b) => b.count - a.count);
 
-  // Conversion (trial → paid)
+  // Conversion (trial -> paid)
   const trialCount = clients.filter((c) => c.status === 'trial' || c.status === 'active').length;
   const paidCount = clients.filter((c) => c.status === 'active').length;
   const conversionRate = trialCount ? Math.round((paidCount / trialCount) * 100) : 0;
@@ -103,26 +117,26 @@ export default function AdminReports(): JSX.Element {
   };
 
   return (
-    <div className="p-4 lg:p-6 space-y-5 page-fade">
+    <div className="p-4 lg:p-6 space-y-5">
       {/* Range + export */}
-      <Card className="p-3 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-1 bg-bg-light dark:bg-bg-dark rounded-full p-1">
-          {ranges.map((r) => (
-            <button
-              key={r.key}
-              onClick={() => setRange(r.key)}
-              className={cn(
-                'px-4 py-1.5 rounded-full text-small font-medium transition-colors',
-                range === r.key ? 'bg-primary text-white shadow' : 'text-muted-light dark:text-muted-dark hover:text-current'
-              )}
-            >
-              {r.label}
-            </button>
-          ))}
-        </div>
-        <button onClick={exportSummary} className="h-10 px-4 rounded-full border border-border-light dark:border-border-dark text-small font-medium hover:bg-bg-light dark:hover:bg-bg-dark flex items-center gap-2">
-          <Download className="h-4 w-4" /> تصدير الملخص
-        </button>
+      <Card>
+        <CardContent className="p-3 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-1 bg-muted rounded-full p-1">
+            {ranges.map((r) => (
+              <Button
+                key={r.key}
+                variant={range === r.key ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setRange(r.key)}
+              >
+                {r.label}
+              </Button>
+            ))}
+          </div>
+          <Button variant="outline" onClick={exportSummary}>
+            <Download className="h-4 w-4" /> تصدير الملخص
+          </Button>
+        </CardContent>
       </Card>
 
       {/* KPIs */}
@@ -134,96 +148,111 @@ export default function AdminReports(): JSX.Element {
       </div>
 
       {/* Signups vs Churn chart */}
-      <Card className="p-5">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="text-h2 font-bold">التسجيلات مقابل الإلغاءات</h2>
-            <p className="text-small text-muted-light dark:text-muted-dark">آخر 6 أشهر</p>
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>التسجيلات مقابل الإلغاءات</CardTitle>
+              <CardDescription>آخر 6 أشهر</CardDescription>
+            </div>
+            <div className="flex items-center gap-3 text-sm">
+              <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-success" /> تسجيلات</span>
+              <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-danger" /> إلغاءات</span>
+            </div>
           </div>
-          <div className="flex items-center gap-3 text-small">
-            <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-success" /> تسجيلات</span>
-            <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-danger" /> إلغاءات</span>
-          </div>
-        </div>
-        <LineChart
-          labels={signupsLabels}
-          series={[
-            { name: 'تسجيلات', color: '#10B981', data: signupsData },
-            { name: 'إلغاءات', color: '#EF4444', data: churnData },
-          ]}
-          height={260}
-        />
+        </CardHeader>
+        <CardContent>
+          <LineChart
+            labels={signupsLabels}
+            series={[
+              { name: 'تسجيلات', color: '#10B981', data: signupsData },
+              { name: 'إلغاءات', color: '#EF4444', data: churnData },
+            ]}
+            height={260}
+          />
+        </CardContent>
       </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Card className="p-5">
-          <h2 className="text-h2 font-bold mb-1">توزيع الباقات</h2>
-          <p className="text-small text-muted-light dark:text-muted-dark mb-4">حسب عدد العملاء النشطين</p>
-          <DoughnutChart size={200} data={planDist} />
+        <Card>
+          <CardHeader>
+            <CardTitle>توزيع الباقات</CardTitle>
+            <CardDescription>حسب عدد العملاء النشطين</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <DoughnutChart size={200} data={planDist} />
+          </CardContent>
         </Card>
-        <Card className="p-5">
-          <h2 className="text-h2 font-bold mb-1">حالة العملاء</h2>
-          <p className="text-small text-muted-light dark:text-muted-dark mb-4">توزيع الحالات الحالية</p>
-          <DoughnutChart size={200} data={statusDist} />
+        <Card>
+          <CardHeader>
+            <CardTitle>حالة العملاء</CardTitle>
+            <CardDescription>توزيع الحالات الحالية</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <DoughnutChart size={200} data={statusDist} />
+          </CardContent>
         </Card>
       </div>
 
       {/* By country */}
-      <Card className="overflow-hidden">
-        <div className="px-5 py-4 border-b border-border-light dark:border-border-dark">
-          <h2 className="text-h2 font-bold flex items-center gap-2"><Globe2 className="h-5 w-5 text-primary" />الأداء حسب الدولة</h2>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-body">
-            <thead className="bg-bg-light dark:bg-bg-dark text-small text-muted-light dark:text-muted-dark">
-              <tr>
-                <th className="text-start font-medium px-4 py-3">الدولة</th>
-                <th className="text-start font-medium px-4 py-3">عدد العملاء</th>
-                <th className="text-start font-medium px-4 py-3">الإيراد الشهري</th>
-                <th className="text-start font-medium px-4 py-3">متوسط الإيراد للعميل</th>
-                <th className="text-start font-medium px-4 py-3">حصة السوق</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border-light dark:divide-border-dark">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Globe2 className="h-5 w-5 text-primary" />
+            الأداء حسب الدولة
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted">
+                <TableHead className="text-start">الدولة</TableHead>
+                <TableHead className="text-start">عدد العملاء</TableHead>
+                <TableHead className="text-start">الإيراد الشهري</TableHead>
+                <TableHead className="text-start">متوسط الإيراد للعميل</TableHead>
+                <TableHead className="text-start">حصة السوق</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {byCountry.map((x) => {
                 const share = clients.length ? (x.count / clients.length) * 100 : 0;
                 return (
-                  <tr key={x.country.code} className="hover:bg-bg-light dark:hover:bg-bg-dark transition-colors">
-                    <td className="px-4 py-3">
+                  <TableRow key={x.country.code}>
+                    <TableCell>
                       <div className="flex items-center gap-2">
                         <span className="text-2xl">{x.country.flag}</span>
                         <span className="font-semibold">{x.country.nameAr}</span>
                       </div>
-                    </td>
-                    <td className="px-4 py-3 font-semibold">{x.count}</td>
-                    <td className="px-4 py-3 font-semibold text-success">${Math.round(x.revenue).toLocaleString()}</td>
-                    <td className="px-4 py-3">${x.count ? Math.round(x.revenue / x.count) : 0}</td>
-                    <td className="px-4 py-3">
+                    </TableCell>
+                    <TableCell className="font-semibold">{x.count}</TableCell>
+                    <TableCell className="font-semibold text-success">${Math.round(x.revenue).toLocaleString()}</TableCell>
+                    <TableCell>${x.count ? Math.round(x.revenue / x.count) : 0}</TableCell>
+                    <TableCell>
                       <div className="flex items-center gap-2">
-                        <div className="flex-1 h-1.5 bg-bg-light dark:bg-bg-dark rounded-full overflow-hidden">
-                          <div className="h-full bg-primary rounded-full" style={{ width: `${share}%` }} />
-                        </div>
-                        <span className="text-small font-medium">{Math.round(share)}%</span>
+                        <Progress value={share} className="flex-1 h-1.5" />
+                        <span className="text-sm font-medium text-muted-foreground">{Math.round(share)}%</span>
                       </div>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 );
               })}
-            </tbody>
-          </table>
-        </div>
+            </TableBody>
+          </Table>
+        </CardContent>
       </Card>
 
       {/* Funnel */}
-      <Card className="p-5">
-        <h2 className="text-h2 font-bold mb-1">مسار التحويل</h2>
-        <p className="text-small text-muted-light dark:text-muted-dark mb-4">من التسجيل إلى الدفع</p>
-        <div className="space-y-3">
+      <Card>
+        <CardHeader>
+          <CardTitle>مسار التحويل</CardTitle>
+          <CardDescription>من التسجيل إلى الدفع</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
           <FunnelStep label="زوار" value={4280} color="bg-info" share={100} />
           <FunnelStep label="تجارب جديدة" value={183} color="bg-primary" share={4.3} />
           <FunnelStep label="نشطوا الحساب" value={142} color="bg-violet-500" share={3.3} />
           <FunnelStep label="اشتراك مدفوع" value={paidCount} color="bg-success" share={(paidCount / 4280) * 100} />
-        </div>
+        </CardContent>
       </Card>
     </div>
   );
@@ -232,16 +261,16 @@ export default function AdminReports(): JSX.Element {
 function FunnelStep({ label, value, color, share }: { label: string; value: number; color: string; share: number }): JSX.Element {
   return (
     <div className="flex items-center gap-3">
-      <p className="w-32 text-body font-medium">{label}</p>
-      <div className="flex-1 h-9 rounded-lg bg-bg-light dark:bg-bg-dark overflow-hidden relative">
+      <p className="w-32 text-sm font-medium">{label}</p>
+      <div className="flex-1 h-9 rounded-lg bg-muted overflow-hidden relative">
         <div className={cn('h-full transition-all', color)} style={{ width: `${share}%` }} />
         <div className="absolute inset-0 flex items-center px-3">
-          <span className="text-small font-bold text-white drop-shadow-sm" style={{ paddingInlineStart: `${Math.max(0, share - 20)}%` }}>
+          <span className="text-sm font-bold text-white drop-shadow-sm" style={{ paddingInlineStart: `${Math.max(0, share - 20)}%` }}>
             {value.toLocaleString()}
           </span>
         </div>
       </div>
-      <p className="w-16 text-small text-muted-light dark:text-muted-dark text-end">{share.toFixed(1)}%</p>
+      <p className="w-16 text-sm text-muted-foreground text-end">{share.toFixed(1)}%</p>
     </div>
   );
 }
