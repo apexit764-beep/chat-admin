@@ -1,11 +1,16 @@
 // shadcn/ui components
 export { Button, buttonVariants } from './button';
 export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from './card';
-export { Input, Textarea } from './input';
+export { Input as ShadcnInput, Textarea as ShadcnTextarea } from './input';
+export type { InputProps as ShadcnInputProps, TextareaProps as ShadcnTextareaProps } from './input';
 export { Label } from './label';
 export { Badge, badgeVariants } from './badge';
 export { Separator } from './separator';
-export { Avatar, AvatarImage, AvatarFallback } from './avatar';
+export {
+  Avatar as ShadcnAvatar,
+  AvatarImage,
+  AvatarFallback,
+} from './avatar';
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './tooltip';
 export {
   DropdownMenu,
@@ -49,7 +54,7 @@ export {
   SheetDescription,
 } from './sheet';
 export {
-  Select,
+  Select as ShadcnSelect,
   SelectGroup,
   SelectValue,
   SelectTrigger,
@@ -91,6 +96,13 @@ export {
   AlertDialogCancel,
 } from './alert-dialog';
 export { Popover, PopoverTrigger, PopoverContent } from './popover';
+
+// Legacy components (backward-compatible API for client pages)
+export { LegacyAvatar as Avatar } from './LegacyAvatar';
+export { LegacyInput as Input, LegacyTextarea as Textarea } from './LegacyInput';
+export type { LegacyInputProps as InputProps, LegacyTextareaProps as TextareaProps } from './LegacyInput';
+export { LegacySelect as Select } from './LegacySelect';
+export type { LegacySelectProps as SelectProps } from './LegacySelect';
 
 // Legacy custom components
 export { Modal } from './Modal';
