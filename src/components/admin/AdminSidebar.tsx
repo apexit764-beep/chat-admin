@@ -105,7 +105,7 @@ export function AdminSidebar(): JSX.Element {
                 <PanelRightOpen className="h-4 w-4" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="start">طي القائمة</TooltipContent>
+            <TooltipContent side="left">طي القائمة</TooltipContent>
           </Tooltip>
         </div>
 
@@ -123,7 +123,7 @@ export function AdminSidebar(): JSX.Element {
                   <PanelRightClose className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="start">توسيع القائمة</TooltipContent>
+              <TooltipContent side="left">توسيع القائمة</TooltipContent>
             </Tooltip>
           </div>
         )}
@@ -159,7 +159,7 @@ export function AdminSidebar(): JSX.Element {
                 return (
                   <Tooltip key={item.to}>
                     <TooltipTrigger asChild>{linkContent}</TooltipTrigger>
-                    <TooltipContent side="start">{item.label}</TooltipContent>
+                    <TooltipContent side="left">{item.label}</TooltipContent>
                   </Tooltip>
                 );
               }
@@ -189,7 +189,7 @@ export function AdminSidebar(): JSX.Element {
                 return (
                   <Tooltip key={item.label}>
                     <TooltipTrigger asChild>{link}</TooltipTrigger>
-                    <TooltipContent side="start">{item.label}</TooltipContent>
+                    <TooltipContent side="left">{item.label}</TooltipContent>
                   </Tooltip>
                 );
               }
@@ -217,7 +217,7 @@ export function AdminSidebar(): JSX.Element {
                 return (
                   <Tooltip key={item.label}>
                     <TooltipTrigger asChild>{link}</TooltipTrigger>
-                    <TooltipContent side="start">{item.label}</TooltipContent>
+                    <TooltipContent side="left">{item.label}</TooltipContent>
                   </Tooltip>
                 );
               }
@@ -239,7 +239,7 @@ export function AdminSidebar(): JSX.Element {
                 return (
                   <Tooltip key={item.label}>
                     <TooltipTrigger asChild>{btn}</TooltipTrigger>
-                    <TooltipContent side="start">{item.label}</TooltipContent>
+                    <TooltipContent side="left">{item.label}</TooltipContent>
                   </Tooltip>
                 );
               }
@@ -313,7 +313,7 @@ export function AdminSidebar(): JSX.Element {
                   <LogOut className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="start">تسجيل الخروج</TooltipContent>
+              <TooltipContent side="left">تسجيل الخروج</TooltipContent>
             </Tooltip>
           )}
         </div>

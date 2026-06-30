@@ -11,7 +11,7 @@ import {
   CreditCard,
   ArrowDownToLine,
 } from 'lucide-react';
-import { Avatar, Card, StatCard, useConfirm } from '@components/ui';
+import { StatCard, useConfirm } from '@components/ui';
 import { LineChart } from '@components/charts/LineChart';
 import { BarChart } from '@components/charts/BarChart';
 import { useAdminStore } from '@/store/useAdminStore';
@@ -19,8 +19,30 @@ import { useUIStore } from '@/store/useUIStore';
 import { formatMoney, approxUSD } from '@/utils/money';
 import { formatDate, timeAgo } from '@/utils/format';
 import { downloadCsv, printAsPdf } from '@/utils/csv';
-import { cn } from '@/utils/cn';
+import { cn } from '@/lib/utils';
 import type { Invoice, InvoiceStatus, Transaction, TransactionStatus } from '@/types';
+
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+} from '@/components/ui/table';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from '@/components/ui/select';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 const invStatusLabel: Record<InvoiceStatus, string> = {
   draft: 'مسودة',
@@ -30,12 +52,12 @@ const invStatusLabel: Record<InvoiceStatus, string> = {
   refunded: 'مرتجعة',
 };
 
-const invStatusColor: Record<InvoiceStatus, string> = {
-  draft: 'bg-bg-light dark:bg-bg-dark text-muted-light dark:text-muted-dark',
-  pending: 'bg-warning/15 text-warning',
-  paid: 'bg-success/15 text-success',
-  failed: 'bg-danger/15 text-danger',
-  refunded: 'bg-info/15 text-info',
+const invStatusVariant: Record<InvoiceStatus, 'secondary' | 'warning' | 'success' | 'destructive' | 'outline'> = {
+  draft: 'secondary',
+  pending: 'warning',
+  paid: 'success',
+  failed: 'destructive',
+  refunded: 'outline',
 };
 
 const txnStatusLabel: Record<TransactionStatus, string> = {
@@ -44,6 +66,21 @@ const txnStatusLabel: Record<TransactionStatus, string> = {
   pending: 'معلّقة',
   refunded: 'مرتجعة',
 };
+
+const txnStatusVariant: Record<TransactionStatus, 'success' | 'destructive' | 'warning' | 'outline'> = {
+  succeeded: 'success',
+  failed: 'destructive',
+  pending: 'warning',
+  refunded: 'outline',
+};
+
+function getInitials(name: string): string {
+  return name
+    .split(' ')
+    .map((w) => w[0])
+    .join('')
+    .slice(0, 2);
+}
 
 export default function AdminFinance(): JSX.Element {
   const clients = useAdminStore((s) => s.clients);
@@ -55,7 +92,6 @@ export default function AdminFinance(): JSX.Element {
   const showToast = useUIStore((s) => s.showToast);
   const { confirm } = useConfirm();
 
-  const [tab, setTab] = useState<'invoices' | 'transactions' | 'revenue'>('invoices');
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | InvoiceStatus>('all');
 
@@ -138,7 +174,7 @@ export default function AdminFinance(): JSX.Element {
   };
 
   return (
-    <div className="p-4 lg:p-6 space-y-5 page-fade">
+    <div className="p-4 lg:p-6 space-y-5">
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="MRR (USD)" value={`$${Math.round(mrr).toLocaleString()}`} icon={<DollarSign className="h-5 w-5" />} iconBg="bg-success/15" iconColor="text-success" trend={{ value: 18, positive: true }} />
@@ -148,218 +184,228 @@ export default function AdminFinance(): JSX.Element {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-full p-1 w-fit">
-        {([
-          { key: 'invoices', label: `الفواتير (${invoices.length})` },
-          { key: 'transactions', label: `المعاملات (${transactions.length})` },
-          { key: 'revenue', label: 'تحليلات الإيرادات' },
-        ] as const).map((t) => (
-          <button
-            key={t.key}
-            onClick={() => setTab(t.key)}
-            className={cn(
-              'px-4 py-1.5 rounded-full text-small font-medium transition-colors',
-              tab === t.key ? 'bg-primary text-white shadow' : 'text-muted-light dark:text-muted-dark hover:text-current'
-            )}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
+      <Tabs defaultValue="invoices">
+        <TabsList>
+          <TabsTrigger value="invoices">الفواتير ({invoices.length})</TabsTrigger>
+          <TabsTrigger value="transactions">المعاملات ({transactions.length})</TabsTrigger>
+          <TabsTrigger value="revenue">تحليلات الإيرادات</TabsTrigger>
+        </TabsList>
 
-      {/* Invoices */}
-      {tab === 'invoices' && (
-        <Card className="overflow-hidden">
-          <div className="p-4 flex flex-wrap items-center gap-3 border-b border-border-light dark:border-border-dark">
-            <div className="relative flex-1 min-w-[200px]">
-              <Search className="h-4 w-4 absolute end-3 top-1/2 -translate-y-1/2 text-muted-light dark:text-muted-dark" />
-              <input
-                type="text"
-                placeholder="بحث برقم الفاتورة أو الشركة..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full h-10 ps-3 pe-9 rounded-full bg-bg-light dark:bg-bg-dark border border-transparent text-body focus:outline-none focus:border-primary"
-              />
-            </div>
-            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as 'all' | InvoiceStatus)} className="h-10 px-4 rounded-full bg-bg-light dark:bg-bg-dark border border-transparent text-small focus:outline-none focus:border-primary">
-              <option value="all">كل الحالات</option>
-              <option value="paid">مدفوعة</option>
-              <option value="pending">معلّقة</option>
-              <option value="failed">فشلت</option>
-              <option value="refunded">مرتجعة</option>
-            </select>
-            <button onClick={handleExportInvoices} className="h-10 px-4 rounded-full border border-border-light dark:border-border-dark text-small font-medium hover:bg-bg-light dark:hover:bg-bg-dark flex items-center gap-2">
-              <Download className="h-4 w-4" /> CSV
-            </button>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-body">
-              <thead className="bg-bg-light dark:bg-bg-dark text-small text-muted-light dark:text-muted-dark">
-                <tr>
-                  <th className="text-start font-medium px-4 py-3">رقم الفاتورة</th>
-                  <th className="text-start font-medium px-4 py-3">العميل</th>
-                  <th className="text-start font-medium px-4 py-3 hidden md:table-cell">الإجمالي</th>
-                  <th className="text-start font-medium px-4 py-3 hidden lg:table-cell">تاريخ الاستحقاق</th>
-                  <th className="text-start font-medium px-4 py-3">الحالة</th>
-                  <th className="text-start font-medium px-4 py-3 w-1">إجراءات</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border-light dark:divide-border-dark">
-                {filteredInvoices.map((inv) => {
-                  const client = clients.find((c) => c.id === inv.clientId);
-                  return (
-                    <tr key={inv.id} className="hover:bg-bg-light dark:hover:bg-bg-dark transition-colors">
-                      <td className="px-4 py-3 font-mono font-semibold">{inv.number}</td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-2">
-                          <Avatar name={client?.companyName ?? '?'} size="xs" />
-                          <span className="font-medium">{client?.companyName ?? '—'}</span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 hidden md:table-cell font-semibold">{formatMoney(inv.total, inv.currency)}</td>
-                      <td className="px-4 py-3 hidden lg:table-cell text-small text-muted-light dark:text-muted-dark">{formatDate(inv.dueDate)}</td>
-                      <td className="px-4 py-3">
-                        <span className={cn('inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold', invStatusColor[inv.status])}>
-                          {invStatusLabel[inv.status]}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-1">
-                          <button title="طباعة PDF" onClick={() => handleDownloadInvoice(inv)} className="h-8 w-8 rounded-full hover:bg-bg-light dark:hover:bg-bg-dark text-muted-light dark:text-muted-dark hover:text-primary flex items-center justify-center">
-                            <FileText className="h-4 w-4" />
-                          </button>
-                          {inv.status === 'paid' && (
-                            <button
-                              title="استرجاع"
-                              onClick={() => {
-                                void (async () => {
-                                  const ok = await confirm({ title: `استرجاع فاتورة ${inv.number}؟`, message: `سيتم إرجاع ${inv.total} ${inv.currency} للعميل`, variant: 'warning', confirmText: 'استرجاع' });
-                                  if (ok) {
-                                    refundInvoice(inv.id);
-                                    showToast('تم استرجاع الفاتورة', 'success');
-                                  }
-                                })();
-                              }}
-                              className="h-8 w-8 rounded-full hover:bg-warning/10 text-muted-light dark:text-muted-dark hover:text-warning flex items-center justify-center"
-                            >
-                              <RefreshCcw className="h-4 w-4" />
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-                {filteredInvoices.length === 0 && (
-                  <tr><td colSpan={6} className="text-center py-12 text-muted-light dark:text-muted-dark">لا توجد فواتير</td></tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </Card>
-      )}
-
-      {/* Transactions */}
-      {tab === 'transactions' && (
-        <Card className="overflow-hidden">
-          <div className="px-5 py-4 border-b border-border-light dark:border-border-dark flex items-center justify-between">
-            <h2 className="text-h2 font-bold">سجل المعاملات (Paymob)</h2>
-            <span className="text-small text-muted-light dark:text-muted-dark">{transactions.length} معاملة</span>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-body">
-              <thead className="bg-bg-light dark:bg-bg-dark text-small text-muted-light dark:text-muted-dark">
-                <tr>
-                  <th className="text-start font-medium px-4 py-3">Transaction ID</th>
-                  <th className="text-start font-medium px-4 py-3">العميل</th>
-                  <th className="text-start font-medium px-4 py-3">المبلغ</th>
-                  <th className="text-start font-medium px-4 py-3 hidden lg:table-cell">البطاقة</th>
-                  <th className="text-start font-medium px-4 py-3 hidden md:table-cell">الحالة</th>
-                  <th className="text-start font-medium px-4 py-3">التاريخ</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border-light dark:divide-border-dark">
-                {transactions.slice(0, 100).map((t) => {
-                  const client = clients.find((c) => c.id === t.clientId);
-                  return (
-                    <tr key={t.id} className="hover:bg-bg-light dark:hover:bg-bg-dark transition-colors">
-                      <td className="px-4 py-3 font-mono text-small">{t.paymobTransactionId}</td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-2">
-                          <Avatar name={client?.companyName ?? '?'} size="xs" />
-                          <span className="font-medium truncate">{client?.companyName ?? '—'}</span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 font-semibold">{formatMoney(t.amount, t.currency)}</td>
-                      <td className="px-4 py-3 hidden lg:table-cell">
-                        <span className="font-mono text-small">VISA •••• {t.last4}</span>
-                      </td>
-                      <td className="px-4 py-3 hidden md:table-cell">
-                        <span className={cn('inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold',
-                          t.status === 'succeeded' && 'bg-success/15 text-success',
-                          t.status === 'failed' && 'bg-danger/15 text-danger',
-                          t.status === 'pending' && 'bg-warning/15 text-warning',
-                          t.status === 'refunded' && 'bg-info/15 text-info'
-                        )}>
-                          {t.status === 'succeeded' ? <CheckCircle2 className="h-3 w-3" /> : t.status === 'failed' ? <AlertTriangle className="h-3 w-3" /> : null}
-                          {txnStatusLabel[t.status]}
-                        </span>
-                        {t.failureReason && <p className="text-[10px] text-muted-light dark:text-muted-dark mt-0.5">{t.failureReason}</p>}
-                      </td>
-                      <td className="px-4 py-3 text-small text-muted-light dark:text-muted-dark">{timeAgo(t.createdAt)}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </Card>
-      )}
-
-      {/* Revenue analytics */}
-      {tab === 'revenue' && (
-        <div className="space-y-5">
-          <Card className="p-5">
-            <h2 className="text-h2 font-bold mb-1">نمو الإيرادات</h2>
-            <p className="text-small text-muted-light dark:text-muted-dark mb-4">آخر 6 أشهر بالدولار</p>
-            <LineChart labels={revenueLabels} series={[{ name: 'الإيرادات', color: '#2563EB', data: revenueData }]} height={280} />
+        {/* Invoices */}
+        <TabsContent value="invoices">
+          <Card className="overflow-hidden">
+            <CardHeader className="flex-row flex-wrap items-center gap-3 border-b">
+              <div className="relative flex-1 min-w-[200px]">
+                <Search className="h-4 w-4 absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="بحث برقم الفاتورة أو الشركة..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="pe-9"
+                />
+              </div>
+              <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as 'all' | InvoiceStatus)}>
+                <SelectTrigger className="w-auto min-w-[140px]">
+                  <SelectValue placeholder="كل الحالات" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">كل الحالات</SelectItem>
+                  <SelectItem value="paid">مدفوعة</SelectItem>
+                  <SelectItem value="pending">معلّقة</SelectItem>
+                  <SelectItem value="failed">فشلت</SelectItem>
+                  <SelectItem value="refunded">مرتجعة</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button variant="outline" onClick={handleExportInvoices}>
+                <Download className="h-4 w-4 me-2" /> CSV
+              </Button>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-start">رقم الفاتورة</TableHead>
+                      <TableHead className="text-start">العميل</TableHead>
+                      <TableHead className="text-start hidden md:table-cell">الإجمالي</TableHead>
+                      <TableHead className="text-start hidden lg:table-cell">تاريخ الاستحقاق</TableHead>
+                      <TableHead className="text-start">الحالة</TableHead>
+                      <TableHead className="text-start w-1">إجراءات</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredInvoices.map((inv) => {
+                      const client = clients.find((c) => c.id === inv.clientId);
+                      return (
+                        <TableRow key={inv.id}>
+                          <TableCell className="font-mono font-semibold">{inv.number}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <Avatar className="h-6 w-6 text-xs">
+                                <AvatarFallback>{getInitials(client?.companyName ?? '?')}</AvatarFallback>
+                              </Avatar>
+                              <span className="font-medium">{client?.companyName ?? '—'}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="hidden md:table-cell font-semibold">{formatMoney(inv.total, inv.currency)}</TableCell>
+                          <TableCell className="hidden lg:table-cell text-sm text-muted-foreground">{formatDate(inv.dueDate)}</TableCell>
+                          <TableCell>
+                            <Badge variant={invStatusVariant[inv.status]}>
+                              {invStatusLabel[inv.status]}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-1">
+                              <Button variant="ghost" size="icon" title="طباعة PDF" onClick={() => handleDownloadInvoice(inv)}>
+                                <FileText className="h-4 w-4" />
+                              </Button>
+                              {inv.status === 'paid' && (
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  title="استرجاع"
+                                  onClick={() => {
+                                    void (async () => {
+                                      const ok = await confirm({ title: `استرجاع فاتورة ${inv.number}؟`, message: `سيتم إرجاع ${inv.total} ${inv.currency} للعميل`, variant: 'warning', confirmText: 'استرجاع' });
+                                      if (ok) {
+                                        refundInvoice(inv.id);
+                                        showToast('تم استرجاع الفاتورة', 'success');
+                                      }
+                                    })();
+                                  }}
+                                >
+                                  <RefreshCcw className="h-4 w-4" />
+                                </Button>
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                    {filteredInvoices.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">لا توجد فواتير</TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
           </Card>
+        </TabsContent>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <Card className="p-5">
-              <h2 className="text-h2 font-bold mb-1">الإيرادات حسب الدولة</h2>
-              <p className="text-small text-muted-light dark:text-muted-dark mb-4">USD equivalent</p>
-              <BarChart
-                labels={revenueByCountry.map((x) => `${x.country.flag} ${x.country.code}`)}
-                data={revenueByCountry.map((x) => Math.round(x.revenue))}
-                color="#10B981"
-              />
+        {/* Transactions */}
+        <TabsContent value="transactions">
+          <Card className="overflow-hidden">
+            <CardHeader className="flex-row items-center justify-between border-b">
+              <CardTitle>سجل المعاملات (Paymob)</CardTitle>
+              <CardDescription>{transactions.length} معاملة</CardDescription>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-start">Transaction ID</TableHead>
+                      <TableHead className="text-start">العميل</TableHead>
+                      <TableHead className="text-start">المبلغ</TableHead>
+                      <TableHead className="text-start hidden lg:table-cell">البطاقة</TableHead>
+                      <TableHead className="text-start hidden md:table-cell">الحالة</TableHead>
+                      <TableHead className="text-start">التاريخ</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {transactions.slice(0, 100).map((t) => {
+                      const client = clients.find((c) => c.id === t.clientId);
+                      return (
+                        <TableRow key={t.id}>
+                          <TableCell className="font-mono text-sm">{t.paymobTransactionId}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <Avatar className="h-6 w-6 text-xs">
+                                <AvatarFallback>{getInitials(client?.companyName ?? '?')}</AvatarFallback>
+                              </Avatar>
+                              <span className="font-medium truncate">{client?.companyName ?? '—'}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="font-semibold">{formatMoney(t.amount, t.currency)}</TableCell>
+                          <TableCell className="hidden lg:table-cell">
+                            <span className="font-mono text-sm">VISA •••• {t.last4}</span>
+                          </TableCell>
+                          <TableCell className="hidden md:table-cell">
+                            <Badge variant={txnStatusVariant[t.status]} className="gap-1">
+                              {t.status === 'succeeded' ? <CheckCircle2 className="h-3 w-3" /> : t.status === 'failed' ? <AlertTriangle className="h-3 w-3" /> : null}
+                              {txnStatusLabel[t.status]}
+                            </Badge>
+                            {t.failureReason && <p className="text-[10px] text-muted-foreground mt-0.5">{t.failureReason}</p>}
+                          </TableCell>
+                          <TableCell className="text-sm text-muted-foreground">{timeAgo(t.createdAt)}</TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Revenue analytics */}
+        <TabsContent value="revenue">
+          <div className="space-y-5">
+            <Card>
+              <CardHeader>
+                <CardTitle>نمو الإيرادات</CardTitle>
+                <CardDescription>آخر 6 أشهر بالدولار</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <LineChart labels={revenueLabels} series={[{ name: 'الإيرادات', color: '#2563EB', data: revenueData }]} height={280} />
+              </CardContent>
             </Card>
 
-            <Card className="overflow-hidden">
-              <div className="px-5 py-4 border-b border-border-light dark:border-border-dark">
-                <h2 className="text-h2 font-bold">ملخص الإيرادات</h2>
-                <p className="text-small text-muted-light dark:text-muted-dark">حسب الدولة</p>
-              </div>
-              <div className="divide-y divide-border-light dark:divide-border-dark">
-                {revenueByCountry.map((x) => (
-                  <div key={x.country.code} className="px-5 py-3 flex items-center gap-3">
-                    <span className="text-2xl">{x.country.flag}</span>
-                    <div className="flex-1">
-                      <p className="text-body font-semibold">{x.country.nameAr}</p>
-                      <p className="text-small text-muted-light dark:text-muted-dark">{clients.filter((c) => c.country === x.country.code).length} عميل</p>
-                    </div>
-                    <div className="text-end">
-                      <p className="text-body font-bold text-success">${Math.round(x.revenue).toLocaleString()}</p>
-                      <p className="text-[10px] text-muted-light dark:text-muted-dark">/شهر</p>
-                    </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>الإيرادات حسب الدولة</CardTitle>
+                  <CardDescription>USD equivalent</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <BarChart
+                    labels={revenueByCountry.map((x) => `${x.country.flag} ${x.country.code}`)}
+                    data={revenueByCountry.map((x) => Math.round(x.revenue))}
+                    color="#10B981"
+                  />
+                </CardContent>
+              </Card>
+
+              <Card className="overflow-hidden">
+                <CardHeader className="border-b">
+                  <CardTitle>ملخص الإيرادات</CardTitle>
+                  <CardDescription>حسب الدولة</CardDescription>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <div className="divide-y">
+                    {revenueByCountry.map((x) => (
+                      <div key={x.country.code} className="px-5 py-3 flex items-center gap-3">
+                        <span className="text-2xl">{x.country.flag}</span>
+                        <div className="flex-1">
+                          <p className="text-sm font-semibold">{x.country.nameAr}</p>
+                          <p className="text-sm text-muted-foreground">{clients.filter((c) => c.country === x.country.code).length} عميل</p>
+                        </div>
+                        <div className="text-end">
+                          <p className="text-sm font-bold text-success">${Math.round(x.revenue).toLocaleString()}</p>
+                          <p className="text-[10px] text-muted-foreground">/شهر</p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
           </div>
-        </div>
-      )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
