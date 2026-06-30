@@ -8,13 +8,11 @@ import {
   Banknote,
   BarChart3,
   Settings,
-  HelpCircle,
   Eye,
   PanelRightClose,
   PanelRightOpen,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
-import { HelpDrawer } from '@components/layout/HelpDrawer';
 import { cn } from '@/lib/utils';
 import {
   Tooltip,
@@ -32,11 +30,7 @@ const navItems = [
   { to: '/payments', label: 'بوابة الدفع', icon: CreditCard },
   { to: '/reports', label: 'التقارير', icon: BarChart3 },
   { to: '/preview', label: 'معاينة', icon: Eye },
-];
-
-const bottomItems = [
-  { type: 'link' as const, to: '/settings', label: 'الإعدادات', icon: Settings },
-  { type: 'action' as const, action: 'help', label: 'المساعدة', icon: HelpCircle },
+  { to: '/settings', label: 'الإعدادات', icon: Settings },
 ];
 
 function getInitials(name: string): string {
@@ -51,7 +45,6 @@ function getInitials(name: string): string {
 export function AdminSidebar(): JSX.Element {
   const user = useAuthStore((s) => s.user);
   const location = useLocation();
-  const [helpOpen, setHelpOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
 
   const sidebarWidth = collapsed ? 'w-[68px]' : 'w-[240px]';
@@ -152,69 +145,6 @@ export function AdminSidebar(): JSX.Element {
           </nav>
         </ScrollArea>
 
-        {/* Bottom items */}
-        <div className="flex flex-col gap-1 px-3 pb-2">
-          {bottomItems.map((item) => {
-            const Icon = item.icon;
-
-            if (item.type === 'link' && item.to) {
-              const isActive = location.pathname === item.to;
-              const link = (
-                <NavLink
-                  key={item.label}
-                  to={item.to}
-                  className={cn(
-                    'flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-200',
-                    collapsed ? 'h-10 w-10 justify-center mx-auto' : 'h-10 px-3',
-                    isActive
-                      ? 'bg-white/15 text-white shadow-lg shadow-black/10'
-                      : 'text-white/60 hover:text-white hover:bg-white/8'
-                  )}
-                >
-                  <Icon className="h-[18px] w-[18px] flex-shrink-0" />
-                  {!collapsed && <span className="truncate">{item.label}</span>}
-                </NavLink>
-              );
-              if (collapsed) {
-                return (
-                  <Tooltip key={item.label}>
-                    <TooltipTrigger asChild>{link}</TooltipTrigger>
-                    <TooltipContent side="left" className="font-medium">{item.label}</TooltipContent>
-                  </Tooltip>
-                );
-              }
-              return link;
-            }
-
-            if (item.type === 'action' && item.action === 'help') {
-              const btn = (
-                <button
-                  key={item.label}
-                  onClick={() => setHelpOpen(true)}
-                  className={cn(
-                    'flex items-center gap-3 rounded-xl text-sm font-medium text-white/60 hover:text-white hover:bg-white/8 transition-all duration-200',
-                    collapsed ? 'h-10 w-10 justify-center mx-auto' : 'h-10 px-3 w-full'
-                  )}
-                >
-                  <Icon className="h-[18px] w-[18px] flex-shrink-0" />
-                  {!collapsed && <span className="truncate">{item.label}</span>}
-                </button>
-              );
-              if (collapsed) {
-                return (
-                  <Tooltip key={item.label}>
-                    <TooltipTrigger asChild>{btn}</TooltipTrigger>
-                    <TooltipContent side="left" className="font-medium">{item.label}</TooltipContent>
-                  </Tooltip>
-                );
-              }
-              return btn;
-            }
-
-            return null;
-          })}
-        </div>
-
         {/* User section */}
         <div className={cn('p-3 flex items-center', collapsed ? 'justify-center' : 'gap-3')}>
           {user && !collapsed && (
@@ -241,7 +171,6 @@ export function AdminSidebar(): JSX.Element {
         </div>
       </aside>
 
-      <HelpDrawer open={helpOpen} onClose={() => setHelpOpen(false)} />
     </TooltipProvider>
   );
 }

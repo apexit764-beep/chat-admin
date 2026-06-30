@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Bell, Moon, Search, Sun } from 'lucide-react';
+import { Bell, HelpCircle, Moon, Search, Sun } from 'lucide-react';
 import { useThemeStore } from '@/store/useThemeStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { CommandPalette } from '@components/ui';
+import { HelpDrawer } from '@components/layout/HelpDrawer';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
@@ -65,6 +66,7 @@ export function AdminTopbar(): JSX.Element {
   const title = titleMap[location.pathname] ?? 'لوحة التحكم';
   const subtitle = subtitleMap[location.pathname] ?? '';
   const [cmdOpen, setCmdOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent): void => {
@@ -154,6 +156,20 @@ export function AdminTopbar(): JSX.Element {
             <TooltipContent>الإشعارات</TooltipContent>
           </Tooltip>
 
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 rounded-xl"
+                onClick={() => setHelpOpen(true)}
+              >
+                <HelpCircle className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>المساعدة</TooltipContent>
+          </Tooltip>
+
           {/* User */}
           {user && (
             <DropdownMenu>
@@ -190,6 +206,7 @@ export function AdminTopbar(): JSX.Element {
       </header>
 
       <CommandPalette open={cmdOpen} onClose={() => setCmdOpen(false)} />
+      <HelpDrawer open={helpOpen} onClose={() => setHelpOpen(false)} />
     </TooltipProvider>
   );
 }
