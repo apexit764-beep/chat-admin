@@ -107,8 +107,8 @@ export const channels: Channel[] = [
   {
     id: 'ch5',
     type: 'messenger',
-    name: 'سكة - Facebook',
-    identifier: 'sekaa.oman',
+    name: 'Qhub - Facebook',
+    identifier: 'qhub.om',
     status: 'connected',
     departmentId: 'd2',
     unreadCount: 1,
@@ -118,8 +118,8 @@ export const channels: Channel[] = [
   {
     id: 'ch6',
     type: 'instagram',
-    name: 'sekaa_oman',
-    identifier: '@sekaa_oman',
+    name: 'qhub_om',
+    identifier: '@qhub_om',
     status: 'connected',
     departmentId: 'd2',
     unreadCount: 2,
@@ -129,8 +129,8 @@ export const channels: Channel[] = [
   {
     id: 'ch7',
     type: 'widget',
-    name: 'موقع سكة - شات حي',
-    identifier: 'sekaaoman.com',
+    name: 'موقع Qhub - شات حي',
+    identifier: 'qhub.com',
     status: 'connected',
     departmentId: 'd2',
     unreadCount: 0,
@@ -141,7 +141,7 @@ export const channels: Channel[] = [
     id: 'ch8',
     type: 'telegram',
     name: 'Telegram Bot',
-    identifier: '@SekaaBot',
+    identifier: '@QhubBot',
     status: 'disconnected',
     departmentId: null,
     unreadCount: 0,
@@ -157,7 +157,7 @@ export const agents: Agent[] = [
   {
     id: 'a1',
     name: 'سالم الرواحي',
-    email: 'salim@sekaaoman.com',
+    email: 'salim@qhub.com',
     role: 'manager',
     status: 'online',
     active: true,
@@ -168,7 +168,7 @@ export const agents: Agent[] = [
   {
     id: 'a2',
     name: 'فاطمة البلوشي',
-    email: 'fatma@sekaaoman.com',
+    email: 'fatma@qhub.com',
     role: 'agent',
     status: 'online',
     active: true,
@@ -179,7 +179,7 @@ export const agents: Agent[] = [
   {
     id: 'a3',
     name: 'محمد الحارثي',
-    email: 'mohammed@sekaaoman.com',
+    email: 'mohammed@qhub.com',
     role: 'agent',
     status: 'busy',
     active: true,
@@ -190,7 +190,7 @@ export const agents: Agent[] = [
   {
     id: 'a4',
     name: 'نور العلوي',
-    email: 'noor@sekaaoman.com',
+    email: 'noor@qhub.com',
     role: 'agent',
     status: 'offline',
     active: true,
@@ -201,7 +201,7 @@ export const agents: Agent[] = [
   {
     id: 'a5',
     name: 'خالد الكندي',
-    email: 'khalid@sekaaoman.com',
+    email: 'khalid@qhub.com',
     role: 'agent',
     status: 'online',
     active: true,
@@ -245,7 +245,7 @@ export const conversations: Conversation[] = [
     ],
     messages: [
       { id: 'm1', conversationId: 'conv1', direction: 'in', type: 'text', content: 'السلام عليكم', timestamp: nowMinus(25), read: true, delivered: true },
-      { id: 'm2', conversationId: 'conv1', direction: 'out', type: 'text', content: 'وعليكم السلام ورحمة الله، أهلاً وسهلاً بك في سكة. كيف يمكنني مساعدتك؟', timestamp: nowMinus(24), read: true, delivered: true },
+      { id: 'm2', conversationId: 'conv1', direction: 'out', type: 'text', content: 'وعليكم السلام ورحمة الله، أهلاً وسهلاً بك في Qhub. كيف يمكنني مساعدتك؟', timestamp: nowMinus(24), read: true, delivered: true },
       { id: 'm3', conversationId: 'conv1', direction: 'in', type: 'text', content: 'أبحث عن شقة للإيجار في مسقط بميزانية 350 ر.ع', timestamp: nowMinus(22), read: true, delivered: true },
       { id: 'm4', conversationId: 'conv1', direction: 'out', type: 'text', content: 'لدينا عدة خيارات متاحة في الخوض والسيب. هل تفضل غرفة واحدة أم غرفتين؟', timestamp: nowMinus(20), read: true, delivered: true },
       { id: 'm5', conversationId: 'conv1', direction: 'in', type: 'text', content: 'غرفتين من فضلك', timestamp: nowMinus(19), read: true, delivered: true },
@@ -364,10 +364,10 @@ export const conversations: Conversation[] = [
 // Templates
 // ============================================================
 export const templates: Template[] = [
-  { id: 't1', name: 'ترحيب أولي', category: 'welcome', body: 'مرحباً {{اسم_العميل}}، أهلاً بك في سكة! كيف يمكنني مساعدتك؟', usageCount: 247, createdAt: nowMinus(60 * 24 * 90) },
+  { id: 't1', name: 'ترحيب أولي', category: 'welcome', body: 'مرحباً {{اسم_العميل}}، أهلاً بك في Qhub! كيف يمكنني مساعدتك؟', usageCount: 247, createdAt: nowMinus(60 * 24 * 90) },
   { id: 't2', name: 'متابعة استفسار', category: 'followup', body: 'مرحباً {{اسم_العميل}}، فقط أتابع معك بخصوص استفسارك السابق. هل ما زلت مهتماً؟', usageCount: 134, createdAt: nowMinus(60 * 24 * 60) },
   { id: 't3', name: 'تأكيد موعد المعاينة', category: 'welcome', body: 'تم تأكيد موعد المعاينة ليوم {{التاريخ}}. نتطلع لرؤيتك!', usageCount: 89, createdAt: nowMinus(60 * 24 * 40) },
-  { id: 't4', name: 'إغلاق المحادثة', category: 'closing', body: 'شكراً لتواصلك مع سكة. نتمنى أن نكون قد أجبنا على كل استفساراتك!', usageCount: 312, createdAt: nowMinus(60 * 24 * 120) },
+  { id: 't4', name: 'إغلاق المحادثة', category: 'closing', body: 'شكراً لتواصلك مع Qhub. نتمنى أن نكون قد أجبنا على كل استفساراتك!', usageCount: 312, createdAt: nowMinus(60 * 24 * 120) },
   { id: 't5', name: 'تذكير الدفع', category: 'payment', body: 'مرحباً {{اسم_العميل}}، نذكرك بدفع المستحقات للطلب رقم {{رقم_الطلب}} قبل {{التاريخ}}.', usageCount: 56, createdAt: nowMinus(60 * 24 * 30) },
   { id: 't6', name: 'إيصال دفع', category: 'payment', body: 'تم استلام دفعتك بنجاح. رقم الطلب: {{رقم_الطلب}}. شكراً لك!', usageCount: 78, createdAt: nowMinus(60 * 24 * 20) },
   { id: 't7', name: 'متابعة بعد المعاينة', category: 'followup', body: 'مرحباً {{اسم_العميل}}، نأمل أن المعاينة كانت مفيدة. هل لديك أي استفسار إضافي؟', usageCount: 45, createdAt: nowMinus(60 * 24 * 15) },
@@ -399,12 +399,12 @@ export const notifications: Notification[] = [
 // Integrations
 // ============================================================
 export const integrations: Integration[] = [
-  { id: 'i1', type: 'messenger', name: 'Facebook Messenger', description: 'استقبل رسائل صفحتك على فيسبوك', connected: true, accountName: 'sekaa.oman', lastSync: nowMinus(5) },
-  { id: 'i2', type: 'instagram', name: 'Instagram Direct', description: 'استقبل رسائل انستجرام المباشرة', connected: true, accountName: '@sekaa_oman', lastSync: nowMinus(12) },
+  { id: 'i1', type: 'messenger', name: 'Facebook Messenger', description: 'استقبل رسائل صفحتك على فيسبوك', connected: true, accountName: 'qhub.om', lastSync: nowMinus(5) },
+  { id: 'i2', type: 'instagram', name: 'Instagram Direct', description: 'استقبل رسائل انستجرام المباشرة', connected: true, accountName: '@qhub_om', lastSync: nowMinus(12) },
   { id: 'i3', type: 'telegram', name: 'Telegram Bot', description: 'بوت تيليجرام لاستقبال الاستفسارات', connected: false },
   { id: 'i4', type: 'x', name: 'X (Twitter)', description: 'استقبل الـ Direct Messages والمنشن من X', connected: false },
   { id: 'i5', type: 'slack', name: 'Slack', description: 'إشعارات داخلية على قناة Slack', connected: false },
-  { id: 'i6', type: 'zapier', name: 'Zapier', description: 'اربط سكة بآلاف التطبيقات الأخرى', connected: false },
+  { id: 'i6', type: 'zapier', name: 'Zapier', description: 'اربط Qhub بآلاف التطبيقات الأخرى', connected: false },
   { id: 'i7', type: 'webhook', name: 'Custom Webhook', description: 'استقبل أحداث المحادثات على خادمك الخاص', connected: false },
 ];
 
@@ -415,7 +415,7 @@ export const widgetConfig: WidgetConfig = {
   primaryColor: '#2563EB',
   position: 'bottom-right',
   welcomeMessage: 'مرحباً 👋 كيف يمكننا مساعدتك اليوم؟',
-  teamName: 'فريق سكة',
+  teamName: 'فريق Qhub',
   responseTime: 'نرد عادةً خلال دقائق',
   showAvatar: true,
   collectEmail: false,

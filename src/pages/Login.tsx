@@ -33,7 +33,7 @@ export default function Login(): JSX.Element {
   const from =
     (location.state as { from?: string } | null)?.from ?? (isAdmin ? '/dashboard' : '/inbox');
 
-  const defaultEmail = isAdmin ? 'admin@apexes.click' : 'admin@sekaa.com';
+  const defaultEmail = isAdmin ? 'admin@apexes.click' : 'admin@qhub.com';
   const [email, setEmail] = useState(defaultEmail);
   const [password, setPassword] = useState('admin123');
   const [showPwd, setShowPwd] = useState(false);
@@ -108,7 +108,7 @@ export default function Login(): JSX.Element {
             </div>
             <div>
               <p className="font-extrabold text-lg leading-tight">
-                {isAdmin ? 'Apex Solutions' : 'سكة'}
+                {isAdmin ? 'Apex Solutions' : 'Qhub'}
               </p>
               <p className="text-[10px] text-muted-light dark:text-muted-dark leading-tight">
                 {isAdmin ? 'Admin Console' : 'WhatsApp CRM'}
@@ -136,7 +136,7 @@ export default function Login(): JSX.Element {
           <p className="text-body text-muted-light dark:text-muted-dark mb-8">
             {isAdmin
               ? 'سجّل دخولك للوصول إلى لوحة إدارة Apex Solutions'
-              : 'سجّل دخولك لإدارة محادثاتك في سكة'}
+              : 'سجّل دخولك لإدارة محادثاتك في Qhub'}
           </p>
 
           <form onSubmit={onSubmit} className="space-y-4">
@@ -325,7 +325,7 @@ export default function Login(): JSX.Element {
 
         {/* Footer */}
         <div className="flex items-center justify-between text-small text-muted-light dark:text-muted-dark">
-          <p>© 2026 {isAdmin ? 'Apex Solutions' : 'سكة'}</p>
+          <p>© 2026 {isAdmin ? 'Apex Solutions' : 'Qhub'}</p>
           <div className="flex items-center gap-3">
             <a href="#" className="hover:text-current">الخصوصية</a>
             <a href="#" className="hover:text-current">الشروط</a>
@@ -368,7 +368,7 @@ function HeroPanel({ isAdmin }: { isAdmin: boolean }): JSX.Element {
       >
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur text-[10px] font-bold uppercase tracking-wider mb-4">
           <Sparkles className="h-3 w-3" />
-          {isAdmin ? 'Admin Console v2.0' : 'سكة CRM v2.0'}
+          {isAdmin ? 'Admin Console v2.0' : 'Qhub CRM v2.0'}
         </div>
         <h2 className="text-h1 lg:text-display font-extrabold leading-tight mb-3">
           {isAdmin ? 'منصّة إدارة منتج SaaS متكاملة' : 'تواصل أفضل، عملاء أسعد'}
@@ -442,7 +442,7 @@ function HeroPanel({ isAdmin }: { isAdmin: boolean }): JSX.Element {
         ) : (
           <blockquote className="max-w-md">
             <p className="text-body italic opacity-95 leading-relaxed mb-3">
-              "سكة وفّرت علينا ساعات يومياً. كل الفريق يشتغل على نفس الصندوق، ومحدّ بيضيع منا عميل. أفضل قرار خذيناه السنة"
+              "Qhub وفّرت علينا ساعات يومياً. كل الفريق يشتغل على نفس الصندوق، ومحدّ بيضيع منا عميل. أفضل قرار خذيناه السنة"
             </p>
             <div className="flex items-center gap-2">
               <div className="h-9 w-9 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-base font-bold">
@@ -450,7 +450,7 @@ function HeroPanel({ isAdmin }: { isAdmin: boolean }): JSX.Element {
               </div>
               <div>
                 <p className="text-small font-semibold">سالم الرواحي</p>
-                <p className="text-[10px] opacity-75">مدير، سكة عُمان</p>
+                <p className="text-[10px] opacity-75">مدير، Qhub</p>
               </div>
             </div>
           </blockquote>

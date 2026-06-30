@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#5BB8F5"/>
+      <stop offset="100%" stop-color="#2563EB"/>
+    </linearGradient>
+  </defs>
+  <!-- Circle -->
+  <circle cx="240" cy="240" r="230" fill="url(#bg)"/>
+  <!-- White chat bubble cutout -->
+  <rect x="140" y="130" width="200" height="180" rx="40" fill="white"/>
+  <!-- Q tail -->
+  <polygon points="340,380 420,500 260,380" fill="url(#bg)"/>
+</svg>

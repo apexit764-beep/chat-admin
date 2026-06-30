@@ -40,7 +40,7 @@ const defaultState: Pick<SettingsState, 'notifications' | 'security' | 'general'
   notifications: { newConv: true, newMsg: true, campaigns: true, browser: false, sound: true },
   security: { twoFactor: false, ipRestriction: false, sessionTimeoutMin: 60 },
   general: {
-    siteName: 'سكة',
+    siteName: 'Qhub',
     siteUrl: 'https://chat-client.apexes.click',
     supportEmail: 'support@apexes.click',
     supportPhone: '+96891234567',

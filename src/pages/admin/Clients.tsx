@@ -405,7 +405,7 @@ export default function AdminClients(): JSX.Element {
                 id="companyName"
                 value={form.companyName}
                 onChange={(e) => { setForm({ ...form, companyName: e.target.value }); setErrors({ ...errors, companyName: undefined }); }}
-                placeholder="مثال: سكة"
+                placeholder="مثال: Qhub"
               />
               {errors.companyName && <p className="text-sm text-destructive">{errors.companyName}</p>}
             </div>

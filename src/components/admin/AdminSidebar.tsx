@@ -77,15 +77,13 @@ export function AdminSidebar(): JSX.Element {
           'flex items-center gap-3 pt-6 pb-4',
           collapsed ? 'justify-center px-3' : 'px-5'
         )}>
-          <div className="h-10 w-10 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center flex-shrink-0 ring-1 ring-white/20">
-            <NavLink to="/dashboard" className="font-extrabold text-lg text-white">
-              S
-            </NavLink>
-          </div>
+          <NavLink to="/dashboard" className="h-10 w-10 flex-shrink-0">
+            <img src="/qhub-icon.svg" alt="Qhub" className="h-10 w-10" />
+          </NavLink>
           {!collapsed && (
             <div className="flex flex-col min-w-0">
-              <span className="text-sm font-bold text-white tracking-wide">Sekaa</span>
-              <span className="text-[10px] text-white/50">Admin Panel</span>
+              <span className="text-sm font-bold text-white tracking-wide">Qhub</span>
+              <span className="text-[10px] text-white/50">لوحة التحكم</span>
             </div>
           )}
         </div>

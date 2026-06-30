@@ -134,9 +134,9 @@ export const plans: Plan[] = [
 export const clients: Client[] = [
   {
     id: 'client_1',
-    companyName: 'سكة Sekaa',
+    companyName: 'Qhub',
     contactName: 'محمد الكندي',
-    email: 'admin@sekaaoman.com',
+    email: 'admin@qhub.com',
     phone: '+96891234567',
     country: 'OM',
     industry: 'عقارات وتأجير',
