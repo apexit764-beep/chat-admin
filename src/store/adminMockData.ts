@@ -514,3 +514,80 @@ export const adminUsers: AdminUser[] = [
   { id: 'au_3', name: 'علي السالم', email: 'ali@apexes.click', role: 'support', active: true, lastActive: nowMinus(120), createdAt: nowMinus(60 * 24 * 60) },
   { id: 'au_4', name: 'Layla Khalid', email: 'layla@apexes.click', role: 'finance', active: true, lastActive: nowMinus(60 * 24), createdAt: nowMinus(60 * 24 * 30) },
 ];
+
+// =====================================================================
+// Platform Statistics
+// =====================================================================
+export const platformStats = {
+  totalConversations: 18_457,
+  activeConversations: 1_234,
+  totalMessages: 156_890,
+  avgResponseTime: 3.2, // minutes
+  totalChannels: 42,
+  channelDistribution: {
+    whatsapp: 28,
+    messenger: 6,
+    instagram: 4,
+    telegram: 2,
+    widget: 1,
+    email: 1,
+  },
+  totalAgents: 106,
+  onlineAgents: 43,
+};
+
+// =====================================================================
+// Campaign Statistics
+// =====================================================================
+export const campaignStats = {
+  totalCampaigns: 87,
+  activeCampaigns: 12,
+  completedCampaigns: 68,
+  failedCampaigns: 7,
+  totalMessagesSent: 45_230,
+  avgOpenRate: 72.4,
+  avgClickRate: 18.6,
+  // Monthly campaign data (last 6 months)
+  monthlyCampaigns: [
+    { month: 'ديسمبر', sent: 5200, delivered: 4800, opened: 3400 },
+    { month: 'يناير', sent: 6100, delivered: 5700, opened: 4200 },
+    { month: 'فبراير', sent: 7400, delivered: 6900, opened: 5100 },
+    { month: 'مارس', sent: 8200, delivered: 7600, opened: 5800 },
+    { month: 'أبريل', sent: 9100, delivered: 8500, opened: 6400 },
+    { month: 'مايو', sent: 9800, delivered: 9200, opened: 7100 },
+  ],
+};
+
+// =====================================================================
+// Customer Satisfaction
+// =====================================================================
+export const satisfactionStats = {
+  avgRating: 4.3, // out of 5
+  totalRatings: 3_421,
+  distribution: {
+    5: 1_450,
+    4: 980,
+    3: 520,
+    2: 280,
+    1: 191,
+  },
+  // By client (top clients by rating count)
+  byClient: [
+    { clientId: 'client_8', avgRating: 4.7, ratingCount: 842 },
+    { clientId: 'client_3', avgRating: 4.5, ratingCount: 634 },
+    { clientId: 'client_10', avgRating: 4.4, ratingCount: 521 },
+    { clientId: 'client_1', avgRating: 4.2, ratingCount: 412 },
+    { clientId: 'client_5', avgRating: 4.1, ratingCount: 389 },
+    { clientId: 'client_7', avgRating: 3.9, ratingCount: 298 },
+    { clientId: 'client_2', avgRating: 3.8, ratingCount: 215 },
+  ],
+  // Monthly trend
+  monthlyTrend: [
+    { month: 'ديسمبر', avg: 4.0 },
+    { month: 'يناير', avg: 4.1 },
+    { month: 'فبراير', avg: 4.2 },
+    { month: 'مارس', avg: 4.1 },
+    { month: 'أبريل', avg: 4.3 },
+    { month: 'مايو', avg: 4.3 },
+  ],
+};

@@ -18,6 +18,9 @@ import {
   plans as initialPlans,
   subscriptions as initialSubscriptions,
   transactions as initialTransactions,
+  platformStats as initialPlatformStats,
+  campaignStats as initialCampaignStats,
+  satisfactionStats as initialSatisfactionStats,
 } from './adminMockData';
 
 interface AdminState {
@@ -29,6 +32,9 @@ interface AdminState {
   transactions: Transaction[];
   paymob: PaymobConfig;
   adminUsers: AdminUser[];
+  platformStats: typeof initialPlatformStats;
+  campaignStats: typeof initialCampaignStats;
+  satisfactionStats: typeof initialSatisfactionStats;
 
   // Client actions
   addClient: (c: Omit<Client, 'id' | 'joinedAt' | 'lastActiveAt' | 'subscriptionId' | 'mrr' | 'agentCount' | 'channelCount' | 'conversationCount'>) => Client;
@@ -70,6 +76,9 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   transactions: initialTransactions,
   paymob: initialPaymobConfig,
   adminUsers: initialAdminUsers,
+  platformStats: initialPlatformStats,
+  campaignStats: initialCampaignStats,
+  satisfactionStats: initialSatisfactionStats,
 
   addClient: (c) => {
     const client: Client = {

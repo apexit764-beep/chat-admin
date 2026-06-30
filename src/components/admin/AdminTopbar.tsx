@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Bell, HelpCircle, Moon, Search, Sun } from 'lucide-react';
+import { HelpCircle, Moon, Search, Sun } from 'lucide-react';
+import { NotificationDropdown } from '@/components/admin/NotificationDropdown';
 import { useThemeStore } from '@/store/useThemeStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { CommandPalette } from '@components/ui';
@@ -146,15 +147,7 @@ export function AdminTopbar(): JSX.Element {
             <TooltipContent>تبديل الوضع</TooltipContent>
           </Tooltip>
 
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl relative">
-                <Bell className="h-4 w-4" />
-                <span className="absolute top-1.5 end-1.5 h-2 w-2 bg-destructive rounded-full ring-2 ring-background" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>الإشعارات</TooltipContent>
-          </Tooltip>
+          <NotificationDropdown />
 
           <Tooltip>
             <TooltipTrigger asChild>

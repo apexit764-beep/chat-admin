@@ -8,6 +8,10 @@ import {
   AlertTriangle,
   Sparkles,
   ArrowUpRight,
+  MessageSquare,
+  Radio,
+  Send,
+  Star,
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -26,6 +30,7 @@ import {
   TableCell,
 } from '@/components/ui/table';
 import { LineChart } from '@components/charts/LineChart';
+import { DoughnutChart } from '@components/charts/DoughnutChart';
 import { useAdminStore } from '@/store/useAdminStore';
 import { formatMoney, approxUSD } from '@/utils/money';
 import { timeAgo } from '@/utils/format';
@@ -38,6 +43,9 @@ export default function AdminDashboard(): JSX.Element {
   const transactions = useAdminStore((s) => s.transactions);
   const plans = useAdminStore((s) => s.plans);
   const countries = useAdminStore((s) => s.countries);
+  const platformStatsData = useAdminStore((s) => s.platformStats);
+  const campaignStatsData = useAdminStore((s) => s.campaignStats);
+  const satisfactionStatsData = useAdminStore((s) => s.satisfactionStats);
 
   const mrr = useMemo(() => subscriptions
     .filter((s) => s.status === 'active' && s.billingCycle === 'monthly')
@@ -157,6 +165,96 @@ export default function AdminDashboard(): JSX.Element {
                 </div>
               );
             })}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Platform Usage KPI Strip */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <Kpi
+          label="إجمالي المحادثات"
+          value={platformStatsData.totalConversations.toLocaleString()}
+          delta={14}
+          deltaLabel={`${platformStatsData.activeConversations.toLocaleString()} محادثة نشطة`}
+          icon={<MessageSquare className="h-4 w-4" />}
+          color="text-violet-600 dark:text-violet-400"
+          iconBg="bg-violet-500/10"
+        />
+        <Kpi
+          label="القنوات المتصلة"
+          value={platformStatsData.totalChannels}
+          delta={null}
+          deltaLabel={`${platformStatsData.onlineAgents} وكيل متصل`}
+          icon={<Radio className="h-4 w-4" />}
+          color="text-cyan-600 dark:text-cyan-400"
+          iconBg="bg-cyan-500/10"
+        />
+        <Kpi
+          label="الحملات النشطة"
+          value={campaignStatsData.activeCampaigns}
+          delta={8}
+          deltaLabel={`${campaignStatsData.totalCampaigns} حملة إجمالية`}
+          icon={<Send className="h-4 w-4" />}
+          color="text-rose-600 dark:text-rose-400"
+          iconBg="bg-rose-500/10"
+        />
+        <Kpi
+          label="رضا العملاء"
+          value={`${satisfactionStatsData.avgRating}/5`}
+          delta={5}
+          deltaLabel={`${satisfactionStatsData.totalRatings.toLocaleString()} تقييم`}
+          icon={<Star className="h-4 w-4" />}
+          color="text-yellow-600 dark:text-yellow-400"
+          iconBg="bg-yellow-500/10"
+        />
+      </div>
+
+      {/* Channel Distribution + Campaign Performance */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Channel Distribution */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg">توزيع القنوات</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <DoughnutChart
+              data={[
+                { label: 'واتساب', value: platformStatsData.channelDistribution.whatsapp, color: '#25D366' },
+                { label: 'ماسنجر', value: platformStatsData.channelDistribution.messenger, color: '#0084FF' },
+                { label: 'انستقرام', value: platformStatsData.channelDistribution.instagram, color: '#E1306C' },
+                { label: 'تلغرام', value: platformStatsData.channelDistribution.telegram, color: '#0088CC' },
+                { label: 'ويدجت', value: platformStatsData.channelDistribution.widget, color: '#6366F1' },
+                { label: 'إيميل', value: platformStatsData.channelDistribution.email, color: '#F59E0B' },
+              ]}
+            />
+          </CardContent>
+        </Card>
+
+        {/* Campaign Performance */}
+        <Card>
+          <CardHeader className="pb-2">
+            <div className="flex items-start justify-between">
+              <div>
+                <CardTitle className="text-lg">أداء الحملات</CardTitle>
+                <p className="text-xs text-muted-foreground mt-1">آخر 6 أشهر · رسائل مرسلة ومفتوحة</p>
+              </div>
+              <div className="flex items-center gap-3 text-[10px]">
+                <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-blue-500 inline-block" /> مرسلة</span>
+                <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-emerald-500 inline-block" /> مستلمة</span>
+                <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-amber-500 inline-block" /> مفتوحة</span>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <LineChart
+              labels={campaignStatsData.monthlyCampaigns.map((m) => m.month)}
+              series={[
+                { name: 'مرسلة', color: '#3B82F6', data: campaignStatsData.monthlyCampaigns.map((m) => m.sent) },
+                { name: 'مستلمة', color: '#10B981', data: campaignStatsData.monthlyCampaigns.map((m) => m.delivered) },
+                { name: 'مفتوحة', color: '#F59E0B', data: campaignStatsData.monthlyCampaigns.map((m) => m.opened) },
+              ]}
+              height={200}
+            />
           </CardContent>
         </Card>
       </div>
