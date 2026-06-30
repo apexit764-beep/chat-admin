@@ -88,25 +88,29 @@ export function AdminSidebar(): JSX.Element {
           'flex items-center gap-3 pt-6 pb-4',
           collapsed ? 'justify-center px-3' : 'px-5'
         )}>
-          <NavLink to="/dashboard" className="h-10 w-10 flex-shrink-0">
-            <img src="/qhub-icon.png" alt="Qhub" className="h-10 w-10" />
-          </NavLink>
-          {!collapsed && (
+          {collapsed ? (
+            <div className="group relative h-10 w-10 flex-shrink-0">
+              <NavLink to="/dashboard" className="block h-10 w-10">
+                <img src="/qhub-icon.png" alt="Qhub" className="h-10 w-10" />
+              </NavLink>
+              <button
+                onClick={() => setCollapsed(false)}
+                className="absolute inset-0 h-10 w-10 rounded-lg bg-black/50 backdrop-blur-sm flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+              >
+                <PanelRightClose className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
             <>
+              <NavLink to="/dashboard" className="h-10 w-10 flex-shrink-0">
+                <img src="/qhub-icon.png" alt="Qhub" className="h-10 w-10" />
+              </NavLink>
               <div className="flex flex-col min-w-0 flex-1">
                 <span className="text-sm font-bold text-white tracking-wide">Qhub</span>
                 <span className="text-[10px] text-white/50">لوحة التحكم</span>
               </div>
               {toggleBtn}
             </>
-          )}
-          {collapsed && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                {toggleBtn}
-              </TooltipTrigger>
-              <TooltipContent side="left" className="font-medium">توسيع القائمة</TooltipContent>
-            </Tooltip>
           )}
         </div>
 
