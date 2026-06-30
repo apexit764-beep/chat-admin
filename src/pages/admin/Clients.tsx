@@ -3,7 +3,6 @@ import {
   Plus,
   Download,
   MoreHorizontal,
-  ExternalLink,
   Eye,
   Edit2,
   Trash2,
@@ -298,11 +297,6 @@ export default function AdminClients(): JSX.Element {
       key: 'actions', header: '', sortable: false, width: '100px', align: 'end',
       cell: (r) => (
         <div className="flex items-center gap-1 justify-end" onClick={(e) => e.stopPropagation()}>
-          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:text-primary" asChild>
-            <a href={r.dashboardUrl} target="_blank" rel="noreferrer" title="فتح داشبورد العميل">
-              <ExternalLink className="h-4 w-4" />
-            </a>
-          </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground" aria-label="المزيد">
@@ -542,13 +536,6 @@ function ClientDrawerBody({ client, onEdit, onDelete }: { client: Client; onEdit
         </Badge>
       </div>
 
-      <Button className="w-full" asChild>
-        <a href={client.dashboardUrl} target="_blank" rel="noreferrer">
-          <ExternalLink className="h-4 w-4 me-2" />
-          فتح داشبورد {client.companyName}
-        </a>
-      </Button>
-
       <div className="grid grid-cols-3 gap-3 text-center">
         <div className="p-3 rounded-lg bg-muted">
           <p className="text-lg font-bold">{client.agentCount}</p>
@@ -569,7 +556,7 @@ function ClientDrawerBody({ client, onEdit, onDelete }: { client: Client; onEdit
         <div className="space-y-1.5 text-small">
           <div className="flex items-center gap-2"><Mail className="h-3.5 w-3.5 text-muted-foreground" /> {client.email}</div>
           <div className="flex items-center gap-2"><Phone className="h-3.5 w-3.5 text-muted-foreground" /> {client.phone}</div>
-          <div className="flex items-center gap-2"><Globe className="h-3.5 w-3.5 text-muted-foreground" /> <a href={client.dashboardUrl} className="text-primary hover:underline" target="_blank" rel="noreferrer">{client.dashboardUrl}</a></div>
+          <div className="flex items-center gap-2"><Globe className="h-3.5 w-3.5 text-muted-foreground" /> <span className="text-muted-foreground">{client.dashboardUrl || '—'}</span></div>
         </div>
       </div>
 

@@ -58,18 +58,7 @@ export function setAppModeOverride(mode: AppMode | null): void {
   }
 }
 
-export const CLIENT_DASHBOARD_URL = 'https://chat-client.apexes.click';
-export const ADMIN_DASHBOARD_URL = 'https://chat-admin.apexes.click';
-
-/** URL of the client dashboard, for cross-linking from admin */
-export function clientDashboardUrl(): string {
-  if (typeof window === 'undefined') return '/client';
-  // Prefer same-host /client path for impersonation (no separate auth needed)
-  if (hostIsAdmin(window.location.hostname)) {
-    return `${window.location.protocol}//${window.location.host}/client`;
-  }
-  return CLIENT_DASHBOARD_URL;
-}
+export const ADMIN_DASHBOARD_URL = 'https://qhub-admin.apexes.click';
 
 export function adminDashboardUrl(): string {
   if (typeof window === 'undefined') return '/';

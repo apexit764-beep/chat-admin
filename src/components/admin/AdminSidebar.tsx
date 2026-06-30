@@ -10,13 +10,11 @@ import {
   Settings,
   LogOut,
   HelpCircle,
-  ExternalLink,
   Eye,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
-import { clientDashboardUrl } from '@/utils/mode';
 import { HelpDrawer } from '@components/layout/HelpDrawer';
 import { cn } from '@/lib/utils';
 import {
@@ -38,7 +36,6 @@ const navItems = [
 ];
 
 const bottomItems = [
-  { type: 'external' as const, href: '', label: 'فتح داشبورد العميل', icon: ExternalLink },
   { type: 'link' as const, to: '/settings', label: 'الإعدادات', icon: Settings },
   { type: 'action' as const, action: 'help', label: 'المساعدة', icon: HelpCircle },
 ];
@@ -145,33 +142,6 @@ export function AdminSidebar(): JSX.Element {
         <div className="flex flex-col gap-1 px-3 pb-2">
           {bottomItems.map((item) => {
             const Icon = item.icon;
-
-            if (item.type === 'external') {
-              const link = (
-                <a
-                  key={item.label}
-                  href={clientDashboardUrl()}
-                  target="_blank"
-                  rel="noreferrer"
-                  className={cn(
-                    'flex items-center gap-3 rounded-xl text-sm font-medium text-white/60 hover:text-white hover:bg-white/8 transition-all duration-200',
-                    collapsed ? 'h-10 w-10 justify-center mx-auto' : 'h-10 px-3'
-                  )}
-                >
-                  <Icon className="h-[18px] w-[18px] flex-shrink-0" />
-                  {!collapsed && <span className="truncate">{item.label}</span>}
-                </a>
-              );
-              if (collapsed) {
-                return (
-                  <Tooltip key={item.label}>
-                    <TooltipTrigger asChild>{link}</TooltipTrigger>
-                    <TooltipContent side="left" className="font-medium">{item.label}</TooltipContent>
-                  </Tooltip>
-                );
-              }
-              return link;
-            }
 
             if (item.type === 'link' && item.to) {
               const isActive = location.pathname === item.to;
