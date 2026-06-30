@@ -5,7 +5,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Tajawal', 'system-ui', 'sans-serif'],
+        sans: ['IBM Plex Sans Arabic', 'system-ui', 'sans-serif'],
       },
       colors: {
         background: 'hsl(var(--background))',
