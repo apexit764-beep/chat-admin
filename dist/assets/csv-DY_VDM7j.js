@@ -1,4 +1,4 @@
-import{ai as u,ak as s,C as g,af as c}from"./index-Cw2vsOfo.js";import{a as f,T as b}from"./trending-up-B-GfMkpr.js";/**
+import{ai as u,ak as s,C as g,af as c}from"./index-DVlvOVOh.js";import{a as f,T as b}from"./trending-up-CCP2qxY5.js";/**
  * @license lucide-react v0.378.0 - ISC
  *
  * This source code is licensed under the ISC license.
