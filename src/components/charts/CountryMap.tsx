@@ -24,18 +24,26 @@ const COUNTRY_COORDS: Record<string, { lon: number; lat: number }> = {
   OM: { lon: 56.5, lat: 21.5 },
 };
 
-const LON_MIN = 26;
-const LON_MAX = 60;
-const LAT_MIN = 15;
-const LAT_MAX = 34;
-const W = 520;
-const H = 320;
+const W = 1000;
+const H = 500;
 
-const toX = (lon: number): number => ((lon - LON_MIN) / (LON_MAX - LON_MIN)) * W;
-const toY = (lat: number): number => ((LAT_MAX - lat) / (LAT_MAX - LAT_MIN)) * H;
+const toX = (lon: number): number => ((lon + 180) / 360) * W;
+const toY = (lat: number): number => ((90 - lat) / 180) * H;
 
-const REGION_PATH = 'M 45,95 L 85,80 L 130,75 L 175,85 L 180,140 L 165,200 L 130,250 L 90,235 L 55,200 L 35,150 Z';
-const PENINSULA_PATH = 'M 175,90 L 235,80 L 295,85 L 345,95 L 395,115 L 440,145 L 470,180 L 480,220 L 460,255 L 415,265 L 365,255 L 320,235 L 280,205 L 240,170 L 210,140 L 185,115 Z';
+const CONTINENTS = `
+M 83 56 L 175 45 L 260 42 L 320 50 L 347 78 L 350 115 L 330 140 L 290 175 L 250 200 L 220 195 L 195 175 L 165 145 L 135 105 L 100 78 Z
+M 230 200 L 258 218 L 275 240 L 268 248 L 248 232 L 232 212 Z
+M 285 240 L 320 232 L 370 248 L 405 278 L 395 320 L 360 365 L 322 400 L 305 405 L 290 380 L 282 330 L 278 285 Z
+M 361 28 L 425 25 L 445 48 L 432 72 L 388 82 L 365 65 Z
+M 478 144 L 510 92 L 555 65 L 605 75 L 680 80 L 695 120 L 670 145 L 612 152 L 560 152 L 510 152 Z
+M 478 155 L 540 152 L 595 162 L 625 185 L 642 220 L 632 260 L 612 305 L 580 340 L 545 350 L 520 332 L 508 295 L 510 252 L 490 222 L 460 205 L 455 185 Z
+M 600 145 L 680 82 L 770 56 L 900 60 L 970 75 L 990 90 L 970 110 L 935 122 L 890 150 L 855 175 L 825 200 L 795 222 L 760 235 L 720 235 L 695 210 L 685 178 L 660 172 L 615 158 Z
+M 700 175 L 728 195 L 745 222 L 730 240 L 710 230 L 695 205 Z
+M 795 235 L 875 240 L 882 252 L 845 258 L 800 252 Z
+M 805 263 L 870 268 L 860 280 L 820 275 Z
+M 814 285 L 870 278 L 925 285 L 922 322 L 895 352 L 845 355 L 815 340 L 810 312 Z
+M 940 365 L 968 360 L 972 378 L 952 388 L 938 378 Z
+`;
 
 export function CountryMap({ data, height = 320 }: CountryMapProps): JSX.Element {
   const [hoveredCode, setHoveredCode] = useState<string | null>(null);
@@ -49,7 +57,7 @@ export function CountryMap({ data, height = 320 }: CountryMapProps): JSX.Element
         const x = toX(c.lon);
         const y = toY(c.lat);
         const ratio = d.count / max;
-        const r = 8 + Math.sqrt(ratio) * 22;
+        const r = 7 + Math.sqrt(ratio) * 16;
         return { ...d, x, y, r, ratio };
       });
   }, [data]);
@@ -65,13 +73,13 @@ export function CountryMap({ data, height = 320 }: CountryMapProps): JSX.Element
         preserveAspectRatio="xMidYMid meet"
       >
         <defs>
-          <radialGradient id="map-bg" cx="50%" cy="40%" r="70%">
-            <stop offset="0%" stopColor="currentColor" stopOpacity="0.04" />
-            <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
-          </radialGradient>
-          <linearGradient id="land-grad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="currentColor" stopOpacity="0.08" />
+          <linearGradient id="ocean-bg" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="currentColor" stopOpacity="0.02" />
             <stop offset="100%" stopColor="currentColor" stopOpacity="0.05" />
+          </linearGradient>
+          <linearGradient id="land-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="currentColor" stopOpacity="0.10" />
+            <stop offset="100%" stopColor="currentColor" stopOpacity="0.07" />
           </linearGradient>
           <filter id="bubble-shadow" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur in="SourceAlpha" stdDeviation="2" />
@@ -86,9 +94,9 @@ export function CountryMap({ data, height = 320 }: CountryMapProps): JSX.Element
           </filter>
         </defs>
 
-        <rect x="0" y="0" width={W} height={H} fill="url(#map-bg)" />
+        <rect x="0" y="0" width={W} height={H} fill="url(#ocean-bg)" />
 
-        {[20, 25, 30].map((lat) => (
+        {[0, 30, 60, -30, -60].map((lat) => (
           <line
             key={`lat-${lat}`}
             x1={0}
@@ -96,11 +104,11 @@ export function CountryMap({ data, height = 320 }: CountryMapProps): JSX.Element
             y1={toY(lat)}
             y2={toY(lat)}
             stroke="currentColor"
-            strokeOpacity="0.05"
-            strokeDasharray="3 5"
+            strokeOpacity="0.04"
+            strokeDasharray="2 6"
           />
         ))}
-        {[30, 40, 50].map((lon) => (
+        {[-120, -60, 0, 60, 120].map((lon) => (
           <line
             key={`lon-${lon}`}
             x1={toX(lon)}
@@ -108,13 +116,19 @@ export function CountryMap({ data, height = 320 }: CountryMapProps): JSX.Element
             y1={0}
             y2={H}
             stroke="currentColor"
-            strokeOpacity="0.05"
-            strokeDasharray="3 5"
+            strokeOpacity="0.04"
+            strokeDasharray="2 6"
           />
         ))}
 
-        <path d={REGION_PATH} fill="url(#land-grad)" stroke="currentColor" strokeOpacity="0.12" strokeWidth="1" />
-        <path d={PENINSULA_PATH} fill="url(#land-grad)" stroke="currentColor" strokeOpacity="0.12" strokeWidth="1" />
+        <path
+          d={CONTINENTS}
+          fill="url(#land-grad)"
+          stroke="currentColor"
+          strokeOpacity="0.12"
+          strokeWidth="0.75"
+          fillRule="evenodd"
+        />
 
         {items.map((it) => {
           const isHovered = hoveredCode === it.code;
@@ -124,7 +138,7 @@ export function CountryMap({ data, height = 320 }: CountryMapProps): JSX.Element
               key={it.code}
               transform={`translate(${it.x},${it.y})`}
               style={{
-                opacity: dim ? 0.35 : 1,
+                opacity: dim ? 0.3 : 1,
                 transition: 'opacity 0.2s ease',
                 cursor: 'pointer',
               }}
@@ -132,24 +146,24 @@ export function CountryMap({ data, height = 320 }: CountryMapProps): JSX.Element
               onMouseLeave={() => setHoveredCode(null)}
             >
               <circle
-                r={it.r + 4}
+                r={it.r + 5}
                 fill="#2563EB"
-                opacity={isHovered ? 0.18 : 0.1}
+                opacity={isHovered ? 0.22 : 0.12}
                 style={{ transition: 'opacity 0.2s ease' }}
               />
               <circle
                 r={it.r}
                 fill="#2563EB"
-                fillOpacity={0.85}
+                fillOpacity={0.9}
                 stroke="white"
-                strokeWidth={isHovered ? 3 : 2}
+                strokeWidth={isHovered ? 2.5 : 2}
                 filter="url(#bubble-shadow)"
                 style={{ transition: 'all 0.2s ease' }}
               />
               <text
-                y={4}
+                y={3.5}
                 textAnchor="middle"
-                fontSize={Math.max(10, it.r * 0.55)}
+                fontSize={Math.max(9, it.r * 0.65)}
                 fontWeight={700}
                 fill="white"
                 style={{ pointerEvents: 'none' }}
@@ -167,7 +181,7 @@ export function CountryMap({ data, height = 320 }: CountryMapProps): JSX.Element
           style={{
             left: `${(hovered.x / W) * 100}%`,
             top: `${(hovered.y / H) * 100}%`,
-            transform: 'translate(-50%, calc(-100% - 16px))',
+            transform: 'translate(-50%, calc(-100% - 14px))',
           }}
         >
           <div className="flex items-center gap-2 mb-1">
@@ -190,11 +204,6 @@ export function CountryMap({ data, height = 320 }: CountryMapProps): JSX.Element
           </div>
         </div>
       )}
-
-      <div className="absolute bottom-2 start-2 flex items-center gap-2 text-[10px] text-muted-foreground bg-background/60 backdrop-blur-sm border border-border/40 rounded-md px-2 py-1">
-        <span className="h-2 w-2 rounded-full bg-primary/85 inline-block" />
-        حجم الدائرة = عدد العملاء
-      </div>
     </div>
   );
 }

@@ -15,7 +15,6 @@ import {
   Clock,
   CreditCard,
   Crown,
-  ChevronLeft,
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -171,10 +170,6 @@ export default function AdminDashboard(): JSX.Element {
     <div className="p-4 lg:p-6 space-y-6 page-fade">
       {/* ═══════════════ Section 1: KPIs الأساسية ═══════════════ */}
       <section className="space-y-3">
-        <SectionHeader
-          title="مؤشرات الأداء الرئيسية"
-          subtitle="نظرة سريعة على الأرقام المهمة"
-        />
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <Kpi
             label="الإيراد الشهري (MRR)"
@@ -217,19 +212,8 @@ export default function AdminDashboard(): JSX.Element {
 
       {/* ═══════════════ Section 2: الأداء المالي ═══════════════ */}
       <section className="space-y-3">
-        <SectionHeader
-          title="الأداء المالي"
-          subtitle="تتبع الإيرادات والتوزيع الجغرافي"
-          action={
-            <Button variant="ghost" size="sm" asChild>
-              <Link to="/finance" className="flex items-center gap-1 text-primary">
-                لوحة المالية <ChevronLeft className="h-4 w-4" />
-              </Link>
-            </Button>
-          }
-        />
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <Card className="lg:col-span-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <Card>
             <CardHeader className="pb-2">
               <div className="flex items-start justify-between">
                 <div>
