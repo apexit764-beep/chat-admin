@@ -22,8 +22,9 @@ import {
   campaignStats as initialCampaignStats,
   satisfactionStats as initialSatisfactionStats,
   activityLog as initialActivityLog,
+  feedbackEntries as initialFeedback,
 } from './adminMockData';
-import type { ActivityEntry } from './adminMockData';
+import type { ActivityEntry, FeedbackEntry, FeedbackStatus } from './adminMockData';
 
 interface AdminState {
   countries: Country[];
@@ -38,6 +39,11 @@ interface AdminState {
   campaignStats: typeof initialCampaignStats;
   satisfactionStats: typeof initialSatisfactionStats;
   activityLog: ActivityEntry[];
+  feedback: FeedbackEntry[];
+
+  // Feedback actions
+  updateFeedbackStatus: (id: string, status: FeedbackStatus) => void;
+  replyToFeedback: (id: string, reply: string, repliedBy: string) => void;
 
   // Client actions
   addClient: (c: Omit<Client, 'id' | 'joinedAt' | 'lastActiveAt' | 'subscriptionId' | 'mrr' | 'agentCount' | 'channelCount' | 'conversationCount'>) => Client;
@@ -83,6 +89,17 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   campaignStats: initialCampaignStats,
   satisfactionStats: initialSatisfactionStats,
   activityLog: initialActivityLog,
+  feedback: initialFeedback,
+
+  updateFeedbackStatus: (id, status) =>
+    set((s) => ({ feedback: s.feedback.map((f) => (f.id === id ? { ...f, status } : f)) })),
+
+  replyToFeedback: (id, reply, repliedBy) =>
+    set((s) => ({
+      feedback: s.feedback.map((f) =>
+        f.id === id ? { ...f, reply, repliedBy, repliedAt: new Date().toISOString(), status: 'in_progress' as FeedbackStatus } : f
+      ),
+    })),
 
   addClient: (c) => {
     const client: Client = {

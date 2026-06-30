@@ -647,3 +647,181 @@ export const activityLog: ActivityEntry[] = [
   { id: 'act_19', action: 'admin_logout', actor: 'Layla Khalid', actorEmail: 'layla@apexes.click', timestamp: nowMinus(5000) },
   { id: 'act_20', action: 'payment_received', actor: 'النظام', actorEmail: 'system', target: 'Qatar Logistics Group', details: '360 ر.ق — باقة الأعمال', timestamp: nowMinus(5760) },
 ];
+
+// =====================================================================
+// Feedback & Complaints
+// =====================================================================
+export type FeedbackType = 'complaint' | 'suggestion' | 'bug' | 'praise';
+export type FeedbackStatus = 'open' | 'in_progress' | 'resolved' | 'closed';
+export type FeedbackPriority = 'low' | 'medium' | 'high' | 'urgent';
+
+export interface FeedbackEntry {
+  id: string;
+  clientId: string;
+  clientName: string;
+  type: FeedbackType;
+  status: FeedbackStatus;
+  priority: FeedbackPriority;
+  subject: string;
+  message: string;
+  reply?: string;
+  repliedBy?: string;
+  repliedAt?: string;
+  rating?: number;
+  timestamp: string;
+}
+
+export const feedbackEntries: FeedbackEntry[] = [
+  {
+    id: 'fb_1',
+    clientId: 'client_8',
+    clientName: 'Royal Auto Kuwait',
+    type: 'complaint',
+    status: 'open',
+    priority: 'urgent',
+    subject: 'توقف الواتساب عن الاستقبال',
+    message: 'منذ أمس الرسائل الواردة لا تصل للوحة. الرقم الأساسي +965999888777 متوقف عن استقبال المحادثات الجديدة. نرجو الحل العاجل لأننا نخسر عملاء.',
+    timestamp: nowMinus(25),
+  },
+  {
+    id: 'fb_2',
+    clientId: 'client_3',
+    clientName: 'Dubai Real Estate Co.',
+    type: 'suggestion',
+    status: 'open',
+    priority: 'medium',
+    subject: 'إضافة تكامل مع Zoho CRM',
+    message: 'نستخدم Zoho CRM في إدارة العملاء. هل يمكن إضافة تكامل مباشر لمزامنة جهات الاتصال والمحادثات تلقائياً؟ سيوفر علينا وقت كبير.',
+    timestamp: nowMinus(180),
+  },
+  {
+    id: 'fb_3',
+    clientId: 'client_5',
+    clientName: 'عيادة الحياة الطبية',
+    type: 'complaint',
+    status: 'in_progress',
+    priority: 'high',
+    subject: 'مشكلة في إرسال الحملات',
+    message: 'عند إرسال حملة لأكثر من 500 جهة اتصال، يتوقف الإرسال عند 200 رسالة تقريباً ويظهر خطأ "Rate limit exceeded". المشكلة متكررة من أسبوع.',
+    reply: 'نعتذر عن الإزعاج. تم تحديد المشكلة وهي متعلقة بحد الإرسال من WhatsApp API. نعمل على تعديل آلية الإرسال بدفعات متتالية.',
+    repliedBy: 'علي السالم',
+    repliedAt: nowMinus(120),
+    timestamp: nowMinus(360),
+  },
+  {
+    id: 'fb_4',
+    clientId: 'client_1',
+    clientName: 'Qhub',
+    type: 'suggestion',
+    status: 'resolved',
+    priority: 'low',
+    subject: 'تقارير PDF قابلة للتخصيص',
+    message: 'نتمنى إمكانية تصدير تقارير PDF بشعار الشركة وألوانها بدلاً من التنسيق الافتراضي.',
+    reply: 'شكراً لاقتراحك! تم إضافة الميزة في التحديث الأخير. يمكنك الآن تخصيص شعار وألوان التقارير من الإعدادات.',
+    repliedBy: 'Sara Ahmed',
+    repliedAt: nowMinus(1440),
+    timestamp: nowMinus(2880),
+  },
+  {
+    id: 'fb_5',
+    clientId: 'client_10',
+    clientName: 'Qatar Logistics Group',
+    type: 'bug',
+    status: 'open',
+    priority: 'high',
+    subject: 'الإشعارات لا تصل للموظفين الجدد',
+    message: 'أضفنا 3 موظفين جدد الأسبوع الماضي ولكنهم لا يتلقون إشعارات المحادثات الجديدة. حاولنا إعادة تسجيل الدخول ولم تحل المشكلة.',
+    timestamp: nowMinus(480),
+  },
+  {
+    id: 'fb_6',
+    clientId: 'client_7',
+    clientName: 'الفجيرة للسياحة',
+    type: 'praise',
+    status: 'closed',
+    priority: 'low',
+    subject: 'شكراً على التحديث الأخير',
+    message: 'ميزة الردود الذكية بالذكاء الاصطناعي ممتازة! وفرت على فريقنا وقت كبير. استمروا بالتطوير 👏',
+    reply: 'شكراً لكلماتك الجميلة! يسعدنا أن الميزة مفيدة لفريقكم. سنستمر بالتطوير إن شاء الله.',
+    repliedBy: 'محمد الكندي',
+    repliedAt: nowMinus(4000),
+    rating: 5,
+    timestamp: nowMinus(4320),
+  },
+  {
+    id: 'fb_7',
+    clientId: 'client_2',
+    clientName: 'مطعم البيت العماني',
+    type: 'complaint',
+    status: 'resolved',
+    priority: 'medium',
+    subject: 'بطء في تحميل المحادثات',
+    message: 'لوحة التحكم أصبحت بطيئة جداً عند فتح المحادثات، خصوصاً المحادثات التي فيها صور. الانتظار يصل لـ 10 ثواني أحياناً.',
+    reply: 'تم تحسين أداء تحميل المحادثات والوسائط في التحديث v2.4.1. يرجى تحديث الصفحة والتأكد.',
+    repliedBy: 'علي السالم',
+    repliedAt: nowMinus(5000),
+    timestamp: nowMinus(5760),
+  },
+  {
+    id: 'fb_8',
+    clientId: 'client_6',
+    clientName: 'TechFlow Egypt',
+    type: 'suggestion',
+    status: 'open',
+    priority: 'medium',
+    subject: 'دعم اللغة الإنجليزية بالكامل',
+    message: 'فريقنا مختلط عربي وأجنبي. نحتاج واجهة إنجليزية كاملة حتى يتمكن الموظفين الأجانب من استخدام النظام.',
+    timestamp: nowMinus(7200),
+  },
+  {
+    id: 'fb_9',
+    clientId: 'client_3',
+    clientName: 'Dubai Real Estate Co.',
+    type: 'bug',
+    status: 'in_progress',
+    priority: 'medium',
+    subject: 'خطأ في احتساب الإحصائيات',
+    message: 'إحصائيات الشهر الحالي تُظهر عدد محادثات أقل من الفعلي. الفرق تقريباً 15-20%. لاحظنا المشكلة بعد التحديث الأخير.',
+    reply: 'تم رصد المشكلة وهي متعلقة بتوقيت المنطقة الزمنية. جاري العمل على الإصلاح.',
+    repliedBy: 'Sara Ahmed',
+    repliedAt: nowMinus(6000),
+    timestamp: nowMinus(8640),
+  },
+  {
+    id: 'fb_10',
+    clientId: 'client_11',
+    clientName: 'صالون لمسة جمال',
+    type: 'suggestion',
+    status: 'open',
+    priority: 'low',
+    subject: 'قوالب جاهزة للصالونات',
+    message: 'نتمنى توفير قوالب رسائل جاهزة خاصة بقطاع الصالونات والتجميل (حجز موعد، تأكيد موعد، تذكير، عرض خاص).',
+    timestamp: nowMinus(10080),
+  },
+  {
+    id: 'fb_11',
+    clientId: 'client_8',
+    clientName: 'Royal Auto Kuwait',
+    type: 'suggestion',
+    status: 'resolved',
+    priority: 'high',
+    subject: 'API للربط مع نظام المبيعات',
+    message: 'نحتاج API endpoint لسحب بيانات المحادثات وجهات الاتصال برمجياً للربط مع نظام ERP الداخلي.',
+    reply: 'تم توفير API كامل مع التوثيق. يمكنكم الوصول من خلال إعدادات > مفاتيح API.',
+    repliedBy: 'محمد الكندي',
+    repliedAt: nowMinus(11000),
+    timestamp: nowMinus(11520),
+  },
+  {
+    id: 'fb_12',
+    clientId: 'client_5',
+    clientName: 'عيادة الحياة الطبية',
+    type: 'praise',
+    status: 'closed',
+    priority: 'low',
+    subject: 'الدعم الفني ممتاز',
+    message: 'أحب أشكر فريق الدعم على سرعة الاستجابة. كل مرة أتواصل يتم حل المشكلة خلال ساعة. خدمة 5 نجوم!',
+    rating: 5,
+    timestamp: nowMinus(14400),
+  },
+];

@@ -10,6 +10,7 @@ import {
   Settings,
   Eye,
   Activity,
+  MessageSquareWarning,
   PanelRightClose,
   PanelRightOpen,
 } from 'lucide-react';
@@ -30,6 +31,7 @@ const navItems = [
   { to: '/finance', label: 'المالية', icon: Banknote },
   { to: '/payments', label: 'بوابة الدفع', icon: CreditCard },
   { to: '/reports', label: 'التقارير', icon: BarChart3 },
+  { to: '/feedback', label: 'الشكاوى والاقتراحات', icon: MessageSquareWarning },
   { to: '/activity', label: 'سجل النشاط', icon: Activity },
   { to: '/preview', label: 'معاينة', icon: Eye },
   { to: '/settings', label: 'الإعدادات', icon: Settings },
