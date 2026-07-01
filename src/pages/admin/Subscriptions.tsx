@@ -153,13 +153,9 @@ export default function AdminSubscriptions(): JSX.Element {
 
   return (
     <div className="p-4 lg:p-8 space-y-6">
-      {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <Repeat className="h-6 w-6 text-primary" />
-          الاشتراكات
-        </h1>
-        <p className="text-sm text-muted-foreground mt-1">إدارة اشتراكات العملاء والتجديدات</p>
+        <h2 className="text-2xl font-bold">الاشتراكات</h2>
+        <p className="text-sm text-muted-foreground">إدارة اشتراكات العملاء والتجديدات</p>
       </div>
 
       {/* Stats */}

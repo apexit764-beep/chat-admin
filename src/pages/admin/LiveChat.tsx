@@ -183,7 +183,7 @@ export default function LiveChat() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="ابحث عن محادثة..."
-                className="pr-9 h-9 text-sm bg-muted/50 border-0"
+                className="pr-9 h-9 text-sm bg-muted/50 border"
               />
             </div>
             <Button variant="outline" size="icon" className="h-9 w-9 shrink-0">

@@ -169,6 +169,10 @@ export default function AdminDashboard(): JSX.Element {
 
   return (
     <div className="p-4 lg:p-6 space-y-6 page-fade">
+      <div>
+        <h2 className="text-2xl font-bold">نظرة عامة</h2>
+        <p className="text-sm text-muted-foreground">نظرة عامة على أداء النظام</p>
+      </div>
       {/* ═══════════════ Section 1: KPIs الأساسية ═══════════════ */}
       <section className="space-y-3">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">

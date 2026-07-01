@@ -166,7 +166,10 @@ export default function KnowledgeBase(): JSX.Element {
     <div className="p-4 lg:p-6 space-y-5 page-fade">
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-xl font-bold">قاعدة المعرفة</h1>
+        <div>
+          <h2 className="text-2xl font-bold">قاعدة المعرفة</h2>
+          <p className="text-sm text-muted-foreground">المقالات التي تظهر للعملاء في نافذة المساعدة</p>
+        </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" onClick={() => setCategoryModalOpen(true)}>
             <Plus className="h-4 w-4 me-1" />

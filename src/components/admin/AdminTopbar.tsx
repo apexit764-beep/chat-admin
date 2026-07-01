@@ -1,12 +1,9 @@
 import { useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import { HelpCircle, Moon, Search, Sun } from 'lucide-react';
+import { useLocation, Link } from 'react-router-dom';
+import { ChevronLeft, Moon, Sun } from 'lucide-react';
 import { NotificationDropdown } from '@/components/admin/NotificationDropdown';
-import { HeaderSearch } from '@/components/admin/HeaderSearch';
 import { useThemeStore } from '@/store/useThemeStore';
 import { useAuthStore } from '@/store/useAuthStore';
-import { CommandPalette } from '@components/ui';
-import { HelpDrawer } from '@components/layout/HelpDrawer';
 import { Button } from '@/components/ui/button';
 import {
   Avatar,
@@ -27,8 +24,8 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
-const titleMap: Record<string, string> = {
-  '/dashboard': 'لوحة التحكم',
+const breadcrumbMap: Record<string, string> = {
+  '/dashboard': 'نظرة عامة',
   '/clients': 'العملاء',
   '/plans': 'الباقات',
   '/finance': 'المالية',
@@ -40,21 +37,6 @@ const titleMap: Record<string, string> = {
   '/knowledge': 'قاعدة المعرفة',
   '/conversations': 'الدردشة المباشرة',
   '/settings': 'الإعدادات',
-};
-
-const subtitleMap: Record<string, string> = {
-  '/dashboard': 'نظرة عامة على أداء النظام',
-  '/clients': 'إدارة حسابات العملاء',
-  '/plans': 'إدارة الباقات والاشتراكات',
-  '/finance': 'المعاملات المالية والفواتير',
-  '/subscriptions': 'إدارة اشتراكات العملاء والتجديدات',
-  '/reports': 'تقارير وإحصائيات مفصلة',
-  '/feedback': 'متابعة ملاحظات وشكاوى العملاء',
-  '/activity': 'تتبع إجراءات فريق الإدارة',
-  '/team': 'إدارة أعضاء الفريق وصلاحياتهم',
-  '/knowledge': 'المقالات التي تظهر للعملاء في نافذة المساعدة',
-  '/conversations': 'المحادثات الواردة من الويدجت والقنوات',
-  '/settings': 'إعدادات النظام',
 };
 
 function getInitials(name: string): string {
@@ -72,47 +54,31 @@ export function AdminTopbar(): JSX.Element {
   const toggleTheme = useThemeStore((s) => s.toggle);
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
-  const title = titleMap[location.pathname] ?? 'لوحة التحكم';
-  const subtitle = subtitleMap[location.pathname] ?? '';
-  const [cmdOpen, setCmdOpen] = useState(false);
-  const [helpOpen, setHelpOpen] = useState(false);
+
+  const segments = location.pathname.split('/').filter(Boolean);
+  const currentLabel = breadcrumbMap[location.pathname] ?? breadcrumbMap['/' + segments[0]] ?? 'لوحة التحكم';
 
   return (
     <TooltipProvider delayDuration={300}>
-      <header className="sticky top-0 z-10 px-6 py-4 flex items-center gap-4 bg-background/80 backdrop-blur-sm border-b border-border/40">
-        {/* Title area */}
-        <div className="flex flex-col min-w-0">
-          <h1 className="text-xl font-bold text-foreground">{title}</h1>
-          {subtitle && (
-            <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>
+      <header className="sticky top-0 z-10 px-6 py-3 flex items-center gap-4 bg-background/80 backdrop-blur-sm border-b border-border/40">
+        {/* Breadcrumb */}
+        <nav className="flex items-center gap-1.5 text-sm min-w-0">
+          <Link to="/dashboard" className="text-muted-foreground hover:text-foreground transition-colors">
+            لوحة التحكم
+          </Link>
+          {location.pathname !== '/dashboard' && (
+            <>
+              <ChevronLeft className="h-3.5 w-3.5 text-muted-foreground/60" />
+              <span className="text-foreground font-medium truncate">{currentLabel}</span>
+            </>
           )}
-        </div>
-
-        {/* Spacer */}
-        <div className="flex-1" />
-
-        {/* Inline search with live results (desktop) */}
-        <HeaderSearch />
+        </nav>
 
         {/* Spacer */}
         <div className="flex-1" />
 
         {/* Actions */}
         <div className="flex items-center gap-1">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="md:hidden h-9 w-9 rounded-xl"
-                onClick={() => setCmdOpen(true)}
-              >
-                <Search className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>بحث</TooltipContent>
-          </Tooltip>
-
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -132,20 +98,6 @@ export function AdminTopbar(): JSX.Element {
           </Tooltip>
 
           <NotificationDropdown />
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-9 w-9 rounded-xl"
-                onClick={() => setHelpOpen(true)}
-              >
-                <HelpCircle className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>المساعدة</TooltipContent>
-          </Tooltip>
 
           {/* User */}
           {user && (
@@ -181,9 +133,6 @@ export function AdminTopbar(): JSX.Element {
           )}
         </div>
       </header>
-
-      <CommandPalette open={cmdOpen} onClose={() => setCmdOpen(false)} />
-      <HelpDrawer open={helpOpen} onClose={() => setHelpOpen(false)} />
     </TooltipProvider>
   );
 }

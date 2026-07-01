@@ -144,6 +144,10 @@ export default function AdminReports(): JSX.Element {
 
   return (
     <div className="p-4 lg:p-6 space-y-5">
+      <div>
+        <h2 className="text-2xl font-bold">التقارير</h2>
+        <p className="text-sm text-muted-foreground">تقارير وإحصائيات مفصلة</p>
+      </div>
       {/* Range + export */}
       <Card>
         <CardContent className="p-3 flex flex-wrap items-center justify-between gap-3">

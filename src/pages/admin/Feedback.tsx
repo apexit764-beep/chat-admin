@@ -124,6 +124,10 @@ export default function AdminFeedback(): JSX.Element {
 
   return (
     <div className="p-4 lg:p-6 space-y-5">
+      <div>
+        <h2 className="text-2xl font-bold">الشكاوى والاقتراحات</h2>
+        <p className="text-sm text-muted-foreground">متابعة ملاحظات وشكاوى العملاء</p>
+      </div>
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <Card className="p-4">

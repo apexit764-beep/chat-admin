@@ -116,7 +116,11 @@ export default function AdminSettings(): JSX.Element {
   ];
 
   return (
-    <div className="p-4 lg:p-8">
+    <div className="p-4 lg:p-8 space-y-5">
+      <div>
+        <h2 className="text-2xl font-bold">الإعدادات</h2>
+        <p className="text-sm text-muted-foreground">إعدادات النظام</p>
+      </div>
       <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-4">
         {/* Sidebar */}
         <Card className="h-fit">

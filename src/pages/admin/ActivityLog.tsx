@@ -112,6 +112,10 @@ export default function AdminActivityLog(): JSX.Element {
 
   return (
     <div className="p-4 lg:p-6 space-y-5">
+      <div>
+        <h2 className="text-2xl font-bold">سجل النشاط</h2>
+        <p className="text-sm text-muted-foreground">تتبع إجراءات فريق الإدارة</p>
+      </div>
       <Card>
         <CardHeader className="pb-3">
           <div className="flex flex-wrap items-center justify-between gap-3">

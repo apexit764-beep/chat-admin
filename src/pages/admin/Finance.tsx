@@ -175,6 +175,10 @@ export default function AdminFinance(): JSX.Element {
 
   return (
     <div className="p-4 lg:p-6 space-y-5">
+      <div>
+        <h2 className="text-2xl font-bold">المالية</h2>
+        <p className="text-sm text-muted-foreground">المعاملات المالية والفواتير</p>
+      </div>
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="MRR (USD)" value={`$${Math.round(mrr).toLocaleString()}`} icon={<DollarSign className="h-5 w-5" />} iconBg="bg-success/15" iconColor="text-success" trend={{ value: 18, positive: true }} />

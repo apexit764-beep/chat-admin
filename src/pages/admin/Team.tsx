@@ -699,11 +699,8 @@ export default function AdminTeam(): JSX.Element {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <Users className="h-6 w-6 text-primary" />
-            إدارة الفريق
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">إدارة أعضاء فريق الإدارة وأدوارهم</p>
+          <h2 className="text-2xl font-bold">إدارة الفريق</h2>
+          <p className="text-sm text-muted-foreground">إدارة أعضاء فريق الإدارة وأدوارهم</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" onClick={() => setView('roles')}>

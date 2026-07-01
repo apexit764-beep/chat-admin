@@ -339,6 +339,10 @@ export default function AdminClients(): JSX.Element {
 
   return (
     <div className="p-4 lg:p-6 space-y-5">
+      <div>
+        <h2 className="text-2xl font-bold">العملاء</h2>
+        <p className="text-sm text-muted-foreground">إدارة حسابات العملاء</p>
+      </div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="إجمالي العملاء" value={stats.total} icon={<Globe className="h-5 w-5" />} iconBg="bg-primary/15" iconColor="text-primary" />
         <StatCard label="نشطون" value={stats.active} icon={<PlayCircle className="h-5 w-5" />} iconBg="bg-success/15" iconColor="text-success" />
