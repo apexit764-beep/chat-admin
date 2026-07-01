@@ -14,6 +14,7 @@ const AdminSettings = lazy(() => import('@pages/admin/Settings'));
 const AdminDashboardPreview = lazy(() => import('@pages/admin/DashboardPreview'));
 const AdminActivityLog = lazy(() => import('@pages/admin/ActivityLog'));
 const AdminFeedback = lazy(() => import('@pages/admin/Feedback'));
+const AdminClientDetail = lazy(() => import('@pages/admin/ClientDetail'));
 
 function PageLoader(): JSX.Element {
   return (
@@ -38,6 +39,7 @@ export default function App(): JSX.Element {
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<AdminDashboard />} />
           <Route path="/clients" element={<AdminClients />} />
+          <Route path="/clients/:id" element={<AdminClientDetail />} />
           <Route path="/plans" element={<AdminPlans />} />
           <Route path="/finance" element={<AdminFinance />} />
           <Route path="/payments" element={<AdminPayments />} />

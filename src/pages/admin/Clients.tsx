@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Plus,
   Download,
@@ -85,6 +86,7 @@ function getInitials(name: string): string {
 }
 
 export default function AdminClients(): JSX.Element {
+  const navigate = useNavigate();
   const clients = useAdminStore((s) => s.clients);
   const plans = useAdminStore((s) => s.plans);
   const countries = useAdminStore((s) => s.countries);
@@ -304,7 +306,7 @@ export default function AdminClients(): JSX.Element {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem onClick={() => setDrawer(r)}>
+              <DropdownMenuItem onClick={() => navigate(`/clients/${r.id}`)}>
                 <Eye className="h-4 w-4 me-2" />
                 عرض التفاصيل
               </DropdownMenuItem>
@@ -350,7 +352,7 @@ export default function AdminClients(): JSX.Element {
         rowKey={(c) => c.id}
         searchPlaceholder="ابحث بالشركة أو الاسم أو البريد..."
         searchAccessor={(c) => `${c.companyName} ${c.contactName} ${c.email} ${c.phone}`}
-        onRowClick={(c) => setDrawer(c)}
+        onRowClick={(c) => navigate(`/clients/${c.id}`)}
         selectable
         bulkActions={(selected, clear) => (
           <>
