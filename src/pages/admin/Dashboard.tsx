@@ -269,10 +269,6 @@ export default function AdminDashboard(): JSX.Element {
 
       {/* ═══════════════ Section 3: نشاط المنصّة ═══════════════ */}
       <section className="space-y-3">
-        <SectionHeader
-          title="نشاط المنصّة"
-          subtitle="استخدام العملاء للقنوات والحملات"
-        />
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <MiniStat
             label="إجمالي المحادثات"
@@ -353,21 +349,12 @@ export default function AdminDashboard(): JSX.Element {
 
       {/* ═══════════════ Section 4: يحتاج اهتمامك ═══════════════ */}
       <section className="space-y-3">
-        <SectionHeader
-          title="يحتاج اهتمامك"
-          subtitle="إجراءات سريعة لتقليل الفقد وزيادة التحويل"
-        />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Past due */}
           <Card className="border-amber-500/30">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <span className="h-7 w-7 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-                    <CreditCard className="h-4 w-4" />
-                  </span>
-                  متأخرون عن الدفع
-                </CardTitle>
+                <CardTitle className="text-base">متأخرون عن الدفع</CardTitle>
                 <Badge variant="warning" className="text-[10px]">{pastDueClients.length}</Badge>
               </div>
             </CardHeader>
@@ -404,12 +391,7 @@ export default function AdminDashboard(): JSX.Element {
           <Card className="border-blue-500/30">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <span className="h-7 w-7 rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center">
-                    <Clock className="h-4 w-4" />
-                  </span>
-                  تجارب تنتهي قريباً
-                </CardTitle>
+                <CardTitle className="text-base">تجارب تنتهي قريباً</CardTitle>
                 <Badge variant="default" className="text-[10px]">{expiringTrials.length}</Badge>
               </div>
             </CardHeader>
@@ -446,12 +428,7 @@ export default function AdminDashboard(): JSX.Element {
           <Card className="border-emerald-500/30">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <span className="h-7 w-7 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-                    <Crown className="h-4 w-4" />
-                  </span>
-                  أكثر الباقات اشتراكاً
-                </CardTitle>
+                <CardTitle className="text-base">أكثر الباقات اشتراكاً</CardTitle>
               </div>
             </CardHeader>
             <CardContent className="space-y-2.5">
@@ -493,10 +470,6 @@ export default function AdminDashboard(): JSX.Element {
 
       {/* ═══════════════ Section 5: النشاط الأخير ═══════════════ */}
       <section className="space-y-3">
-        <SectionHeader
-          title="النشاط الأخير"
-          subtitle="أحدث التسجيلات والمعاملات على المنصّة"
-        />
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <Card>
             <CardHeader className="pb-3">
@@ -626,22 +599,6 @@ export default function AdminDashboard(): JSX.Element {
 }
 
 /* ============== Helper Components ============== */
-
-function SectionHeader({ title, subtitle, action }: {
-  title: string;
-  subtitle?: string;
-  action?: React.ReactNode;
-}): JSX.Element {
-  return (
-    <div className="flex items-end justify-between gap-3 pb-1 border-b border-border/50">
-      <div>
-        <h2 className="text-lg lg:text-xl font-bold tracking-tight">{title}</h2>
-        {subtitle && <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>}
-      </div>
-      {action && <div className="flex-shrink-0">{action}</div>}
-    </div>
-  );
-}
 
 function Kpi({ label, value, delta, deltaLabel, icon, color, iconBg }: {
   label: string;
