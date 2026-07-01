@@ -51,7 +51,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps): JSX.Elem
       nav('/clients', 'العملاء', <Users className="h-4 w-4" />, 'إدارة العملاء'),
       nav('/plans', 'الباقات', <Package className="h-4 w-4" />, 'الباقات والأسعار'),
       nav('/finance', 'المالية', <CreditCard className="h-4 w-4" />, 'الفواتير والمعاملات'),
-      nav('/payments', 'بوابة الدفع', <CreditCard className="h-4 w-4" />, 'إعدادات Paymob'),
+      nav('/settings#payments', 'بوابة الدفع', <CreditCard className="h-4 w-4" />, 'إعدادات Paymob'),
       nav('/reports', 'التقارير', <BarChart3 className="h-4 w-4" />, 'تحليلات المنصة'),
       nav('/settings', 'الإعدادات', <Settings className="h-4 w-4" />, 'إعدادات النظام'),
     );

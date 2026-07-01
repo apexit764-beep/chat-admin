@@ -58,7 +58,7 @@ export default function AdminPayments(): JSX.Element {
   })();
 
   return (
-    <div className="p-4 lg:p-6 space-y-5 max-w-5xl">
+    <div className="space-y-5">
       {/* Hero */}
       <Card className="border-0 overflow-hidden">
         <div className="p-6 bg-gradient-to-l from-[#D71921] to-[#9c0008] text-white">

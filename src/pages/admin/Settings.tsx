@@ -14,7 +14,9 @@ import {
   Copy,
   Eye,
   EyeOff,
+  CreditCard,
 } from 'lucide-react';
+import AdminPayments from './Payments';
 import { useConfirm } from '@components/ui';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -49,7 +51,7 @@ import {
   SelectItem,
 } from '@/components/ui/select';
 
-type Tab = 'general' | 'team' | 'security' | 'appearance' | 'emails' | 'api' | 'danger';
+type Tab = 'general' | 'team' | 'security' | 'appearance' | 'emails' | 'api' | 'payments' | 'danger';
 
 const roleLabel: Record<AdminRole, string> = {
   super_admin: 'مدير النظام',
@@ -65,8 +67,14 @@ const roleBadgeVariant: Record<AdminRole, 'destructive' | 'default' | 'secondary
   finance: 'warning',
 };
 
+const validTabs: Tab[] = ['general', 'team', 'security', 'appearance', 'emails', 'api', 'payments', 'danger'];
+
 export default function AdminSettings(): JSX.Element {
-  const [tab, setTab] = useState<Tab>('general');
+  const initialTab = ((): Tab => {
+    const h = typeof window !== 'undefined' ? window.location.hash.replace('#', '') : '';
+    return validTabs.includes(h as Tab) ? (h as Tab) : 'general';
+  })();
+  const [tab, setTab] = useState<Tab>(initialTab);
   const adminUsers = useAdminStore((s) => s.adminUsers);
   const addAdminUser = useAdminStore((s) => s.addAdminUser);
   const updateAdminUser = useAdminStore((s) => s.updateAdminUser);
@@ -143,6 +151,7 @@ export default function AdminSettings(): JSX.Element {
     { key: 'security', label: 'الأمان', icon: <Shield className="h-4 w-4" /> },
     { key: 'emails', label: 'قوالب البريد', icon: <FileText className="h-4 w-4" /> },
     { key: 'api', label: 'مفاتيح API', icon: <Key className="h-4 w-4" /> },
+    { key: 'payments', label: 'بوابة الدفع', icon: <CreditCard className="h-4 w-4" /> },
     { key: 'appearance', label: 'المظهر', icon: <Palette className="h-4 w-4" /> },
     { key: 'danger', label: 'منطقة الخطر', icon: <AlertTriangle className="h-4 w-4" /> },
   ];
@@ -203,6 +212,9 @@ export default function AdminSettings(): JSX.Element {
           </CardContent>
         </Card>
 
+        {tab === 'payments' ? (
+          <AdminPayments />
+        ) : (
         <Card>
           <CardContent className="p-5 lg:p-6">
             {/* GENERAL */}
@@ -556,6 +568,7 @@ export default function AdminSettings(): JSX.Element {
             )}
           </CardContent>
         </Card>
+        )}
       </div>
 
       {/* Add/Edit User Dialog */}

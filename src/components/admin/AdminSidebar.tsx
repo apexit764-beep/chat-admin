@@ -3,7 +3,6 @@ import { useState } from 'react';
 import {
   LayoutDashboard,
   Users,
-  CreditCard,
   Package,
   Banknote,
   BarChart3,
@@ -54,7 +53,6 @@ const navGroups: NavGroup[] = [
     title: 'المالية',
     items: [
       { to: '/finance', label: 'المالية', icon: Banknote },
-      { to: '/payments', label: 'بوابة الدفع', icon: CreditCard },
     ],
   },
   {
