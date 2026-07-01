@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { HelpCircle, Moon, Search, Sun } from 'lucide-react';
 import { NotificationDropdown } from '@/components/admin/NotificationDropdown';
+import { HeaderSearch } from '@/components/admin/HeaderSearch';
 import { useThemeStore } from '@/store/useThemeStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { CommandPalette } from '@components/ui';
 import { HelpDrawer } from '@components/layout/HelpDrawer';
-import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
   Avatar,
@@ -73,17 +73,6 @@ export function AdminTopbar(): JSX.Element {
   const [cmdOpen, setCmdOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
 
-  useEffect(() => {
-    const handler = (e: KeyboardEvent): void => {
-      if ((e.key === 'k' || e.key === 'K') && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        setCmdOpen((v) => !v);
-      }
-    };
-    document.addEventListener('keydown', handler);
-    return () => document.removeEventListener('keydown', handler);
-  }, []);
-
   return (
     <TooltipProvider delayDuration={300}>
       <header className="sticky top-0 z-10 px-6 py-4 flex items-center gap-4 bg-background/80 backdrop-blur-sm border-b border-border/40">
@@ -98,21 +87,8 @@ export function AdminTopbar(): JSX.Element {
         {/* Spacer */}
         <div className="flex-1" />
 
-        {/* Search - centered */}
-        <Button
-          variant="outline"
-          onClick={() => setCmdOpen(true)}
-          className={cn(
-            'h-9 gap-2 text-muted-foreground font-normal rounded-xl border-border/60 bg-background/60 backdrop-blur-sm',
-            'hidden md:inline-flex w-80 justify-start'
-          )}
-        >
-          <Search className="h-4 w-4 flex-shrink-0" />
-          <span className="flex-1 text-start truncate text-xs">بحث...</span>
-          <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] bg-muted border border-border/50 font-mono">
-            ⌘K
-          </kbd>
-        </Button>
+        {/* Inline search with live results (desktop) */}
+        <HeaderSearch />
 
         {/* Spacer */}
         <div className="flex-1" />

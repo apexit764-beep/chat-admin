@@ -1,14 +1,9 @@
 import { useState } from 'react';
 import {
   Building,
-  User,
   Shield,
   Palette,
   AlertTriangle,
-  UserPlus,
-  Edit2,
-  Trash2,
-  Mail,
   Key,
   FileText,
   Copy,
@@ -19,13 +14,10 @@ import {
 import AdminPayments from './Payments';
 import { useConfirm } from '@components/ui';
 import { useAdminStore } from '@/store/useAdminStore';
-import { useAuthStore } from '@/store/useAuthStore';
 import { useUIStore } from '@/store/useUIStore';
 import { useThemeStore } from '@/store/useThemeStore';
 import { useSettingsStore } from '@/store/useSettingsStore';
-import { timeAgo } from '@/utils/format';
 import { cn } from '@/lib/utils';
-import type { AdminRole, AdminUser } from '@/types';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -35,14 +27,6 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogFooter,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import {
   Select,
   SelectTrigger,
@@ -51,23 +35,9 @@ import {
   SelectItem,
 } from '@/components/ui/select';
 
-type Tab = 'general' | 'team' | 'security' | 'appearance' | 'emails' | 'api' | 'payments' | 'danger';
+type Tab = 'general' | 'security' | 'appearance' | 'emails' | 'api' | 'payments' | 'danger';
 
-const roleLabel: Record<AdminRole, string> = {
-  super_admin: 'مدير النظام',
-  admin: 'مدير',
-  support: 'دعم فني',
-  finance: 'مالية',
-};
-
-const roleBadgeVariant: Record<AdminRole, 'destructive' | 'default' | 'secondary' | 'warning'> = {
-  super_admin: 'destructive',
-  admin: 'default',
-  support: 'secondary',
-  finance: 'warning',
-};
-
-const validTabs: Tab[] = ['general', 'team', 'security', 'appearance', 'emails', 'api', 'payments', 'danger'];
+const validTabs: Tab[] = ['general', 'security', 'appearance', 'emails', 'api', 'payments', 'danger'];
 
 export default function AdminSettings(): JSX.Element {
   const initialTab = ((): Tab => {
@@ -76,15 +46,11 @@ export default function AdminSettings(): JSX.Element {
   })();
   const [tab, setTab] = useState<Tab>(initialTab);
   const adminUsers = useAdminStore((s) => s.adminUsers);
-  const addAdminUser = useAdminStore((s) => s.addAdminUser);
-  const updateAdminUser = useAdminStore((s) => s.updateAdminUser);
-  const deleteAdminUser = useAdminStore((s) => s.deleteAdminUser);
   const clients = useAdminStore((s) => s.clients);
   const invoices = useAdminStore((s) => s.invoices);
   const showToast = useUIStore((s) => s.showToast);
   const theme = useThemeStore((s) => s.theme);
   const setTheme = useThemeStore((s) => s.setTheme);
-  const currentUser = useAuthStore((s) => s.user);
   const securityPrefs = useSettingsStore((s) => s.security);
   const setSecurityPrefs = useSettingsStore((s) => s.setSecurity);
   const resetSettings = useSettingsStore((s) => s.reset);
@@ -139,15 +105,8 @@ export default function AdminSettings(): JSX.Element {
     if (ok) showToast('تم المسح (تجريبي)', 'info');
   };
 
-  const [userModal, setUserModal] = useState(false);
-  const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
-  const [userForm, setUserForm] = useState<{ name: string; email: string; role: AdminRole; active: boolean }>({
-    name: '', email: '', role: 'admin', active: true,
-  });
-
   const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
     { key: 'general', label: 'عام', icon: <Building className="h-4 w-4" /> },
-    { key: 'team', label: 'فريق الإدارة', icon: <User className="h-4 w-4" /> },
     { key: 'security', label: 'الأمان', icon: <Shield className="h-4 w-4" /> },
     { key: 'emails', label: 'قوالب البريد', icon: <FileText className="h-4 w-4" /> },
     { key: 'api', label: 'مفاتيح API', icon: <Key className="h-4 w-4" /> },
@@ -156,41 +115,8 @@ export default function AdminSettings(): JSX.Element {
     { key: 'danger', label: 'منطقة الخطر', icon: <AlertTriangle className="h-4 w-4" /> },
   ];
 
-  const openAddUser = (): void => {
-    setEditingUser(null);
-    setUserForm({ name: '', email: '', role: 'admin', active: true });
-    setUserModal(true);
-  };
-
-  const openEditUser = (u: AdminUser): void => {
-    setEditingUser(u);
-    setUserForm({ name: u.name, email: u.email, role: u.role, active: u.active });
-    setUserModal(true);
-  };
-
-  const submitUser = (): void => {
-    if (!userForm.name.trim() || !userForm.email.trim()) {
-      showToast('الاسم والبريد مطلوبان', 'error');
-      return;
-    }
-    if (editingUser) {
-      updateAdminUser(editingUser.id, userForm);
-      showToast('تم تحديث المستخدم', 'success');
-    } else {
-      addAdminUser(userForm);
-      showToast('تمت إضافة المستخدم', 'success');
-    }
-    setUserModal(false);
-  };
-
-  const getInitials = (name: string): string => {
-    const parts = name.trim().split(/\s+/);
-    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
-    return name.slice(0, 2).toUpperCase();
-  };
-
   return (
-    <div className="p-4 lg:p-8 max-w-5xl mx-auto">
+    <div className="p-4 lg:p-8">
       <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-4">
         {/* Sidebar */}
         <Card className="h-fit">
@@ -235,70 +161,6 @@ export default function AdminSettings(): JSX.Element {
                 </Row>
                 <div className="flex justify-end pt-4">
                   <Button onClick={() => showToast('تم الحفظ', 'success')}>حفظ التغييرات</Button>
-                </div>
-              </div>
-            )}
-
-            {/* TEAM */}
-            {tab === 'team' && (
-              <div>
-                <div className="flex items-center justify-between mb-6 pb-5">
-                  <div>
-                    <h2 className="text-lg font-bold flex items-center gap-2">
-                      <User className="h-5 w-5 text-primary" /> فريق الإدارة
-                    </h2>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {adminUsers.length} مستخدم لديهم وصول للوحة الإدارة
-                    </p>
-                  </div>
-                  <Button onClick={openAddUser} size="sm">
-                    <UserPlus className="h-4 w-4" /> إضافة
-                  </Button>
-                </div>
-                <Separator className="mb-4" />
-                <div className="space-y-2">
-                  {adminUsers.map((u) => (
-                    <div key={u.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted">
-                      <Avatar className="h-8 w-8">
-                        <AvatarFallback className="text-xs">{getInitials(u.name)}</AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold">
-                          {u.name}{' '}
-                          {currentUser?.email === u.email && (
-                            <span className="text-[10px] text-primary">(أنت)</span>
-                          )}
-                        </p>
-                        <p className="text-xs text-muted-foreground">{u.email}</p>
-                      </div>
-                      <Badge variant={roleBadgeVariant[u.role]}>{roleLabel[u.role]}</Badge>
-                      <p className="text-xs text-muted-foreground hidden sm:block">{timeAgo(u.lastActive)}</p>
-                      <div className="flex items-center gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => openEditUser(u)}
-                          className="h-8 w-8 text-muted-foreground hover:text-primary"
-                        >
-                          <Edit2 className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => {
-                            if (u.id === 'au_1') { showToast('لا يمكن حذف مدير النظام', 'error'); return; }
-                            void (async () => {
-                              const ok = await confirm({ title: `حذف ${u.name}؟`, message: 'لا يمكن التراجع', variant: 'danger', confirmText: 'حذف' });
-                              if (ok) { deleteAdminUser(u.id); showToast('تم الحذف', 'success'); }
-                            })();
-                          }}
-                          className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
                 </div>
               </div>
             )}
@@ -570,67 +432,6 @@ export default function AdminSettings(): JSX.Element {
         </Card>
         )}
       </div>
-
-      {/* Add/Edit User Dialog */}
-      <Dialog open={userModal} onOpenChange={setUserModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{editingUser ? 'تعديل مستخدم' : 'مستخدم جديد'}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div className="space-y-2">
-              <Label>الاسم</Label>
-              <Input
-                value={userForm.name}
-                onChange={(e) => setUserForm({ ...userForm, name: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>البريد</Label>
-              <div className="relative">
-                <Input
-                  type="email"
-                  value={userForm.email}
-                  onChange={(e) => setUserForm({ ...userForm, email: e.target.value })}
-                  className="pe-10"
-                />
-                <Mail className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>الدور</Label>
-              <Select
-                value={userForm.role}
-                onValueChange={(v) => setUserForm({ ...userForm, role: v as AdminRole })}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="super_admin">مدير النظام</SelectItem>
-                  <SelectItem value="admin">مدير</SelectItem>
-                  <SelectItem value="support">دعم فني</SelectItem>
-                  <SelectItem value="finance">مالية</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-muted">
-              <Switch
-                checked={userForm.active}
-                onCheckedChange={(v) => setUserForm({ ...userForm, active: v })}
-              />
-              <div>
-                <p className="text-sm font-medium">حساب نشط</p>
-                <p className="text-xs text-muted-foreground">يستطيع تسجيل الدخول</p>
-              </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setUserModal(false)}>إلغاء</Button>
-            <Button onClick={submitUser}>{editingUser ? 'حفظ' : 'إضافة'}</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
