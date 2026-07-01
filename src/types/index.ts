@@ -292,3 +292,54 @@ export interface AdminUser {
   lastActive: string;
   createdAt: string;
 }
+
+export type ArticleStatus = 'published' | 'draft';
+
+export interface KnowledgeCategory {
+  id: string;
+  name: string;
+  slug: string;
+  articleCount: number;
+  order: number;
+}
+
+export interface KnowledgeArticle {
+  id: string;
+  title: string;
+  content: string;
+  categoryId: string;
+  status: ArticleStatus;
+  views: number;
+  helpful: number;
+  notHelpful: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// =====================================================================
+// Live Chat types
+// =====================================================================
+
+export type LiveChatStatus = 'open' | 'assigned' | 'resolved' | 'closed';
+
+export interface LiveChatMessage {
+  id: string;
+  conversationId: string;
+  sender: 'visitor' | 'agent';
+  senderName: string;
+  content: string;
+  timestamp: string;
+}
+
+export interface LiveChatConversation {
+  id: string;
+  visitorName: string;
+  visitorEmail?: string;
+  clientId: string;
+  status: LiveChatStatus;
+  assignedTo?: string;
+  channel: 'widget' | 'whatsapp' | 'email';
+  messages: LiveChatMessage[];
+  startedAt: string;
+  lastMessageAt: string;
+}
