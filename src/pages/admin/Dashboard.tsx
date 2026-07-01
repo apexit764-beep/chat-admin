@@ -33,7 +33,7 @@ import {
 } from '@/components/ui/table';
 import { LineChart } from '@components/charts/LineChart';
 import { DoughnutChart } from '@components/charts/DoughnutChart';
-import { CountryMap } from '@components/charts/CountryMap';
+import { BarChart } from '@components/charts/BarChart';
 import { useAdminStore } from '@/store/useAdminStore';
 import { formatMoney, approxUSD } from '@/utils/money';
 import { timeAgo } from '@/utils/format';
@@ -154,7 +154,8 @@ export default function AdminDashboard(): JSX.Element {
           mrr: Math.round(mrr),
         };
       })
-      .filter((x) => x.count > 0);
+      .filter((x) => x.count > 0)
+      .sort((a, b) => b.count - a.count);
   }, [countries, clients, subscriptions]);
 
   const recentClients = useMemo(
@@ -249,7 +250,18 @@ export default function AdminDashboard(): JSX.Element {
               </div>
             </CardHeader>
             <CardContent className="p-3">
-              <CountryMap data={byCountry} />
+              {byCountry.length === 0 ? (
+                <div className="h-[260px] flex items-center justify-center text-sm text-muted-foreground">
+                  لا توجد بيانات
+                </div>
+              ) : (
+                <BarChart
+                  labels={byCountry.map((c) => c.name)}
+                  data={byCountry.map((c) => c.count)}
+                  color="#2563EB"
+                  height={260}
+                />
+              )}
             </CardContent>
           </Card>
         </div>
