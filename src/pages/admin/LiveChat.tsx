@@ -167,7 +167,7 @@ export default function LiveChat() {
     new Date(iso).toLocaleDateString('ar-OM', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
   return (
-    <div className="flex gap-3 h-[calc(100vh-73px)] p-3 bg-white dark:bg-background">
+    <div className="flex gap-3 h-[calc(100vh-73px)] p-3">
       {/* ====== Right Panel: Conversation List ====== */}
       <div className="w-[340px] lg:w-[380px] flex flex-col bg-background shrink-0 rounded-xl border shadow-sm overflow-hidden">
         {/* Header */}
