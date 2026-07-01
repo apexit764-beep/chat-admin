@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { ChevronLeft, Moon, Sun } from 'lucide-react';
 import { NotificationDropdown } from '@/components/admin/NotificationDropdown';
+import { HeaderSearch } from '@/components/admin/HeaderSearch';
 import { useThemeStore } from '@/store/useThemeStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { Button } from '@/components/ui/button';
@@ -73,6 +74,12 @@ export function AdminTopbar(): JSX.Element {
             </>
           )}
         </nav>
+
+        {/* Spacer */}
+        <div className="flex-1" />
+
+        {/* Inline search with live results (desktop) */}
+        <HeaderSearch />
 
         {/* Spacer */}
         <div className="flex-1" />
