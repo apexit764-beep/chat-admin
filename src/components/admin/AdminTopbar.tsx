@@ -1,6 +1,5 @@
-import { useState } from 'react';
-import { useLocation, Link } from 'react-router-dom';
-import { ChevronLeft, Moon, Sun } from 'lucide-react';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
+import { ChevronLeft, Moon, Sun, User, Settings, Shield, Bell, LogOut } from 'lucide-react';
 import { NotificationDropdown } from '@/components/admin/NotificationDropdown';
 import { HeaderSearch } from '@/components/admin/HeaderSearch';
 import { useThemeStore } from '@/store/useThemeStore';
@@ -51,6 +50,7 @@ function getInitials(name: string): string {
 
 export function AdminTopbar(): JSX.Element {
   const location = useLocation();
+  const navigate = useNavigate();
   const theme = useThemeStore((s) => s.theme);
   const toggleTheme = useThemeStore((s) => s.toggle);
   const user = useAuthStore((s) => s.user);
@@ -121,18 +121,48 @@ export function AdminTopbar(): JSX.Element {
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuLabel className="font-normal">
+              <DropdownMenuContent align="start" className="w-52">
+                <DropdownMenuLabel className="font-normal px-3 py-2">
                   <div className="flex flex-col gap-1">
                     <p className="text-sm font-medium">{user.name}</p>
-                    <p className="text-xs text-muted-foreground">مدير النظام</p>
+                    <p className="text-xs text-muted-foreground">{user.email}</p>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
-                  className="text-destructive focus:text-destructive cursor-pointer"
+                  className="cursor-pointer gap-2 px-3"
+                  onClick={() => navigate('/settings')}
+                >
+                  <User className="h-4 w-4" />
+                  الملف الشخصي
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="cursor-pointer gap-2 px-3"
+                  onClick={() => navigate('/settings')}
+                >
+                  <Settings className="h-4 w-4" />
+                  الإعدادات
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="cursor-pointer gap-2 px-3"
+                  onClick={() => navigate('/activity')}
+                >
+                  <Shield className="h-4 w-4" />
+                  سجل النشاط
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="cursor-pointer gap-2 px-3"
+                  onClick={() => navigate('/notifications')}
+                >
+                  <Bell className="h-4 w-4" />
+                  الإشعارات
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="text-destructive focus:text-destructive cursor-pointer gap-2 px-3"
                   onClick={logout}
                 >
+                  <LogOut className="h-4 w-4" />
                   تسجيل الخروج
                 </DropdownMenuItem>
               </DropdownMenuContent>

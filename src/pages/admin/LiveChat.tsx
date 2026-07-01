@@ -13,12 +13,13 @@ import {
   Hash,
   Clock,
   Tag,
-  X,
   ChevronDown,
   SlidersHorizontal,
   Globe,
   ArrowRightLeft,
   StickyNote,
+  PanelRightClose,
+  PanelRightOpen,
 } from 'lucide-react';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -94,7 +95,7 @@ export default function LiveChat() {
   const [filter, setFilter] = useState<FilterStatus>('all');
   const [draft, setDraft] = useState('');
   const [activeTab, setActiveTab] = useState<'message' | 'note'>('message');
-  const [showDetails, setShowDetails] = useState(true);
+  const [showDetails, setShowDetails] = useState(false);
   const [showTransferDialog, setShowTransferDialog] = useState(false);
   const [showAssignDialog, setShowAssignDialog] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -159,6 +160,15 @@ export default function LiveChat() {
     setShowTransferDialog(false);
   };
 
+  const handleStatusChange = (newStatus: LiveChatStatus) => {
+    if (!selectedId || !selected) return;
+    if (newStatus === 'resolved') {
+      resolveLiveChat(selectedId);
+    } else if (newStatus === 'assigned' && !selected.assignedTo) {
+      setShowAssignDialog(true);
+    }
+  };
+
   const formatMsgTime = (iso: string) =>
     new Date(iso).toLocaleTimeString('ar-OM', { hour: '2-digit', minute: '2-digit' });
 
@@ -193,23 +203,21 @@ export default function LiveChat() {
 
           {/* Sort + Count */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <Select value={filter} onValueChange={(v) => setFilter(v as FilterStatus)}>
+              <SelectTrigger className="h-7 w-auto border-0 bg-transparent text-xs gap-1 p-0 pe-1 shadow-none">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">الكل</SelectItem>
+                <SelectItem value="open">جديدة</SelectItem>
+                <SelectItem value="assigned">قيد المعالجة</SelectItem>
+                <SelectItem value="resolved">تم الحل</SelectItem>
+              </SelectContent>
+            </Select>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span className="font-bold text-foreground text-sm">{stats.total}</span>
               <span>الأحدث أولاً</span>
               <ChevronDown className="h-3 w-3" />
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-sm font-bold">{stats.total}</span>
-              <Select value={filter} onValueChange={(v) => setFilter(v as FilterStatus)}>
-                <SelectTrigger className="h-7 w-auto border-0 bg-transparent text-xs gap-1 p-0 pe-1 shadow-none">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">الكل</SelectItem>
-                  <SelectItem value="open">جديدة</SelectItem>
-                  <SelectItem value="assigned">قيد المعالجة</SelectItem>
-                  <SelectItem value="resolved">تم الحل</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
           </div>
         </div>
@@ -227,15 +235,13 @@ export default function LiveChat() {
                 const visibleMsgs = conv.messages.filter(m => m.sender !== 'note');
                 const lastMsg = visibleMsgs[visibleMsgs.length - 1];
                 const cfg = statusConfig[conv.status];
-                const chCfg = channelConfig[conv.channel];
-                const ChIcon = chCfg?.icon ?? MessageCircle;
                 const isActive = conv.id === selectedId;
                 const unread = conv.status === 'open' ? conv.messages.filter(m => m.sender === 'visitor').length : 0;
 
                 return (
                   <button
                     key={conv.id}
-                    onClick={() => setSelectedId(conv.id)}
+                    onClick={() => { setSelectedId(conv.id); setShowDetails(false); }}
                     className={cn(
                       'w-full text-right px-3 py-3 transition-colors border-b border-border/40 hover:bg-muted/50',
                       isActive && 'bg-primary/5 border-r-[3px] border-r-primary'
@@ -267,16 +273,14 @@ export default function LiveChat() {
                           </div>
                         </div>
 
-                        {/* Last message */}
+                        {/* Last message - max 2 lines */}
                         {lastMsg && (
-                          <p className="text-xs text-muted-foreground truncate mt-1">{lastMsg.content}</p>
+                          <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{lastMsg.content}</p>
                         )}
 
-                        {/* Channel + unread */}
+                        {/* Unread badge */}
                         <div className="flex items-center justify-between mt-1.5">
-                          <div className="flex items-center gap-1">
-                            <ChIcon className={cn('h-3.5 w-3.5', chCfg?.color)} />
-                          </div>
+                          <div />
                           {unread > 0 && (
                             <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-full bg-primary text-primary-foreground text-[11px] font-bold">
                               {unread}
@@ -315,25 +319,44 @@ export default function LiveChat() {
                   {getInitials(selected.visitorName)}
                 </div>
                 <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-sm">{selected.visitorName}</span>
-                    {(() => {
-                      const ChIcon = channelConfig[selected.channel]?.icon ?? MessageCircle;
-                      return <ChIcon className={cn('h-4 w-4', channelConfig[selected.channel]?.color)} />;
-                    })()}
-                  </div>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="font-bold text-sm">{selected.visitorName}</span>
+                  <span className="text-xs text-muted-foreground block">
                     {channelConfig[selected.channel]?.label}
+                    {selected.assignedTo && ` · ${selected.assignedTo}`}
                   </span>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Badge className={cn('text-xs px-2.5 py-0.5 font-medium', statusConfig[selected.status].color)}>
-                  {statusConfig[selected.status].label}
-                  <ChevronDown className="h-3 w-3 ms-1" />
-                </Badge>
+              <div className="flex items-center gap-1.5">
+                {/* Status dropdown */}
+                <Select value={selected.status} onValueChange={(v) => handleStatusChange(v as LiveChatStatus)}>
+                  <SelectTrigger className={cn('h-7 w-auto border-0 text-xs gap-1 px-2.5 py-0.5 rounded-full shadow-none font-medium', statusConfig[selected.status].color)}>
+                    <div className={cn('h-1.5 w-1.5 rounded-full', statusConfig[selected.status].dotColor)} />
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="open">جديدة</SelectItem>
+                    <SelectItem value="assigned">قيد المعالجة</SelectItem>
+                    <SelectItem value="resolved">تم الحل</SelectItem>
+                    <SelectItem value="closed">مغلقة</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                {/* Action icons */}
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setShowAssignDialog(true)} title="تعيين لموظف">
+                  <User className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setShowTransferDialog(true)} title="تحويل المحادثة">
+                  <ArrowRightLeft className="h-4 w-4" />
+                </Button>
+                {selected.status !== 'resolved' && selected.status !== 'closed' && (
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-green-600" onClick={() => resolveLiveChat(selected.id)} title="تم الحل">
+                    <CheckCircle2 className="h-4 w-4" />
+                  </Button>
+                )}
+
+                {/* Toggle details */}
                 <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setShowDetails(!showDetails)}>
-                  <SlidersHorizontal className="h-4 w-4" />
+                  {showDetails ? <PanelRightClose className="h-4 w-4" /> : <PanelRightOpen className="h-4 w-4" />}
                 </Button>
               </div>
             </div>
@@ -354,15 +377,20 @@ export default function LiveChat() {
 
                   if (isNote) {
                     return (
-                      <div key={msg.id} className="flex justify-center">
-                        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200/60 dark:border-amber-700/30 rounded-lg px-4 py-2.5 max-w-[80%]">
-                          <div className="flex items-center gap-1.5 mb-1">
-                            <StickyNote className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
-                            <span className="text-[11px] font-semibold text-amber-700 dark:text-amber-400">ملاحظة داخلية</span>
-                            <span className="text-[10px] text-amber-600/60 dark:text-amber-400/60">— {msg.senderName}</span>
+                      <div key={msg.id} className={cn('flex gap-2 items-end', 'justify-start')}>
+                        <div className="h-8 w-8 rounded-full bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shrink-0 mb-1">
+                          <StickyNote className="h-3.5 w-3.5 text-white" />
+                        </div>
+                        <div className="max-w-[65%]">
+                          <p className="text-[11px] text-muted-foreground mb-1 px-1">
+                            ملاحظة داخلية — {msg.senderName}
+                          </p>
+                          <div className="rounded-2xl rounded-tl-md px-4 py-2.5 shadow-sm bg-gradient-to-br from-amber-50 to-amber-100/80 dark:from-amber-900/30 dark:to-amber-800/20 border border-amber-200/40 dark:border-amber-700/30">
+                            <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                            <div className="flex items-center justify-end mt-1.5">
+                              <span className="text-[10px] text-muted-foreground">{formatMsgTime(msg.timestamp)}</span>
+                            </div>
                           </div>
-                          <p className="text-sm text-amber-900 dark:text-amber-200 leading-relaxed">{msg.content}</p>
-                          <span className="text-[10px] text-amber-600/50 dark:text-amber-400/50 mt-1 block text-start">{formatMsgTime(msg.timestamp)}</span>
                         </div>
                       </div>
                     );
@@ -466,18 +494,8 @@ export default function LiveChat() {
                 />
               </div>
 
-              {/* Toolbar */}
+              {/* Toolbar - attachments on right, send on left */}
               <div className={cn('flex items-center justify-between px-3 py-2 border-t border-border/40', activeTab === 'note' && 'bg-amber-50/30 dark:bg-amber-900/5')}>
-                <Button
-                  size="sm"
-                  onClick={handleSend}
-                  disabled={!draft.trim()}
-                  className={cn('gap-1.5 rounded-lg h-9 px-5', activeTab === 'note' && 'bg-amber-500 hover:bg-amber-600')}
-                >
-                  {activeTab === 'note' ? 'حفظ ملاحظة' : 'إرسال'}
-                  {activeTab === 'note' ? <StickyNote className="h-3.5 w-3.5" /> : <Send className="h-3.5 w-3.5 rotate-180" />}
-                </Button>
-
                 <div className="flex items-center gap-0.5">
                   <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
                     <Paperclip className="h-4 w-4" />
@@ -492,6 +510,16 @@ export default function LiveChat() {
                     <Star className="h-4 w-4" />
                   </Button>
                 </div>
+
+                <Button
+                  size="sm"
+                  onClick={handleSend}
+                  disabled={!draft.trim()}
+                  className={cn('gap-1.5 rounded-lg h-9 px-5', activeTab === 'note' && 'bg-amber-500 hover:bg-amber-600')}
+                >
+                  {activeTab === 'note' ? 'حفظ ملاحظة' : 'إرسال'}
+                  {activeTab === 'note' ? <StickyNote className="h-3.5 w-3.5" /> : <Send className="h-3.5 w-3.5 rotate-180" />}
+                </Button>
               </div>
             </div>
           </>
@@ -504,7 +532,7 @@ export default function LiveChat() {
           <div className="flex items-center justify-between px-4 py-3 border-b">
             <h3 className="font-bold text-sm">التفاصيل</h3>
             <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setShowDetails(false)}>
-              <X className="h-4 w-4" />
+              <PanelRightClose className="h-4 w-4" />
             </Button>
           </div>
 
