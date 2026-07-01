@@ -8,6 +8,7 @@ const AdminDashboard = lazy(() => import('@pages/admin/Dashboard'));
 const AdminClients = lazy(() => import('@pages/admin/Clients'));
 const AdminPlans = lazy(() => import('@pages/admin/Plans'));
 const AdminFinance = lazy(() => import('@pages/admin/Finance'));
+const AdminSubscriptions = lazy(() => import('@pages/admin/Subscriptions'));
 const AdminReports = lazy(() => import('@pages/admin/Reports'));
 const AdminSettings = lazy(() => import('@pages/admin/Settings'));
 const AdminActivityLog = lazy(() => import('@pages/admin/ActivityLog'));
@@ -41,6 +42,7 @@ export default function App(): JSX.Element {
           <Route path="/clients/:id" element={<AdminClientDetail />} />
           <Route path="/plans" element={<AdminPlans />} />
           <Route path="/finance" element={<AdminFinance />} />
+          <Route path="/subscriptions" element={<AdminSubscriptions />} />
           <Route path="/reports" element={<AdminReports />} />
           <Route path="/settings" element={<AdminSettings />} />
           <Route path="/activity" element={<AdminActivityLog />} />

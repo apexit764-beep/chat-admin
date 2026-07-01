@@ -3,6 +3,7 @@ import { useState } from 'react';
 import {
   LayoutDashboard,
   Users,
+  Repeat,
   Package,
   Banknote,
   BarChart3,
@@ -53,6 +54,7 @@ const navGroups: NavGroup[] = [
     title: 'المالية',
     items: [
       { to: '/finance', label: 'المالية', icon: Banknote },
+      { to: '/subscriptions', label: 'الاشتراكات', icon: Repeat },
     ],
   },
   {
