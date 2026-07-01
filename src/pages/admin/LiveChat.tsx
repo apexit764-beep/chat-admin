@@ -1,5 +1,26 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { Search, Send, MessageCircle, Globe, Phone, CheckCircle2, Circle, User, ArrowLeft } from 'lucide-react';
+import {
+  Search,
+  Send,
+  MessageCircle,
+  Phone,
+  CheckCircle2,
+  User,
+  Smile,
+  Paperclip,
+  Image,
+  Star,
+  Hash,
+  Clock,
+  Tag,
+  X,
+  Plus,
+  ChevronDown,
+  SlidersHorizontal,
+  PenSquare,
+  Instagram,
+  Globe,
+} from 'lucide-react';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { timeAgo } from '@/utils/format';
@@ -8,24 +29,53 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import type { LiveChatConversation, LiveChatStatus } from '@/types';
 
-const statusConfig: Record<LiveChatStatus, { label: string; color: string; dot: string }> = {
-  open: { label: 'مفتوحة', color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', dot: 'bg-green-500' },
-  assigned: { label: 'قيد المعالجة', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400', dot: 'bg-blue-500' },
-  resolved: { label: 'تم الحل', color: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400', dot: 'bg-gray-400' },
-  closed: { label: 'مغلقة', color: 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-500', dot: 'bg-gray-300' },
+const avatarColors = [
+  'bg-blue-500',
+  'bg-green-500',
+  'bg-purple-500',
+  'bg-orange-500',
+  'bg-pink-500',
+  'bg-teal-500',
+  'bg-indigo-500',
+  'bg-rose-500',
+  'bg-cyan-500',
+  'bg-amber-500',
+];
+
+function getAvatarColor(name: string): string {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return avatarColors[Math.abs(hash) % avatarColors.length];
+}
+
+function getInitials(name: string): string {
+  const parts = name.split(' ');
+  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+  return name.slice(0, 2).toUpperCase();
+}
+
+const statusConfig: Record<LiveChatStatus, { label: string; color: string; dotColor: string }> = {
+  open: { label: 'جديدة', color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', dotColor: 'bg-green-500' },
+  assigned: { label: 'قيد المعالجة', color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400', dotColor: 'bg-yellow-500' },
+  resolved: { label: 'تم الحل', color: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400', dotColor: 'bg-gray-400' },
+  closed: { label: 'مغلقة', color: 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-500', dotColor: 'bg-gray-300' },
 };
 
-const channelIcon = (channel: 'widget' | 'whatsapp' | 'email') => {
-  switch (channel) {
-    case 'whatsapp':
-      return <Phone className="h-3.5 w-3.5 text-green-600" />;
-    case 'email':
-      return <Globe className="h-3.5 w-3.5 text-blue-500" />;
-    default:
-      return <MessageCircle className="h-3.5 w-3.5 text-primary" />;
-  }
+const channelConfig: Record<string, { icon: React.ElementType; label: string; color: string }> = {
+  whatsapp: { icon: Phone, label: 'WhatsApp', color: 'text-green-600' },
+  widget: { icon: MessageCircle, label: 'الويدجت', color: 'text-primary' },
+  email: { icon: Globe, label: 'البريد', color: 'text-blue-500' },
 };
 
 type FilterStatus = 'all' | 'open' | 'assigned' | 'resolved';
@@ -38,23 +88,19 @@ export default function LiveChat() {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<FilterStatus>('all');
   const [draft, setDraft] = useState('');
+  const [activeTab, setActiveTab] = useState<'message' | 'note'>('message');
+  const [showDetails, setShowDetails] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const clientMap = useMemo(() => {
     const map: Record<string, string> = {};
-    clients.forEach((c) => {
-      map[c.id] = c.companyName;
-    });
+    clients.forEach((c) => { map[c.id] = c.companyName; });
     return map;
   }, [clients]);
 
   const filtered = useMemo(() => {
     let list = [...liveChatConversations];
-
-    if (filter !== 'all') {
-      list = list.filter((c) => c.status === filter);
-    }
-
+    if (filter !== 'all') list = list.filter((c) => c.status === filter);
     if (search.trim()) {
       const q = search.trim().toLowerCase();
       list = list.filter(
@@ -64,7 +110,6 @@ export default function LiveChat() {
           (clientMap[c.clientId] || '').toLowerCase().includes(q)
       );
     }
-
     list.sort((a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime());
     return list;
   }, [liveChatConversations, filter, search, clientMap]);
@@ -74,15 +119,12 @@ export default function LiveChat() {
     [liveChatConversations, selectedId]
   );
 
-  // Stats
   const stats = useMemo(() => {
     const open = liveChatConversations.filter((c) => c.status === 'open').length;
     const assigned = liveChatConversations.filter((c) => c.status === 'assigned').length;
-    const resolved = liveChatConversations.filter((c) => c.status === 'resolved').length;
-    return { open, assigned, resolved, total: liveChatConversations.length };
+    return { open, assigned, total: liveChatConversations.length };
   }, [liveChatConversations]);
 
-  // Scroll to bottom on new message or conversation change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [selected?.messages.length, selectedId]);
@@ -100,253 +142,478 @@ export default function LiveChat() {
     }
   };
 
-  const filters: { key: FilterStatus; label: string }[] = [
-    { key: 'all', label: 'الكل' },
-    { key: 'open', label: 'مفتوحة' },
-    { key: 'assigned', label: 'قيد المعالجة' },
-    { key: 'resolved', label: 'تم الحل' },
-  ];
-
   const formatMsgTime = (iso: string) =>
     new Date(iso).toLocaleTimeString('ar-OM', { hour: '2-digit', minute: '2-digit' });
 
-  return (
-    <div className="flex flex-col h-[calc(100vh-73px)]">
-      {/* Stats row */}
-      <div className="flex items-center gap-4 px-4 py-2.5 border-b bg-card">
-        <StatMini label="محادثات مفتوحة" value={stats.open} color="text-green-600" />
-        <StatMini label="قيد المعالجة" value={stats.assigned} color="text-blue-600" />
-        <StatMini label="تم الحل" value={stats.resolved} color="text-gray-500" />
-        <StatMini label="إجمالي اليوم" value={stats.total} color="text-foreground" />
-      </div>
+  const formatDate = (iso: string) =>
+    new Date(iso).toLocaleDateString('ar-OM', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
-      <div className="flex flex-1 min-h-0">
-        {/* Right panel — Conversation list */}
-        <div className="w-80 lg:w-96 border-l flex flex-col bg-card">
-          {/* Search */}
-          <div className="p-3 border-b space-y-2">
-            <div className="relative">
+  return (
+    <div className="flex h-[calc(100vh-73px)]">
+      {/* ====== Right Panel: Conversation List ====== */}
+      <div className="w-[340px] lg:w-[380px] border-l flex flex-col bg-background shrink-0">
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 py-3 border-b">
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg font-bold">المحادثات</h2>
+          </div>
+          <Button size="sm" className="gap-1.5 rounded-lg h-8 text-xs">
+            <PenSquare className="h-3.5 w-3.5" />
+            محادثة جديدة
+          </Button>
+        </div>
+
+        {/* Search + Filter */}
+        <div className="px-3 py-2 border-b space-y-2">
+          <div className="flex gap-2">
+            <div className="relative flex-1">
               <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="بحث بالاسم أو البريد..."
-                className="pr-9"
+                placeholder="ابحث عن محادثة..."
+                className="pr-9 h-9 text-sm bg-muted/50 border-0"
               />
             </div>
-            {/* Filter chips */}
-            <div className="flex gap-1.5">
-              {filters.map((f) => (
-                <button
-                  key={f.key}
-                  onClick={() => setFilter(f.key)}
-                  className={cn(
-                    'px-2.5 py-1 text-xs rounded-full transition-colors',
-                    filter === f.key
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                  )}
-                >
-                  {f.label}
-                </button>
-              ))}
-            </div>
+            <Button variant="outline" size="icon" className="h-9 w-9 shrink-0">
+              <SlidersHorizontal className="h-4 w-4" />
+            </Button>
           </div>
 
-          {/* Conversation list */}
-          <ScrollArea className="flex-1">
-            {filtered.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-                <MessageCircle className="h-10 w-10 mb-2 opacity-40" />
-                <p className="text-sm">لا توجد محادثات</p>
-              </div>
-            ) : (
-              <div className="divide-y">
-                {filtered.map((conv) => (
-                  <ConversationCard
-                    key={conv.id}
-                    conv={conv}
-                    clientName={clientMap[conv.clientId] || '—'}
-                    isSelected={conv.id === selectedId}
-                    onClick={() => setSelectedId(conv.id)}
-                  />
-                ))}
-              </div>
-            )}
-          </ScrollArea>
+          {/* Sort + Count */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <span>الأحدث أولاً</span>
+              <ChevronDown className="h-3 w-3" />
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm font-bold">{stats.total}</span>
+              <Select value={filter} onValueChange={(v) => setFilter(v as FilterStatus)}>
+                <SelectTrigger className="h-7 w-auto border-0 bg-transparent text-xs gap-1 p-0 pe-1 shadow-none">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">الكل</SelectItem>
+                  <SelectItem value="open">جديدة</SelectItem>
+                  <SelectItem value="assigned">قيد المعالجة</SelectItem>
+                  <SelectItem value="resolved">تم الحل</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </div>
 
-        {/* Left panel — Chat view */}
-        <div className="flex-1 flex flex-col min-w-0">
-          {!selected ? (
-            <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground">
-              <MessageCircle className="h-16 w-16 mb-4 opacity-30" />
-              <p className="text-lg">اختر محادثة للبدء</p>
+        {/* Conversation list */}
+        <ScrollArea className="flex-1">
+          {filtered.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+              <MessageCircle className="h-10 w-10 mb-2 opacity-40" />
+              <p className="text-sm">لا توجد محادثات</p>
             </div>
           ) : (
-            <>
-              {/* Chat header */}
-              <div className="flex items-center justify-between px-4 py-3 border-b bg-card">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="h-9 w-9 rounded-full bg-muted flex items-center justify-center shrink-0">
-                    <User className="h-4.5 w-4.5 text-muted-foreground" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold text-sm truncate">{selected.visitorName}</span>
-                      <Badge variant="outline" className={cn('text-[10px] px-1.5 py-0', statusConfig[selected.status].color)}>
-                        {statusConfig[selected.status].label}
-                      </Badge>
+            <div>
+              {filtered.map((conv) => {
+                const lastMsg = conv.messages[conv.messages.length - 1];
+                const cfg = statusConfig[conv.status];
+                const chCfg = channelConfig[conv.channel];
+                const ChIcon = chCfg?.icon ?? MessageCircle;
+                const isActive = conv.id === selectedId;
+                const unread = conv.status === 'open' ? conv.messages.filter(m => m.sender === 'visitor').length : 0;
+
+                return (
+                  <button
+                    key={conv.id}
+                    onClick={() => setSelectedId(conv.id)}
+                    className={cn(
+                      'w-full text-right px-3 py-3 transition-colors border-b border-border/40 hover:bg-muted/50',
+                      isActive && 'bg-primary/5 border-r-[3px] border-r-primary'
+                    )}
+                  >
+                    <div className="flex items-start gap-2.5">
+                      {/* Avatar */}
+                      <div className={cn(
+                        'h-10 w-10 rounded-full flex items-center justify-center shrink-0 text-white font-bold text-sm',
+                        getAvatarColor(conv.visitorName)
+                      )}>
+                        {getInitials(conv.visitorName)}
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        {/* Name row */}
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <span className="font-semibold text-sm truncate">{conv.visitorName}</span>
+                            {conv.status === 'assigned' && (
+                              <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-800 shrink-0">
+                                محولة
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <span className="text-[11px] text-muted-foreground">{timeAgo(conv.lastMessageAt)}</span>
+                            <div className={cn('h-2 w-2 rounded-full', cfg.dotColor)} />
+                          </div>
+                        </div>
+
+                        {/* Last message */}
+                        {lastMsg && (
+                          <p className="text-xs text-muted-foreground truncate mt-1">{lastMsg.content}</p>
+                        )}
+
+                        {/* Channel + unread */}
+                        <div className="flex items-center justify-between mt-1.5">
+                          <div className="flex items-center gap-1">
+                            <ChIcon className={cn('h-3.5 w-3.5', chCfg?.color)} />
+                          </div>
+                          {unread > 0 && (
+                            <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-full bg-primary text-primary-foreground text-[11px] font-bold">
+                              {unread}
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      {selected.visitorEmail && <span>{selected.visitorEmail}</span>}
-                      {selected.visitorEmail && <span>·</span>}
-                      <span>{clientMap[selected.clientId] || '—'}</span>
-                    </div>
-                  </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </ScrollArea>
+      </div>
+
+      {/* ====== Middle Panel: Chat Area ====== */}
+      <div className="flex-1 flex flex-col min-w-0 border-l">
+        {!selected ? (
+          <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground bg-muted/20">
+            <div className="h-20 w-20 rounded-full bg-muted/50 flex items-center justify-center mb-4">
+              <MessageCircle className="h-10 w-10 opacity-40" />
+            </div>
+            <p className="text-lg font-medium">اختر محادثة للبدء</p>
+            <p className="text-sm mt-1">اختر محادثة من القائمة لعرض الرسائل</p>
+          </div>
+        ) : (
+          <>
+            {/* Chat header */}
+            <div className="flex items-center justify-between px-4 py-2.5 border-b bg-background">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className={cn(
+                  'h-10 w-10 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0',
+                  getAvatarColor(selected.visitorName)
+                )}>
+                  {getInitials(selected.visitorName)}
                 </div>
-                <div className="flex items-center gap-2">
-                  {(selected.status === 'open' || !selected.assignedTo) && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => assignLiveChat(selected.id, user?.name ?? 'مشرف')}
-                    >
-                      تعيين لي
-                    </Button>
-                  )}
-                  {selected.status !== 'resolved' && selected.status !== 'closed' && (
-                    <Button
-                      size="sm"
-                      variant="default"
-                      onClick={() => resolveLiveChat(selected.id)}
-                    >
-                      <CheckCircle2 className="h-4 w-4 ml-1" />
-                      تم الحل
-                    </Button>
-                  )}
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-sm">{selected.visitorName}</span>
+                    {(() => {
+                      const ChIcon = channelConfig[selected.channel]?.icon ?? MessageCircle;
+                      return <ChIcon className={cn('h-4 w-4', channelConfig[selected.channel]?.color)} />;
+                    })()}
+                  </div>
+                  <span className="text-xs text-muted-foreground">
+                    {channelConfig[selected.channel]?.label}
+                  </span>
                 </div>
               </div>
+              <div className="flex items-center gap-2">
+                <Badge className={cn('text-xs px-2.5 py-0.5 font-medium', statusConfig[selected.status].color)}>
+                  {statusConfig[selected.status].label}
+                  <ChevronDown className="h-3 w-3 ms-1" />
+                </Badge>
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setShowDetails(!showDetails)}>
+                  <SlidersHorizontal className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
 
-              {/* Messages */}
-              <ScrollArea className="flex-1 px-4 py-4">
-                <div className="space-y-3 max-w-3xl mx-auto">
-                  {selected.messages.map((msg) => {
-                    const isVisitor = msg.sender === 'visitor';
-                    return (
-                      <div
-                        key={msg.id}
-                        className={cn('flex', isVisitor ? 'justify-end' : 'justify-start')}
-                      >
+            {/* Messages area */}
+            <ScrollArea className="flex-1 bg-[#f8f9fa] dark:bg-muted/10">
+              <div className="px-4 py-4 space-y-4 max-w-3xl mx-auto">
+                {/* Date separator */}
+                <div className="flex items-center justify-center">
+                  <span className="text-[11px] text-muted-foreground bg-muted/80 dark:bg-muted px-3 py-1 rounded-full">
+                    اليوم
+                  </span>
+                </div>
+
+                {selected.messages.map((msg) => {
+                  const isVisitor = msg.sender === 'visitor';
+                  return (
+                    <div
+                      key={msg.id}
+                      className={cn('flex gap-2 items-end', isVisitor ? 'justify-end' : 'justify-start')}
+                    >
+                      {/* Agent avatar (left side in RTL) */}
+                      {!isVisitor && (
+                        <div className="h-8 w-8 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shrink-0 mb-1">
+                          <Star className="h-3.5 w-3.5 text-white" />
+                        </div>
+                      )}
+
+                      <div className={cn('max-w-[65%]')}>
+                        {/* Sender name */}
+                        {!isVisitor && (
+                          <p className="text-[11px] text-muted-foreground mb-1 px-1">{msg.senderName}</p>
+                        )}
+
                         <div
                           className={cn(
-                            'max-w-[70%] rounded-2xl px-4 py-2.5',
+                            'rounded-2xl px-4 py-2.5 shadow-sm',
                             isVisitor
-                              ? 'bg-muted text-foreground rounded-br-md'
-                              : 'bg-primary text-primary-foreground rounded-bl-md'
+                              ? 'bg-white dark:bg-card border border-border/60 rounded-tr-md'
+                              : 'bg-gradient-to-br from-purple-50 to-purple-100/80 dark:from-purple-900/30 dark:to-purple-800/20 border border-purple-200/40 dark:border-purple-700/30 rounded-tl-md'
                           )}
                         >
                           <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
-                          <p
-                            className={cn(
-                              'text-[10px] mt-1',
-                              isVisitor ? 'text-muted-foreground' : 'text-primary-foreground/70'
+                          <div className={cn(
+                            'flex items-center gap-1.5 mt-1.5',
+                            isVisitor ? 'justify-start' : 'justify-end'
+                          )}>
+                            {isVisitor && (
+                              <span className="text-[10px] text-muted-foreground">{msg.senderName}</span>
                             )}
-                          >
-                            {formatMsgTime(msg.timestamp)}
-                          </p>
+                            {isVisitor && <span className="text-[10px] text-muted-foreground">·</span>}
+                            <span className="text-[10px] text-muted-foreground">{formatMsgTime(msg.timestamp)}</span>
+                          </div>
                         </div>
                       </div>
-                    );
-                  })}
-                  <div ref={messagesEndRef} />
-                </div>
-              </ScrollArea>
 
-              {/* Compose bar */}
-              <div className="border-t bg-card px-4 py-3">
-                <div className="flex items-center gap-2 max-w-3xl mx-auto">
-                  <Input
-                    value={draft}
-                    onChange={(e) => setDraft(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder="اكتب رداً..."
-                    className="flex-1"
-                  />
-                  <Button
-                    size="icon"
-                    onClick={handleSend}
-                    disabled={!draft.trim()}
-                  >
-                    <Send className="h-4 w-4" />
+                      {/* Visitor avatar */}
+                      {isVisitor && (
+                        <div className={cn(
+                          'h-8 w-8 rounded-full flex items-center justify-center shrink-0 text-white font-bold text-xs mb-1',
+                          getAvatarColor(selected.visitorName)
+                        )}>
+                          {getInitials(selected.visitorName)}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+                <div ref={messagesEndRef} />
+              </div>
+            </ScrollArea>
+
+            {/* Compose area */}
+            <div className="border-t bg-background">
+              {/* Tabs */}
+              <div className="flex border-b">
+                <button
+                  onClick={() => setActiveTab('message')}
+                  className={cn(
+                    'px-4 py-2 text-sm font-medium transition-colors relative',
+                    activeTab === 'message'
+                      ? 'text-primary'
+                      : 'text-muted-foreground hover:text-foreground'
+                  )}
+                >
+                  رسالة
+                  {activeTab === 'message' && (
+                    <span className="absolute bottom-0 inset-x-0 h-0.5 bg-primary rounded-t" />
+                  )}
+                </button>
+                <button
+                  onClick={() => setActiveTab('note')}
+                  className={cn(
+                    'px-4 py-2 text-sm font-medium transition-colors relative',
+                    activeTab === 'note'
+                      ? 'text-primary'
+                      : 'text-muted-foreground hover:text-foreground'
+                  )}
+                >
+                  ملاحظة
+                  {activeTab === 'note' && (
+                    <span className="absolute bottom-0 inset-x-0 h-0.5 bg-primary rounded-t" />
+                  )}
+                </button>
+              </div>
+
+              {/* Input area */}
+              <div className="px-4 py-3">
+                <Input
+                  value={draft}
+                  onChange={(e) => setDraft(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder={activeTab === 'message' ? 'اكتب ردك هنا...' : 'اكتب ملاحظة داخلية...'}
+                  className="border-0 shadow-none bg-transparent px-0 text-sm h-8 focus-visible:ring-0"
+                />
+              </div>
+
+              {/* Toolbar */}
+              <div className="flex items-center justify-between px-3 py-2 border-t border-border/40">
+                <Button
+                  size="sm"
+                  onClick={handleSend}
+                  disabled={!draft.trim()}
+                  className="gap-1.5 rounded-lg h-9 px-5"
+                >
+                  إرسال
+                  <Send className="h-3.5 w-3.5 rotate-180" />
+                </Button>
+
+                <div className="flex items-center gap-0.5">
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
+                    <Paperclip className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
+                    <Smile className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
+                    <Image className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
+                    <Star className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
-            </>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ---------- Sub-components ---------- */
-
-function StatMini({ label, value, color }: { label: string; value: number; color: string }) {
-  return (
-    <div className="flex items-center gap-1.5">
-      <span className={cn('text-lg font-bold', color)}>{value}</span>
-      <span className="text-xs text-muted-foreground">{label}</span>
-    </div>
-  );
-}
-
-function ConversationCard({
-  conv,
-  clientName,
-  isSelected,
-  onClick,
-}: {
-  conv: LiveChatConversation;
-  clientName: string;
-  isSelected: boolean;
-  onClick: () => void;
-}) {
-  const lastMsg = conv.messages[conv.messages.length - 1];
-  const cfg = statusConfig[conv.status];
-
-  return (
-    <button
-      onClick={onClick}
-      className={cn(
-        'w-full text-right px-3 py-3 transition-colors hover:bg-muted/50',
-        isSelected && 'bg-primary/10 border-r-2 border-primary'
-      )}
-    >
-      <div className="flex items-start gap-2.5">
-        {/* Avatar placeholder */}
-        <div className="h-9 w-9 rounded-full bg-muted flex items-center justify-center shrink-0 mt-0.5">
-          <User className="h-4 w-4 text-muted-foreground" />
-        </div>
-
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between gap-2">
-            <span className="font-semibold text-sm truncate">{conv.visitorName}</span>
-            <div className="flex items-center gap-1.5 shrink-0">
-              {channelIcon(conv.channel)}
-              <div className={cn('h-2 w-2 rounded-full', cfg.dot)} />
             </div>
+          </>
+        )}
+      </div>
+
+      {/* ====== Left Panel: Details Sidebar ====== */}
+      {selected && showDetails && (
+        <div className="w-[300px] lg:w-[320px] border-l flex flex-col bg-background shrink-0">
+          <div className="flex items-center justify-between px-4 py-3 border-b">
+            <h3 className="font-bold text-sm">التفاصيل</h3>
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setShowDetails(false)}>
+              <X className="h-4 w-4" />
+            </Button>
           </div>
 
-          <p className="text-xs text-muted-foreground truncate mt-0.5">{clientName}</p>
+          <ScrollArea className="flex-1">
+            <div className="p-4 space-y-5">
+              {/* Contact card */}
+              <div className="flex flex-col items-center text-center pb-4 border-b">
+                <div className={cn(
+                  'h-16 w-16 rounded-full flex items-center justify-center text-white font-bold text-xl mb-3',
+                  getAvatarColor(selected.visitorName)
+                )}>
+                  {getInitials(selected.visitorName)}
+                </div>
+                <h4 className="font-bold text-base">{selected.visitorName}</h4>
+                {selected.visitorEmail && (
+                  <p className="text-xs text-muted-foreground mt-1">{selected.visitorEmail}</p>
+                )}
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {clientMap[selected.clientId] || '—'}
+                </p>
+              </div>
 
-          {lastMsg && (
-            <p className="text-xs text-muted-foreground/80 truncate mt-1">{lastMsg.content}</p>
-          )}
+              {/* Assignment */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">الموظف المسؤول</span>
+                  <div className="flex items-center gap-1.5">
+                    {selected.assignedTo ? (
+                      <>
+                        <div className={cn(
+                          'h-5 w-5 rounded-full flex items-center justify-center text-white text-[9px] font-bold',
+                          getAvatarColor(selected.assignedTo)
+                        )}>
+                          {getInitials(selected.assignedTo)}
+                        </div>
+                        <span className="text-sm font-medium">{selected.assignedTo}</span>
+                      </>
+                    ) : (
+                      <span className="text-sm text-muted-foreground">غير معين</span>
+                    )}
+                  </div>
+                </div>
 
-          <p className="text-[10px] text-muted-foreground/60 mt-1">{timeAgo(conv.lastMessageAt)}</p>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">الحالة</span>
+                  <Badge className={cn('text-[11px] px-2 py-0.5', statusConfig[selected.status].color)}>
+                    <div className={cn('h-1.5 w-1.5 rounded-full me-1', statusConfig[selected.status].dotColor)} />
+                    {statusConfig[selected.status].label}
+                  </Badge>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">القناة</span>
+                  <div className="flex items-center gap-1">
+                    {(() => {
+                      const ChIcon = channelConfig[selected.channel]?.icon ?? MessageCircle;
+                      return <ChIcon className={cn('h-3.5 w-3.5', channelConfig[selected.channel]?.color)} />;
+                    })()}
+                    <span className="text-sm">{channelConfig[selected.channel]?.label}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tags */}
+              <div className="border-t pt-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs text-muted-foreground">الوسوم</span>
+                  <button className="text-xs text-primary hover:underline flex items-center gap-0.5">
+                    <Plus className="h-3 w-3" />
+                    وسم جديد
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  <Badge variant="secondary" className="text-[11px] gap-1 rounded-md">
+                    {channelConfig[selected.channel]?.label}
+                    <X className="h-2.5 w-2.5 cursor-pointer" />
+                  </Badge>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="border-t pt-4 space-y-2">
+                {(selected.status === 'open' || !selected.assignedTo) && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="w-full h-9 text-xs"
+                    onClick={() => assignLiveChat(selected.id, user?.name ?? 'مشرف')}
+                  >
+                    <User className="h-3.5 w-3.5 me-1.5" />
+                    تعيين لي
+                  </Button>
+                )}
+                {selected.status !== 'resolved' && selected.status !== 'closed' && (
+                  <Button
+                    size="sm"
+                    className="w-full h-9 text-xs"
+                    onClick={() => resolveLiveChat(selected.id)}
+                  >
+                    <CheckCircle2 className="h-3.5 w-3.5 me-1.5" />
+                    تم الحل
+                  </Button>
+                )}
+              </div>
+
+              {/* Conversation info */}
+              <div className="border-t pt-4 space-y-3">
+                <h5 className="text-xs font-semibold text-muted-foreground">خصائص المحادثة</h5>
+                <div className="space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground flex items-center gap-1">
+                      <Hash className="h-3 w-3" />
+                      المعرّف
+                    </span>
+                    <span className="text-xs font-mono">#{selected.id.replace('lc_', '').padStart(4, '0')}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground flex items-center gap-1">
+                      <Clock className="h-3 w-3" />
+                      بدأت
+                    </span>
+                    <span className="text-xs">{formatDate(selected.startedAt)}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground flex items-center gap-1">
+                      <Tag className="h-3 w-3" />
+                      الرسائل
+                    </span>
+                    <span className="text-xs">{selected.messages.length}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ScrollArea>
         </div>
-      </div>
-    </button>
+      )}
+    </div>
   );
 }
