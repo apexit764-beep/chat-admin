@@ -1,10 +1,14 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import {
   Search,
+  Send,
   MessageCircle,
   Phone,
   CheckCircle2,
   User,
+  Smile,
+  Paperclip,
+  Image,
   Star,
   Hash,
   Clock,
@@ -82,13 +86,14 @@ const channelConfig: Record<string, { icon: React.ElementType; label: string; co
 type FilterStatus = 'all' | 'open' | 'assigned' | 'resolved';
 
 export default function LiveChat() {
-  const { liveChatConversations, clients, adminUsers, assignLiveChat, transferLiveChat, resolveLiveChat, sendLiveChatNote } = useAdminStore();
+  const { liveChatConversations, clients, adminUsers, assignLiveChat, transferLiveChat, resolveLiveChat, sendLiveChatMessage, sendLiveChatNote } = useAdminStore();
   const user = useAuthStore((s) => s.user);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<FilterStatus>('all');
   const [draft, setDraft] = useState('');
+  const [activeTab, setActiveTab] = useState<'message' | 'note'>('message');
   const [showDetails, setShowDetails] = useState(true);
   const [showTransferDialog, setShowTransferDialog] = useState(false);
   const [showAssignDialog, setShowAssignDialog] = useState(false);
@@ -133,7 +138,11 @@ export default function LiveChat() {
 
   const handleSend = () => {
     if (!draft.trim() || !selectedId) return;
-    sendLiveChatNote(selectedId, draft.trim(), user?.name ?? 'مشرف');
+    if (activeTab === 'note') {
+      sendLiveChatNote(selectedId, draft.trim(), user?.name ?? 'مشرف');
+    } else {
+      sendLiveChatMessage(selectedId, draft.trim(), user?.name ?? 'مشرف');
+    }
     setDraft('');
   };
 
@@ -412,31 +421,77 @@ export default function LiveChat() {
               </div>
             </ScrollArea>
 
-            {/* Notes-only compose area */}
-            <div className="border-t bg-amber-50/30 dark:bg-amber-900/5">
-              <div className="flex items-center gap-1.5 px-4 pt-2.5">
-                <StickyNote className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
-                <span className="text-xs font-medium text-amber-700 dark:text-amber-400">ملاحظة داخلية</span>
+            {/* Compose area */}
+            <div className="border-t bg-background">
+              {/* Tabs */}
+              <div className="flex border-b">
+                <button
+                  onClick={() => setActiveTab('message')}
+                  className={cn(
+                    'px-4 py-2 text-sm font-medium transition-colors relative',
+                    activeTab === 'message'
+                      ? 'text-primary'
+                      : 'text-muted-foreground hover:text-foreground'
+                  )}
+                >
+                  رسالة
+                  {activeTab === 'message' && (
+                    <span className="absolute bottom-0 inset-x-0 h-0.5 bg-primary rounded-t" />
+                  )}
+                </button>
+                <button
+                  onClick={() => setActiveTab('note')}
+                  className={cn(
+                    'px-4 py-2 text-sm font-medium transition-colors relative',
+                    activeTab === 'note'
+                      ? 'text-amber-600 dark:text-amber-400'
+                      : 'text-muted-foreground hover:text-foreground'
+                  )}
+                >
+                  ملاحظة
+                  {activeTab === 'note' && (
+                    <span className="absolute bottom-0 inset-x-0 h-0.5 bg-amber-500 rounded-t" />
+                  )}
+                </button>
               </div>
-              <div className="px-4 py-2">
+
+              {/* Input area */}
+              <div className={cn('px-4 py-3', activeTab === 'note' && 'bg-amber-50/50 dark:bg-amber-900/10')}>
                 <Input
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="اكتب ملاحظة داخلية (مرئية فقط للموظفين)..."
+                  placeholder={activeTab === 'message' ? 'اكتب ردك هنا...' : 'اكتب ملاحظة داخلية (مرئية فقط للموظفين)...'}
                   className="border-0 shadow-none bg-transparent px-0 text-sm h-8 focus-visible:ring-0"
                 />
               </div>
-              <div className="flex items-center justify-between px-3 py-2 border-t border-amber-200/40 dark:border-amber-700/20">
+
+              {/* Toolbar */}
+              <div className={cn('flex items-center justify-between px-3 py-2 border-t border-border/40', activeTab === 'note' && 'bg-amber-50/30 dark:bg-amber-900/5')}>
                 <Button
                   size="sm"
                   onClick={handleSend}
                   disabled={!draft.trim()}
-                  className="gap-1.5 rounded-lg h-9 px-5 bg-amber-500 hover:bg-amber-600"
+                  className={cn('gap-1.5 rounded-lg h-9 px-5', activeTab === 'note' && 'bg-amber-500 hover:bg-amber-600')}
                 >
-                  حفظ ملاحظة
-                  <StickyNote className="h-3.5 w-3.5" />
+                  {activeTab === 'note' ? 'حفظ ملاحظة' : 'إرسال'}
+                  {activeTab === 'note' ? <StickyNote className="h-3.5 w-3.5" /> : <Send className="h-3.5 w-3.5 rotate-180" />}
                 </Button>
+
+                <div className="flex items-center gap-0.5">
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
+                    <Paperclip className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
+                    <Smile className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
+                    <Image className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
+                    <Star className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
           </>
