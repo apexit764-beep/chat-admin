@@ -1,23 +1,17 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import {
   Search,
-  Send,
   MessageCircle,
   Phone,
   CheckCircle2,
   User,
-  Smile,
-  Paperclip,
-  Image,
   Star,
   Hash,
   Clock,
   Tag,
   X,
-  Plus,
   ChevronDown,
   SlidersHorizontal,
-  PenSquare,
   Globe,
   ArrowRightLeft,
   StickyNote,
@@ -88,16 +82,16 @@ const channelConfig: Record<string, { icon: React.ElementType; label: string; co
 type FilterStatus = 'all' | 'open' | 'assigned' | 'resolved';
 
 export default function LiveChat() {
-  const { liveChatConversations, clients, adminUsers, assignLiveChat, transferLiveChat, resolveLiveChat, sendLiveChatMessage, sendLiveChatNote } = useAdminStore();
+  const { liveChatConversations, clients, adminUsers, assignLiveChat, transferLiveChat, resolveLiveChat, sendLiveChatNote } = useAdminStore();
   const user = useAuthStore((s) => s.user);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<FilterStatus>('all');
   const [draft, setDraft] = useState('');
-  const [activeTab, setActiveTab] = useState<'message' | 'note'>('message');
   const [showDetails, setShowDetails] = useState(true);
   const [showTransferDialog, setShowTransferDialog] = useState(false);
+  const [showAssignDialog, setShowAssignDialog] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const clientMap = useMemo(() => {
@@ -139,11 +133,7 @@ export default function LiveChat() {
 
   const handleSend = () => {
     if (!draft.trim() || !selectedId) return;
-    if (activeTab === 'note') {
-      sendLiveChatNote(selectedId, draft.trim(), user?.name ?? 'مشرف');
-    } else {
-      sendLiveChatMessage(selectedId, draft.trim(), user?.name ?? 'مشرف');
-    }
+    sendLiveChatNote(selectedId, draft.trim(), user?.name ?? 'مشرف');
     setDraft('');
   };
 
@@ -172,13 +162,7 @@ export default function LiveChat() {
       <div className="w-[340px] lg:w-[380px] flex flex-col bg-background shrink-0 rounded-xl border shadow-sm overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b">
-          <div className="flex items-center gap-2">
-            <h2 className="text-lg font-bold">المحادثات</h2>
-          </div>
-          <Button size="sm" className="gap-1.5 rounded-lg h-8 text-xs">
-            <PenSquare className="h-3.5 w-3.5" />
-            محادثة جديدة
-          </Button>
+          <h2 className="text-lg font-bold">المحادثات</h2>
         </div>
 
         {/* Search + Filter */}
@@ -428,77 +412,31 @@ export default function LiveChat() {
               </div>
             </ScrollArea>
 
-            {/* Compose area */}
-            <div className="border-t bg-background">
-              {/* Tabs */}
-              <div className="flex border-b">
-                <button
-                  onClick={() => setActiveTab('message')}
-                  className={cn(
-                    'px-4 py-2 text-sm font-medium transition-colors relative',
-                    activeTab === 'message'
-                      ? 'text-primary'
-                      : 'text-muted-foreground hover:text-foreground'
-                  )}
-                >
-                  رسالة
-                  {activeTab === 'message' && (
-                    <span className="absolute bottom-0 inset-x-0 h-0.5 bg-primary rounded-t" />
-                  )}
-                </button>
-                <button
-                  onClick={() => setActiveTab('note')}
-                  className={cn(
-                    'px-4 py-2 text-sm font-medium transition-colors relative',
-                    activeTab === 'note'
-                      ? 'text-amber-600 dark:text-amber-400'
-                      : 'text-muted-foreground hover:text-foreground'
-                  )}
-                >
-                  ملاحظة
-                  {activeTab === 'note' && (
-                    <span className="absolute bottom-0 inset-x-0 h-0.5 bg-amber-500 rounded-t" />
-                  )}
-                </button>
+            {/* Notes-only compose area */}
+            <div className="border-t bg-amber-50/30 dark:bg-amber-900/5">
+              <div className="flex items-center gap-1.5 px-4 pt-2.5">
+                <StickyNote className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+                <span className="text-xs font-medium text-amber-700 dark:text-amber-400">ملاحظة داخلية</span>
               </div>
-
-              {/* Input area */}
-              <div className={cn('px-4 py-3', activeTab === 'note' && 'bg-amber-50/50 dark:bg-amber-900/10')}>
+              <div className="px-4 py-2">
                 <Input
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder={activeTab === 'message' ? 'اكتب ردك هنا...' : 'اكتب ملاحظة داخلية (مرئية فقط للموظفين)...'}
+                  placeholder="اكتب ملاحظة داخلية (مرئية فقط للموظفين)..."
                   className="border-0 shadow-none bg-transparent px-0 text-sm h-8 focus-visible:ring-0"
                 />
               </div>
-
-              {/* Toolbar */}
-              <div className={cn('flex items-center justify-between px-3 py-2 border-t border-border/40', activeTab === 'note' && 'bg-amber-50/30 dark:bg-amber-900/5')}>
+              <div className="flex items-center justify-between px-3 py-2 border-t border-amber-200/40 dark:border-amber-700/20">
                 <Button
                   size="sm"
                   onClick={handleSend}
                   disabled={!draft.trim()}
-                  className={cn('gap-1.5 rounded-lg h-9 px-5', activeTab === 'note' && 'bg-amber-500 hover:bg-amber-600')}
+                  className="gap-1.5 rounded-lg h-9 px-5 bg-amber-500 hover:bg-amber-600"
                 >
-                  {activeTab === 'note' ? 'حفظ ملاحظة' : 'إرسال'}
-                  {activeTab === 'note' ? <StickyNote className="h-3.5 w-3.5" /> : <Send className="h-3.5 w-3.5 rotate-180" />}
+                  حفظ ملاحظة
+                  <StickyNote className="h-3.5 w-3.5" />
                 </Button>
-
-                <div className="flex items-center gap-0.5">
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
-                    <Paperclip className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
-                    <Smile className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
-                    <Image className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
-                    <Star className="h-4 w-4" />
-                  </Button>
-                </div>
               </div>
             </div>
           </>
@@ -583,19 +521,12 @@ export default function LiveChat() {
                 </div>
               </div>
 
-              {/* Tags */}
+              {/* Tags (read-only) */}
               <div className="border-t pt-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-muted-foreground">الوسوم</span>
-                  <button className="text-xs text-primary hover:underline flex items-center gap-0.5">
-                    <Plus className="h-3 w-3" />
-                    وسم جديد
-                  </button>
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  <Badge variant="secondary" className="text-[11px] gap-1 rounded-md">
+                <span className="text-xs text-muted-foreground">الوسوم</span>
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  <Badge variant="secondary" className="text-[11px] rounded-md">
                     {channelConfig[selected.channel]?.label}
-                    <X className="h-2.5 w-2.5 cursor-pointer" />
                   </Badge>
                 </div>
               </div>
@@ -607,10 +538,10 @@ export default function LiveChat() {
                     size="sm"
                     variant="outline"
                     className="w-full h-9 text-xs"
-                    onClick={() => assignLiveChat(selected.id, user?.name ?? 'مشرف')}
+                    onClick={() => setShowAssignDialog(true)}
                   >
                     <User className="h-3.5 w-3.5 me-1.5" />
-                    تعيين لي
+                    تعيين لموظف
                   </Button>
                 )}
                 <Button
@@ -634,26 +565,6 @@ export default function LiveChat() {
                 )}
               </div>
 
-              {/* Classification */}
-              <div className="border-t pt-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-muted-foreground">التصنيف</span>
-                  <button className="text-xs text-primary hover:underline flex items-center gap-0.5">
-                    <Plus className="h-3 w-3" />
-                    تصنيف جديد
-                  </button>
-                </div>
-                <Select>
-                  <SelectTrigger className="h-8 text-xs">
-                    <SelectValue placeholder="عميل جديد" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="new">عميل جديد</SelectItem>
-                    <SelectItem value="returning">عميل حالي</SelectItem>
-                    <SelectItem value="vip">عميل VIP</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
 
               {/* Conversation info */}
               <div className="border-t pt-4 space-y-3">
@@ -700,6 +611,43 @@ export default function LiveChat() {
                 <button
                   key={agent.id}
                   onClick={() => handleTransfer(agent.name)}
+                  className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-muted/70 transition-colors text-start"
+                >
+                  <div className={cn(
+                    'h-9 w-9 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0',
+                    getAvatarColor(agent.name)
+                  )}>
+                    {getInitials(agent.name)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium">{agent.name}</p>
+                    <p className="text-xs text-muted-foreground">{agent.email}</p>
+                  </div>
+                  <Badge variant="outline" className="text-[10px]">
+                    {agent.role === 'super_admin' ? 'مدير عام' : agent.role === 'admin' ? 'مدير' : agent.role === 'support' ? 'دعم' : 'مالية'}
+                  </Badge>
+                </button>
+              ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Assign Dialog */}
+      <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>تعيين لموظف</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2 pt-2">
+            {adminUsers
+              .filter((a) => a.active)
+              .map((agent) => (
+                <button
+                  key={agent.id}
+                  onClick={() => {
+                    if (selectedId) assignLiveChat(selectedId, agent.name);
+                    setShowAssignDialog(false);
+                  }}
                   className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-muted/70 transition-colors text-start"
                 >
                   <div className={cn(
