@@ -61,8 +61,10 @@ interface AdminState {
 
   // Live Chat actions
   assignLiveChat: (id: string, agentName: string) => void;
+  transferLiveChat: (id: string, toAgent: string) => void;
   resolveLiveChat: (id: string) => void;
   sendLiveChatMessage: (conversationId: string, content: string, senderName: string) => void;
+  sendLiveChatNote: (conversationId: string, content: string, senderName: string) => void;
 
   // Feedback actions
   updateFeedbackStatus: (id: string, status: FeedbackStatus) => void;
@@ -188,6 +190,25 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       ),
     })),
 
+  transferLiveChat: (id, toAgent) =>
+    set((s) => {
+      const now = new Date().toISOString();
+      return {
+        liveChatConversations: s.liveChatConversations.map((c) => {
+          if (c.id !== id) return c;
+          const note: LiveChatMessage = {
+            id: `lm_${Math.random().toString(36).slice(2, 10)}`,
+            conversationId: id,
+            sender: 'note',
+            senderName: 'النظام',
+            content: `تم تحويل المحادثة من ${c.assignedTo ?? 'غير معين'} إلى ${toAgent}`,
+            timestamp: now,
+          };
+          return { ...c, assignedTo: toAgent, status: 'assigned', messages: [...c.messages, note], lastMessageAt: now };
+        }),
+      };
+    }),
+
   resolveLiveChat: (id) =>
     set((s) => ({
       liveChatConversations: s.liveChatConversations.map((c) =>
@@ -210,6 +231,26 @@ export const useAdminStore = create<AdminState>((set, get) => ({
         liveChatConversations: s.liveChatConversations.map((c) =>
           c.id === conversationId
             ? { ...c, messages: [...c.messages, msg], lastMessageAt: now }
+            : c
+        ),
+      };
+    }),
+
+  sendLiveChatNote: (conversationId, content, senderName) =>
+    set((s) => {
+      const now = new Date().toISOString();
+      const note: LiveChatMessage = {
+        id: `lm_${Math.random().toString(36).slice(2, 10)}`,
+        conversationId,
+        sender: 'note',
+        senderName,
+        content,
+        timestamp: now,
+      };
+      return {
+        liveChatConversations: s.liveChatConversations.map((c) =>
+          c.id === conversationId
+            ? { ...c, messages: [...c.messages, note] }
             : c
         ),
       };

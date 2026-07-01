@@ -325,7 +325,7 @@ export type LiveChatStatus = 'open' | 'assigned' | 'resolved' | 'closed';
 export interface LiveChatMessage {
   id: string;
   conversationId: string;
-  sender: 'visitor' | 'agent';
+  sender: 'visitor' | 'agent' | 'note';
   senderName: string;
   content: string;
   timestamp: string;
