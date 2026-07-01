@@ -14,6 +14,8 @@ import {
   CheckCircle2,
   XCircle,
   Filter,
+  ArrowRight,
+  Plus,
 } from 'lucide-react';
 import { useConfirm } from '@components/ui';
 import { useAdminStore } from '@/store/useAdminStore';
@@ -61,20 +63,25 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-type Tab = 'members' | 'permissions';
+type View = 'members' | 'roles' | 'role-editor';
+
+interface RoleConfig {
+  id: string;
+  key: AdminRole | string;
+  label: string;
+  description: string;
+  color: string;
+  bgColor: string;
+  icon: React.ElementType;
+  isSystem: boolean;
+  permissions: Set<string>;
+}
 
 const roleLabel: Record<AdminRole, string> = {
   super_admin: 'مدير النظام',
   admin: 'مدير',
   support: 'دعم فني',
   finance: 'مالية',
-};
-
-const roleDescription: Record<AdminRole, string> = {
-  super_admin: 'وصول كامل لكل الأقسام والإعدادات',
-  admin: 'إدارة العملاء والباقات والتقارير',
-  support: 'إدارة الشكاوى والدعم الفني فقط',
-  finance: 'إدارة المالية والفواتير والمدفوعات',
 };
 
 const roleBadgeVariant: Record<AdminRole, 'destructive' | 'default' | 'secondary' | 'warning'> = {
@@ -166,29 +173,71 @@ const permissionGroups: PermissionGroup[] = [
   },
 ];
 
-const defaultRolePermissions: Record<AdminRole, Set<string>> = {
-  super_admin: new Set(permissionGroups.flatMap((g) => g.permissions.map((p) => p.id))),
-  admin: new Set([
-    'dashboard.view', 'dashboard.export',
-    'clients.view', 'clients.create', 'clients.edit', 'clients.delete', 'clients.suspend',
-    'plans.view', 'plans.create', 'plans.edit', 'plans.delete',
-    'finance.view', 'finance.invoices',
-    'support.view', 'support.reply', 'support.status',
-    'reports.view', 'reports.export',
-    'settings.general',
-  ]),
-  support: new Set([
-    'dashboard.view',
-    'clients.view',
-    'support.view', 'support.reply', 'support.status',
-  ]),
-  finance: new Set([
-    'dashboard.view',
-    'clients.view',
-    'finance.view', 'finance.invoices', 'finance.refund', 'finance.payments',
-    'reports.view', 'reports.export',
-  ]),
-};
+const allPermissionIds = permissionGroups.flatMap((g) => g.permissions.map((p) => p.id));
+
+const initialRoles: RoleConfig[] = [
+  {
+    id: 'role_super_admin',
+    key: 'super_admin',
+    label: 'مدير النظام',
+    description: 'وصول كامل لكل الأقسام والإعدادات',
+    color: 'text-red-600',
+    bgColor: 'bg-red-100 dark:bg-red-950',
+    icon: ShieldAlert,
+    isSystem: true,
+    permissions: new Set(allPermissionIds),
+  },
+  {
+    id: 'role_admin',
+    key: 'admin',
+    label: 'مدير',
+    description: 'إدارة العملاء والباقات والتقارير',
+    color: 'text-blue-600',
+    bgColor: 'bg-blue-100 dark:bg-blue-950',
+    icon: ShieldCheck,
+    isSystem: true,
+    permissions: new Set([
+      'dashboard.view', 'dashboard.export',
+      'clients.view', 'clients.create', 'clients.edit', 'clients.delete', 'clients.suspend',
+      'plans.view', 'plans.create', 'plans.edit', 'plans.delete',
+      'finance.view', 'finance.invoices',
+      'support.view', 'support.reply', 'support.status',
+      'reports.view', 'reports.export',
+      'settings.general',
+    ]),
+  },
+  {
+    id: 'role_support',
+    key: 'support',
+    label: 'دعم فني',
+    description: 'إدارة الشكاوى والدعم الفني فقط',
+    color: 'text-gray-600',
+    bgColor: 'bg-gray-100 dark:bg-gray-800',
+    icon: Shield,
+    isSystem: true,
+    permissions: new Set([
+      'dashboard.view',
+      'clients.view',
+      'support.view', 'support.reply', 'support.status',
+    ]),
+  },
+  {
+    id: 'role_finance',
+    key: 'finance',
+    label: 'مالية',
+    description: 'إدارة المالية والفواتير والمدفوعات',
+    color: 'text-amber-600',
+    bgColor: 'bg-amber-100 dark:bg-amber-950',
+    icon: Shield,
+    isSystem: true,
+    permissions: new Set([
+      'dashboard.view',
+      'clients.view',
+      'finance.view', 'finance.invoices', 'finance.refund', 'finance.payments',
+      'reports.view', 'reports.export',
+    ]),
+  },
+];
 
 function getInitials(name: string): string {
   const parts = name.trim().split(/\s+/);
@@ -197,7 +246,7 @@ function getInitials(name: string): string {
 }
 
 export default function AdminTeam(): JSX.Element {
-  const [tab, setTab] = useState<Tab>('members');
+  const [view, setView] = useState<View>('members');
   const adminUsers = useAdminStore((s) => s.adminUsers);
   const addAdminUser = useAdminStore((s) => s.addAdminUser);
   const updateAdminUser = useAdminStore((s) => s.updateAdminUser);
@@ -214,12 +263,13 @@ export default function AdminTeam(): JSX.Element {
     name: '', email: '', role: 'admin', active: true,
   });
 
-  const [rolePermissions, setRolePermissions] = useState<Record<AdminRole, Set<string>>>(() => ({
-    super_admin: new Set(defaultRolePermissions.super_admin),
-    admin: new Set(defaultRolePermissions.admin),
-    support: new Set(defaultRolePermissions.support),
-    finance: new Set(defaultRolePermissions.finance),
-  }));
+  const [roles, setRoles] = useState<RoleConfig[]>(initialRoles);
+  const [editingRole, setEditingRole] = useState<RoleConfig | null>(null);
+  const [roleForm, setRoleForm] = useState<{ label: string; description: string; permissions: Set<string> }>({
+    label: '',
+    description: '',
+    permissions: new Set(),
+  });
 
   const filtered = useMemo(() => {
     let list = adminUsers;
@@ -304,32 +354,346 @@ export default function AdminTeam(): JSX.Element {
     }
   };
 
-  const togglePermission = (role: AdminRole, permId: string): void => {
-    if (role === 'super_admin') return;
-    setRolePermissions((prev) => {
-      const next = { ...prev };
-      const s = new Set(next[role]);
-      if (s.has(permId)) s.delete(permId);
-      else s.add(permId);
-      next[role] = s;
-      return next;
+  const openAddRole = (): void => {
+    setEditingRole(null);
+    setRoleForm({ label: '', description: '', permissions: new Set() });
+    setView('role-editor');
+  };
+
+  const openEditRole = (role: RoleConfig): void => {
+    setEditingRole(role);
+    setRoleForm({
+      label: role.label,
+      description: role.description,
+      permissions: new Set(role.permissions),
+    });
+    setView('role-editor');
+  };
+
+  const submitRole = (): void => {
+    if (!roleForm.label.trim()) {
+      showToast('اسم الدور مطلوب', 'error');
+      return;
+    }
+    if (editingRole) {
+      setRoles((prev) =>
+        prev.map((r) =>
+          r.id === editingRole.id
+            ? { ...r, label: roleForm.label, description: roleForm.description, permissions: new Set(roleForm.permissions) }
+            : r
+        )
+      );
+      showToast('تم تحديث الدور', 'success');
+    } else {
+      const id = `role_${Math.random().toString(36).slice(2, 10)}`;
+      setRoles((prev) => [
+        ...prev,
+        {
+          id,
+          key: id,
+          label: roleForm.label,
+          description: roleForm.description,
+          color: 'text-purple-600',
+          bgColor: 'bg-purple-100 dark:bg-purple-950',
+          icon: Shield,
+          isSystem: false,
+          permissions: new Set(roleForm.permissions),
+        },
+      ]);
+      showToast('تمت إضافة الدور', 'success');
+    }
+    setView('roles');
+  };
+
+  const handleDeleteRole = async (role: RoleConfig): Promise<void> => {
+    if (role.isSystem) {
+      showToast('لا يمكن حذف الأدوار الأساسية', 'error');
+      return;
+    }
+    const ok = await confirm({
+      title: `حذف دور "${role.label}"؟`,
+      message: 'سيتم إزالة الدور. الأعضاء المرتبطين به سينقلون إلى دور "مدير".',
+      variant: 'danger',
+      confirmText: 'حذف',
+    });
+    if (ok) {
+      setRoles((prev) => prev.filter((r) => r.id !== role.id));
+      showToast('تم حذف الدور', 'success');
+    }
+  };
+
+  const togglePermInForm = (permId: string): void => {
+    setRoleForm((prev) => {
+      const next = new Set(prev.permissions);
+      if (next.has(permId)) next.delete(permId);
+      else next.add(permId);
+      return { ...prev, permissions: next };
     });
   };
 
-  const toggleGroupForRole = (role: AdminRole, group: PermissionGroup): void => {
-    if (role === 'super_admin') return;
+  const toggleGroupInForm = (group: PermissionGroup): void => {
     const allPerms = group.permissions.map((p) => p.id);
-    const allGranted = allPerms.every((p) => rolePermissions[role].has(p));
-    setRolePermissions((prev) => {
-      const next = { ...prev };
-      const s = new Set(next[role]);
-      if (allGranted) allPerms.forEach((p) => s.delete(p));
-      else allPerms.forEach((p) => s.add(p));
-      next[role] = s;
-      return next;
+    const allGranted = allPerms.every((p) => roleForm.permissions.has(p));
+    setRoleForm((prev) => {
+      const next = new Set(prev.permissions);
+      if (allGranted) allPerms.forEach((p) => next.delete(p));
+      else allPerms.forEach((p) => next.add(p));
+      return { ...prev, permissions: next };
     });
   };
 
+  // ==========================================================================
+  // ROLE EDITOR VIEW
+  // ==========================================================================
+  if (view === 'role-editor') {
+    const totalPerms = allPermissionIds.length;
+    const granted = roleForm.permissions.size;
+    return (
+      <div className="p-4 lg:p-8 space-y-6 max-w-5xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={() => setView('roles')} className="h-9 w-9">
+            <ArrowRight className="h-5 w-5" />
+          </Button>
+          <div className="flex-1">
+            <h1 className="text-2xl font-bold">
+              {editingRole ? `تعديل دور: ${editingRole.label}` : 'دور جديد'}
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              {editingRole?.isSystem
+                ? 'يمكنك تعديل الاسم والوصف والصلاحيات لهذا الدور الأساسي.'
+                : 'حدد الصلاحيات المتاحة لأعضاء هذا الدور.'}
+            </p>
+          </div>
+        </div>
+
+        {/* Basic info */}
+        <Card>
+          <CardContent className="p-5 lg:p-6 space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>اسم الدور</Label>
+                <Input
+                  value={roleForm.label}
+                  onChange={(e) => setRoleForm({ ...roleForm, label: e.target.value })}
+                  placeholder="مثلاً: مسؤول تسويق"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>الوصف</Label>
+                <Input
+                  value={roleForm.description}
+                  onChange={(e) => setRoleForm({ ...roleForm, description: e.target.value })}
+                  placeholder="وصف قصير للدور"
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Permissions matrix */}
+        <Card>
+          <CardContent className="p-0">
+            <div className="p-4 border-b flex items-center justify-between flex-wrap gap-3">
+              <div>
+                <h3 className="font-bold flex items-center gap-2">
+                  <Shield className="h-4 w-4 text-primary" />
+                  الصلاحيات
+                </h3>
+                <p className="text-xs text-muted-foreground mt-1">
+                  اختر الصلاحيات المتاحة لهذا الدور
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-32 h-1.5 rounded-full bg-muted overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-primary transition-all"
+                      style={{ width: `${(granted / totalPerms) * 100}%` }}
+                    />
+                  </div>
+                  <span className="text-xs text-muted-foreground font-medium">{granted}/{totalPerms}</span>
+                </div>
+              </div>
+            </div>
+            <div className="divide-y">
+              {permissionGroups.map((group) => {
+                const allPerms = group.permissions.map((p) => p.id);
+                const allGranted = allPerms.every((p) => roleForm.permissions.has(p));
+                const someGranted = allPerms.some((p) => roleForm.permissions.has(p));
+                return (
+                  <div key={group.id} className="p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => toggleGroupInForm(group)}
+                          className={cn(
+                            'h-5 w-5 rounded border inline-flex items-center justify-center transition-colors',
+                            allGranted && 'bg-primary border-primary text-primary-foreground',
+                            !allGranted && someGranted && 'bg-primary/30 border-primary/50',
+                            !allGranted && !someGranted && 'border-muted-foreground/30 hover:border-primary/50',
+                          )}
+                        >
+                          {allGranted && <CheckCircle2 className="h-3 w-3" />}
+                          {!allGranted && someGranted && <span className="h-1.5 w-1.5 rounded-full bg-primary" />}
+                        </button>
+                        <h4 className="font-bold text-sm">{group.label}</h4>
+                      </div>
+                      <span className="text-[11px] text-muted-foreground">
+                        {allPerms.filter((p) => roleForm.permissions.has(p)).length}/{allPerms.length}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 ps-8">
+                      {group.permissions.map((perm) => {
+                        const granted = roleForm.permissions.has(perm.id);
+                        return (
+                          <button
+                            key={perm.id}
+                            onClick={() => togglePermInForm(perm.id)}
+                            className={cn(
+                              'flex items-center gap-2.5 p-2.5 rounded-lg border text-start transition-all',
+                              granted
+                                ? 'border-primary/40 bg-primary/5 text-foreground'
+                                : 'border-transparent hover:border-muted-foreground/20 hover:bg-muted/50 text-muted-foreground'
+                            )}
+                          >
+                            <div className={cn(
+                              'h-4 w-4 rounded border flex items-center justify-center flex-shrink-0',
+                              granted
+                                ? 'bg-primary border-primary text-primary-foreground'
+                                : 'border-muted-foreground/30'
+                            )}>
+                              {granted && <CheckCircle2 className="h-3 w-3" />}
+                            </div>
+                            <span className="text-xs">{perm.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Actions */}
+        <div className="flex items-center justify-end gap-3">
+          <Button variant="outline" onClick={() => setView('roles')}>إلغاء</Button>
+          <Button onClick={submitRole}>{editingRole ? 'حفظ التغييرات' : 'إضافة الدور'}</Button>
+        </div>
+      </div>
+    );
+  }
+
+  // ==========================================================================
+  // ROLES LIST VIEW
+  // ==========================================================================
+  if (view === 'roles') {
+    return (
+      <div className="p-4 lg:p-8 space-y-6">
+        {/* Header */}
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={() => setView('members')} className="h-9 w-9">
+            <ArrowRight className="h-5 w-5" />
+          </Button>
+          <div className="flex-1">
+            <h1 className="text-2xl font-bold flex items-center gap-2">
+              <Shield className="h-6 w-6 text-primary" />
+              الأدوار والصلاحيات
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              إدارة الأدوار وتحديد الصلاحيات لكل دور
+            </p>
+          </div>
+          <Button onClick={openAddRole}>
+            <Plus className="h-4 w-4" />
+            دور جديد
+          </Button>
+        </div>
+
+        {/* Roles grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {roles.map((role) => {
+            const RoleIcon = role.icon;
+            const memberCount = adminUsers.filter((u) => u.role === role.key).length;
+            const permCount = role.permissions.size;
+            const totalPerms = allPermissionIds.length;
+            const pct = (permCount / totalPerms) * 100;
+            return (
+              <Card key={role.id} className="hover:shadow-md transition-shadow group relative">
+                <CardContent className="p-5">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className={cn('h-11 w-11 rounded-xl flex items-center justify-center', role.bgColor, role.color)}>
+                      <RoleIcon className="h-5 w-5" />
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {role.isSystem && (
+                        <Badge variant="secondary" className="text-[10px]">أساسي</Badge>
+                      )}
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => openEditRole(role)}>
+                            <Edit2 className="h-4 w-4 ml-2" />
+                            تعديل
+                          </DropdownMenuItem>
+                          {!role.isSystem && (
+                            <>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onClick={() => void handleDeleteRole(role)}
+                                className="text-destructive focus:text-destructive"
+                              >
+                                <Trash2 className="h-4 w-4 ml-2" />
+                                حذف
+                              </DropdownMenuItem>
+                            </>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => openEditRole(role)}
+                    className="text-start w-full"
+                  >
+                    <h3 className="font-bold text-base">{role.label}</h3>
+                    <p className="text-xs text-muted-foreground mt-1 min-h-[32px]">{role.description}</p>
+                  </button>
+                  <Separator className="my-4" />
+                  <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
+                    <span className="flex items-center gap-1.5">
+                      <Users className="h-3.5 w-3.5" />
+                      {memberCount} عضو
+                    </span>
+                    <span>{permCount}/{totalPerms} صلاحية</span>
+                  </div>
+                  <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                    <div
+                      className={cn(
+                        'h-full rounded-full transition-all',
+                        role.color.replace('text-', 'bg-')
+                      )}
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  // ==========================================================================
+  // MEMBERS VIEW (default)
+  // ==========================================================================
   return (
     <div className="p-4 lg:p-8 space-y-6">
       {/* Header */}
@@ -339,12 +703,18 @@ export default function AdminTeam(): JSX.Element {
             <Users className="h-6 w-6 text-primary" />
             إدارة الفريق
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">إدارة أعضاء فريق الإدارة وصلاحياتهم</p>
+          <p className="text-sm text-muted-foreground mt-1">إدارة أعضاء فريق الإدارة وأدوارهم</p>
         </div>
-        <Button onClick={openAddUser}>
-          <UserPlus className="h-4 w-4" />
-          إضافة عضو
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={() => setView('roles')}>
+            <Shield className="h-4 w-4" />
+            الأدوار والصلاحيات
+          </Button>
+          <Button onClick={openAddUser}>
+            <UserPlus className="h-4 w-4" />
+            إضافة عضو
+          </Button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -357,331 +727,157 @@ export default function AdminTeam(): JSX.Element {
         <StatMini label="مالية" value={stats.finance} color="bg-amber-500/10 text-amber-600" />
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-1 p-1 bg-muted rounded-lg w-fit">
-        <button
-          onClick={() => setTab('members')}
-          className={cn(
-            'px-4 py-2 rounded-md text-sm font-medium transition-all',
-            tab === 'members' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
-          )}
-        >
-          <Users className="h-4 w-4 inline-block ml-1.5" />
-          الأعضاء
-        </button>
-        <button
-          onClick={() => setTab('permissions')}
-          className={cn(
-            'px-4 py-2 rounded-md text-sm font-medium transition-all',
-            tab === 'permissions' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
-          )}
-        >
-          <Shield className="h-4 w-4 inline-block ml-1.5" />
-          الصلاحيات
-        </button>
-      </div>
-
-      {/* Members Tab */}
-      {tab === 'members' && (
-        <Card>
-          <CardContent className="p-0">
-            {/* Filters */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 p-4 border-b">
-              <div className="relative flex-1">
-                <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="بحث بالاسم أو البريد..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="ps-9"
-                />
-              </div>
-              <Select value={roleFilter} onValueChange={(v) => setRoleFilter(v as AdminRole | 'all')}>
-                <SelectTrigger className="w-full sm:w-[180px]">
-                  <Filter className="h-4 w-4 ml-2 text-muted-foreground" />
-                  <SelectValue placeholder="كل الأدوار" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">كل الأدوار</SelectItem>
-                  <SelectItem value="super_admin">مدير النظام</SelectItem>
-                  <SelectItem value="admin">مدير</SelectItem>
-                  <SelectItem value="support">دعم فني</SelectItem>
-                  <SelectItem value="finance">مالية</SelectItem>
-                </SelectContent>
-              </Select>
+      {/* Members table */}
+      <Card>
+        <CardContent className="p-0">
+          {/* Filters */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 p-4 border-b">
+            <div className="relative flex-1">
+              <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="بحث بالاسم أو البريد..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="ps-9"
+              />
             </div>
-
-            {/* Table */}
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[280px]">العضو</TableHead>
-                  <TableHead>الدور</TableHead>
-                  <TableHead>الحالة</TableHead>
-                  <TableHead className="hidden md:table-cell">آخر نشاط</TableHead>
-                  <TableHead className="hidden lg:table-cell">تاريخ الإضافة</TableHead>
-                  <TableHead className="w-[60px]" />
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filtered.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
-                      لا توجد نتائج
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  filtered.map((u) => {
-                    const RoleIcon = roleIcon[u.role];
-                    return (
-                      <TableRow key={u.id} className="group">
-                        <TableCell>
-                          <div className="flex items-center gap-3">
-                            <div className="relative">
-                              <Avatar className="h-9 w-9">
-                                <AvatarFallback className="text-xs font-bold">{getInitials(u.name)}</AvatarFallback>
-                              </Avatar>
-                              <span
-                                className={cn(
-                                  'absolute -bottom-0.5 -end-0.5 h-3 w-3 rounded-full border-2 border-background',
-                                  u.active ? 'bg-emerald-500' : 'bg-gray-400'
-                                )}
-                              />
-                            </div>
-                            <div className="min-w-0">
-                              <p className="text-sm font-semibold truncate">
-                                {u.name}
-                                {currentUser?.email === u.email && (
-                                  <span className="text-[10px] text-primary mr-1">(أنت)</span>
-                                )}
-                              </p>
-                              <p className="text-xs text-muted-foreground truncate">{u.email}</p>
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={roleBadgeVariant[u.role]} className="gap-1">
-                            <RoleIcon className="h-3 w-3" />
-                            {roleLabel[u.role]}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          {u.active ? (
-                            <Badge variant="outline" className="gap-1 text-emerald-600 border-emerald-200 bg-emerald-50 dark:bg-emerald-950/30 dark:border-emerald-800">
-                              <CheckCircle2 className="h-3 w-3" />
-                              نشط
-                            </Badge>
-                          ) : (
-                            <Badge variant="outline" className="gap-1 text-gray-500 border-gray-200 bg-gray-50 dark:bg-gray-950/30 dark:border-gray-700">
-                              <XCircle className="h-3 w-3" />
-                              معطل
-                            </Badge>
-                          )}
-                        </TableCell>
-                        <TableCell className="hidden md:table-cell">
-                          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                            <Clock className="h-3.5 w-3.5" />
-                            {timeAgo(u.lastActive)}
-                          </div>
-                        </TableCell>
-                        <TableCell className="hidden lg:table-cell">
-                          <span className="text-xs text-muted-foreground">
-                            {new Date(u.createdAt).toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric' })}
-                          </span>
-                        </TableCell>
-                        <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => openEditUser(u)}>
-                                <Edit2 className="h-4 w-4 ml-2" />
-                                تعديل
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => void handleToggleActive(u)}>
-                                {u.active ? (
-                                  <>
-                                    <XCircle className="h-4 w-4 ml-2" />
-                                    تعطيل الحساب
-                                  </>
-                                ) : (
-                                  <>
-                                    <CheckCircle2 className="h-4 w-4 ml-2" />
-                                    تفعيل الحساب
-                                  </>
-                                )}
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem
-                                onClick={() => void handleDelete(u)}
-                                className="text-destructive focus:text-destructive"
-                              >
-                                <Trash2 className="h-4 w-4 ml-2" />
-                                حذف
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })
-                )}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Permissions Tab */}
-      {tab === 'permissions' && (
-        <div className="space-y-6">
-          {/* Role cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {(Object.keys(roleLabel) as AdminRole[]).map((role) => {
-              const RoleIcon = roleIcon[role];
-              const memberCount = adminUsers.filter((u) => u.role === role).length;
-              const permCount = rolePermissions[role].size;
-              const totalPerms = permissionGroups.reduce((sum, g) => sum + g.permissions.length, 0);
-              return (
-                <Card key={role} className={cn(
-                  'relative overflow-hidden',
-                  role === 'super_admin' && 'ring-1 ring-red-200 dark:ring-red-900'
-                )}>
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className={cn(
-                        'h-10 w-10 rounded-xl flex items-center justify-center',
-                        role === 'super_admin' && 'bg-red-100 text-red-600 dark:bg-red-950 dark:text-red-400',
-                        role === 'admin' && 'bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400',
-                        role === 'support' && 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
-                        role === 'finance' && 'bg-amber-100 text-amber-600 dark:bg-amber-950 dark:text-amber-400',
-                      )}>
-                        <RoleIcon className="h-5 w-5" />
-                      </div>
-                      <Badge variant={roleBadgeVariant[role]} className="text-[10px]">
-                        {memberCount} عضو
-                      </Badge>
-                    </div>
-                    <h3 className="font-bold text-sm">{roleLabel[role]}</h3>
-                    <p className="text-xs text-muted-foreground mt-1">{roleDescription[role]}</p>
-                    <div className="mt-3 flex items-center gap-2">
-                      <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
-                        <div
-                          className={cn(
-                            'h-full rounded-full transition-all',
-                            role === 'super_admin' && 'bg-red-500',
-                            role === 'admin' && 'bg-blue-500',
-                            role === 'support' && 'bg-gray-500',
-                            role === 'finance' && 'bg-amber-500',
-                          )}
-                          style={{ width: `${(permCount / totalPerms) * 100}%` }}
-                        />
-                      </div>
-                      <span className="text-[10px] text-muted-foreground">{permCount}/{totalPerms}</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
+            <Select value={roleFilter} onValueChange={(v) => setRoleFilter(v as AdminRole | 'all')}>
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <Filter className="h-4 w-4 ml-2 text-muted-foreground" />
+                <SelectValue placeholder="كل الأدوار" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">كل الأدوار</SelectItem>
+                <SelectItem value="super_admin">مدير النظام</SelectItem>
+                <SelectItem value="admin">مدير</SelectItem>
+                <SelectItem value="support">دعم فني</SelectItem>
+                <SelectItem value="finance">مالية</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
-          {/* Permissions matrix */}
-          <Card>
-            <CardContent className="p-0">
-              <div className="p-4 border-b">
-                <h3 className="font-bold flex items-center gap-2">
-                  <Shield className="h-4 w-4 text-primary" />
-                  مصفوفة الصلاحيات
-                </h3>
-                <p className="text-xs text-muted-foreground mt-1">
-                  حدد الصلاحيات المتاحة لكل دور. مدير النظام يحصل على كل الصلاحيات تلقائياً.
-                </p>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b bg-muted/50">
-                      <th className="text-start px-4 py-3 font-semibold w-[250px]">الصلاحية</th>
-                      {(Object.keys(roleLabel) as AdminRole[]).map((role) => (
-                        <th key={role} className="px-4 py-3 text-center font-semibold min-w-[120px]">
-                          <Badge variant={roleBadgeVariant[role]} className="text-[10px]">
-                            {roleLabel[role]}
+          {/* Table */}
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[280px]">العضو</TableHead>
+                <TableHead>الدور</TableHead>
+                <TableHead>الحالة</TableHead>
+                <TableHead className="hidden md:table-cell">آخر نشاط</TableHead>
+                <TableHead className="hidden lg:table-cell">تاريخ الإضافة</TableHead>
+                <TableHead className="w-[60px]" />
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filtered.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
+                    لا توجد نتائج
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filtered.map((u) => {
+                  const RoleIcon = roleIcon[u.role];
+                  return (
+                    <TableRow key={u.id} className="group">
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <div className="relative">
+                            <Avatar className="h-9 w-9">
+                              <AvatarFallback className="text-xs font-bold">{getInitials(u.name)}</AvatarFallback>
+                            </Avatar>
+                            <span
+                              className={cn(
+                                'absolute -bottom-0.5 -end-0.5 h-3 w-3 rounded-full border-2 border-background',
+                                u.active ? 'bg-emerald-500' : 'bg-gray-400'
+                              )}
+                            />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-semibold truncate">
+                              {u.name}
+                              {currentUser?.email === u.email && (
+                                <span className="text-[10px] text-primary mr-1">(أنت)</span>
+                              )}
+                            </p>
+                            <p className="text-xs text-muted-foreground truncate">{u.email}</p>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={roleBadgeVariant[u.role]} className="gap-1">
+                          <RoleIcon className="h-3 w-3" />
+                          {roleLabel[u.role]}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {u.active ? (
+                          <Badge variant="outline" className="gap-1 text-emerald-600 border-emerald-200 bg-emerald-50 dark:bg-emerald-950/30 dark:border-emerald-800">
+                            <CheckCircle2 className="h-3 w-3" />
+                            نشط
                           </Badge>
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {permissionGroups.map((group) => (
-                      <>
-                        <tr key={`g-${group.id}`} className="bg-muted/30">
-                          <td className="px-4 py-2.5 font-bold text-xs">{group.label}</td>
-                          {(Object.keys(roleLabel) as AdminRole[]).map((role) => {
-                            const allPerms = group.permissions.map((p) => p.id);
-                            const allGranted = allPerms.every((p) => rolePermissions[role].has(p));
-                            const someGranted = allPerms.some((p) => rolePermissions[role].has(p));
-                            return (
-                              <td key={role} className="px-4 py-2.5 text-center">
-                                <button
-                                  onClick={() => toggleGroupForRole(role, group)}
-                                  disabled={role === 'super_admin'}
-                                  className={cn(
-                                    'h-5 w-5 rounded border inline-flex items-center justify-center transition-colors mx-auto',
-                                    role === 'super_admin' && 'opacity-50 cursor-not-allowed',
-                                    allGranted && 'bg-primary border-primary text-primary-foreground',
-                                    !allGranted && someGranted && 'bg-primary/30 border-primary/50',
-                                    !allGranted && !someGranted && 'border-muted-foreground/30',
-                                  )}
-                                >
-                                  {allGranted && <CheckCircle2 className="h-3 w-3" />}
-                                  {!allGranted && someGranted && <span className="h-1.5 w-1.5 rounded-full bg-primary" />}
-                                </button>
-                              </td>
-                            );
-                          })}
-                        </tr>
-                        {group.permissions.map((perm) => (
-                          <tr key={perm.id} className="border-b last:border-b-0 hover:bg-muted/20 transition-colors">
-                            <td className="px-4 py-2.5 ps-8 text-muted-foreground text-xs">{perm.label}</td>
-                            {(Object.keys(roleLabel) as AdminRole[]).map((role) => {
-                              const granted = rolePermissions[role].has(perm.id);
-                              return (
-                                <td key={role} className="px-4 py-2.5 text-center">
-                                  <button
-                                    onClick={() => togglePermission(role, perm.id)}
-                                    disabled={role === 'super_admin'}
-                                    className={cn(
-                                      'h-5 w-5 rounded border inline-flex items-center justify-center transition-colors mx-auto',
-                                      role === 'super_admin' && 'opacity-50 cursor-not-allowed',
-                                      granted
-                                        ? 'bg-primary border-primary text-primary-foreground'
-                                        : 'border-muted-foreground/30 hover:border-primary/50',
-                                    )}
-                                  >
-                                    {granted && <CheckCircle2 className="h-3 w-3" />}
-                                  </button>
-                                </td>
-                              );
-                            })}
-                          </tr>
-                        ))}
-                      </>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <div className="p-4 border-t flex justify-end">
-                <Button onClick={() => showToast('تم حفظ الصلاحيات', 'success')}>
-                  حفظ الصلاحيات
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+                        ) : (
+                          <Badge variant="outline" className="gap-1 text-gray-500 border-gray-200 bg-gray-50 dark:bg-gray-950/30 dark:border-gray-700">
+                            <XCircle className="h-3 w-3" />
+                            معطل
+                          </Badge>
+                        )}
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <Clock className="h-3.5 w-3.5" />
+                          {timeAgo(u.lastActive)}
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden lg:table-cell">
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(u.createdAt).toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric' })}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => openEditUser(u)}>
+                              <Edit2 className="h-4 w-4 ml-2" />
+                              تعديل
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => void handleToggleActive(u)}>
+                              {u.active ? (
+                                <>
+                                  <XCircle className="h-4 w-4 ml-2" />
+                                  تعطيل الحساب
+                                </>
+                              ) : (
+                                <>
+                                  <CheckCircle2 className="h-4 w-4 ml-2" />
+                                  تفعيل الحساب
+                                </>
+                              )}
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              onClick={() => void handleDelete(u)}
+                              className="text-destructive focus:text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4 ml-2" />
+                              حذف
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
       {/* Add/Edit User Dialog */}
       <Dialog open={userModal} onOpenChange={setUserModal}>
@@ -737,9 +933,6 @@ export default function AdminTeam(): JSX.Element {
                   })}
                 </SelectContent>
               </Select>
-              <p className="text-[11px] text-muted-foreground">
-                {roleDescription[userForm.role]}
-              </p>
             </div>
             <Separator />
             <div className="flex items-center gap-3 p-3 rounded-lg bg-muted">
