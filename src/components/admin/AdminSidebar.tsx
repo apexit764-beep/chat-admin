@@ -24,17 +24,48 @@ import {
 } from '@/components/ui/tooltip';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-const navItems = [
-  { to: '/dashboard', label: 'نظرة عامة', icon: LayoutDashboard },
-  { to: '/clients', label: 'العملاء', icon: Users },
-  { to: '/plans', label: 'الباقات', icon: Package },
-  { to: '/finance', label: 'المالية', icon: Banknote },
-  { to: '/payments', label: 'بوابة الدفع', icon: CreditCard },
-  { to: '/reports', label: 'التقارير', icon: BarChart3 },
-  { to: '/feedback', label: 'الشكاوى والاقتراحات', icon: MessageSquareWarning },
-  { to: '/activity', label: 'سجل النشاط', icon: Activity },
-  { to: '/preview', label: 'معاينة', icon: Eye },
-  { to: '/settings', label: 'الإعدادات', icon: Settings },
+interface NavItem {
+  to: string;
+  label: string;
+  icon: React.ElementType;
+}
+
+interface NavGroup {
+  title: string;
+  items: NavItem[];
+}
+
+const navGroups: NavGroup[] = [
+  {
+    title: '',
+    items: [
+      { to: '/dashboard', label: 'نظرة عامة', icon: LayoutDashboard },
+    ],
+  },
+  {
+    title: 'العملاء',
+    items: [
+      { to: '/clients', label: 'العملاء', icon: Users },
+      { to: '/plans', label: 'الباقات', icon: Package },
+      { to: '/feedback', label: 'الشكاوى والاقتراحات', icon: MessageSquareWarning },
+    ],
+  },
+  {
+    title: 'المالية',
+    items: [
+      { to: '/finance', label: 'المالية', icon: Banknote },
+      { to: '/payments', label: 'بوابة الدفع', icon: CreditCard },
+    ],
+  },
+  {
+    title: 'النظام',
+    items: [
+      { to: '/reports', label: 'التقارير', icon: BarChart3 },
+      { to: '/activity', label: 'سجل النشاط', icon: Activity },
+      { to: '/preview', label: 'معاينة', icon: Eye },
+      { to: '/settings', label: 'الإعدادات', icon: Settings },
+    ],
+  },
 ];
 
 function getInitials(name: string): string {
@@ -113,39 +144,51 @@ export function AdminSidebar(): JSX.Element {
 
         {/* Main nav items */}
         <ScrollArea className="flex-1 px-3">
-          <nav className="flex flex-col gap-1">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = location.pathname === item.to || location.pathname.startsWith(item.to + '/');
+          <nav className="flex flex-col gap-0.5">
+            {navGroups.map((group, gi) => (
+              <div key={gi}>
+                {group.title && !collapsed && (
+                  <div className="px-3 pt-4 pb-1.5 first:pt-0">
+                    <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider">{group.title}</span>
+                  </div>
+                )}
+                {group.title && collapsed && gi > 0 && (
+                  <div className="mx-auto my-2 w-6 border-t border-white/10" />
+                )}
+                {group.items.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = location.pathname === item.to || location.pathname.startsWith(item.to + '/');
 
-              const linkEl = (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  className={cn(
-                    'flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-200',
-                    collapsed ? 'h-10 w-10 justify-center mx-auto' : 'h-10 px-3',
-                    isActive
-                      ? 'bg-white/15 text-white shadow-lg shadow-black/10 backdrop-blur-sm'
-                      : 'text-white/60 hover:text-white hover:bg-white/8'
-                  )}
-                >
-                  <Icon className="h-[18px] w-[18px] flex-shrink-0" />
-                  {!collapsed && <span className="truncate">{item.label}</span>}
-                </NavLink>
-              );
+                  const linkEl = (
+                    <NavLink
+                      key={item.to}
+                      to={item.to}
+                      className={cn(
+                        'flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-200',
+                        collapsed ? 'h-10 w-10 justify-center mx-auto' : 'h-10 px-3',
+                        isActive
+                          ? 'bg-white/15 text-white shadow-lg shadow-black/10 backdrop-blur-sm'
+                          : 'text-white/60 hover:text-white hover:bg-white/8'
+                      )}
+                    >
+                      <Icon className="h-[18px] w-[18px] flex-shrink-0" />
+                      {!collapsed && <span className="truncate">{item.label}</span>}
+                    </NavLink>
+                  );
 
-              if (collapsed) {
-                return (
-                  <Tooltip key={item.to}>
-                    <TooltipTrigger asChild>{linkEl}</TooltipTrigger>
-                    <TooltipContent side="left" className="font-medium">{item.label}</TooltipContent>
-                  </Tooltip>
-                );
-              }
+                  if (collapsed) {
+                    return (
+                      <Tooltip key={item.to}>
+                        <TooltipTrigger asChild>{linkEl}</TooltipTrigger>
+                        <TooltipContent side="left" className="font-medium">{item.label}</TooltipContent>
+                      </Tooltip>
+                    );
+                  }
 
-              return linkEl;
-            })}
+                  return linkEl;
+                })}
+              </div>
+            ))}
           </nav>
         </ScrollArea>
 
