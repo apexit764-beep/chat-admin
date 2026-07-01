@@ -4,6 +4,10 @@ import type {
   Client,
   Country,
   Invoice,
+  KnowledgeArticle,
+  KnowledgeCategory,
+  LiveChatConversation,
+  LiveChatMessage,
   PaymobConfig,
   Plan,
   Subscription,
@@ -23,6 +27,9 @@ import {
   satisfactionStats as initialSatisfactionStats,
   activityLog as initialActivityLog,
   feedbackEntries as initialFeedback,
+  liveChatConversations as initialLiveChatConversations,
+  knowledgeCategories as initialKnowledgeCategories,
+  knowledgeArticles as initialKnowledgeArticles,
 } from './adminMockData';
 import type { ActivityEntry, FeedbackEntry, FeedbackStatus } from './adminMockData';
 
@@ -40,6 +47,22 @@ interface AdminState {
   satisfactionStats: typeof initialSatisfactionStats;
   activityLog: ActivityEntry[];
   feedback: FeedbackEntry[];
+  liveChatConversations: LiveChatConversation[];
+  knowledgeCategories: KnowledgeCategory[];
+  knowledgeArticles: KnowledgeArticle[];
+
+  // Knowledge Base actions
+  addKnowledgeCategory: (name: string) => KnowledgeCategory;
+  updateKnowledgeCategory: (id: string, name: string) => void;
+  deleteKnowledgeCategory: (id: string) => void;
+  addKnowledgeArticle: (article: Omit<KnowledgeArticle, 'id' | 'views' | 'helpful' | 'notHelpful' | 'createdAt' | 'updatedAt'>) => KnowledgeArticle;
+  updateKnowledgeArticle: (id: string, patch: Partial<KnowledgeArticle>) => void;
+  deleteKnowledgeArticle: (id: string) => void;
+
+  // Live Chat actions
+  assignLiveChat: (id: string, agentName: string) => void;
+  resolveLiveChat: (id: string) => void;
+  sendLiveChatMessage: (conversationId: string, content: string, senderName: string) => void;
 
   // Feedback actions
   updateFeedbackStatus: (id: string, status: FeedbackStatus) => void;
@@ -90,6 +113,107 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   satisfactionStats: initialSatisfactionStats,
   activityLog: initialActivityLog,
   feedback: initialFeedback,
+  liveChatConversations: initialLiveChatConversations,
+  knowledgeCategories: initialKnowledgeCategories,
+  knowledgeArticles: initialKnowledgeArticles,
+
+  addKnowledgeCategory: (name) => {
+    const slug = name.replace(/\s+/g, '-').toLowerCase();
+    const cat: KnowledgeCategory = {
+      id: newId('kc'),
+      name,
+      slug,
+      articleCount: 0,
+      order: get().knowledgeCategories.length + 1,
+    };
+    set((s) => ({ knowledgeCategories: [...s.knowledgeCategories, cat] }));
+    return cat;
+  },
+
+  updateKnowledgeCategory: (id, name) =>
+    set((s) => ({
+      knowledgeCategories: s.knowledgeCategories.map((c) =>
+        c.id === id ? { ...c, name, slug: name.replace(/\s+/g, '-').toLowerCase() } : c
+      ),
+    })),
+
+  deleteKnowledgeCategory: (id) =>
+    set((s) => ({
+      knowledgeCategories: s.knowledgeCategories.filter((c) => c.id !== id),
+      knowledgeArticles: s.knowledgeArticles.filter((a) => a.categoryId !== id),
+    })),
+
+  addKnowledgeArticle: (article) => {
+    const now = new Date().toISOString();
+    const a: KnowledgeArticle = {
+      ...article,
+      id: newId('ka'),
+      views: 0,
+      helpful: 0,
+      notHelpful: 0,
+      createdAt: now,
+      updatedAt: now,
+    };
+    set((s) => ({
+      knowledgeArticles: [a, ...s.knowledgeArticles],
+      knowledgeCategories: s.knowledgeCategories.map((c) =>
+        c.id === article.categoryId ? { ...c, articleCount: c.articleCount + 1 } : c
+      ),
+    }));
+    return a;
+  },
+
+  updateKnowledgeArticle: (id, patch) =>
+    set((s) => ({
+      knowledgeArticles: s.knowledgeArticles.map((a) =>
+        a.id === id ? { ...a, ...patch, updatedAt: new Date().toISOString() } : a
+      ),
+    })),
+
+  deleteKnowledgeArticle: (id) =>
+    set((s) => {
+      const article = s.knowledgeArticles.find((a) => a.id === id);
+      return {
+        knowledgeArticles: s.knowledgeArticles.filter((a) => a.id !== id),
+        knowledgeCategories: s.knowledgeCategories.map((c) =>
+          c.id === article?.categoryId ? { ...c, articleCount: Math.max(0, c.articleCount - 1) } : c
+        ),
+      };
+    }),
+
+  assignLiveChat: (id, agentName) =>
+    set((s) => ({
+      liveChatConversations: s.liveChatConversations.map((c) =>
+        c.id === id ? { ...c, status: 'assigned', assignedTo: agentName } : c
+      ),
+    })),
+
+  resolveLiveChat: (id) =>
+    set((s) => ({
+      liveChatConversations: s.liveChatConversations.map((c) =>
+        c.id === id ? { ...c, status: 'resolved' } : c
+      ),
+    })),
+
+  sendLiveChatMessage: (conversationId, content, senderName) =>
+    set((s) => {
+      const now = new Date().toISOString();
+      const msg: LiveChatMessage = {
+        id: `lm_${Math.random().toString(36).slice(2, 10)}`,
+        conversationId,
+        sender: 'agent',
+        senderName,
+        content,
+        timestamp: now,
+      };
+      return {
+        liveChatConversations: s.liveChatConversations.map((c) =>
+          c.id === conversationId
+            ? { ...c, messages: [...c.messages, msg], lastMessageAt: now }
+            : c
+        ),
+      };
+    }),
 
   updateFeedbackStatus: (id, status) =>
     set((s) => ({ feedback: s.feedback.map((f) => (f.id === id ? { ...f, status } : f)) })),
