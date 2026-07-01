@@ -11,7 +11,6 @@ const AdminFinance = lazy(() => import('@pages/admin/Finance'));
 const AdminPayments = lazy(() => import('@pages/admin/Payments'));
 const AdminReports = lazy(() => import('@pages/admin/Reports'));
 const AdminSettings = lazy(() => import('@pages/admin/Settings'));
-const AdminDashboardPreview = lazy(() => import('@pages/admin/DashboardPreview'));
 const AdminActivityLog = lazy(() => import('@pages/admin/ActivityLog'));
 const AdminFeedback = lazy(() => import('@pages/admin/Feedback'));
 const AdminTeam = lazy(() => import('@pages/admin/Team'));
@@ -49,7 +48,6 @@ export default function App(): JSX.Element {
           <Route path="/activity" element={<AdminActivityLog />} />
           <Route path="/feedback" element={<AdminFeedback />} />
           <Route path="/team" element={<AdminTeam />} />
-          <Route path="/preview" element={<AdminDashboardPreview />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Route>
       </Routes>

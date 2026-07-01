@@ -36,8 +36,8 @@ const titleMap: Record<string, string> = {
   '/reports': 'التقارير',
   '/feedback': 'الشكاوى والاقتراحات',
   '/activity': 'سجل النشاط',
+  '/team': 'الفريق',
   '/settings': 'الإعدادات',
-  '/preview': 'معاينة',
 };
 
 const subtitleMap: Record<string, string> = {
@@ -49,8 +49,8 @@ const subtitleMap: Record<string, string> = {
   '/reports': 'تقارير وإحصائيات مفصلة',
   '/feedback': 'متابعة ملاحظات وشكاوى العملاء',
   '/activity': 'تتبع إجراءات فريق الإدارة',
+  '/team': 'إدارة أعضاء الفريق وصلاحياتهم',
   '/settings': 'إعدادات النظام',
-  '/preview': 'معاينة واجهة العميل',
 };
 
 function getInitials(name: string): string {
