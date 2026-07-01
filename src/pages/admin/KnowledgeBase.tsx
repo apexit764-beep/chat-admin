@@ -2,7 +2,6 @@ import { useState, useMemo } from 'react';
 import {
   Search,
   Plus,
-  MoreHorizontal,
   FileText,
   Eye,
   ThumbsUp,
@@ -42,12 +41,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Switch } from '@/components/ui/switch';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import type { ArticleStatus, KnowledgeArticle } from '@/types';
 
 export default function KnowledgeBase(): JSX.Element {
@@ -296,8 +296,8 @@ export default function KnowledgeBase(): JSX.Element {
                       <TableHead className="text-center">المشاهدات</TableHead>
                       <TableHead className="text-center">مفيد / غير مفيد</TableHead>
                       <TableHead>آخر تحديث</TableHead>
-                      <TableHead>الحالة</TableHead>
-                      <TableHead className="w-10" />
+                      <TableHead className="text-center">منشور</TableHead>
+                      <TableHead className="text-center">إجراءات</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -329,42 +329,42 @@ export default function KnowledgeBase(): JSX.Element {
                         <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
                           {timeAgo(article.updatedAt)}
                         </TableCell>
-                        <TableCell>
-                          {article.status === 'published' ? (
-                            <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-[11px]" variant="outline">
-                              منشور
-                            </Badge>
-                          ) : (
-                            <Badge className="bg-slate-400/10 text-slate-500 border-slate-400/20 text-[11px]" variant="outline">
-                              مسودة
-                            </Badge>
-                          )}
+                        <TableCell className="text-center">
+                          <TooltipProvider delayDuration={300}>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <span className="inline-flex">
+                                  <Switch
+                                    checked={article.status === 'published'}
+                                    onCheckedChange={() => toggleArticleStatus(article)}
+                                  />
+                                </span>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                {article.status === 'published' ? 'تحويل لمسودة' : 'نشر المقال'}
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                         </TableCell>
-                        <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => openEditArticle(article)}>
-                                <Pencil className="h-4 w-4 me-2" />
-                                تعديل
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => toggleArticleStatus(article)}>
-                                <Eye className="h-4 w-4 me-2" />
-                                {article.status === 'published' ? 'تحويل لمسودة' : 'نشر'}
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                className="text-red-600"
-                                onClick={() => setDeleteTarget({ type: 'article', id: article.id, name: article.title })}
-                              >
-                                <Trash2 className="h-4 w-4 me-2" />
-                                حذف
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                        <TableCell className="text-center">
+                          <div className="flex items-center justify-center gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => openEditArticle(article)}
+                            >
+                              <Pencil className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-500/10"
+                              onClick={() => setDeleteTarget({ type: 'article', id: article.id, name: article.title })}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
