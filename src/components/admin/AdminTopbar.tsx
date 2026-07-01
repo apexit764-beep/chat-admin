@@ -37,6 +37,8 @@ const titleMap: Record<string, string> = {
   '/feedback': 'الشكاوى والاقتراحات',
   '/activity': 'سجل النشاط',
   '/team': 'الفريق',
+  '/knowledge': 'قاعدة المعرفة',
+  '/conversations': 'الدردشة المباشرة',
   '/settings': 'الإعدادات',
 };
 
@@ -50,6 +52,8 @@ const subtitleMap: Record<string, string> = {
   '/feedback': 'متابعة ملاحظات وشكاوى العملاء',
   '/activity': 'تتبع إجراءات فريق الإدارة',
   '/team': 'إدارة أعضاء الفريق وصلاحياتهم',
+  '/knowledge': 'المقالات التي تظهر للعملاء في نافذة المساعدة',
+  '/conversations': 'المحادثات الواردة من الويدجت والقنوات',
   '/settings': 'إعدادات النظام',
 };
 

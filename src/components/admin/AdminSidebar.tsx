@@ -13,6 +13,8 @@ import {
   UsersRound,
   PanelRightClose,
   PanelRightOpen,
+  BookOpen,
+  MessageCircle,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { cn } from '@/lib/utils';
@@ -46,6 +48,7 @@ const navGroups: NavGroup[] = [
     title: 'العملاء',
     items: [
       { to: '/clients', label: 'العملاء', icon: Users },
+      { to: '/conversations', label: 'الدردشة المباشرة', icon: MessageCircle },
       { to: '/plans', label: 'الباقات', icon: Package },
       { to: '/feedback', label: 'الشكاوى والاقتراحات', icon: MessageSquareWarning },
     ],
@@ -63,6 +66,7 @@ const navGroups: NavGroup[] = [
       { to: '/team', label: 'الفريق', icon: UsersRound },
       { to: '/reports', label: 'التقارير', icon: BarChart3 },
       { to: '/activity', label: 'سجل النشاط', icon: Activity },
+      { to: '/knowledge', label: 'قاعدة المعرفة', icon: BookOpen },
       { to: '/settings', label: 'الإعدادات', icon: Settings },
     ],
   },

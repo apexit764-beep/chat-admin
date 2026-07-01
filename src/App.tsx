@@ -15,6 +15,8 @@ const AdminActivityLog = lazy(() => import('@pages/admin/ActivityLog'));
 const AdminFeedback = lazy(() => import('@pages/admin/Feedback'));
 const AdminTeam = lazy(() => import('@pages/admin/Team'));
 const AdminClientDetail = lazy(() => import('@pages/admin/ClientDetail'));
+const AdminKnowledgeBase = lazy(() => import('@pages/admin/KnowledgeBase'));
+const AdminLiveChat = lazy(() => import('@pages/admin/LiveChat'));
 
 function PageLoader(): JSX.Element {
   return (
@@ -48,6 +50,8 @@ export default function App(): JSX.Element {
           <Route path="/activity" element={<AdminActivityLog />} />
           <Route path="/feedback" element={<AdminFeedback />} />
           <Route path="/team" element={<AdminTeam />} />
+          <Route path="/knowledge" element={<AdminKnowledgeBase />} />
+          <Route path="/conversations" element={<AdminLiveChat />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Route>
       </Routes>
