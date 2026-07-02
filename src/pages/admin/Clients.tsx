@@ -398,6 +398,10 @@ export default function AdminClients(): JSX.Element {
                 {plans.map((p) => <SelectItem key={p.id} value={p.id}>{p.nameAr}</SelectItem>)}
               </SelectContent>
             </Select>
+          </>
+        }
+        actions={
+          <>
             <Button variant="outline" size="sm" className="h-9 rounded-lg" onClick={() => handleExport(filtered)}>
               <Download className="h-4 w-4 me-2" /> CSV
             </Button>

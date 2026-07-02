@@ -29,6 +29,7 @@ export interface DataTableProps<T> {
   searchPlaceholder?: string;
   searchAccessor?: (row: T) => string;
   toolbar?: ReactNode;
+  actions?: ReactNode;
   searchable?: boolean;
   pageSize?: number;
   emptyState?: ReactNode;
@@ -62,6 +63,7 @@ export function DataTable<T>({
   searchPlaceholder = 'بحث...',
   searchAccessor,
   toolbar,
+  actions,
   searchable = true,
   pageSize = 10,
   emptyState,
@@ -157,11 +159,8 @@ export function DataTable<T>({
   return (
     <div className={cn('bg-card border border-border rounded-xl overflow-hidden', className)}>
       {/* Toolbar */}
-      {(searchable || toolbar) && (
+      {(searchable || toolbar || actions) && (
         <div className="p-3 flex flex-wrap items-center gap-3 border-b border-border">
-          <div className="flex items-center gap-2 flex-wrap flex-1">
-            {toolbar && <>{toolbar}</>}
-          </div>
           {searchable && searchAccessor && (
             <div className="relative w-[220px]">
               <Search className="h-4 w-4 absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -173,6 +172,12 @@ export function DataTable<T>({
                 className="w-full h-9 ps-3 pe-9 rounded-lg bg-background border border-border text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/15 transition-all placeholder:text-muted-foreground"
               />
             </div>
+          )}
+          {toolbar && (
+            <div className="flex items-center gap-2 flex-wrap">{toolbar}</div>
+          )}
+          {actions && (
+            <div className="flex items-center gap-2 flex-wrap ms-auto">{actions}</div>
           )}
         </div>
       )}
