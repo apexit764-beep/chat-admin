@@ -19,6 +19,8 @@ import {
   Sparkles,
   ChevronDown,
   ChevronUp,
+  LayoutGrid,
+  LayoutList,
 } from 'lucide-react';
 import { useConfirm } from '@components/ui';
 import { useAdminStore } from '@/store/useAdminStore';
@@ -63,6 +65,11 @@ import {
   TooltipContent,
   TooltipProvider,
 } from '@/components/ui/tooltip';
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from '@/components/ui/popover';
 
 const tierStyle: Record<PlanTier, { bg: string; ring: string; text: string }> = {
   starter: { bg: 'from-cyan-50 to-cyan-100/50 dark:from-cyan-900/20 dark:to-cyan-900/10', ring: 'ring-cyan-300 dark:ring-cyan-700', text: 'text-cyan-700 dark:text-cyan-300' },
@@ -164,6 +171,7 @@ export default function AdminPlans(): JSX.Element {
   const [editing, setEditing] = useState<Plan | null>(null);
   const [tierFilter, setTierFilter] = useState<'all' | PlanTier>('all');
   const [activeFilter, setActiveFilter] = useState<'all' | 'active' | 'inactive'>('all');
+  const [view, setView] = useState<'table' | 'cards'>('table');
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [expandedFeatures, setExpandedFeatures] = useState<Set<string>>(new Set());
   const [reassignModal, setReassignModal] = useState<{ plan: Plan; targetPlanId: string } | null>(null);
@@ -406,6 +414,30 @@ export default function AdminPlans(): JSX.Element {
                 ))}
               </SelectContent>
             </Select>
+            <div className="flex items-center gap-0.5 rounded-lg border bg-card p-0.5">
+              <button
+                type="button"
+                onClick={() => setView('table')}
+                className={cn(
+                  'flex items-center gap-1.5 px-2.5 h-8 rounded-md text-xs font-medium transition-colors',
+                  view === 'table' ? 'bg-primary text-white shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                )}
+                aria-label="عرض جدول"
+              >
+                <LayoutList className="h-3.5 w-3.5" /> جدول
+              </button>
+              <button
+                type="button"
+                onClick={() => setView('cards')}
+                className={cn(
+                  'flex items-center gap-1.5 px-2.5 h-8 rounded-md text-xs font-medium transition-colors',
+                  view === 'cards' ? 'bg-primary text-white shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                )}
+                aria-label="عرض بطاقات"
+              >
+                <LayoutGrid className="h-3.5 w-3.5" /> بطاقات
+              </button>
+            </div>
             <Button onClick={openCreate} className="h-9 rounded-lg">
               <Plus className="h-4 w-4 me-2" /> باقة جديدة
             </Button>
@@ -430,7 +462,8 @@ export default function AdminPlans(): JSX.Element {
           </div>
         )}
 
-        {/* Plan cards */}
+        {/* Plans view */}
+        {view === 'cards' && filteredPlans.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
           {filteredPlans.map((p) => {
             const style = tierStyle[p.tier];
@@ -578,6 +611,193 @@ export default function AdminPlans(): JSX.Element {
             );
           })}
         </div>
+        )}
+
+        {/* Table view */}
+        {view === 'table' && filteredPlans.length > 0 && (
+          <div className="rounded-xl border bg-card overflow-hidden">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-start">الباقة</TableHead>
+                    <TableHead className="text-start">الحالة</TableHead>
+                    <TableHead className="text-start">السعر ({previewC?.currency ?? '—'})</TableHead>
+                    <TableHead className="text-start">الحدود</TableHead>
+                    <TableHead className="text-start">الميزات</TableHead>
+                    <TableHead className="text-start">العملاء</TableHead>
+                    <TableHead className="text-start">MRR</TableHead>
+                    <TableHead className="text-end">الإجراءات</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredPlans.map((p) => {
+                    const style = tierStyle[p.tier];
+                    const price = p.pricesPerCountry[previewCountry] ?? { monthly: 0, yearly: 0 };
+                    const clientCount = clients.filter((c) => c.planId === p.id).length;
+                    const totalMrr = clients
+                      .filter((c) => c.planId === p.id && c.status === 'active')
+                      .reduce((acc, c) => acc + c.mrr, 0);
+                    const yearlyDiscountPct = price.monthly > 0 && price.yearly > 0 && price.yearly < price.monthly * 12
+                      ? Math.round(((price.monthly * 12 - price.yearly) / (price.monthly * 12)) * 100)
+                      : 0;
+                    const mrrCurrency = clients.find((c) => c.planId === p.id)?.currency ?? previewC?.currency ?? 'USD';
+                    return (
+                      <TableRow
+                        key={p.id}
+                        ref={(el) => { cardRefs.current[p.id] = el as unknown as HTMLDivElement; }}
+                        className={cn(
+                          !p.active && 'opacity-70',
+                          copiedId === p.id && 'animate-copied-pulse'
+                        )}
+                      >
+                        <TableCell>
+                          <div className="flex items-center gap-2 min-w-0">
+                            {p.popular && (
+                              <Star className="h-4 w-4 text-primary fill-current shrink-0" />
+                            )}
+                            <div className="min-w-0">
+                              <p className={cn('font-bold', style.text)}>{p.nameAr}</p>
+                              <p className="text-xs text-muted-foreground line-clamp-1">{p.tagline}</p>
+                            </div>
+                            <Badge variant={tierBadgeVariant[p.tier]} className="text-[10px] shrink-0">
+                              {tierLabel[p.tier]}
+                            </Badge>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <button
+                            type="button"
+                            onClick={() => { updatePlan(p.id, { active: !p.active }); showToast(p.active ? 'تم تعطيل الباقة' : 'تم تفعيل الباقة', 'success'); }}
+                            className={cn(
+                              'inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium transition-colors',
+                              p.active
+                                ? 'bg-success/10 text-success hover:bg-success/20'
+                                : 'bg-muted text-muted-foreground hover:bg-muted/70'
+                            )}
+                          >
+                            <span className={cn('h-1.5 w-1.5 rounded-full', p.active ? 'bg-success' : 'bg-muted-foreground')} />
+                            {p.active ? 'نشطة' : 'معطّلة'}
+                          </button>
+                        </TableCell>
+                        <TableCell>
+                          <div>
+                            <p className="font-bold whitespace-nowrap">
+                              {formatMoney(price.monthly, previewC?.currency ?? 'USD')}
+                              <span className="text-xs text-muted-foreground font-normal"> /شهر</span>
+                            </p>
+                            <p className="text-xs text-muted-foreground whitespace-nowrap">
+                              {formatMoney(price.yearly, previewC?.currency ?? 'USD')} /سنة
+                              {yearlyDiscountPct > 0 && (
+                                <span className="text-emerald-600 font-semibold ms-1">-{yearlyDiscountPct}%</span>
+                              )}
+                            </p>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-wrap items-center gap-1.5 text-xs">
+                            <LimitPill icon={<Users className="h-3 w-3" />} value={p.limits.agents === -1 ? '∞' : p.limits.agents} />
+                            <LimitPill icon={<MessageSquare className="h-3 w-3" />} value={p.limits.channels === -1 ? '∞' : p.limits.channels} />
+                            <LimitPill icon={<Database className="h-3 w-3" />} value={p.limits.conversations === -1 ? '∞' : (p.limits.conversations / 1000) + 'K'} />
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <button
+                                type="button"
+                                className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                              >
+                                <Check className="h-3 w-3" />
+                                {p.features.length} ميزة
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent side="top" align="start" className="w-64 p-3">
+                              <p className="text-xs font-semibold mb-2 text-muted-foreground">ميزات الباقة</p>
+                              <ul className="space-y-1.5 text-sm max-h-64 overflow-y-auto">
+                                {p.features.map((f, i) => (
+                                  <li key={i} className="flex items-start gap-1.5">
+                                    <Check className="h-3.5 w-3.5 text-emerald-500 flex-shrink-0 mt-0.5" />
+                                    <span>{f}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </PopoverContent>
+                          </Popover>
+                        </TableCell>
+                        <TableCell>
+                          <span className="font-semibold">{clientCount}</span>
+                          <span className="text-xs text-muted-foreground"> عميل</span>
+                        </TableCell>
+                        <TableCell>
+                          <span className={cn('font-semibold', totalMrr > 0 ? 'text-emerald-600' : 'text-muted-foreground')}>
+                            {totalMrr > 0 ? formatMoney(totalMrr, mrrCurrency) : '—'}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-0.5 justify-end">
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted"
+                                  onClick={() => openEdit(p)}
+                                >
+                                  <Edit2 className="h-3.5 w-3.5" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>تعديل</TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted"
+                                  onClick={() => duplicate(p)}
+                                >
+                                  <Copy className="h-3.5 w-3.5" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>تكرار</TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted"
+                                  onClick={() => { updatePlan(p.id, { popular: !p.popular }); if (!p.popular) { plans.forEach((other) => { if (other.popular && other.id !== p.id) updatePlan(other.id, { popular: false }); }); } }}
+                                >
+                                  <Star className={cn('h-3.5 w-3.5', p.popular && 'fill-current text-primary')} />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>{p.popular ? 'إلغاء الأكثر شعبية' : 'تعيين الأكثر شعبية'}</TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted"
+                                  onClick={() => remove(p)}
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>حذف</TooltipContent>
+                            </Tooltip>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+        )}
 
         {/* Per-country pricing table */}
         <Card>
@@ -827,6 +1047,16 @@ export default function AdminPlans(): JSX.Element {
         </Dialog>
       </div>
     </TooltipProvider>
+  );
+}
+
+function LimitPill({ icon, value }: { icon: React.ReactNode; value: string | number }): JSX.Element {
+  const isInfinite = value === '∞';
+  return (
+    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-muted text-xs">
+      <span className="text-muted-foreground">{icon}</span>
+      <span className="font-semibold">{isInfinite ? <InfinityIcon className="h-3 w-3 inline" /> : value}</span>
+    </span>
   );
 }
 
