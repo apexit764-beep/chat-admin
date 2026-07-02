@@ -466,15 +466,15 @@ export default function AdminPlans(): JSX.Element {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-start w-12">#</TableHead>
+                    <TableHead className="text-center w-12">#</TableHead>
                     <TableHead className="text-start">الباقة</TableHead>
-                    <TableHead className="text-start">الحالة</TableHead>
+                    <TableHead className="text-center">الحالة</TableHead>
                     <TableHead className="text-start">السعر ({previewC?.currency ?? '—'})</TableHead>
-                    <TableHead className="text-start">الحدود</TableHead>
-                    <TableHead className="text-start">الميزات</TableHead>
-                    <TableHead className="text-start">العملاء</TableHead>
-                    <TableHead className="text-start">MRR</TableHead>
-                    <TableHead className="text-end">الإجراءات</TableHead>
+                    <TableHead className="text-center">الحدود</TableHead>
+                    <TableHead className="text-center">الميزات</TableHead>
+                    <TableHead className="text-center">العملاء</TableHead>
+                    <TableHead className="text-center">MRR</TableHead>
+                    <TableHead className="text-center">الإجراءات</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -498,7 +498,7 @@ export default function AdminPlans(): JSX.Element {
                           copiedId === p.id && 'animate-copied-pulse'
                         )}
                       >
-                        <TableCell className="text-xs text-muted-foreground font-mono">
+                        <TableCell className="text-center text-xs text-muted-foreground font-mono">
                           {idx + 1}
                         </TableCell>
                         <TableCell>
@@ -515,7 +515,7 @@ export default function AdminPlans(): JSX.Element {
                             </Badge>
                           </div>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="text-center">
                           <button
                             type="button"
                             onClick={() => { updatePlan(p.id, { active: !p.active }); showToast(p.active ? 'تم تعطيل الباقة' : 'تم تفعيل الباقة', 'success'); }}
@@ -544,14 +544,14 @@ export default function AdminPlans(): JSX.Element {
                             </p>
                           </div>
                         </TableCell>
-                        <TableCell>
-                          <div className="flex flex-wrap items-center gap-1.5 text-xs">
+                        <TableCell className="text-center">
+                          <div className="inline-flex flex-wrap items-center gap-1.5 text-xs justify-center">
                             <LimitPill icon={<Users className="h-3 w-3" />} value={p.limits.agents === -1 ? '∞' : p.limits.agents} />
                             <LimitPill icon={<MessageSquare className="h-3 w-3" />} value={p.limits.channels === -1 ? '∞' : p.limits.channels} />
                             <LimitPill icon={<Database className="h-3 w-3" />} value={p.limits.conversations === -1 ? '∞' : (p.limits.conversations / 1000) + 'K'} />
                           </div>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="text-center">
                           <Popover>
                             <PopoverTrigger asChild>
                               <button
@@ -575,17 +575,17 @@ export default function AdminPlans(): JSX.Element {
                             </PopoverContent>
                           </Popover>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="text-center">
                           <span className="font-semibold">{clientCount}</span>
                           <span className="text-xs text-muted-foreground"> عميل</span>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="text-center">
                           <span className={cn('font-semibold', totalMrr > 0 ? 'text-emerald-600' : 'text-muted-foreground')}>
                             {totalMrr > 0 ? formatMoney(totalMrr, mrrCurrency) : '—'}
                           </span>
                         </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-0.5 justify-end">
+                        <TableCell className="text-center">
+                          <div className="flex items-center gap-0.5 justify-center">
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <Button
