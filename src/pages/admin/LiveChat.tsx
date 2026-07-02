@@ -382,13 +382,13 @@ export default function LiveChat() {
                           <StickyNote className="h-3.5 w-3.5 text-white" />
                         </div>
                         <div className="max-w-[65%]">
-                          <p className="text-[11px] text-muted-foreground mb-1 px-1">
-                            ملاحظة داخلية — {msg.senderName}
-                          </p>
                           <div className="rounded-2xl rounded-tl-md px-4 py-2.5 shadow-sm bg-gradient-to-br from-amber-50 to-amber-100/80 dark:from-amber-900/30 dark:to-amber-800/20 border border-amber-200/40 dark:border-amber-700/30">
                             <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
-                            <div className="flex items-center justify-end mt-1.5">
+                            <div className="flex items-center gap-1.5 mt-1.5 justify-start">
+                              <span className="text-[10px] text-muted-foreground">{msg.senderName}</span>
+                              <span className="text-[10px] text-muted-foreground">·</span>
                               <span className="text-[10px] text-muted-foreground">{formatMsgTime(msg.timestamp)}</span>
+                              <span className="text-[10px] text-amber-700 dark:text-amber-400 font-medium">· ملاحظة داخلية</span>
                             </div>
                           </div>
                         </div>
@@ -408,10 +408,6 @@ export default function LiveChat() {
                       )}
 
                       <div className={cn('max-w-[65%]')}>
-                        {!isVisitor && (
-                          <p className="text-[11px] text-muted-foreground mb-1 px-1">{msg.senderName}</p>
-                        )}
-
                         <div
                           className={cn(
                             'rounded-2xl px-4 py-2.5 shadow-sm',
@@ -423,12 +419,10 @@ export default function LiveChat() {
                           <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                           <div className={cn(
                             'flex items-center gap-1.5 mt-1.5',
-                            isVisitor ? 'justify-start' : 'justify-end'
+                            isVisitor ? 'justify-start' : 'justify-start'
                           )}>
-                            {isVisitor && (
-                              <span className="text-[10px] text-muted-foreground">{msg.senderName}</span>
-                            )}
-                            {isVisitor && <span className="text-[10px] text-muted-foreground">·</span>}
+                            <span className="text-[10px] text-muted-foreground">{msg.senderName}</span>
+                            <span className="text-[10px] text-muted-foreground">·</span>
                             <span className="text-[10px] text-muted-foreground">{formatMsgTime(msg.timestamp)}</span>
                           </div>
                         </div>
