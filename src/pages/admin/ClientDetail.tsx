@@ -197,56 +197,58 @@ export default function ClientDetail(): JSX.Element {
       </div>
 
       {/* Top bar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <Avatar className="h-14 w-14">
-            <AvatarFallback className="text-lg font-bold">{getInitials(client.companyName)}</AvatarFallback>
-          </Avatar>
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-xl font-bold">{client.companyName}</h1>
-              <Badge className={cn('text-[10px] font-semibold', statusBadgeClass[client.status])}>
-                {statusLabel[client.status]}
-              </Badge>
+      <div className="rounded-xl border bg-card p-5">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <Avatar className="h-14 w-14 border-2 border-primary/20">
+              <AvatarFallback className="text-lg font-bold bg-primary/10 text-primary">{getInitials(client.companyName)}</AvatarFallback>
+            </Avatar>
+            <div>
+              <div className="flex items-center gap-3">
+                <h1 className="text-xl font-bold">{client.companyName}</h1>
+                <Badge className={cn('text-[10px] font-semibold', statusBadgeClass[client.status])}>
+                  {statusLabel[client.status]}
+                </Badge>
+              </div>
+              <p className="text-sm text-muted-foreground mt-1">
+                {country?.flag} {country?.nameAr} • {client.industry} • {client.contactName}
+              </p>
             </div>
-            <p className="text-sm text-muted-foreground mt-0.5">
-              {country?.flag} {country?.nameAr} • {client.industry} • {client.contactName}
-            </p>
           </div>
-        </div>
-        <div className="flex items-center gap-2">
-          {client.dashboardUrl && (
-            <Button variant="outline" size="sm" className="rounded-full" asChild>
-              <a href={client.dashboardUrl} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="h-4 w-4 me-2" /> لوحة العميل
-              </a>
-            </Button>
-          )}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon" className="rounded-full h-9 w-9">
-                <MoreHorizontal className="h-4 w-4" />
+          <div className="flex items-center gap-2">
+            {client.dashboardUrl && (
+              <Button variant="outline" size="sm" className="rounded-lg" asChild>
+                <a href={client.dashboardUrl} target="_blank" rel="noopener noreferrer">
+                  <ExternalLink className="h-4 w-4 me-2" /> لوحة العميل
+                </a>
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem onClick={() => navigate(`/clients`)}>
-                <Edit2 className="h-4 w-4 me-2" /> تعديل البيانات
-              </DropdownMenuItem>
-              {client.status === 'suspended' ? (
-                <DropdownMenuItem onClick={() => { reactivateClient(client.id); showToast('تم التفعيل', 'success'); }}>
-                  <PlayCircle className="h-4 w-4 me-2" /> إعادة تفعيل
+            )}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon" className="rounded-lg h-9 w-9">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={() => navigate(`/clients`)}>
+                  <Edit2 className="h-4 w-4 me-2" /> تعديل البيانات
                 </DropdownMenuItem>
-              ) : (
-                <DropdownMenuItem onClick={handleSuspend}>
-                  <PauseCircle className="h-4 w-4 me-2" /> إيقاف
+                {client.status === 'suspended' ? (
+                  <DropdownMenuItem onClick={() => { reactivateClient(client.id); showToast('تم التفعيل', 'success'); }}>
+                    <PlayCircle className="h-4 w-4 me-2" /> إعادة تفعيل
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem onClick={handleSuspend}>
+                    <PauseCircle className="h-4 w-4 me-2" /> إيقاف
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="text-danger focus:text-danger" onClick={handleDelete}>
+                  <Trash2 className="h-4 w-4 me-2" /> حذف
                 </DropdownMenuItem>
-              )}
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-danger focus:text-danger" onClick={handleDelete}>
-                <Trash2 className="h-4 w-4 me-2" /> حذف
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
 
@@ -280,10 +282,10 @@ export default function ClientDetail(): JSX.Element {
           <TabsContent value="overview" className="mt-5 space-y-5">
             {/* Quick stats */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <QuickStat icon={MessageSquare} label="المحادثات" value={client.conversationCount.toLocaleString()} />
-              <QuickStat icon={Users} label="الموظفون" value={String(client.agentCount)} />
-              <QuickStat icon={Radio} label="القنوات" value={String(client.channelCount)} />
-              <QuickStat icon={TrendingUp} label="MRR" value={client.mrr > 0 ? formatMoney(client.mrr, client.currency) : '—'} />
+              <QuickStat icon={MessageSquare} label="المحادثات" value={client.conversationCount.toLocaleString()} color="primary" />
+              <QuickStat icon={Users} label="الموظفون" value={String(client.agentCount)} color="info" />
+              <QuickStat icon={Radio} label="القنوات" value={String(client.channelCount)} color="success" />
+              <QuickStat icon={TrendingUp} label="MRR" value={client.mrr > 0 ? formatMoney(client.mrr, client.currency) : '—'} color="warning" />
             </div>
 
             {/* Timeline */}
@@ -634,25 +636,26 @@ export default function ClientDetail(): JSX.Element {
         <div className="space-y-4 order-first lg:order-last">
           {/* Contact info card */}
           <div className="rounded-xl border bg-card p-4 space-y-3">
-            <h3 className="font-semibold text-sm">معلومات الاتصال</h3>
-            <div className="space-y-2.5 text-sm">
-              <div className="flex items-center gap-2.5">
-                <Building2 className="h-4 w-4 text-muted-foreground shrink-0" />
-                <span>{client.companyName}</span>
+            <h3 className="font-semibold text-sm flex items-center gap-2">
+              <div className="h-7 w-7 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Building2 className="h-3.5 w-3.5 text-primary" />
               </div>
-              <div className="flex items-center gap-2.5">
+              معلومات الاتصال
+            </h3>
+            <div className="space-y-2.5 text-sm">
+              <div className="flex items-center gap-2.5 p-2 rounded-lg bg-muted/50">
                 <Mail className="h-4 w-4 text-muted-foreground shrink-0" />
                 <span className="truncate">{client.email}</span>
               </div>
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-2.5 p-2 rounded-lg bg-muted/50">
                 <Phone className="h-4 w-4 text-muted-foreground shrink-0" />
                 <span dir="ltr">{client.phone}</span>
               </div>
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-2.5 p-2 rounded-lg bg-muted/50">
                 <Globe className="h-4 w-4 text-muted-foreground shrink-0" />
                 <span>{country?.flag} {country?.nameAr}</span>
               </div>
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-2.5 p-2 rounded-lg bg-muted/50">
                 <Hash className="h-4 w-4 text-muted-foreground shrink-0" />
                 <span className="text-muted-foreground font-mono text-xs">{client.id}</span>
               </div>
@@ -662,7 +665,12 @@ export default function ClientDetail(): JSX.Element {
           {/* Plan & subscription card */}
           {plan && (
             <div className="rounded-xl border bg-card p-4 space-y-3">
-              <h3 className="font-semibold text-sm">الباقة الحالية</h3>
+              <h3 className="font-semibold text-sm flex items-center gap-2">
+                <div className="h-7 w-7 rounded-lg bg-success/10 flex items-center justify-center">
+                  <CreditCard className="h-3.5 w-3.5 text-success" />
+                </div>
+                الباقة الحالية
+              </h3>
               <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
                 <p className="font-bold text-primary">{plan.nameAr}</p>
                 <p className="text-xs text-muted-foreground mt-0.5">{plan.tagline}</p>
@@ -679,7 +687,12 @@ export default function ClientDetail(): JSX.Element {
           {/* Usage bars */}
           {usageBars.length > 0 && (
             <div className="rounded-xl border bg-card p-4 space-y-3">
-              <h3 className="font-semibold text-sm">الاستخدام</h3>
+              <h3 className="font-semibold text-sm flex items-center gap-2">
+                <div className="h-7 w-7 rounded-lg bg-warning/10 flex items-center justify-center">
+                  <Activity className="h-3.5 w-3.5 text-warning" />
+                </div>
+                الاستخدام
+              </h3>
               {usageBars.map((bar) => {
                 const isUnlimited = bar.max === -1;
                 const pct = isUnlimited ? Math.min((bar.used / 100) * 100, 100) : Math.min((bar.used / bar.max) * 100, 100);
@@ -707,7 +720,12 @@ export default function ClientDetail(): JSX.Element {
 
           {/* Internal notes */}
           <div className="rounded-xl border bg-card p-4 space-y-3">
-            <h3 className="font-semibold text-sm">ملاحظات داخلية</h3>
+            <h3 className="font-semibold text-sm flex items-center gap-2">
+              <div className="h-7 w-7 rounded-lg bg-info/10 flex items-center justify-center">
+                <FileText className="h-3.5 w-3.5 text-info" />
+              </div>
+              ملاحظات داخلية
+            </h3>
             <div className="space-y-2">
               <Textarea
                 value={internalNote}
@@ -746,14 +764,20 @@ function InfoRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-function QuickStat({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string }) {
+function QuickStat({ icon: Icon, label, value, color = 'primary' }: { icon: React.ElementType; label: string; value: string; color?: string }) {
+  const colorMap: Record<string, string> = {
+    primary: 'bg-primary/10 text-primary',
+    success: 'bg-success/10 text-success',
+    info: 'bg-info/10 text-info',
+    warning: 'bg-warning/10 text-warning',
+  };
   return (
     <div className="rounded-xl border bg-card p-4">
-      <div className="flex items-center gap-2 text-muted-foreground mb-1">
-        <Icon className="h-4 w-4" />
-        <span className="text-xs">{label}</span>
+      <div className={cn('h-9 w-9 rounded-xl flex items-center justify-center mb-2', colorMap[color] ?? colorMap.primary)}>
+        <Icon className="h-4.5 w-4.5" />
       </div>
-      <p className="text-lg font-bold">{value}</p>
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="text-lg font-bold mt-0.5">{value}</p>
     </div>
   );
 }

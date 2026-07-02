@@ -13,19 +13,12 @@ import { cn } from '@/utils/cn';
 export interface Column<T> {
   key: string;
   header: string;
-  /** value accessor used for sorting + default rendering */
   accessor?: (row: T) => string | number | undefined | null;
-  /** custom cell renderer */
   cell?: (row: T) => ReactNode;
-  /** allow sorting (default: true if accessor provided) */
   sortable?: boolean;
-  /** hide on small screens */
   hideOn?: 'sm' | 'md' | 'lg' | 'xl';
-  /** explicit width or "1" for shrink */
   width?: string;
-  /** text alignment */
   align?: 'start' | 'end' | 'center';
-  /** className passed to th + td */
   className?: string;
 }
 
@@ -35,21 +28,14 @@ export interface DataTableProps<T> {
   rowKey: (row: T) => string;
   searchPlaceholder?: string;
   searchAccessor?: (row: T) => string;
-  /** Extra toolbar on the right of the search */
   toolbar?: ReactNode;
-  /** Show search input. Default true */
   searchable?: boolean;
-  /** Page size, default 10. Set to 0 to disable pagination */
   pageSize?: number;
-  /** Empty state shown when filtered data is empty */
   emptyState?: ReactNode;
-  /** Bulk select callbacks */
   selectable?: boolean;
   onSelectionChange?: (rows: T[]) => void;
   bulkActions?: (selected: T[], clear: () => void) => ReactNode;
-  /** Click row */
   onRowClick?: (row: T) => void;
-  /** Optional className for the wrapper card */
   className?: string;
 }
 
@@ -169,35 +155,37 @@ export function DataTable<T>({
   const allOnPageSelected = pageRows.length > 0 && pageRows.every((r) => selected.has(rowKey(r)));
 
   return (
-    <div className={cn('bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-card overflow-hidden', className)}>
+    <div className={cn('bg-card border border-border rounded-xl overflow-hidden', className)}>
       {/* Toolbar */}
       {(searchable || toolbar) && (
-        <div className="p-3 flex flex-wrap items-center gap-3 border-b border-border-light dark:border-border-dark">
+        <div className="p-3 flex flex-wrap items-center gap-3 border-b border-border">
+          <div className="flex items-center gap-2 flex-wrap flex-1">
+            {toolbar && <>{toolbar}</>}
+          </div>
           {searchable && searchAccessor && (
-            <div className="relative flex-1 min-w-[200px]">
-              <Search className="h-4 w-4 absolute end-3 top-1/2 -translate-y-1/2 text-muted-light dark:text-muted-dark" />
+            <div className="relative w-[220px]">
+              <Search className="h-4 w-4 absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <input
                 type="text"
                 placeholder={searchPlaceholder}
                 value={search}
                 onChange={(e) => { setSearch(e.target.value); setPage(0); }}
-                className="w-full h-9 ps-3 pe-9 rounded-full bg-bg-light dark:bg-bg-dark border border-transparent text-small focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/15 transition-all"
+                className="w-full h-9 ps-3 pe-9 rounded-lg bg-background border border-border text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/15 transition-all placeholder:text-muted-foreground"
               />
             </div>
           )}
-          {toolbar && <div className="flex items-center gap-2 flex-wrap">{toolbar}</div>}
         </div>
       )}
 
       {/* Bulk action bar */}
       {selectable && selectedArr.length > 0 && (
         <div className="px-4 py-2.5 bg-primary/5 border-b border-primary/20 flex items-center justify-between gap-2 flex-wrap">
-          <p className="text-small font-medium">
+          <p className="text-sm font-medium">
             <span className="text-primary font-bold">{selectedArr.length}</span> صف مُحدّد
           </p>
           <div className="flex items-center gap-2">
             {bulkActions && bulkActions(selectedArr, clearSelection)}
-            <button onClick={clearSelection} className="text-small text-muted-light dark:text-muted-dark hover:text-current">
+            <button onClick={clearSelection} className="text-sm text-muted-foreground hover:text-foreground">
               إلغاء التحديد
             </button>
           </div>
@@ -206,8 +194,8 @@ export function DataTable<T>({
 
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="w-full text-body">
-          <thead className="bg-bg-light dark:bg-bg-dark/50 text-small text-muted-light dark:text-muted-dark border-b border-border-light dark:border-border-dark">
+        <table className="w-full text-sm">
+          <thead className="bg-muted/50 text-xs text-muted-foreground border-b border-border">
             <tr>
               {selectable && (
                 <th className="px-3 py-2.5 w-10">
@@ -231,7 +219,7 @@ export function DataTable<T>({
                       'font-medium px-3 py-2.5 whitespace-nowrap',
                       alignClass(col.align),
                       hideClass(col.hideOn),
-                      isSortable && 'cursor-pointer select-none hover:text-current',
+                      isSortable && 'cursor-pointer select-none hover:text-foreground',
                       col.className
                     )}
                     onClick={isSortable ? () => toggleSort(col) : undefined}
@@ -251,7 +239,7 @@ export function DataTable<T>({
               })}
             </tr>
           </thead>
-          <tbody className="divide-y divide-border-light dark:divide-border-dark">
+          <tbody className="divide-y divide-border">
             {pageRows.map((row) => {
               const id = rowKey(row);
               const isSelected = selected.has(id);
@@ -262,7 +250,7 @@ export function DataTable<T>({
                   className={cn(
                     'transition-colors',
                     onRowClick && 'cursor-pointer',
-                    'hover:bg-bg-light dark:hover:bg-bg-dark/40',
+                    'hover:bg-muted/50',
                     isSelected && 'bg-primary/5'
                   )}
                 >
@@ -298,11 +286,11 @@ export function DataTable<T>({
                 <td colSpan={columns.length + (selectable ? 1 : 0)} className="px-3 py-12 text-center">
                   {emptyState ?? (
                     <div className="flex flex-col items-center text-center">
-                      <div className="h-12 w-12 rounded-full bg-bg-light dark:bg-bg-dark flex items-center justify-center text-muted-light dark:text-muted-dark mb-2">
+                      <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground mb-2">
                         <InboxIcon className="h-6 w-6" />
                       </div>
-                      <p className="text-body font-medium">لا توجد نتائج</p>
-                      <p className="text-small text-muted-light dark:text-muted-dark mt-0.5">
+                      <p className="text-sm font-medium">لا توجد نتائج</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
                         {search ? 'جرّب تعديل بحثك أو الفلاتر' : 'لا توجد بيانات لعرضها'}
                       </p>
                     </div>
@@ -316,31 +304,31 @@ export function DataTable<T>({
 
       {/* Pagination */}
       {pageSize > 0 && total > pageSize && (
-        <div className="px-4 py-3 border-t border-border-light dark:border-border-dark flex items-center justify-between flex-wrap gap-2">
-          <p className="text-small text-muted-light dark:text-muted-dark">
+        <div className="px-4 py-3 border-t border-border flex items-center justify-between flex-wrap gap-2">
+          <p className="text-xs text-muted-foreground">
             عرض {start + 1}-{Math.min(end, total)} من {total}
           </p>
           <div className="flex items-center gap-1">
             <button
               onClick={() => setPage((p) => Math.max(0, p - 1))}
               disabled={safePage === 0}
-              className="h-8 w-8 rounded-md hover:bg-bg-light dark:hover:bg-bg-dark text-muted-light dark:text-muted-dark hover:text-current flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed"
+              className="h-8 w-8 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed"
               aria-label="السابق"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
             {pageNumbers(safePage, totalPages).map((n, i) =>
               n === '…' ? (
-                <span key={`gap-${i}`} className="text-small text-muted-light dark:text-muted-dark px-1">…</span>
+                <span key={`gap-${i}`} className="text-xs text-muted-foreground px-1">…</span>
               ) : (
                 <button
                   key={n}
                   onClick={() => setPage(n as number)}
                   className={cn(
-                    'h-8 min-w-8 px-2.5 rounded-md text-small font-medium',
+                    'h-8 min-w-8 px-2.5 rounded-md text-xs font-medium',
                     safePage === n
                       ? 'bg-primary text-white'
-                      : 'text-muted-light dark:text-muted-dark hover:bg-bg-light dark:hover:bg-bg-dark hover:text-current'
+                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   )}
                 >
                   {(n as number) + 1}
@@ -350,7 +338,7 @@ export function DataTable<T>({
             <button
               onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
               disabled={safePage === totalPages - 1}
-              className="h-8 w-8 rounded-md hover:bg-bg-light dark:hover:bg-bg-dark text-muted-light dark:text-muted-dark hover:text-current flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed"
+              className="h-8 w-8 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed"
               aria-label="التالي"
             >
               <ChevronLeft className="h-4 w-4" />

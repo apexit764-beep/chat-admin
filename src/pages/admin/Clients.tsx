@@ -257,7 +257,7 @@ export default function AdminClients(): JSX.Element {
           </Avatar>
           <div className="min-w-0">
             <p className="font-semibold truncate">{r.companyName}</p>
-            <p className="text-small text-muted-foreground truncate">{r.email}</p>
+            <p className="text-xs text-muted-foreground truncate">{r.email}</p>
           </div>
         </div>
       ),
@@ -269,24 +269,24 @@ export default function AdminClients(): JSX.Element {
         return (
           <span className="inline-flex items-center gap-1.5">
             <span className="text-lg">{country?.flag}</span>
-            <span className="text-small">{country?.nameAr}</span>
+            <span className="text-xs">{country?.nameAr}</span>
           </span>
         );
       },
     },
-    { key: 'industry', header: 'القطاع', accessor: (r) => r.industry, hideOn: 'lg', cell: (r) => <span className="text-muted-foreground text-small">{r.industry}</span> },
+    { key: 'industry', header: 'القطاع', accessor: (r) => r.industry, hideOn: 'lg', cell: (r) => <span className="text-muted-foreground text-xs">{r.industry}</span> },
     {
       key: 'plan', header: 'الباقة', accessor: (r) => r.planId ?? '',
       cell: (r) => {
         const plan = plans.find((p) => p.id === r.planId);
-        return plan ? <span className="text-small font-medium">{plan.nameAr}</span> : <span className="text-small text-muted-foreground italic">بدون باقة</span>;
+        return plan ? <span className="text-xs font-medium">{plan.nameAr}</span> : <span className="text-xs text-muted-foreground italic">بدون باقة</span>;
       },
     },
     {
       key: 'mrr', header: 'MRR', accessor: (r) => r.mrr,
       cell: (r) => r.mrr > 0 ? <span className="font-semibold">{formatMoney(r.mrr, r.currency)}</span> : <span className="text-muted-foreground">—</span>,
     },
-    { key: 'last', header: 'آخر نشاط', accessor: (r) => r.lastActiveAt, hideOn: 'lg', cell: (r) => <span className="text-muted-foreground text-small">{timeAgo(r.lastActiveAt)}</span> },
+    { key: 'last', header: 'آخر نشاط', accessor: (r) => r.lastActiveAt, hideOn: 'lg', cell: (r) => <span className="text-muted-foreground text-xs">{timeAgo(r.lastActiveAt)}</span> },
     {
       key: 'status', header: 'الحالة', accessor: (r) => r.status,
       cell: (r) => (
@@ -367,26 +367,41 @@ export default function AdminClients(): JSX.Element {
         )}
         toolbar={
           <>
-            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as 'all' | ClientStatus)} className="h-9 px-3 rounded-full bg-muted border border-transparent text-small focus:outline-none focus:border-primary">
-              <option value="all">كل الحالات</option>
-              <option value="trial">تجريبي</option>
-              <option value="active">نشط</option>
-              <option value="past_due">متأخر</option>
-              <option value="suspended">موقوف</option>
-              <option value="cancelled">ملغي</option>
-            </select>
-            <select value={countryFilter} onChange={(e) => setCountryFilter(e.target.value)} className="h-9 px-3 rounded-full bg-muted border border-transparent text-small focus:outline-none focus:border-primary">
-              <option value="all">كل الدول</option>
-              {countries.map((c) => <option key={c.code} value={c.code}>{c.flag} {c.nameAr}</option>)}
-            </select>
-            <select value={planFilter} onChange={(e) => setPlanFilter(e.target.value)} className="h-9 px-3 rounded-full bg-muted border border-transparent text-small focus:outline-none focus:border-primary">
-              <option value="all">كل الباقات</option>
-              {plans.map((p) => <option key={p.id} value={p.id}>{p.nameAr}</option>)}
-            </select>
-            <Button variant="outline" size="sm" className="h-9 rounded-full" onClick={() => handleExport(filtered)}>
+            <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as 'all' | ClientStatus)}>
+              <SelectTrigger className="h-9 w-[130px] rounded-lg text-sm">
+                <SelectValue placeholder="كل الحالات" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">كل الحالات</SelectItem>
+                <SelectItem value="trial">تجريبي</SelectItem>
+                <SelectItem value="active">نشط</SelectItem>
+                <SelectItem value="past_due">متأخر</SelectItem>
+                <SelectItem value="suspended">موقوف</SelectItem>
+                <SelectItem value="cancelled">ملغي</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={countryFilter} onValueChange={(v) => setCountryFilter(v)}>
+              <SelectTrigger className="h-9 w-[130px] rounded-lg text-sm">
+                <SelectValue placeholder="كل الدول" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">كل الدول</SelectItem>
+                {countries.map((c) => <SelectItem key={c.code} value={c.code}>{c.flag} {c.nameAr}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Select value={planFilter} onValueChange={(v) => setPlanFilter(v)}>
+              <SelectTrigger className="h-9 w-[130px] rounded-lg text-sm">
+                <SelectValue placeholder="كل الباقات" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">كل الباقات</SelectItem>
+                {plans.map((p) => <SelectItem key={p.id} value={p.id}>{p.nameAr}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Button variant="outline" size="sm" className="h-9 rounded-lg" onClick={() => handleExport(filtered)}>
               <Download className="h-4 w-4 me-2" /> CSV
             </Button>
-            <Button size="sm" className="h-9 rounded-full" onClick={openCreate}>
+            <Button size="sm" className="h-9 rounded-lg" onClick={openCreate}>
               <Plus className="h-4 w-4 me-2" /> إضافة عميل
             </Button>
           </>
@@ -536,7 +551,7 @@ function ClientDrawerBody({ client, onEdit, onDelete }: { client: Client; onEdit
           <AvatarFallback className="text-lg">{getInitials(client.companyName)}</AvatarFallback>
         </Avatar>
         <p className="text-xl font-bold mt-3">{client.companyName} <span className="text-xl">{country?.flag}</span></p>
-        <p className="text-small text-muted-foreground">{client.contactName}</p>
+        <p className="text-xs text-muted-foreground">{client.contactName}</p>
         <Badge className={cn('mt-2 text-[10px] font-semibold', statusBadgeClass[client.status])}>
           {statusLabel[client.status]}
         </Badge>
@@ -545,21 +560,21 @@ function ClientDrawerBody({ client, onEdit, onDelete }: { client: Client; onEdit
       <div className="grid grid-cols-3 gap-3 text-center">
         <div className="p-3 rounded-lg bg-muted">
           <p className="text-lg font-bold">{client.agentCount}</p>
-          <p className="text-small text-muted-foreground">موظفون</p>
+          <p className="text-xs text-muted-foreground">موظفون</p>
         </div>
         <div className="p-3 rounded-lg bg-muted">
           <p className="text-lg font-bold">{client.channelCount}</p>
-          <p className="text-small text-muted-foreground">قنوات</p>
+          <p className="text-xs text-muted-foreground">قنوات</p>
         </div>
         <div className="p-3 rounded-lg bg-muted">
           <p className="text-lg font-bold">{client.conversationCount}</p>
-          <p className="text-small text-muted-foreground">محادثات</p>
+          <p className="text-xs text-muted-foreground">محادثات</p>
         </div>
       </div>
 
       <div>
-        <p className="text-small font-semibold mb-2">معلومات الاتصال</p>
-        <div className="space-y-1.5 text-small">
+        <p className="text-xs font-semibold mb-2">معلومات الاتصال</p>
+        <div className="space-y-1.5 text-xs">
           <div className="flex items-center gap-2"><Mail className="h-3.5 w-3.5 text-muted-foreground" /> {client.email}</div>
           <div className="flex items-center gap-2"><Phone className="h-3.5 w-3.5 text-muted-foreground" /> {client.phone}</div>
           <div className="flex items-center gap-2"><Globe className="h-3.5 w-3.5 text-muted-foreground" /> <span className="text-muted-foreground">{client.dashboardUrl || '—'}</span></div>
@@ -568,8 +583,8 @@ function ClientDrawerBody({ client, onEdit, onDelete }: { client: Client; onEdit
 
       {plan && sub && (
         <div>
-          <p className="text-small font-semibold mb-2">الاشتراك</p>
-          <div className="p-3 rounded-lg bg-primary/5 border border-primary/20 space-y-1.5 text-small">
+          <p className="text-xs font-semibold mb-2">الاشتراك</p>
+          <div className="p-3 rounded-lg bg-primary/5 border border-primary/20 space-y-1.5 text-xs">
             <div className="flex justify-between"><span className="text-muted-foreground">الباقة</span><span className="font-semibold">{plan.nameAr}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">قيمة الاشتراك</span><span className="font-semibold">{formatMoney(sub.amount, sub.currency)} / شهر</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">يتجدد في</span><span>{formatDate(sub.currentPeriodEnd)}</span></div>
@@ -582,10 +597,10 @@ function ClientDrawerBody({ client, onEdit, onDelete }: { client: Client; onEdit
 
       {clientInvoices.length > 0 && (
         <div>
-          <p className="text-small font-semibold mb-2">آخر الفواتير</p>
+          <p className="text-xs font-semibold mb-2">آخر الفواتير</p>
           <div className="space-y-1.5">
             {clientInvoices.slice(0, 4).map((inv) => (
-              <div key={inv.id} className="p-2.5 rounded-lg bg-muted flex items-center justify-between text-small">
+              <div key={inv.id} className="p-2.5 rounded-lg bg-muted flex items-center justify-between text-xs">
                 <div className="min-w-0">
                   <p className="font-medium font-mono">{inv.number}</p>
                   <p className="text-[10px] text-muted-foreground">{formatDate(inv.dueDate)}</p>

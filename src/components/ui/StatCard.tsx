@@ -21,15 +21,15 @@ export function StatCard({
   trend,
 }: StatCardProps): JSX.Element {
   return (
-    <Card className="p-5 hover:shadow-card-hover transition-shadow">
+    <Card className="p-5 hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between mb-3">
-        <div className={cn('h-11 w-11 rounded-card flex items-center justify-center', iconBg, iconColor)}>
+        <div className={cn('h-11 w-11 rounded-xl flex items-center justify-center', iconBg, iconColor)}>
           {icon}
         </div>
         {trend && (
           <span
             className={cn(
-              'inline-flex items-center gap-1 text-small font-semibold px-2 py-1 rounded-md',
+              'inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-md',
               trend.positive ? 'bg-success/15 text-success' : 'bg-danger/15 text-danger'
             )}
           >
@@ -39,8 +39,8 @@ export function StatCard({
         )}
       </div>
       <div className="space-y-1">
-        <p className="text-small text-muted-light dark:text-muted-dark">{label}</p>
-        <p className="text-h1 font-bold">{value}</p>
+        <p className="text-xs text-muted-foreground">{label}</p>
+        <p className="text-2xl font-bold">{value}</p>
       </div>
     </Card>
   );
