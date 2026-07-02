@@ -36,6 +36,7 @@ const breadcrumbMap: Record<string, string> = {
   '/team': 'الفريق',
   '/knowledge': 'قاعدة المعرفة',
   '/conversations': 'الدردشة المباشرة',
+  '/notifications': 'الإشعارات',
   '/settings': 'الإعدادات',
 };
 

@@ -168,7 +168,7 @@ export default function AdminDashboard(): JSX.Element {
   );
 
   return (
-    <div className="p-4 lg:p-6 space-y-6 page-fade">
+    <div className="p-4 lg:p-6 space-y-5 page-fade">
       <div>
         <h2 className="text-2xl font-bold">نظرة عامة</h2>
         <p className="text-sm text-muted-foreground">نظرة عامة على أداء النظام</p>
@@ -217,6 +217,10 @@ export default function AdminDashboard(): JSX.Element {
 
       {/* ═══════════════ Section 2: الأداء المالي ═══════════════ */}
       <section className="space-y-3">
+        <div className="flex items-center gap-2">
+          <h3 className="text-sm font-semibold text-muted-foreground">الأداء المالي</h3>
+          <div className="flex-1 h-px bg-border/40" />
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <Card>
             <CardHeader className="pb-2">
@@ -273,6 +277,10 @@ export default function AdminDashboard(): JSX.Element {
 
       {/* ═══════════════ Section 3: نشاط المنصّة ═══════════════ */}
       <section className="space-y-3">
+        <div className="flex items-center gap-2">
+          <h3 className="text-sm font-semibold text-muted-foreground">نشاط المنصّة</h3>
+          <div className="flex-1 h-px bg-border/40" />
+        </div>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <MiniStat
             label="إجمالي المحادثات"
@@ -353,6 +361,10 @@ export default function AdminDashboard(): JSX.Element {
 
       {/* ═══════════════ Section 4: يحتاج اهتمامك ═══════════════ */}
       <section className="space-y-3">
+        <div className="flex items-center gap-2">
+          <h3 className="text-sm font-semibold text-muted-foreground">يحتاج اهتمامك</h3>
+          <div className="flex-1 h-px bg-border/40" />
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Past due */}
           <Card className="border-amber-500/30">
@@ -474,6 +486,10 @@ export default function AdminDashboard(): JSX.Element {
 
       {/* ═══════════════ Section 5: النشاط الأخير ═══════════════ */}
       <section className="space-y-3">
+        <div className="flex items-center gap-2">
+          <h3 className="text-sm font-semibold text-muted-foreground">النشاط الأخير</h3>
+          <div className="flex-1 h-px bg-border/40" />
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <Card>
             <CardHeader className="pb-3">
@@ -648,17 +664,15 @@ function MiniStat({ label, value, sub, icon, color, iconBg }: {
 }): JSX.Element {
   return (
     <Card>
-      <CardContent className="p-3.5">
-        <div className="flex items-center gap-2.5">
-          <div className={cn('h-9 w-9 rounded-lg flex items-center justify-center flex-shrink-0', iconBg, color)}>
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between mb-2">
+          <div className={cn('h-8 w-8 rounded-md flex items-center justify-center', iconBg, color)}>
             {icon}
           </div>
-          <div className="min-w-0">
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold truncate">{label}</p>
-            <p className="text-lg font-extrabold tracking-tight leading-tight">{value}</p>
-            <p className="text-[10px] text-muted-foreground truncate">{sub}</p>
-          </div>
         </div>
+        <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">{label}</p>
+        <p className="text-2xl font-extrabold tracking-tight mt-0.5">{value}</p>
+        <p className="text-[11px] text-muted-foreground mt-1">{sub}</p>
       </CardContent>
     </Card>
   );

@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { Bell, CreditCard, Users, Package, AlertTriangle, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -33,6 +34,7 @@ const typeColors: Record<NotificationType, string> = {
 };
 
 export function NotificationDropdown(): JSX.Element {
+  const navigate = useNavigate();
   const notifications = useNotificationStore((s) => s.notifications);
   const markAsRead = useNotificationStore((s) => s.markAsRead);
   const markAllAsRead = useNotificationStore((s) => s.markAllAsRead);
@@ -157,9 +159,7 @@ export function NotificationDropdown(): JSX.Element {
             variant="ghost"
             size="sm"
             className="w-full h-8 text-xs text-muted-foreground hover:text-foreground"
-            onClick={() => {
-              // Future: navigate to /notifications
-            }}
+            onClick={() => navigate('/notifications')}
           >
             عرض جميع الإشعارات
           </Button>

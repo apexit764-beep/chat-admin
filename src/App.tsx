@@ -17,6 +17,7 @@ const AdminTeam = lazy(() => import('@pages/admin/Team'));
 const AdminClientDetail = lazy(() => import('@pages/admin/ClientDetail'));
 const AdminKnowledgeBase = lazy(() => import('@pages/admin/KnowledgeBase'));
 const AdminLiveChat = lazy(() => import('@pages/admin/LiveChat'));
+const AdminNotifications = lazy(() => import('@pages/admin/Notifications'));
 
 function PageLoader(): JSX.Element {
   return (
@@ -52,6 +53,7 @@ export default function App(): JSX.Element {
           <Route path="/team" element={<AdminTeam />} />
           <Route path="/knowledge" element={<AdminKnowledgeBase />} />
           <Route path="/conversations" element={<AdminLiveChat />} />
+          <Route path="/notifications" element={<AdminNotifications />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Route>
       </Routes>
