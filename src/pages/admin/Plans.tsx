@@ -1,10 +1,9 @@
-import { useState } from 'react';
+import { useMemo, useRef, useState, useEffect } from 'react';
 import {
   Plus,
   Edit2,
   Trash2,
   Check,
-  X,
   Star,
   Users,
   MessageSquare,
@@ -13,6 +12,13 @@ import {
   Globe2,
   Power,
   Copy,
+  MessageCircle,
+  Bot,
+  Zap,
+  Shield,
+  Sparkles,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import { useConfirm } from '@components/ui';
 import { useAdminStore } from '@/store/useAdminStore';
@@ -33,7 +39,6 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -73,6 +78,76 @@ const tierBadgeVariant: Record<PlanTier, 'default' | 'secondary' | 'outline' | '
   enterprise: 'warning',
 };
 
+const tierLabel: Record<PlanTier, string> = {
+  starter: 'مبتدئ',
+  pro: 'احترافي',
+  business: 'أعمال',
+  enterprise: 'مؤسسات',
+};
+
+const tierOrder: Record<PlanTier, number> = {
+  starter: 0,
+  pro: 1,
+  business: 2,
+  enterprise: 3,
+};
+
+type FeatureGroup = { label: string; icon: React.ComponentType<{ className?: string }>; items: string[] };
+
+const FEATURE_CATALOG: FeatureGroup[] = [
+  {
+    label: 'قنوات التواصل',
+    icon: MessageCircle,
+    items: [
+      'تكامل واتساب',
+      'تكامل ماسنجر',
+      'تكامل انستقرام',
+      'تكامل تلقرام',
+      'Live Chat Widget',
+      'دعم عبر البريد',
+    ],
+  },
+  {
+    label: 'الذكاء والأتمتة',
+    icon: Bot,
+    items: [
+      'ردود جاهزة',
+      'ردود ذكية بالـ AI',
+      'قوالب رسائل',
+      'الحملات (Outreach)',
+      'التوجيه التلقائي',
+      'ساعات العمل',
+    ],
+  },
+  {
+    label: 'التقارير والتكامل',
+    icon: Zap,
+    items: [
+      'تقارير أساسية',
+      'تقارير متقدمة',
+      'تصدير CSV',
+      'API access',
+      'Webhooks',
+      'تكامل Zapier',
+    ],
+  },
+  {
+    label: 'الدعم والمؤسسات',
+    icon: Shield,
+    items: [
+      'دعم فني قياسي',
+      'دعم فني ٢٤/٧',
+      'SLA مضمون ٩٩.٩٪',
+      'مدير حساب مخصص',
+      'تدريب مجاني للفريق',
+      'Whitelabel',
+      'SSO',
+    ],
+  },
+];
+
+const ALL_CATALOG_FEATURES: string[] = FEATURE_CATALOG.flatMap((g) => g.items);
+
 export default function AdminPlans(): JSX.Element {
   const plans = useAdminStore((s) => s.plans);
   const clients = useAdminStore((s) => s.clients);
@@ -80,18 +155,48 @@ export default function AdminPlans(): JSX.Element {
   const addPlan = useAdminStore((s) => s.addPlan);
   const updatePlan = useAdminStore((s) => s.updatePlan);
   const deletePlan = useAdminStore((s) => s.deletePlan);
+  const updateClient = useAdminStore((s) => s.updateClient);
   const showToast = useUIStore((s) => s.showToast);
   const { confirm } = useConfirm();
 
   const [previewCountry, setPreviewCountry] = useState('OM');
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Plan | null>(null);
+  const [tierFilter, setTierFilter] = useState<'all' | PlanTier>('all');
+  const [activeFilter, setActiveFilter] = useState<'all' | 'active' | 'inactive'>('all');
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [expandedFeatures, setExpandedFeatures] = useState<Set<string>>(new Set());
+  const [reassignModal, setReassignModal] = useState<{ plan: Plan; targetPlanId: string } | null>(null);
+  const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  const sortedPlans = useMemo(
+    () => [...plans].sort((a, b) => tierOrder[a.tier] - tierOrder[b.tier]),
+    [plans]
+  );
+
+  const filteredPlans = useMemo(
+    () => sortedPlans.filter((p) => {
+      if (tierFilter !== 'all' && p.tier !== tierFilter) return false;
+      if (activeFilter === 'active' && !p.active) return false;
+      if (activeFilter === 'inactive' && p.active) return false;
+      return true;
+    }),
+    [sortedPlans, tierFilter, activeFilter]
+  );
+
+  useEffect(() => {
+    if (!copiedId) return;
+    const el = cardRefs.current[copiedId];
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const t = setTimeout(() => setCopiedId(null), 1700);
+    return () => clearTimeout(t);
+  }, [copiedId]);
   const [form, setForm] = useState<{
     tier: PlanTier;
     name: string;
     nameAr: string;
     tagline: string;
-    features: string;
+    features: string[];
     limitAgents: number;
     limitChannels: number;
     limitConversations: number;
@@ -104,7 +209,7 @@ export default function AdminPlans(): JSX.Element {
     name: '',
     nameAr: '',
     tagline: '',
-    features: '',
+    features: [],
     limitAgents: 5,
     limitChannels: 2,
     limitConversations: 5000,
@@ -119,7 +224,7 @@ export default function AdminPlans(): JSX.Element {
     const defaults: Record<string, { monthly: number; yearly: number }> = {};
     countries.forEach((c) => { defaults[c.code] = { monthly: 0, yearly: 0 }; });
     setForm({
-      tier: 'pro', name: '', nameAr: '', tagline: '', features: '',
+      tier: 'pro', name: '', nameAr: '', tagline: '', features: [],
       limitAgents: 5, limitChannels: 2, limitConversations: 5000, limitContacts: 1000,
       pricesPerCountry: defaults, popular: false, active: true,
     });
@@ -133,7 +238,7 @@ export default function AdminPlans(): JSX.Element {
       name: p.name,
       nameAr: p.nameAr,
       tagline: p.tagline,
-      features: p.features.join('\n'),
+      features: [...p.features],
       limitAgents: p.limits.agents,
       limitChannels: p.limits.channels,
       limitConversations: p.limits.conversations,
@@ -156,7 +261,8 @@ export default function AdminPlans(): JSX.Element {
       pricesPerCountry: { ...p.pricesPerCountry },
       active: false,
     });
-    showToast(`تم إنشاء نسخة: ${newPlan.nameAr}`, 'success');
+    setCopiedId(newPlan.id);
+    showToast(`تم إنشاء نسخة "${newPlan.nameAr}" — معطّلة، فعّلها من الأزرار السفلية`, 'success');
   };
 
   const submit = (): void => {
@@ -164,13 +270,23 @@ export default function AdminPlans(): JSX.Element {
       showToast('الاسم بالعربية والإنجليزية مطلوبان', 'error');
       return;
     }
-    const features = form.features.split('\n').map((f) => f.trim()).filter(Boolean);
+    if (form.features.length === 0) {
+      showToast('اختر ميزة واحدة على الأقل', 'error');
+      return;
+    }
+    if (form.popular) {
+      plans.forEach((other) => {
+        if (other.popular && other.id !== editing?.id) {
+          updatePlan(other.id, { popular: false });
+        }
+      });
+    }
     const payload = {
       tier: form.tier,
       name: form.name,
       nameAr: form.nameAr,
       tagline: form.tagline,
-      features,
+      features: form.features,
       limits: {
         agents: form.limitAgents,
         channels: form.limitChannels,
@@ -192,9 +308,14 @@ export default function AdminPlans(): JSX.Element {
   };
 
   const remove = async (p: Plan): Promise<void> => {
-    const count = clients.filter((c) => c.planId === p.id).length;
-    if (count > 0) {
-      showToast(`لا يمكن الحذف — ${count} عميل مرتبط بهذه الباقة`, 'error');
+    const linkedClients = clients.filter((c) => c.planId === p.id);
+    if (linkedClients.length > 0) {
+      const otherPlans = plans.filter((pl) => pl.id !== p.id);
+      if (otherPlans.length === 0) {
+        showToast('لا يمكن الحذف — لا توجد باقة أخرى لنقل العملاء إليها', 'error');
+        return;
+      }
+      setReassignModal({ plan: p, targetPlanId: otherPlans[0].id });
       return;
     }
     const ok = await confirm({ title: `حذف باقة ${p.nameAr}؟`, message: 'لا يمكن التراجع عن هذا الإجراء', variant: 'danger', confirmText: 'حذف' });
@@ -202,6 +323,43 @@ export default function AdminPlans(): JSX.Element {
       deletePlan(p.id);
       showToast('تم الحذف', 'success');
     }
+  };
+
+  const confirmReassign = (): void => {
+    if (!reassignModal) return;
+    const { plan, targetPlanId } = reassignModal;
+    const linkedClients = clients.filter((c) => c.planId === plan.id);
+    linkedClients.forEach((c) => updateClient(c.id, { planId: targetPlanId }));
+    deletePlan(plan.id);
+    showToast(`تم نقل ${linkedClients.length} عميل وحذف الباقة`, 'success');
+    setReassignModal(null);
+  };
+
+  const setMonthlyPrice = (countryCode: string, monthly: number): void => {
+    const current = form.pricesPerCountry[countryCode] ?? { monthly: 0, yearly: 0 };
+    const autoYearly = current.yearly === 0 || current.yearly === current.monthly * 10
+      ? monthly * 10
+      : current.yearly;
+    setForm({
+      ...form,
+      pricesPerCountry: { ...form.pricesPerCountry, [countryCode]: { monthly, yearly: autoYearly } },
+    });
+  };
+
+  const toggleFeature = (feature: string): void => {
+    const s = new Set(form.features);
+    if (s.has(feature)) s.delete(feature);
+    else s.add(feature);
+    setForm({ ...form, features: Array.from(s) });
+  };
+
+  const toggleExpandedFeatures = (planId: string): void => {
+    setExpandedFeatures((prev) => {
+      const s = new Set(prev);
+      if (s.has(planId)) s.delete(planId);
+      else s.add(planId);
+      return s;
+    });
   };
 
   const previewC = countries.find((c) => c.code === previewCountry);
@@ -215,9 +373,31 @@ export default function AdminPlans(): JSX.Element {
             <h2 className="text-2xl font-bold">الباقات والأسعار</h2>
             <p className="text-sm text-muted-foreground">أدر الباقات والأسعار حسب الدولة</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <Select value={tierFilter} onValueChange={(v) => setTierFilter(v as 'all' | PlanTier)}>
+              <SelectTrigger className="h-9 w-[130px] rounded-lg text-sm">
+                <SelectValue placeholder="كل الفئات" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">كل الفئات</SelectItem>
+                <SelectItem value="starter">مبتدئ</SelectItem>
+                <SelectItem value="pro">احترافي</SelectItem>
+                <SelectItem value="business">أعمال</SelectItem>
+                <SelectItem value="enterprise">مؤسسات</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={activeFilter} onValueChange={(v) => setActiveFilter(v as 'all' | 'active' | 'inactive')}>
+              <SelectTrigger className="h-9 w-[130px] rounded-lg text-sm">
+                <SelectValue placeholder="كل الحالات" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">كل الحالات</SelectItem>
+                <SelectItem value="active">نشطة</SelectItem>
+                <SelectItem value="inactive">معطّلة</SelectItem>
+              </SelectContent>
+            </Select>
             <Select value={previewCountry} onValueChange={setPreviewCountry}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[160px] h-9 rounded-lg">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -226,15 +406,33 @@ export default function AdminPlans(): JSX.Element {
                 ))}
               </SelectContent>
             </Select>
-            <Button onClick={openCreate} className="rounded-full">
+            <Button onClick={openCreate} className="h-9 rounded-lg">
               <Plus className="h-4 w-4 me-2" /> باقة جديدة
             </Button>
           </div>
         </div>
 
+        {/* Empty state */}
+        {filteredPlans.length === 0 && (
+          <div className="rounded-xl border-2 border-dashed bg-card p-12 text-center">
+            <Sparkles className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
+            <p className="text-lg font-semibold mb-1">
+              {plans.length === 0 ? 'لا توجد باقات بعد' : 'لا توجد نتائج مطابقة'}
+            </p>
+            <p className="text-sm text-muted-foreground mb-4">
+              {plans.length === 0 ? 'ابدأ بإنشاء باقة جديدة لعملائك' : 'جرّب تعديل الفلاتر أعلاه'}
+            </p>
+            {plans.length === 0 && (
+              <Button onClick={openCreate}>
+                <Plus className="h-4 w-4 me-2" /> إنشاء أول باقة
+              </Button>
+            )}
+          </div>
+        )}
+
         {/* Plan cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-          {plans.map((p) => {
+          {filteredPlans.map((p) => {
             const style = tierStyle[p.tier];
             const price = p.pricesPerCountry[previewCountry] ?? { monthly: 0, yearly: 0 };
             const clientCount = clients.filter((c) => c.planId === p.id).length;
@@ -242,14 +440,22 @@ export default function AdminPlans(): JSX.Element {
               .filter((c) => c.planId === p.id && c.status === 'active')
               .reduce((acc, c) => acc + c.mrr, 0);
 
+            const yearlyDiscountPct = price.monthly > 0 && price.yearly > 0 && price.yearly < price.monthly * 12
+              ? Math.round(((price.monthly * 12 - price.yearly) / (price.monthly * 12)) * 100)
+              : 0;
+            const isExpanded = expandedFeatures.has(p.id);
+            const visibleFeatures = isExpanded ? p.features : p.features.slice(0, 6);
+
             return (
               <Card
                 key={p.id}
+                ref={(el) => { cardRefs.current[p.id] = el; }}
                 className={cn(
-                  'relative bg-gradient-to-br p-0 transition-all hover:shadow-lg',
+                  'relative bg-gradient-to-br p-0 transition-all hover:shadow-lg flex flex-col',
                   style.bg,
                   p.popular ? `ring-2 ${style.ring}` : 'border',
-                  !p.active && 'opacity-60'
+                  !p.active && 'opacity-70',
+                  copiedId === p.id && 'animate-copied-pulse'
                 )}
               >
                 {p.popular && (
@@ -260,14 +466,21 @@ export default function AdminPlans(): JSX.Element {
                 )}
 
                 <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between gap-2">
                     <h3 className={cn('text-xl font-extrabold', style.text)}>{p.nameAr}</h3>
-                    <Badge variant={tierBadgeVariant[p.tier]}>{p.tier}</Badge>
+                    <div className="flex items-center gap-1.5 flex-wrap justify-end">
+                      <Badge variant={tierBadgeVariant[p.tier]}>{tierLabel[p.tier]}</Badge>
+                      {!p.active && (
+                        <Badge className="bg-muted text-muted-foreground border-transparent text-[10px]">
+                          معطّلة
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                   <p className="text-sm text-muted-foreground line-clamp-2 min-h-[2.5em]">{p.tagline}</p>
                 </CardHeader>
 
-                <CardContent className="space-y-3">
+                <CardContent className="space-y-3 flex-1 flex flex-col">
                   {/* Pricing */}
                   <div className="pb-3">
                     <p className="text-3xl font-extrabold">
@@ -275,7 +488,10 @@ export default function AdminPlans(): JSX.Element {
                       <span className="text-sm font-medium text-muted-foreground"> / شهر</span>
                     </p>
                     <p className="text-sm text-muted-foreground mt-0.5">
-                      {formatMoney(price.yearly, previewC?.currency ?? 'USD')} سنوياً (وفّر شهرين)
+                      {formatMoney(price.yearly, previewC?.currency ?? 'USD')} سنوياً
+                      {yearlyDiscountPct > 0 && (
+                        <span className="text-emerald-600 font-semibold ms-1">(وفّر {yearlyDiscountPct}%)</span>
+                      )}
                     </p>
                   </div>
 
@@ -291,15 +507,25 @@ export default function AdminPlans(): JSX.Element {
 
                   {/* Features */}
                   <ul className="space-y-1.5 text-sm">
-                    {p.features.slice(0, 6).map((f, i) => (
+                    {visibleFeatures.map((f, i) => (
                       <li key={i} className="flex items-start gap-1.5">
                         <Check className="h-3.5 w-3.5 text-emerald-500 flex-shrink-0 mt-0.5" />
                         <span>{f}</span>
                       </li>
                     ))}
                     {p.features.length > 6 && (
-                      <li className="text-sm text-muted-foreground">
-                        +{p.features.length - 6} ميزة أخرى
+                      <li>
+                        <button
+                          type="button"
+                          onClick={() => toggleExpandedFeatures(p.id)}
+                          className="text-xs text-primary hover:underline inline-flex items-center gap-1"
+                        >
+                          {isExpanded ? (
+                            <>عرض أقل <ChevronUp className="h-3 w-3" /></>
+                          ) : (
+                            <>+{p.features.length - 6} ميزة أخرى <ChevronDown className="h-3 w-3" /></>
+                          )}
+                        </button>
                       </li>
                     )}
                   </ul>
@@ -440,27 +666,58 @@ export default function AdminPlans(): JSX.Element {
                 <Input value={form.tagline} onChange={(e) => setForm({ ...form, tagline: e.target.value })} placeholder="للشركات النامية" />
               </div>
 
-              <div className="space-y-2">
-                <Label>الميزات (كل ميزة في سطر)</Label>
-                <Textarea value={form.features} onChange={(e) => setForm({ ...form, features: e.target.value })} rows={6} placeholder={'حتى 10 موظفين\n3 أرقام واتساب\n...'} />
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label>الميزات</Label>
+                  <span className="text-xs text-muted-foreground">
+                    {form.features.length} ميزة مفعّلة
+                  </span>
+                </div>
+                <div className="space-y-3 rounded-xl border bg-muted/30 p-3 max-h-72 overflow-y-auto">
+                  {FEATURE_CATALOG.map((group) => (
+                    <div key={group.label} className="space-y-2">
+                      <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                        <group.icon className="h-3.5 w-3.5" />
+                        {group.label}
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {group.items.map((feature) => {
+                          const enabled = form.features.includes(feature);
+                          return (
+                            <label
+                              key={feature}
+                              className={cn(
+                                'flex items-center justify-between gap-2 p-2.5 rounded-lg border bg-background cursor-pointer transition-colors',
+                                enabled && 'border-primary/40 bg-primary/5'
+                              )}
+                            >
+                              <span className="text-sm">{feature}</span>
+                              <Switch checked={enabled} onCheckedChange={() => toggleFeature(feature)} />
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div className="space-y-2">
                   <Label>حد الموظفين (-1 = ∞)</Label>
-                  <Input type="number" value={form.limitAgents} onChange={(e) => setForm({ ...form, limitAgents: Number(e.target.value) })} />
+                  <Input type="number" min={-1} value={form.limitAgents} onChange={(e) => setForm({ ...form, limitAgents: Number(e.target.value) || 0 })} />
                 </div>
                 <div className="space-y-2">
                   <Label>حد القنوات (-1 = ∞)</Label>
-                  <Input type="number" value={form.limitChannels} onChange={(e) => setForm({ ...form, limitChannels: Number(e.target.value) })} />
+                  <Input type="number" min={-1} value={form.limitChannels} onChange={(e) => setForm({ ...form, limitChannels: Number(e.target.value) || 0 })} />
                 </div>
                 <div className="space-y-2">
                   <Label>محادثات/شهر (-1 = ∞)</Label>
-                  <Input type="number" value={form.limitConversations} onChange={(e) => setForm({ ...form, limitConversations: Number(e.target.value) })} />
+                  <Input type="number" min={-1} value={form.limitConversations} onChange={(e) => setForm({ ...form, limitConversations: Number(e.target.value) || 0 })} />
                 </div>
                 <div className="space-y-2">
                   <Label>جهات اتصال (-1 = ∞)</Label>
-                  <Input type="number" value={form.limitContacts} onChange={(e) => setForm({ ...form, limitContacts: Number(e.target.value) })} />
+                  <Input type="number" min={-1} value={form.limitContacts} onChange={(e) => setForm({ ...form, limitContacts: Number(e.target.value) || 0 })} />
                 </div>
               </div>
 
@@ -475,8 +732,9 @@ export default function AdminPlans(): JSX.Element {
                         <div className="relative">
                           <Input
                             type="number"
+                            min={0}
                             value={price.monthly}
-                            onChange={(e) => setForm({ ...form, pricesPerCountry: { ...form.pricesPerCountry, [co.code]: { ...price, monthly: Number(e.target.value) } } })}
+                            onChange={(e) => setMonthlyPrice(co.code, Number(e.target.value) || 0)}
                             placeholder="شهري"
                             className="font-mono"
                           />
@@ -485,8 +743,9 @@ export default function AdminPlans(): JSX.Element {
                         <div className="relative">
                           <Input
                             type="number"
+                            min={0}
                             value={price.yearly}
-                            onChange={(e) => setForm({ ...form, pricesPerCountry: { ...form.pricesPerCountry, [co.code]: { ...price, yearly: Number(e.target.value) } } })}
+                            onChange={(e) => setForm({ ...form, pricesPerCountry: { ...form.pricesPerCountry, [co.code]: { ...price, yearly: Number(e.target.value) || 0 } } })}
                             placeholder="سنوي"
                             className="font-mono"
                           />
@@ -519,6 +778,50 @@ export default function AdminPlans(): JSX.Element {
             <DialogFooter className="gap-2 sm:gap-0">
               <Button variant="outline" onClick={() => setModalOpen(false)}>إلغاء</Button>
               <Button onClick={submit}>{editing ? 'حفظ' : 'إنشاء'}</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Reassign clients before delete */}
+        <Dialog open={!!reassignModal} onOpenChange={(open) => { if (!open) setReassignModal(null); }}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>نقل العملاء قبل الحذف</DialogTitle>
+              <DialogDescription>
+                {reassignModal && (
+                  <>
+                    باقة <span className="font-bold text-foreground">{reassignModal.plan.nameAr}</span> مرتبطة بـ{' '}
+                    <span className="font-bold text-foreground">{clients.filter((c) => c.planId === reassignModal.plan.id).length}</span> عميل.
+                    اختر باقة بديلة لنقلهم إليها، ثم سيتم حذف الباقة الأصلية.
+                  </>
+                )}
+              </DialogDescription>
+            </DialogHeader>
+            {reassignModal && (
+              <div className="space-y-2 py-2">
+                <Label>الباقة البديلة</Label>
+                <Select
+                  value={reassignModal.targetPlanId}
+                  onValueChange={(v) => setReassignModal({ ...reassignModal, targetPlanId: v })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {plans.filter((pl) => pl.id !== reassignModal.plan.id).map((pl) => (
+                      <SelectItem key={pl.id} value={pl.id}>
+                        {pl.nameAr} ({tierLabel[pl.tier]})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button variant="outline" onClick={() => setReassignModal(null)}>إلغاء</Button>
+              <Button className="bg-destructive hover:bg-destructive/90 text-destructive-foreground" onClick={confirmReassign}>
+                نقل وحذف
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
