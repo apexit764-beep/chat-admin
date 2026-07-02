@@ -294,7 +294,7 @@ export default function AdminClients(): JSX.Element {
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10"
+            className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted"
             onClick={() => navigate(`/clients/${r.id}`)}
             title="عرض التفاصيل"
             aria-label="عرض التفاصيل"
@@ -304,7 +304,7 @@ export default function AdminClients(): JSX.Element {
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10"
+            className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted"
             onClick={() => openEdit(r)}
             title="تعديل"
             aria-label="تعديل"
@@ -315,7 +315,7 @@ export default function AdminClients(): JSX.Element {
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 rounded-lg text-muted-foreground hover:text-success hover:bg-success/10"
+              className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted"
               onClick={() => { reactivateClient(r.id); showToast('تم التفعيل', 'success'); }}
               title="إعادة تفعيل"
               aria-label="إعادة تفعيل"
@@ -326,7 +326,7 @@ export default function AdminClients(): JSX.Element {
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 rounded-lg text-muted-foreground hover:text-warning hover:bg-warning/10"
+              className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted"
               onClick={() => handleSuspend(r)}
               title="إيقاف"
               aria-label="إيقاف"
@@ -337,7 +337,7 @@ export default function AdminClients(): JSX.Element {
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 rounded-lg text-muted-foreground hover:text-danger hover:bg-danger/10"
+            className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted"
             onClick={() => remove(r)}
             title="حذف"
             aria-label="حذف"
