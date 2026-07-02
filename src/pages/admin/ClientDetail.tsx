@@ -256,7 +256,7 @@ export default function ClientDetail(): JSX.Element {
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
         {/* Tabs area */}
         <Tabs defaultValue="overview" dir="rtl">
-          <TabsList className="w-full justify-start overflow-x-auto flex-nowrap bg-transparent border-b rounded-none h-auto p-0 gap-0">
+          <TabsList className="w-full justify-start overflow-x-auto flex-nowrap bg-card border rounded-xl h-auto p-1 gap-1">
             {[
               { value: 'overview', label: 'نظرة عامة', icon: Activity },
               { value: 'invoices', label: 'الفواتير', icon: FileText },
@@ -270,7 +270,7 @@ export default function ClientDetail(): JSX.Element {
               <TabsTrigger
                 key={tab.value}
                 value={tab.value}
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-2.5 text-sm gap-1.5"
+                className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm hover:bg-muted/60 px-3 py-2 text-sm gap-1.5 flex-shrink-0 transition-colors"
               >
                 <tab.icon className="h-4 w-4" />
                 {tab.label}
@@ -289,37 +289,69 @@ export default function ClientDetail(): JSX.Element {
             </div>
 
             {/* Timeline */}
-            <div className="rounded-xl border bg-card p-4">
-              <h3 className="font-semibold mb-4 text-sm">الجدول الزمني</h3>
-              <div className="space-y-4">
-                <TimelineItem icon={Calendar} label="تاريخ الانضمام" value={formatDate(client.joinedAt)} />
-                <TimelineItem icon={Clock} label="آخر نشاط" value={timeAgo(client.lastActiveAt)} />
-                {client.trialEndsAt && (
-                  <TimelineItem
-                    icon={AlertTriangle}
-                    label="انتهاء التجربة"
-                    value={formatDate(client.trialEndsAt)}
-                    className={Date.parse(client.trialEndsAt) < Date.now() + 3 * 86400000 ? 'text-warning' : ''}
-                  />
-                )}
-                {sub && <TimelineItem icon={CreditCard} label="بداية الاشتراك" value={formatDate(sub.startedAt)} />}
-                {sub && <TimelineItem icon={Calendar} label="التجديد القادم" value={formatDate(sub.currentPeriodEnd)} />}
+            <div className="rounded-xl border bg-card p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Clock className="h-4 w-4 text-primary" />
+                </div>
+                <h3 className="font-semibold text-sm">الجدول الزمني</h3>
+              </div>
+              <div className="relative">
+                {(() => {
+                  const items = [
+                    { icon: Calendar, label: 'تاريخ الانضمام', value: formatDate(client.joinedAt), tone: 'success' as const },
+                    { icon: Clock, label: 'آخر نشاط', value: timeAgo(client.lastActiveAt), tone: 'info' as const },
+                    ...(client.trialEndsAt ? [{
+                      icon: AlertTriangle,
+                      label: 'انتهاء التجربة',
+                      value: formatDate(client.trialEndsAt),
+                      tone: (Date.parse(client.trialEndsAt) < Date.now() + 3 * 86400000 ? 'warning' : 'muted') as 'warning' | 'muted',
+                    }] : []),
+                    ...(sub ? [{ icon: CreditCard, label: 'بداية الاشتراك', value: formatDate(sub.startedAt), tone: 'success' as const }] : []),
+                    ...(sub ? [{ icon: Calendar, label: 'التجديد القادم', value: formatDate(sub.currentPeriodEnd), tone: 'primary' as const }] : []),
+                  ];
+                  return (
+                    <div className="space-y-4">
+                      {items.map((item, i) => (
+                        <TimelineItem
+                          key={i}
+                          icon={item.icon}
+                          label={item.label}
+                          value={item.value}
+                          tone={item.tone}
+                          isLast={i === items.length - 1}
+                        />
+                      ))}
+                    </div>
+                  );
+                })()}
               </div>
             </div>
 
             {/* Recent invoices mini */}
             {clientInvoices.length > 0 && (
-              <div className="rounded-xl border bg-card p-4">
-                <h3 className="font-semibold mb-3 text-sm">آخر الفواتير</h3>
+              <div className="rounded-xl border bg-card p-5">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="h-8 w-8 rounded-lg bg-success/10 flex items-center justify-center">
+                      <FileText className="h-4 w-4 text-success" />
+                    </div>
+                    <h3 className="font-semibold text-sm">آخر الفواتير</h3>
+                  </div>
+                  <span className="text-xs text-muted-foreground">{clientInvoices.length} فاتورة</span>
+                </div>
                 <div className="space-y-2">
                   {clientInvoices.slice(0, 3).map((inv) => (
-                    <div key={inv.id} className="flex items-center justify-between p-2.5 rounded-lg bg-muted text-sm">
-                      <div>
-                        <span className="font-mono font-medium">{inv.number}</span>
-                        <span className="text-muted-foreground ms-2 text-xs">{formatDate(inv.dueDate)}</span>
+                    <div key={inv.id} className="flex items-center gap-3 p-3 rounded-lg border bg-background hover:bg-muted/30 transition-colors">
+                      <div className="h-9 w-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                        <FileText className="h-4 w-4 text-muted-foreground" />
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold">{formatMoney(inv.total, inv.currency)}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-mono font-semibold text-sm">{inv.number}</p>
+                        <p className="text-xs text-muted-foreground">{formatDate(inv.dueDate)}</p>
+                      </div>
+                      <div className="flex flex-col items-end gap-1">
+                        <span className="font-bold text-sm">{formatMoney(inv.total, inv.currency)}</span>
                         <InvoiceStatusBadge status={inv.status} />
                       </div>
                     </div>
@@ -671,15 +703,20 @@ export default function ClientDetail(): JSX.Element {
                 </div>
                 الباقة الحالية
               </h3>
-              <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
-                <p className="font-bold text-primary">{plan.nameAr}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{plan.tagline}</p>
-                {sub && (
-                  <p className="text-sm font-semibold mt-2">
-                    {formatMoney(sub.amount, sub.currency)}
-                    <span className="text-xs text-muted-foreground font-normal"> / {sub.billingCycle === 'monthly' ? 'شهر' : 'سنة'}</span>
-                  </p>
-                )}
+              <div className="relative p-4 rounded-lg bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border border-primary/20 overflow-hidden">
+                <div className="absolute -top-8 -left-8 h-24 w-24 rounded-full bg-primary/10 blur-2xl" aria-hidden="true" />
+                <div className="relative">
+                  <p className="font-bold text-primary text-base">{plan.nameAr}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{plan.tagline}</p>
+                  {sub && (
+                    <div className="mt-3 pt-3 border-t border-primary/15">
+                      <p className="text-xl font-bold">
+                        {formatMoney(sub.amount, sub.currency)}
+                        <span className="text-xs text-muted-foreground font-normal ms-1">/ {sub.billingCycle === 'monthly' ? 'شهر' : 'سنة'}</span>
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}
@@ -772,25 +809,38 @@ function QuickStat({ icon: Icon, label, value, color = 'primary' }: { icon: Reac
     warning: 'bg-warning/10 text-warning',
   };
   return (
-    <div className="rounded-xl border bg-card p-4">
-      <div className={cn('h-9 w-9 rounded-xl flex items-center justify-center mb-2', colorMap[color] ?? colorMap.primary)}>
-        <Icon className="h-4.5 w-4.5" />
+    <div className="rounded-xl border bg-card p-4 flex items-center gap-3 hover:shadow-sm transition-shadow">
+      <div className={cn('h-11 w-11 rounded-xl flex items-center justify-center shrink-0', colorMap[color] ?? colorMap.primary)}>
+        <Icon className="h-5 w-5" />
       </div>
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="text-lg font-bold mt-0.5">{value}</p>
+      <div className="min-w-0 flex-1">
+        <p className="text-xs text-muted-foreground truncate">{label}</p>
+        <p className="text-lg font-bold leading-tight mt-0.5 truncate">{value}</p>
+      </div>
     </div>
   );
 }
 
-function TimelineItem({ icon: Icon, label, value, className }: { icon: React.ElementType; label: string; value: string; className?: string }) {
+const toneMap: Record<string, string> = {
+  primary: 'bg-primary/10 text-primary',
+  success: 'bg-success/10 text-success',
+  info: 'bg-info/10 text-info',
+  warning: 'bg-warning/10 text-warning',
+  muted: 'bg-muted text-muted-foreground',
+};
+
+function TimelineItem({ icon: Icon, label, value, tone = 'muted', isLast }: { icon: React.ElementType; label: string; value: string; tone?: 'primary' | 'success' | 'info' | 'warning' | 'muted'; isLast?: boolean }) {
   return (
-    <div className="flex items-center gap-3">
-      <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center shrink-0">
-        <Icon className="h-4 w-4 text-muted-foreground" />
+    <div className="relative flex items-center gap-3">
+      {!isLast && (
+        <span className="absolute top-8 right-4 -translate-x-1/2 rtl:translate-x-1/2 w-px h-full bg-border" aria-hidden="true" />
+      )}
+      <div className={cn('h-8 w-8 rounded-full flex items-center justify-center shrink-0 relative z-10 ring-4 ring-card', toneMap[tone])}>
+        <Icon className="h-4 w-4" />
       </div>
       <div className="flex-1 flex items-center justify-between text-sm">
         <span className="text-muted-foreground">{label}</span>
-        <span className={cn('font-medium', className)}>{value}</span>
+        <span className={cn('font-medium', tone === 'warning' && 'text-warning')}>{value}</span>
       </div>
     </div>
   );
