@@ -17,10 +17,7 @@ import {
   Zap,
   Shield,
   Sparkles,
-  ChevronDown,
-  ChevronUp,
-  LayoutGrid,
-  LayoutList,
+  X,
 } from 'lucide-react';
 import { useConfirm } from '@components/ui';
 import { useAdminStore } from '@/store/useAdminStore';
@@ -171,9 +168,16 @@ export default function AdminPlans(): JSX.Element {
   const [editing, setEditing] = useState<Plan | null>(null);
   const [tierFilter, setTierFilter] = useState<'all' | PlanTier>('all');
   const [activeFilter, setActiveFilter] = useState<'all' | 'active' | 'inactive'>('all');
-  const [view, setView] = useState<'table' | 'cards'>('table');
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [expandedFeatures, setExpandedFeatures] = useState<Set<string>>(new Set());
+
+  const activeFilterCount =
+    (tierFilter !== 'all' ? 1 : 0) +
+    (activeFilter !== 'all' ? 1 : 0);
+
+  const clearFilters = (): void => {
+    setTierFilter('all');
+    setActiveFilter('all');
+  };
   const [reassignModal, setReassignModal] = useState<{ plan: Plan; targetPlanId: string } | null>(null);
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
@@ -361,27 +365,22 @@ export default function AdminPlans(): JSX.Element {
     setForm({ ...form, features: Array.from(s) });
   };
 
-  const toggleExpandedFeatures = (planId: string): void => {
-    setExpandedFeatures((prev) => {
-      const s = new Set(prev);
-      if (s.has(planId)) s.delete(planId);
-      else s.add(planId);
-      return s;
-    });
-  };
-
   const previewC = countries.find((c) => c.code === previewCountry);
 
   return (
     <TooltipProvider>
       <div className="p-4 lg:p-6 space-y-5">
         {/* Header */}
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <div>
-            <h2 className="text-2xl font-bold">الباقات والأسعار</h2>
-            <p className="text-sm text-muted-foreground">أدر الباقات والأسعار حسب الدولة</p>
-          </div>
-          <div className="flex items-center gap-2 flex-wrap">
+        <div>
+          <h2 className="text-2xl font-bold">الباقات والأسعار</h2>
+          <p className="text-sm text-muted-foreground">أدر الباقات والأسعار حسب الدولة</p>
+        </div>
+
+
+        {/* Plans table */}
+        <div className="bg-card border border-border rounded-xl overflow-hidden">
+          {/* Toolbar */}
+          <div className="p-3 flex flex-wrap items-center gap-3 border-b border-border">
             <Select value={tierFilter} onValueChange={(v) => setTierFilter(v as 'all' | PlanTier)}>
               <SelectTrigger className="h-9 w-[130px] rounded-lg text-sm">
                 <SelectValue placeholder="كل الفئات" />
@@ -405,7 +404,7 @@ export default function AdminPlans(): JSX.Element {
               </SelectContent>
             </Select>
             <Select value={previewCountry} onValueChange={setPreviewCountry}>
-              <SelectTrigger className="w-[160px] h-9 rounded-lg">
+              <SelectTrigger className="w-[160px] h-9 rounded-lg text-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -414,208 +413,48 @@ export default function AdminPlans(): JSX.Element {
                 ))}
               </SelectContent>
             </Select>
-            <div className="flex items-center gap-0.5 rounded-lg border bg-card p-0.5">
-              <button
-                type="button"
-                onClick={() => setView('table')}
-                className={cn(
-                  'flex items-center gap-1.5 px-2.5 h-8 rounded-md text-xs font-medium transition-colors',
-                  view === 'table' ? 'bg-primary text-white shadow-sm' : 'text-muted-foreground hover:text-foreground'
-                )}
-                aria-label="عرض جدول"
+            {activeFilterCount > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-9 rounded-lg text-xs text-muted-foreground hover:text-foreground gap-1.5"
+                onClick={clearFilters}
               >
-                <LayoutList className="h-3.5 w-3.5" /> جدول
-              </button>
-              <button
-                type="button"
-                onClick={() => setView('cards')}
-                className={cn(
-                  'flex items-center gap-1.5 px-2.5 h-8 rounded-md text-xs font-medium transition-colors',
-                  view === 'cards' ? 'bg-primary text-white shadow-sm' : 'text-muted-foreground hover:text-foreground'
-                )}
-                aria-label="عرض بطاقات"
-              >
-                <LayoutGrid className="h-3.5 w-3.5" /> بطاقات
-              </button>
-            </div>
-            <Button onClick={openCreate} className="h-9 rounded-lg">
+                <X className="h-3.5 w-3.5" />
+                مسح الفلاتر
+                <Badge className="h-5 px-1.5 rounded-md bg-primary/15 text-primary border-transparent text-[10px]">
+                  {activeFilterCount}
+                </Badge>
+              </Button>
+            )}
+            <Button onClick={openCreate} size="sm" className="h-9 rounded-lg ms-auto">
               <Plus className="h-4 w-4 me-2" /> باقة جديدة
             </Button>
           </div>
-        </div>
 
-        {/* Empty state */}
-        {filteredPlans.length === 0 && (
-          <div className="rounded-xl border-2 border-dashed bg-card p-12 text-center">
-            <Sparkles className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-            <p className="text-lg font-semibold mb-1">
-              {plans.length === 0 ? 'لا توجد باقات بعد' : 'لا توجد نتائج مطابقة'}
-            </p>
-            <p className="text-sm text-muted-foreground mb-4">
-              {plans.length === 0 ? 'ابدأ بإنشاء باقة جديدة لعملائك' : 'جرّب تعديل الفلاتر أعلاه'}
-            </p>
-            {plans.length === 0 && (
-              <Button onClick={openCreate}>
-                <Plus className="h-4 w-4 me-2" /> إنشاء أول باقة
-              </Button>
-            )}
-          </div>
-        )}
+          {/* Empty state inside container */}
+          {filteredPlans.length === 0 && (
+            <div className="p-12 text-center">
+              <Sparkles className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
+              <p className="text-lg font-semibold mb-1">
+                {plans.length === 0 ? 'لا توجد باقات بعد' : 'لا توجد نتائج مطابقة'}
+              </p>
+              <p className="text-sm text-muted-foreground mb-4">
+                {plans.length === 0 ? 'ابدأ بإنشاء باقة جديدة لعملائك' : 'جرّب تعديل الفلاتر أعلاه'}
+              </p>
+              {plans.length === 0 ? (
+                <Button onClick={openCreate}>
+                  <Plus className="h-4 w-4 me-2" /> إنشاء أول باقة
+                </Button>
+              ) : (
+                <Button variant="outline" onClick={clearFilters}>
+                  <X className="h-4 w-4 me-2" /> مسح الفلاتر
+                </Button>
+              )}
+            </div>
+          )}
 
-        {/* Plans view */}
-        {view === 'cards' && filteredPlans.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-          {filteredPlans.map((p) => {
-            const style = tierStyle[p.tier];
-            const price = p.pricesPerCountry[previewCountry] ?? { monthly: 0, yearly: 0 };
-            const clientCount = clients.filter((c) => c.planId === p.id).length;
-            const totalMrr = clients
-              .filter((c) => c.planId === p.id && c.status === 'active')
-              .reduce((acc, c) => acc + c.mrr, 0);
-
-            const yearlyDiscountPct = price.monthly > 0 && price.yearly > 0 && price.yearly < price.monthly * 12
-              ? Math.round(((price.monthly * 12 - price.yearly) / (price.monthly * 12)) * 100)
-              : 0;
-            const isExpanded = expandedFeatures.has(p.id);
-            const visibleFeatures = isExpanded ? p.features : p.features.slice(0, 6);
-
-            return (
-              <Card
-                key={p.id}
-                ref={(el) => { cardRefs.current[p.id] = el; }}
-                className={cn(
-                  'relative bg-gradient-to-br p-0 transition-all hover:shadow-lg flex flex-col',
-                  style.bg,
-                  p.popular ? `ring-2 ${style.ring}` : 'border',
-                  !p.active && 'opacity-70',
-                  copiedId === p.id && 'animate-copied-pulse'
-                )}
-              >
-                {p.popular && (
-                  <span className="absolute -top-3 start-1/2 -translate-x-1/2 inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary text-primary-foreground text-[10px] font-bold shadow-lg z-10">
-                    <Star className="h-3 w-3 fill-current" />
-                    الأكثر شعبية
-                  </span>
-                )}
-
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between gap-2">
-                    <h3 className={cn('text-xl font-extrabold', style.text)}>{p.nameAr}</h3>
-                    <div className="flex items-center gap-1.5 flex-wrap justify-end">
-                      <Badge variant={tierBadgeVariant[p.tier]}>{tierLabel[p.tier]}</Badge>
-                      {!p.active && (
-                        <Badge className="bg-muted text-muted-foreground border-transparent text-[10px]">
-                          معطّلة
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                  <p className="text-sm text-muted-foreground line-clamp-2 min-h-[2.5em]">{p.tagline}</p>
-                </CardHeader>
-
-                <CardContent className="space-y-3 flex-1 flex flex-col">
-                  {/* Pricing */}
-                  <div className="pb-3">
-                    <p className="text-3xl font-extrabold">
-                      {formatMoney(price.monthly, previewC?.currency ?? 'USD')}
-                      <span className="text-sm font-medium text-muted-foreground"> / شهر</span>
-                    </p>
-                    <p className="text-sm text-muted-foreground mt-0.5">
-                      {formatMoney(price.yearly, previewC?.currency ?? 'USD')} سنوياً
-                      {yearlyDiscountPct > 0 && (
-                        <span className="text-emerald-600 font-semibold ms-1">(وفّر {yearlyDiscountPct}%)</span>
-                      )}
-                    </p>
-                  </div>
-
-                  <Separator />
-
-                  {/* Limits */}
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    <LimitChip icon={<Users className="h-3.5 w-3.5" />} value={p.limits.agents === -1 ? '∞' : p.limits.agents} label="موظف" />
-                    <LimitChip icon={<MessageSquare className="h-3.5 w-3.5" />} value={p.limits.channels === -1 ? '∞' : p.limits.channels} label="قناة" />
-                    <LimitChip icon={<MessageSquare className="h-3.5 w-3.5" />} value={p.limits.conversations === -1 ? '∞' : (p.limits.conversations / 1000) + 'K'} label="محادثة" />
-                    <LimitChip icon={<Database className="h-3.5 w-3.5" />} value={p.limits.contacts === -1 ? '∞' : p.limits.contacts} label="جهة اتصال" />
-                  </div>
-
-                  {/* Features */}
-                  <ul className="space-y-1.5 text-sm">
-                    {visibleFeatures.map((f, i) => (
-                      <li key={i} className="flex items-start gap-1.5">
-                        <Check className="h-3.5 w-3.5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                        <span>{f}</span>
-                      </li>
-                    ))}
-                    {p.features.length > 6 && (
-                      <li>
-                        <button
-                          type="button"
-                          onClick={() => toggleExpandedFeatures(p.id)}
-                          className="text-xs text-primary hover:underline inline-flex items-center gap-1"
-                        >
-                          {isExpanded ? (
-                            <>عرض أقل <ChevronUp className="h-3 w-3" /></>
-                          ) : (
-                            <>+{p.features.length - 6} ميزة أخرى <ChevronDown className="h-3 w-3" /></>
-                          )}
-                        </button>
-                      </li>
-                    )}
-                  </ul>
-
-                  <Separator />
-
-                  {/* Stats */}
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-lg font-bold">{clientCount}</p>
-                      <p className="text-[10px] text-muted-foreground">عميل مشترك</p>
-                    </div>
-                    <div className="text-end">
-                      <p className="text-lg font-bold text-emerald-500">{totalMrr > 0 ? formatMoney(totalMrr, clients.find((c) => c.planId === p.id)?.currency ?? 'USD') : '—'}</p>
-                      <p className="text-[10px] text-muted-foreground">MRR</p>
-                    </div>
-                  </div>
-                </CardContent>
-
-                <CardFooter className="flex items-center gap-1 pt-0">
-                  <Button variant="outline" size="sm" className="flex-1 rounded-full" onClick={() => openEdit(p)}>
-                    <Edit2 className="h-3.5 w-3.5 me-1.5" /> تعديل
-                  </Button>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="outline" size="icon" className="rounded-full h-9 w-9" onClick={() => duplicate(p)}>
-                        <Copy className="h-3.5 w-3.5" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>نسخ</TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="outline" size="icon" className="rounded-full h-9 w-9" onClick={() => { updatePlan(p.id, { active: !p.active }); showToast(p.active ? 'تم تعطيل الباقة' : 'تم تفعيل الباقة', 'success'); }}>
-                        <Power className="h-3.5 w-3.5" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>{p.active ? 'تعطيل' : 'تفعيل'}</TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="outline" size="icon" className="rounded-full h-9 w-9 hover:text-destructive" onClick={() => remove(p)}>
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>حذف</TooltipContent>
-                  </Tooltip>
-                </CardFooter>
-              </Card>
-            );
-          })}
-        </div>
-        )}
-
-        {/* Table view */}
-        {view === 'table' && filteredPlans.length > 0 && (
-          <div className="rounded-xl border bg-card overflow-hidden">
+          {filteredPlans.length > 0 && (
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
@@ -796,8 +635,8 @@ export default function AdminPlans(): JSX.Element {
                 </TableBody>
               </Table>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Per-country pricing table */}
         <Card>
