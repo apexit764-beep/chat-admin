@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import {
   Plus,
   Download,
-  MoreHorizontal,
   Eye,
   Edit2,
   Trash2,
@@ -43,13 +42,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
 import {
   Select,
   SelectTrigger,
@@ -296,42 +288,62 @@ export default function AdminClients(): JSX.Element {
       ),
     },
     {
-      key: 'actions', header: '', sortable: false, width: '100px', align: 'end',
+      key: 'actions', header: '', sortable: false, width: '160px', align: 'end',
       cell: (r) => (
-        <div className="flex items-center gap-1 justify-end" onClick={(e) => e.stopPropagation()}>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground" aria-label="المزيد">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem onClick={() => navigate(`/clients/${r.id}`)}>
-                <Eye className="h-4 w-4 me-2" />
-                عرض التفاصيل
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => openEdit(r)}>
-                <Edit2 className="h-4 w-4 me-2" />
-                تعديل
-              </DropdownMenuItem>
-              {r.status === 'suspended' ? (
-                <DropdownMenuItem onClick={() => { reactivateClient(r.id); showToast('تم التفعيل', 'success'); }}>
-                  <PlayCircle className="h-4 w-4 me-2" />
-                  إعادة تفعيل
-                </DropdownMenuItem>
-              ) : (
-                <DropdownMenuItem onClick={() => handleSuspend(r)}>
-                  <PauseCircle className="h-4 w-4 me-2" />
-                  إيقاف
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-danger focus:text-danger" onClick={() => remove(r)}>
-                <Trash2 className="h-4 w-4 me-2" />
-                حذف
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <div className="flex items-center gap-0.5 justify-end" onClick={(e) => e.stopPropagation()}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10"
+            onClick={() => navigate(`/clients/${r.id}`)}
+            title="عرض التفاصيل"
+            aria-label="عرض التفاصيل"
+          >
+            <Eye className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10"
+            onClick={() => openEdit(r)}
+            title="تعديل"
+            aria-label="تعديل"
+          >
+            <Edit2 className="h-4 w-4" />
+          </Button>
+          {r.status === 'suspended' ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-lg text-muted-foreground hover:text-success hover:bg-success/10"
+              onClick={() => { reactivateClient(r.id); showToast('تم التفعيل', 'success'); }}
+              title="إعادة تفعيل"
+              aria-label="إعادة تفعيل"
+            >
+              <PlayCircle className="h-4 w-4" />
+            </Button>
+          ) : (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-lg text-muted-foreground hover:text-warning hover:bg-warning/10"
+              onClick={() => handleSuspend(r)}
+              title="إيقاف"
+              aria-label="إيقاف"
+            >
+              <PauseCircle className="h-4 w-4" />
+            </Button>
+          )}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 rounded-lg text-muted-foreground hover:text-danger hover:bg-danger/10"
+            onClick={() => remove(r)}
+            title="حذف"
+            aria-label="حذف"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
         </div>
       ),
     },
