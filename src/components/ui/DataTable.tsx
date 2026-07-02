@@ -213,6 +213,7 @@ export function DataTable<T>({
                   />
                 </th>
               )}
+              <th className="px-3 py-2.5 w-12 text-start font-medium">#</th>
               {columns.map((col) => {
                 const isSorted = sortKey === col.key;
                 const isSortable = col.sortable !== false && !!col.accessor;
@@ -245,7 +246,7 @@ export function DataTable<T>({
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {pageRows.map((row) => {
+            {pageRows.map((row, idx) => {
               const id = rowKey(row);
               const isSelected = selected.has(id);
               return (
@@ -270,6 +271,9 @@ export function DataTable<T>({
                       />
                     </td>
                   )}
+                  <td className="px-3 py-2.5 w-12 text-start text-xs text-muted-foreground font-mono">
+                    {start + idx + 1}
+                  </td>
                   {columns.map((col) => (
                     <td
                       key={col.key}
@@ -288,7 +292,7 @@ export function DataTable<T>({
             })}
             {pageRows.length === 0 && (
               <tr>
-                <td colSpan={columns.length + (selectable ? 1 : 0)} className="px-3 py-12 text-center">
+                <td colSpan={columns.length + 1 + (selectable ? 1 : 0)} className="px-3 py-12 text-center">
                   {emptyState ?? (
                     <div className="flex flex-col items-center text-center">
                       <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground mb-2">

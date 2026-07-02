@@ -459,6 +459,7 @@ export default function AdminPlans(): JSX.Element {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="text-start w-12">#</TableHead>
                     <TableHead className="text-start">الباقة</TableHead>
                     <TableHead className="text-start">الحالة</TableHead>
                     <TableHead className="text-start">السعر ({previewC?.currency ?? '—'})</TableHead>
@@ -470,7 +471,7 @@ export default function AdminPlans(): JSX.Element {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredPlans.map((p) => {
+                  {filteredPlans.map((p, idx) => {
                     const style = tierStyle[p.tier];
                     const price = p.pricesPerCountry[previewCountry] ?? { monthly: 0, yearly: 0 };
                     const clientCount = clients.filter((c) => c.planId === p.id).length;
@@ -490,6 +491,9 @@ export default function AdminPlans(): JSX.Element {
                           copiedId === p.id && 'animate-copied-pulse'
                         )}
                       >
+                        <TableCell className="text-xs text-muted-foreground font-mono">
+                          {idx + 1}
+                        </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2 min-w-0">
                             {p.popular && (

@@ -230,6 +230,7 @@ export default function AdminFinance(): JSX.Element {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead className="text-start w-12">#</TableHead>
                       <TableHead className="text-start">رقم الفاتورة</TableHead>
                       <TableHead className="text-start">العميل</TableHead>
                       <TableHead className="text-start hidden md:table-cell">الإجمالي</TableHead>
@@ -239,10 +240,11 @@ export default function AdminFinance(): JSX.Element {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredInvoices.map((inv) => {
+                    {filteredInvoices.map((inv, idx) => {
                       const client = clients.find((c) => c.id === inv.clientId);
                       return (
                         <TableRow key={inv.id}>
+                          <TableCell className="text-xs text-muted-foreground font-mono">{idx + 1}</TableCell>
                           <TableCell className="font-mono font-semibold">{inv.number}</TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
@@ -311,6 +313,7 @@ export default function AdminFinance(): JSX.Element {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead className="text-start w-12">#</TableHead>
                       <TableHead className="text-start">Transaction ID</TableHead>
                       <TableHead className="text-start">العميل</TableHead>
                       <TableHead className="text-start">المبلغ</TableHead>
@@ -320,10 +323,11 @@ export default function AdminFinance(): JSX.Element {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {transactions.slice(0, 100).map((t) => {
+                    {transactions.slice(0, 100).map((t, idx) => {
                       const client = clients.find((c) => c.id === t.clientId);
                       return (
                         <TableRow key={t.id}>
+                          <TableCell className="text-xs text-muted-foreground font-mono">{idx + 1}</TableCell>
                           <TableCell className="font-mono text-sm">{t.paymobTransactionId}</TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">

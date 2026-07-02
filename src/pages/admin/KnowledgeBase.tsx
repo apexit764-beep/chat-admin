@@ -294,6 +294,7 @@ export default function KnowledgeBase(): JSX.Element {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead className="w-12">#</TableHead>
                       <TableHead>العنوان</TableHead>
                       <TableHead>التصنيف</TableHead>
                       <TableHead className="text-center">المشاهدات</TableHead>
@@ -304,8 +305,9 @@ export default function KnowledgeBase(): JSX.Element {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filtered.map((article) => (
+                    {filtered.map((article, idx) => (
                       <TableRow key={article.id}>
+                        <TableCell className="text-xs text-muted-foreground font-mono">{idx + 1}</TableCell>
                         <TableCell className="font-medium max-w-[250px] truncate">
                           {article.title}
                         </TableCell>

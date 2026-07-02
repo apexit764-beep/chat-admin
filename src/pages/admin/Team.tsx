@@ -757,6 +757,7 @@ export default function AdminTeam(): JSX.Element {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-12">#</TableHead>
                 <TableHead className="w-[280px]">العضو</TableHead>
                 <TableHead>الدور</TableHead>
                 <TableHead>الحالة</TableHead>
@@ -768,15 +769,16 @@ export default function AdminTeam(): JSX.Element {
             <TableBody>
               {filtered.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
+                  <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
                     لا توجد نتائج
                   </TableCell>
                 </TableRow>
               ) : (
-                filtered.map((u) => {
+                filtered.map((u, idx) => {
                   const RoleIcon = roleIcon[u.role];
                   return (
                     <TableRow key={u.id} className="group">
+                      <TableCell className="text-xs text-muted-foreground font-mono">{idx + 1}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-3">
                           <div className="relative">

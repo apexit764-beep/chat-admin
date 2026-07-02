@@ -236,6 +236,7 @@ export default function AdminReports(): JSX.Element {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted">
+                <TableHead className="text-start w-12">#</TableHead>
                 <TableHead className="text-start">الدولة</TableHead>
                 <TableHead className="text-start">عدد العملاء</TableHead>
                 <TableHead className="text-start">الإيراد الشهري</TableHead>
@@ -244,10 +245,11 @@ export default function AdminReports(): JSX.Element {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {byCountry.map((x) => {
+              {byCountry.map((x, idx) => {
                 const share = clients.length ? (x.count / clients.length) * 100 : 0;
                 return (
                   <TableRow key={x.country.code}>
+                    <TableCell className="text-xs text-muted-foreground font-mono">{idx + 1}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <span className="text-2xl">{x.country.flag}</span>
@@ -307,6 +309,7 @@ export default function AdminReports(): JSX.Element {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted">
+                <TableHead className="text-start w-12">#</TableHead>
                 <TableHead className="text-start">العميل</TableHead>
                 <TableHead className="text-start">الحالة</TableHead>
                 <TableHead className="text-start">النشاط</TableHead>
@@ -315,8 +318,9 @@ export default function AdminReports(): JSX.Element {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {clientHealthScores.map((h) => (
+              {clientHealthScores.map((h, idx) => (
                 <TableRow key={h.client.id}>
+                  <TableCell className="text-xs text-muted-foreground font-mono">{idx + 1}</TableCell>
                   <TableCell>
                     <div>
                       <p className="font-semibold text-sm">{h.client.companyName}</p>

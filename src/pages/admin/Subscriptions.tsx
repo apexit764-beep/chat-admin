@@ -232,6 +232,7 @@ export default function AdminSubscriptions(): JSX.Element {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-12">#</TableHead>
                 <TableHead className="w-[260px]">العميل</TableHead>
                 <TableHead>الباقة</TableHead>
                 <TableHead>الحالة</TableHead>
@@ -244,16 +245,17 @@ export default function AdminSubscriptions(): JSX.Element {
             <TableBody>
               {filtered.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
+                  <TableCell colSpan={8} className="text-center py-12 text-muted-foreground">
                     لا توجد اشتراكات مطابقة
                   </TableCell>
                 </TableRow>
               ) : (
-                filtered.map(({ sub, client, plan }) => {
+                filtered.map(({ sub, client, plan }, idx) => {
                   const renewDays = daysUntil(sub.currentPeriodEnd);
                   const soon = sub.status === 'active' && renewDays >= 0 && renewDays <= 7;
                   return (
                     <TableRow key={sub.id} className="group">
+                      <TableCell className="text-xs text-muted-foreground font-mono">{idx + 1}</TableCell>
                       <TableCell>
                         <button
                           onClick={() => client && navigate(`/clients/${client.id}`)}

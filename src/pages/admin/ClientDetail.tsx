@@ -367,6 +367,7 @@ export default function ClientDetail(): JSX.Element {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="text-right w-12">#</TableHead>
                     <TableHead className="text-right">رقم الفاتورة</TableHead>
                     <TableHead className="text-right">التاريخ</TableHead>
                     <TableHead className="text-right">المبلغ</TableHead>
@@ -378,11 +379,12 @@ export default function ClientDetail(): JSX.Element {
                 <TableBody>
                   {clientInvoices.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">لا توجد فواتير</TableCell>
+                      <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">لا توجد فواتير</TableCell>
                     </TableRow>
                   ) : (
-                    clientInvoices.map((inv) => (
+                    clientInvoices.map((inv, idx) => (
                       <TableRow key={inv.id}>
+                        <TableCell className="text-xs text-muted-foreground font-mono">{idx + 1}</TableCell>
                         <TableCell className="font-mono font-medium">{inv.number}</TableCell>
                         <TableCell className="text-muted-foreground">{formatDate(inv.dueDate)}</TableCell>
                         <TableCell>{formatMoney(inv.amount, inv.currency)}</TableCell>
@@ -405,6 +407,7 @@ export default function ClientDetail(): JSX.Element {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead className="text-right w-12">#</TableHead>
                       <TableHead className="text-right">المعرّف</TableHead>
                       <TableHead className="text-right">التاريخ</TableHead>
                       <TableHead className="text-right">المبلغ</TableHead>
@@ -413,8 +416,9 @@ export default function ClientDetail(): JSX.Element {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {clientTransactions.map((txn) => (
+                    {clientTransactions.map((txn, idx) => (
                       <TableRow key={txn.id}>
+                        <TableCell className="text-xs text-muted-foreground font-mono">{idx + 1}</TableCell>
                         <TableCell className="font-mono text-xs">{txn.id.slice(0, 12)}...</TableCell>
                         <TableCell className="text-muted-foreground">{formatDate(txn.createdAt)}</TableCell>
                         <TableCell className="font-semibold">{formatMoney(txn.amount, txn.currency)}</TableCell>
