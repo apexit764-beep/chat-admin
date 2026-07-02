@@ -213,14 +213,44 @@ export default function AdminDashboard(): JSX.Element {
             iconBg="bg-amber-500/10"
           />
         </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <MiniStat
+            label="إجمالي المحادثات"
+            value={platformStatsData.totalConversations.toLocaleString()}
+            sub={`${platformStatsData.activeConversations.toLocaleString()} نشطة الآن`}
+            icon={<MessageSquare className="h-4 w-4" />}
+            color="text-violet-600 dark:text-violet-400"
+            iconBg="bg-violet-500/10"
+          />
+          <MiniStat
+            label="إجمالي القنوات"
+            value={platformStatsData.totalChannels}
+            sub={`${platformStatsData.onlineAgents} وكيل متصل`}
+            icon={<Radio className="h-4 w-4" />}
+            color="text-cyan-600 dark:text-cyan-400"
+            iconBg="bg-cyan-500/10"
+          />
+          <MiniStat
+            label="الحملات النشطة"
+            value={campaignStatsData.activeCampaigns}
+            sub={`من ${campaignStatsData.totalCampaigns} حملة`}
+            icon={<Send className="h-4 w-4" />}
+            color="text-rose-600 dark:text-rose-400"
+            iconBg="bg-rose-500/10"
+          />
+          <MiniStat
+            label="رضا العملاء"
+            value={`${satisfactionStatsData.avgRating}/5`}
+            sub={`${satisfactionStatsData.totalRatings.toLocaleString()} تقييم`}
+            icon={<Star className="h-4 w-4" />}
+            color="text-yellow-600 dark:text-yellow-400"
+            iconBg="bg-yellow-500/10"
+          />
+        </div>
       </section>
 
       {/* ═══════════════ Section 2: الأداء المالي ═══════════════ */}
       <section className="space-y-3">
-        <div className="flex items-center gap-2">
-          <h3 className="text-sm font-semibold text-muted-foreground">الأداء المالي</h3>
-          <div className="flex-1 h-px bg-border/40" />
-        </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <Card>
             <CardHeader className="pb-2">
@@ -277,45 +307,6 @@ export default function AdminDashboard(): JSX.Element {
 
       {/* ═══════════════ Section 3: نشاط المنصّة ═══════════════ */}
       <section className="space-y-3">
-        <div className="flex items-center gap-2">
-          <h3 className="text-sm font-semibold text-muted-foreground">نشاط المنصّة</h3>
-          <div className="flex-1 h-px bg-border/40" />
-        </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <MiniStat
-            label="إجمالي المحادثات"
-            value={platformStatsData.totalConversations.toLocaleString()}
-            sub={`${platformStatsData.activeConversations.toLocaleString()} نشطة الآن`}
-            icon={<MessageSquare className="h-4 w-4" />}
-            color="text-violet-600 dark:text-violet-400"
-            iconBg="bg-violet-500/10"
-          />
-          <MiniStat
-            label="إجمالي القنوات"
-            value={platformStatsData.totalChannels}
-            sub={`${platformStatsData.onlineAgents} وكيل متصل`}
-            icon={<Radio className="h-4 w-4" />}
-            color="text-cyan-600 dark:text-cyan-400"
-            iconBg="bg-cyan-500/10"
-          />
-          <MiniStat
-            label="الحملات النشطة"
-            value={campaignStatsData.activeCampaigns}
-            sub={`من ${campaignStatsData.totalCampaigns} حملة`}
-            icon={<Send className="h-4 w-4" />}
-            color="text-rose-600 dark:text-rose-400"
-            iconBg="bg-rose-500/10"
-          />
-          <MiniStat
-            label="رضا العملاء"
-            value={`${satisfactionStatsData.avgRating}/5`}
-            sub={`${satisfactionStatsData.totalRatings.toLocaleString()} تقييم`}
-            icon={<Star className="h-4 w-4" />}
-            color="text-yellow-600 dark:text-yellow-400"
-            iconBg="bg-yellow-500/10"
-          />
-        </div>
-
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <Card>
             <CardHeader className="pb-2">
@@ -361,10 +352,6 @@ export default function AdminDashboard(): JSX.Element {
 
       {/* ═══════════════ Section 4: يحتاج اهتمامك ═══════════════ */}
       <section className="space-y-3">
-        <div className="flex items-center gap-2">
-          <h3 className="text-sm font-semibold text-muted-foreground">يحتاج اهتمامك</h3>
-          <div className="flex-1 h-px bg-border/40" />
-        </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Past due */}
           <Card className="border-amber-500/30">
@@ -486,10 +473,6 @@ export default function AdminDashboard(): JSX.Element {
 
       {/* ═══════════════ Section 5: النشاط الأخير ═══════════════ */}
       <section className="space-y-3">
-        <div className="flex items-center gap-2">
-          <h3 className="text-sm font-semibold text-muted-foreground">النشاط الأخير</h3>
-          <div className="flex-1 h-px bg-border/40" />
-        </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <Card>
             <CardHeader className="pb-3">
