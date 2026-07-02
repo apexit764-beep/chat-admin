@@ -18,6 +18,7 @@ import {
   Shield,
   Sparkles,
   X,
+  MoreHorizontal,
 } from 'lucide-react';
 import { useConfirm } from '@components/ui';
 import { useAdminStore } from '@/store/useAdminStore';
@@ -67,6 +68,12 @@ import {
   PopoverTrigger,
   PopoverContent,
 } from '@/components/ui/popover';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from '@/components/ui/dropdown-menu';
 
 const tierStyle: Record<PlanTier, { bg: string; ring: string; text: string }> = {
   starter: { bg: 'from-cyan-50 to-cyan-100/50 dark:from-cyan-900/20 dark:to-cyan-900/10', ring: 'ring-cyan-300 dark:ring-cyan-700', text: 'text-cyan-700 dark:text-cyan-300' },
@@ -592,32 +599,37 @@ export default function AdminPlans(): JSX.Element {
                               </TooltipTrigger>
                               <TooltipContent>تعديل</TooltipContent>
                             </Tooltip>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
                                 <Button
                                   variant="ghost"
                                   size="icon"
                                   className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted"
-                                  onClick={() => duplicate(p)}
+                                  aria-label="المزيد"
                                 >
-                                  <Copy className="h-3.5 w-3.5" />
+                                  <MoreHorizontal className="h-4 w-4" />
                                 </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>تكرار</TooltipContent>
-                            </Tooltip>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted"
-                                  onClick={() => { updatePlan(p.id, { popular: !p.popular }); if (!p.popular) { plans.forEach((other) => { if (other.popular && other.id !== p.id) updatePlan(other.id, { popular: false }); }); } }}
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-48">
+                                <DropdownMenuItem onClick={() => duplicate(p)}>
+                                  <Copy className="h-4 w-4 me-2" />
+                                  تكرار
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    updatePlan(p.id, { popular: !p.popular });
+                                    if (!p.popular) {
+                                      plans.forEach((other) => {
+                                        if (other.popular && other.id !== p.id) updatePlan(other.id, { popular: false });
+                                      });
+                                    }
+                                  }}
                                 >
-                                  <Star className={cn('h-3.5 w-3.5', p.popular && 'fill-current text-primary')} />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>{p.popular ? 'إلغاء الأكثر شعبية' : 'تعيين الأكثر شعبية'}</TooltipContent>
-                            </Tooltip>
+                                  <Star className={cn('h-4 w-4 me-2', p.popular && 'fill-current text-primary')} />
+                                  {p.popular ? 'إلغاء الأكثر شعبية' : 'تعيين الأكثر شعبية'}
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <Button
