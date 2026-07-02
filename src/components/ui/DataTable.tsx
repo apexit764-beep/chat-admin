@@ -198,9 +198,9 @@ export function DataTable<T>({
       )}
 
       {/* Table */}
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto max-h-[70vh]">
         <table className="w-full text-sm">
-          <thead className="bg-muted/50 text-xs text-muted-foreground border-b border-border">
+          <thead className="bg-muted/50 text-xs text-muted-foreground border-b border-border sticky top-0 z-10 backdrop-blur">
             <tr>
               {selectable && (
                 <th className="px-3 py-2.5 w-10">

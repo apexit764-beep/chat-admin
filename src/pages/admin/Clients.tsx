@@ -11,6 +11,7 @@ import {
   Mail,
   Phone,
   Globe,
+  X,
 } from 'lucide-react';
 import {
   DataTable,
@@ -69,12 +70,9 @@ const statusBadgeClass: Record<ClientStatus, string> = {
 };
 
 function getInitials(name: string): string {
-  return name
-    .split(/\s+/)
-    .map((w) => w[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
+  const parts = name.split(/\s+/).filter((w) => /\p{L}|\p{N}/u.test(w));
+  const initials = parts.map((w) => w[0]).slice(0, 2).join('').toUpperCase();
+  return initials || '?';
 }
 
 export default function AdminClients(): JSX.Element {
@@ -82,6 +80,7 @@ export default function AdminClients(): JSX.Element {
   const clients = useAdminStore((s) => s.clients);
   const plans = useAdminStore((s) => s.plans);
   const countries = useAdminStore((s) => s.countries);
+  const subscriptions = useAdminStore((s) => s.subscriptions);
   const addClient = useAdminStore((s) => s.addClient);
   const updateClient = useAdminStore((s) => s.updateClient);
   const deleteClient = useAdminStore((s) => s.deleteClient);
@@ -127,11 +126,22 @@ export default function AdminClients(): JSX.Element {
     });
   }, [clients, statusFilter, countryFilter, planFilter]);
 
-  const stats = {
+  const stats = useMemo(() => ({
     total: clients.length,
     active: clients.filter((c) => c.status === 'active').length,
     trial: clients.filter((c) => c.status === 'trial').length,
     pastDue: clients.filter((c) => c.status === 'past_due').length,
+  }), [clients]);
+
+  const activeFilterCount =
+    (statusFilter !== 'all' ? 1 : 0) +
+    (countryFilter !== 'all' ? 1 : 0) +
+    (planFilter !== 'all' ? 1 : 0);
+
+  const clearFilters = (): void => {
+    setStatusFilter('all');
+    setCountryFilter('all');
+    setPlanFilter('all');
   };
 
   const openCreate = (): void => {
@@ -188,9 +198,13 @@ export default function AdminClients(): JSX.Element {
   };
 
   const remove = async (c: Client): Promise<void> => {
+    const activeSub = subscriptions.find((s) => s.clientId === c.id && s.status === 'active');
+    const warning = activeSub
+      ? `⚠️ لدى ${c.companyName} اشتراك نشط بـ ${formatMoney(activeSub.amount, activeSub.currency)}/${activeSub.billingCycle === 'monthly' ? 'شهر' : 'سنة'}. سيتم إلغاؤه وحذف الفواتير والمعاملات المرتبطة. لا يمكن التراجع.`
+      : 'سيتم حذف الاشتراك والفواتير والمعاملات المرتبطة معه. هذه العملية لا يمكن التراجع عنها.';
     const ok = await confirm({
       title: `حذف ${c.companyName}؟`,
-      message: 'سيتم حذف الاشتراك والفواتير والمعاملات المرتبطة معه. هذه العملية لا يمكن التراجع عنها.',
+      message: warning,
       variant: 'danger',
       confirmText: 'حذف نهائي',
     });
@@ -372,8 +386,48 @@ export default function AdminClients(): JSX.Element {
         selectable
         bulkActions={(selected, clear) => (
           <>
-            <Button variant="outline" size="sm" className="rounded-full" onClick={() => { handleExport(selected); clear(); }}>
-              <Download className="h-3.5 w-3.5 me-1.5" /> تصدير المحدّد
+            <Button variant="outline" size="sm" className="rounded-lg" onClick={() => { handleExport(selected); clear(); }}>
+              <Download className="h-3.5 w-3.5 me-1.5" /> تصدير
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-lg"
+              onClick={async () => {
+                const ok = await confirm({
+                  title: `إيقاف ${selected.length} عميل؟`,
+                  message: 'سيتم تعطيل حساباتهم ومنع الدخول. يمكن إعادة التفعيل لاحقاً.',
+                  variant: 'warning',
+                  confirmText: 'إيقاف الكل',
+                });
+                if (ok) {
+                  selected.forEach((c) => suspendClient(c.id));
+                  showToast(`تم إيقاف ${selected.length} عميل`, 'success');
+                  clear();
+                }
+              }}
+            >
+              <PauseCircle className="h-3.5 w-3.5 me-1.5" /> إيقاف
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-lg text-danger hover:text-danger"
+              onClick={async () => {
+                const ok = await confirm({
+                  title: `حذف ${selected.length} عميل؟`,
+                  message: 'سيتم حذف الاشتراكات والفواتير والمعاملات المرتبطة. هذه العملية لا يمكن التراجع عنها.',
+                  variant: 'danger',
+                  confirmText: 'حذف نهائي',
+                });
+                if (ok) {
+                  selected.forEach((c) => deleteClient(c.id));
+                  showToast(`تم حذف ${selected.length} عميل`, 'success');
+                  clear();
+                }
+              }}
+            >
+              <Trash2 className="h-3.5 w-3.5 me-1.5" /> حذف
             </Button>
           </>
         )}
@@ -410,6 +464,20 @@ export default function AdminClients(): JSX.Element {
                 {plans.map((p) => <SelectItem key={p.id} value={p.id}>{p.nameAr}</SelectItem>)}
               </SelectContent>
             </Select>
+            {activeFilterCount > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-9 rounded-lg text-xs text-muted-foreground hover:text-foreground gap-1.5"
+                onClick={clearFilters}
+              >
+                <X className="h-3.5 w-3.5" />
+                مسح الفلاتر
+                <Badge className="h-5 px-1.5 rounded-md bg-primary/15 text-primary border-transparent text-[10px]">
+                  {activeFilterCount}
+                </Badge>
+              </Button>
+            )}
           </>
         }
         actions={
