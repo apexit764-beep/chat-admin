@@ -65,15 +65,29 @@ export default function Login(): JSX.Element {
   };
 
   return (
-    <div className="min-h-screen bg-bg-light dark:bg-bg-dark flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden bg-white dark:bg-bg-dark">
+      {/* Decorative background pattern */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <img
+          src="/qhub-icon.svg"
+          alt=""
+          aria-hidden="true"
+          className="absolute -end-40 -top-40 h-[520px] w-[520px] opacity-[0.06] dark:opacity-[0.08]"
+        />
+        <img
+          src="/qhub-icon.svg"
+          alt=""
+          aria-hidden="true"
+          className="absolute -start-32 -bottom-32 h-[380px] w-[380px] opacity-[0.05] dark:opacity-[0.06] rotate-45"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-white/70 via-white/85 to-white dark:from-bg-dark/70 dark:via-bg-dark/85 dark:to-bg-dark" />
+      </div>
+
+      <div className="w-full max-w-md relative">
         {/* Brand */}
         <div className="flex flex-col items-center mb-8">
-          <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-primary to-primary-dark shadow-lg shadow-primary/30 flex items-center justify-center text-white font-extrabold text-2xl mb-3">
-            Q
-          </div>
-          <h1 className="text-xl font-bold">Qhub</h1>
-          <p className="text-xs text-muted-light dark:text-muted-dark mt-0.5">لوحة تحكم واتساب CRM</p>
+          <img src="/qhub-logo.png" alt="Qhub" className="h-16 w-auto mb-3 drop-shadow-sm" />
+          <p className="text-xs text-muted-light dark:text-muted-dark">لوحة تحكم واتساب CRM</p>
         </div>
 
         {/* Card */}
@@ -174,17 +188,6 @@ export default function Login(): JSX.Element {
               )}
             </button>
           </form>
-
-          {/* Demo credentials */}
-          <div className="mt-6 pt-5 border-t border-border-light dark:border-border-dark">
-            <p className="text-[10px] uppercase tracking-wider font-semibold text-muted-light dark:text-muted-dark mb-2">
-              بيانات تجريبية
-            </p>
-            <div className="text-xs font-mono space-y-0.5 text-muted-light dark:text-muted-dark">
-              <p>admin@apexes.click</p>
-              <p>admin123</p>
-            </div>
-          </div>
         </div>
 
         <p className="text-center text-xs text-muted-light dark:text-muted-dark mt-6">
