@@ -67,21 +67,8 @@ export default function Login(): JSX.Element {
   return (
     <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden bg-white dark:bg-bg-dark">
       {/* Decorative background pattern */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <img
-          src="/qhub-icon.svg"
-          alt=""
-          aria-hidden="true"
-          className="absolute -end-40 -top-40 h-[520px] w-[520px] opacity-[0.06] dark:opacity-[0.08]"
-        />
-        <img
-          src="/qhub-icon.svg"
-          alt=""
-          aria-hidden="true"
-          className="absolute -start-32 -bottom-32 h-[380px] w-[380px] opacity-[0.05] dark:opacity-[0.06] rotate-45"
-        />
-        <div className="absolute inset-0 bg-gradient-to-br from-white/70 via-white/85 to-white dark:from-bg-dark/70 dark:via-bg-dark/85 dark:to-bg-dark" />
-      </div>
+      <LoginBackdrop />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/60 via-white/75 to-white dark:from-bg-dark/60 dark:via-bg-dark/75 dark:to-bg-dark" />
 
       <div className="w-full max-w-md relative">
         {/* Brand */}
@@ -240,6 +227,43 @@ export default function Login(): JSX.Element {
           </div>
         )}
       </Modal>
+    </div>
+  );
+}
+
+function LoginBackdrop(): JSX.Element {
+  // Positions scatter parts of the Qhub icon across the background as a pattern.
+  const shapes = [
+    { top: '-4%',  left: '-6%',  size: 380, rot: -12, op: 0.09 },
+    { top: '8%',   left: '62%',  size: 260, rot: 24,  op: 0.07 },
+    { top: '-8%',  left: '78%',  size: 320, rot: 40,  op: 0.10 },
+    { top: '30%',  left: '18%',  size: 180, rot: 60,  op: 0.06 },
+    { top: '48%',  left: '78%',  size: 220, rot: -30, op: 0.08 },
+    { top: '68%',  left: '4%',   size: 300, rot: 15,  op: 0.09 },
+    { top: '78%',  left: '55%',  size: 200, rot: -50, op: 0.07 },
+    { top: '92%',  left: '84%',  size: 260, rot: 80,  op: 0.08 },
+    { top: '20%',  left: '42%',  size: 140, rot: 120, op: 0.05 },
+    { top: '58%',  left: '38%',  size: 160, rot: -75, op: 0.06 },
+  ];
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      {shapes.map((s, i) => (
+        <img
+          key={i}
+          src="/qhub-icon.svg"
+          alt=""
+          aria-hidden="true"
+          className="absolute select-none"
+          style={{
+            top: s.top,
+            left: s.left,
+            width: s.size,
+            height: s.size,
+            opacity: s.op,
+            transform: `rotate(${s.rot}deg)`,
+          }}
+        />
+      ))}
     </div>
   );
 }
