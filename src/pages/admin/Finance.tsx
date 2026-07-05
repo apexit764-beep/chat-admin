@@ -189,11 +189,13 @@ export default function AdminFinance(): JSX.Element {
 
       {/* Tabs */}
       <Tabs defaultValue="invoices">
-        <TabsList>
-          <TabsTrigger value="invoices">الفواتير ({invoices.length})</TabsTrigger>
-          <TabsTrigger value="transactions">المعاملات ({transactions.length})</TabsTrigger>
-          <TabsTrigger value="revenue">تحليلات الإيرادات</TabsTrigger>
-        </TabsList>
+        <div className="flex justify-start">
+          <TabsList>
+            <TabsTrigger value="invoices">الفواتير ({invoices.length})</TabsTrigger>
+            <TabsTrigger value="transactions">المعاملات ({transactions.length})</TabsTrigger>
+            <TabsTrigger value="revenue">تحليلات الإيرادات</TabsTrigger>
+          </TabsList>
+        </div>
 
         {/* Invoices */}
         <TabsContent value="invoices">
