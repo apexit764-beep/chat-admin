@@ -93,6 +93,7 @@ export default function LiveChat() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<FilterStatus>('all');
+  const [sort, setSort] = useState<'newest' | 'oldest' | 'unread'>('newest');
   const [draft, setDraft] = useState('');
   const [activeTab, setActiveTab] = useState<'message' | 'note'>('message');
   const [showDetails, setShowDetails] = useState(false);
@@ -118,9 +119,20 @@ export default function LiveChat() {
           (clientMap[c.clientId] || '').toLowerCase().includes(q)
       );
     }
-    list.sort((a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime());
+    if (sort === 'newest') {
+      list.sort((a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime());
+    } else if (sort === 'oldest') {
+      list.sort((a, b) => new Date(a.lastMessageAt).getTime() - new Date(b.lastMessageAt).getTime());
+    } else {
+      list.sort((a, b) => {
+        const aUnread = a.status === 'open' ? a.messages.filter((m) => m.sender === 'visitor').length : 0;
+        const bUnread = b.status === 'open' ? b.messages.filter((m) => m.sender === 'visitor').length : 0;
+        if (bUnread !== aUnread) return bUnread - aUnread;
+        return new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime();
+      });
+    }
     return list;
-  }, [liveChatConversations, filter, search, clientMap]);
+  }, [liveChatConversations, filter, search, sort, clientMap]);
 
   const selected = useMemo(
     () => liveChatConversations.find((c) => c.id === selectedId) ?? null,
@@ -201,24 +213,34 @@ export default function LiveChat() {
             </Button>
           </div>
 
-          {/* Sort + Count */}
-          <div className="flex items-center justify-between">
-            <Select value={filter} onValueChange={(v) => setFilter(v as FilterStatus)}>
-              <SelectTrigger className="h-7 w-auto border-0 bg-transparent text-xs gap-1 p-0 pe-1 shadow-none">
+          {/* Sort + Filter */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <Select value={filter} onValueChange={(v) => setFilter(v as FilterStatus)}>
+                <SelectTrigger className="h-8 w-auto border bg-background text-xs gap-1.5 rounded-lg px-2.5">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">الكل</SelectItem>
+                  <SelectItem value="open">جديدة</SelectItem>
+                  <SelectItem value="assigned">قيد المعالجة</SelectItem>
+                  <SelectItem value="resolved">تم الحل</SelectItem>
+                </SelectContent>
+              </Select>
+              <span className="text-xs text-muted-foreground">
+                <span className="font-bold text-foreground">{filtered.length}</span> محادثة
+              </span>
+            </div>
+            <Select value={sort} onValueChange={(v) => setSort(v as 'newest' | 'oldest' | 'unread')}>
+              <SelectTrigger className="h-8 w-auto border bg-background text-xs gap-1.5 rounded-lg px-2.5">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">الكل</SelectItem>
-                <SelectItem value="open">جديدة</SelectItem>
-                <SelectItem value="assigned">قيد المعالجة</SelectItem>
-                <SelectItem value="resolved">تم الحل</SelectItem>
+              <SelectContent align="end">
+                <SelectItem value="newest">الأحدث أولاً</SelectItem>
+                <SelectItem value="oldest">الأقدم أولاً</SelectItem>
+                <SelectItem value="unread">غير المقروءة أولاً</SelectItem>
               </SelectContent>
             </Select>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <span className="font-bold text-foreground text-sm">{stats.total}</span>
-              <span>الأحدث أولاً</span>
-              <ChevronDown className="h-3 w-3" />
-            </div>
           </div>
         </div>
 
@@ -354,10 +376,12 @@ export default function LiveChat() {
                   </Button>
                 )}
 
-                {/* Toggle details */}
-                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setShowDetails(!showDetails)}>
-                  {showDetails ? <PanelRightClose className="h-4 w-4" /> : <PanelRightOpen className="h-4 w-4" />}
-                </Button>
+                {/* Toggle details — hidden while details panel is already open */}
+                {!showDetails && (
+                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setShowDetails(true)} title="عرض التفاصيل">
+                    <PanelRightOpen className="h-4 w-4" />
+                  </Button>
+                )}
               </div>
             </div>
 
@@ -378,8 +402,11 @@ export default function LiveChat() {
                   if (isNote) {
                     return (
                       <div key={msg.id} className={cn('flex gap-2 items-end', 'justify-start')}>
-                        <div className="h-8 w-8 rounded-full bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shrink-0 mb-1">
-                          <StickyNote className="h-3.5 w-3.5 text-white" />
+                        <div className={cn(
+                          'h-8 w-8 rounded-full flex items-center justify-center shrink-0 text-white font-bold text-xs mb-1',
+                          getAvatarColor(msg.senderName)
+                        )}>
+                          {getInitials(msg.senderName)}
                         </div>
                         <div className="max-w-[65%]">
                           <div className="rounded-2xl rounded-tl-md px-4 py-2.5 shadow-sm bg-gradient-to-br from-amber-50 to-amber-100/80 dark:from-amber-900/30 dark:to-amber-800/20 border border-amber-200/40 dark:border-amber-700/30">
@@ -402,8 +429,11 @@ export default function LiveChat() {
                       className={cn('flex gap-2 items-end', isVisitor ? 'justify-end' : 'justify-start')}
                     >
                       {!isVisitor && (
-                        <div className="h-8 w-8 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shrink-0 mb-1">
-                          <Star className="h-3.5 w-3.5 text-white" />
+                        <div className={cn(
+                          'h-8 w-8 rounded-full flex items-center justify-center shrink-0 text-white font-bold text-xs mb-1',
+                          getAvatarColor(msg.senderName)
+                        )}>
+                          {getInitials(msg.senderName)}
                         </div>
                       )}
 
