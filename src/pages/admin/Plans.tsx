@@ -599,6 +599,19 @@ export default function AdminPlans(): JSX.Element {
                               </TooltipTrigger>
                               <TooltipContent>تعديل</TooltipContent>
                             </Tooltip>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted"
+                                  onClick={() => remove(p)}
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>حذف</TooltipContent>
+                            </Tooltip>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <Button
@@ -630,19 +643,6 @@ export default function AdminPlans(): JSX.Element {
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted"
-                                  onClick={() => remove(p)}
-                                >
-                                  <Trash2 className="h-3.5 w-3.5" />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>حذف</TooltipContent>
-                            </Tooltip>
                           </div>
                         </TableCell>
                       </TableRow>

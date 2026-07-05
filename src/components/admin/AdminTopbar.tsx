@@ -122,7 +122,7 @@ export function AdminTopbar(): JSX.Element {
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-52">
+              <DropdownMenuContent align="end" className="w-52">
                 <DropdownMenuLabel className="font-normal px-3 py-2">
                   <div className="flex flex-col gap-1">
                     <p className="text-sm font-medium">{user.name}</p>
