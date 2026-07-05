@@ -82,6 +82,11 @@ interface AdminState {
   updatePlan: (id: string, patch: Partial<Plan>) => void;
   deletePlan: (id: string) => void;
 
+  // Country actions
+  addCountry: (c: Country) => void;
+  updateCountry: (code: string, patch: Partial<Country>) => void;
+  deleteCountry: (code: string) => void;
+
   // Subscription actions
   createSubscription: (clientId: string, planId: string, billingCycle: 'monthly' | 'yearly') => Subscription;
   cancelSubscription: (id: string) => void;
@@ -310,6 +315,15 @@ export const useAdminStore = create<AdminState>((set, get) => ({
 
   deletePlan: (id) =>
     set((s) => ({ plans: s.plans.filter((p) => p.id !== id) })),
+
+  addCountry: (c) =>
+    set((s) => ({ countries: [...s.countries.filter((x) => x.code !== c.code), c] })),
+
+  updateCountry: (code, patch) =>
+    set((s) => ({ countries: s.countries.map((c) => (c.code === code ? { ...c, ...patch } : c)) })),
+
+  deleteCountry: (code) =>
+    set((s) => ({ countries: s.countries.filter((c) => c.code !== code) })),
 
   createSubscription: (clientId, planId, billingCycle) => {
     const client = get().clients.find((c) => c.id === clientId);
