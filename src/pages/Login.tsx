@@ -65,10 +65,10 @@ export default function Login(): JSX.Element {
   };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden bg-white dark:bg-bg-dark">
+    <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden bg-gradient-to-br from-sky-50 via-white to-blue-50 dark:from-bg-dark dark:via-bg-dark dark:to-bg-dark">
       {/* Decorative background pattern */}
       <LoginBackdrop />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/60 via-white/75 to-white dark:from-bg-dark/60 dark:via-bg-dark/75 dark:to-bg-dark" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/20 via-white/50 to-white/85 dark:from-bg-dark/30 dark:via-bg-dark/60 dark:to-bg-dark/85" />
 
       <div className="w-full max-w-md relative">
         {/* Brand */}
@@ -234,16 +234,16 @@ export default function Login(): JSX.Element {
 function LoginBackdrop(): JSX.Element {
   // Positions scatter parts of the Qhub icon across the background as a pattern.
   const shapes = [
-    { top: '-4%',  left: '-6%',  size: 380, rot: -12, op: 0.09 },
-    { top: '8%',   left: '62%',  size: 260, rot: 24,  op: 0.07 },
-    { top: '-8%',  left: '78%',  size: 320, rot: 40,  op: 0.10 },
-    { top: '30%',  left: '18%',  size: 180, rot: 60,  op: 0.06 },
-    { top: '48%',  left: '78%',  size: 220, rot: -30, op: 0.08 },
-    { top: '68%',  left: '4%',   size: 300, rot: 15,  op: 0.09 },
-    { top: '78%',  left: '55%',  size: 200, rot: -50, op: 0.07 },
-    { top: '92%',  left: '84%',  size: 260, rot: 80,  op: 0.08 },
-    { top: '20%',  left: '42%',  size: 140, rot: 120, op: 0.05 },
-    { top: '58%',  left: '38%',  size: 160, rot: -75, op: 0.06 },
+    { top: '-4%',  left: '-6%',  size: 420, rot: -12, op: 0.28 },
+    { top: '8%',   left: '62%',  size: 300, rot: 24,  op: 0.22 },
+    { top: '-8%',  left: '78%',  size: 360, rot: 40,  op: 0.30 },
+    { top: '30%',  left: '18%',  size: 200, rot: 60,  op: 0.18 },
+    { top: '48%',  left: '78%',  size: 260, rot: -30, op: 0.24 },
+    { top: '68%',  left: '4%',   size: 340, rot: 15,  op: 0.28 },
+    { top: '78%',  left: '55%',  size: 230, rot: -50, op: 0.22 },
+    { top: '92%',  left: '84%',  size: 290, rot: 80,  op: 0.26 },
+    { top: '20%',  left: '42%',  size: 160, rot: 120, op: 0.15 },
+    { top: '58%',  left: '38%',  size: 180, rot: -75, op: 0.18 },
   ];
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
