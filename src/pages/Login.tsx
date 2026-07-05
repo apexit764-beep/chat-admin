@@ -255,15 +255,15 @@ function LoginBackdrop(): JSX.Element {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
       <svg
-        className="absolute inset-0 w-full h-full"
+        className="absolute inset-0 w-full h-full opacity-45"
         viewBox="0 0 100 100"
         preserveAspectRatio="xMidYMid slice"
         aria-hidden="true"
       >
         <defs>
           <radialGradient id="hub-glow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#2196F3" stopOpacity="0.20" />
-            <stop offset="60%" stopColor="#2196F3" stopOpacity="0.06" />
+            <stop offset="0%" stopColor="#2196F3" stopOpacity="0.10" />
+            <stop offset="60%" stopColor="#2196F3" stopOpacity="0.03" />
             <stop offset="100%" stopColor="#2196F3" stopOpacity="0" />
           </radialGradient>
         </defs>
@@ -276,8 +276,8 @@ function LoginBackdrop(): JSX.Element {
             x2={hub.x}
             y2={hub.y}
             stroke={n.color}
-            strokeOpacity="0.32"
-            strokeWidth="0.18"
+            strokeOpacity="0.18"
+            strokeWidth="0.14"
             strokeDasharray="0.6 0.6"
           />
         ))}
@@ -289,21 +289,28 @@ function LoginBackdrop(): JSX.Element {
             x2={nodes[b].x}
             y2={nodes[b].y}
             stroke="#64748B"
-            strokeOpacity="0.14"
-            strokeWidth="0.12"
+            strokeOpacity="0.08"
+            strokeWidth="0.08"
           />
         ))}
         {nodes.map((n, i) => (
           <g key={`n-${i}`}>
-            <circle cx={n.x} cy={n.y} r={n.r + 1.4} fill={n.color} fillOpacity="0.10" />
-            <circle cx={n.x} cy={n.y} r={n.r} fill={n.color} fillOpacity="0.55" />
-            <circle cx={n.x} cy={n.y} r={n.r * 0.45} fill="#ffffff" fillOpacity="0.85" />
+            <circle cx={n.x} cy={n.y} r={n.r + 1.2} fill={n.color} fillOpacity="0.05" />
+            <circle cx={n.x} cy={n.y} r={n.r} fill={n.color} fillOpacity="0.3" />
+            <circle cx={n.x} cy={n.y} r={n.r * 0.45} fill="#ffffff" fillOpacity="0.55" />
           </g>
         ))}
-        <circle cx={hub.x} cy={hub.y} r="5" fill="#2196F3" fillOpacity="0.16" />
-        <circle cx={hub.x} cy={hub.y} r="3" fill="#2196F3" fillOpacity="0.45" />
-        <circle cx={hub.x} cy={hub.y} r="1.6" fill="#ffffff" />
+        <circle cx={hub.x} cy={hub.y} r="5" fill="#2196F3" fillOpacity="0.08" />
+        <circle cx={hub.x} cy={hub.y} r="3" fill="#2196F3" fillOpacity="0.22" />
+        <circle cx={hub.x} cy={hub.y} r="1.6" fill="#ffffff" fillOpacity="0.7" />
       </svg>
+      {/* Focus vignette — fades pattern behind the login card */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: 'radial-gradient(ellipse 55% 45% at center, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.55) 30%, rgba(255,255,255,0) 65%)',
+        }}
+      />
     </div>
   );
 }
