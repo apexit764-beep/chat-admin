@@ -1,20 +1,6 @@
 import { FormEvent, useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
-import {
-  Eye,
-  EyeOff,
-  Lock,
-  Mail,
-  Shield,
-  Sparkles,
-  CheckCircle2,
-  Users,
-  CreditCard,
-  BarChart3,
-  Globe,
-  ArrowRight,
-} from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Eye, EyeOff, Lock, Mail, ArrowLeft, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { Modal, useConfirm } from '@components/ui';
 import { cn } from '@/utils/cn';
@@ -24,7 +10,6 @@ export default function Login(): JSX.Element {
   const login = useAuthStore((s) => s.login);
   const navigate = useNavigate();
   const location = useLocation();
-
   const from = (location.state as { from?: string } | null)?.from ?? '/dashboard';
 
   const [email, setEmail] = useState('admin@apexes.click');
@@ -40,16 +25,15 @@ export default function Login(): JSX.Element {
   const [resetSent, setResetSent] = useState(false);
   const { alert } = useConfirm();
 
-  if (isAuthenticated) {
-    return <Navigate to={from} replace />;
-  }
+  if (isAuthenticated) return <Navigate to={from} replace />;
+
+  const emailRe = /^[\w.+-]+@[\w-]+\.[\w.-]+$/;
 
   const validate = (): boolean => {
     let ok = true;
     setEmailError(null);
     setPwdError(null);
     setError(null);
-    const emailRe = /^[\w.+-]+@[\w-]+\.[\w.-]+$/;
     if (!email.trim()) { setEmailError('البريد مطلوب'); ok = false; }
     else if (!emailRe.test(email.trim())) { setEmailError('صيغة البريد غير صحيحة'); ok = false; }
     if (!password) { setPwdError('كلمة المرور مطلوبة'); ok = false; }
@@ -73,7 +57,6 @@ export default function Login(): JSX.Element {
   };
 
   const submitReset = (): void => {
-    const emailRe = /^[\w.+-]+@[\w-]+\.[\w.-]+$/;
     if (!emailRe.test(resetEmail.trim())) {
       alert({ title: 'بريد غير صالح', message: 'أدخل بريداً إلكترونياً صحيحاً', variant: 'warning' });
       return;
@@ -82,41 +65,22 @@ export default function Login(): JSX.Element {
   };
 
   return (
-    <div className="min-h-screen bg-bg-light dark:bg-bg-dark flex">
-      {/* Left: form column */}
-      <div className="w-full lg:w-[480px] xl:w-[520px] flex flex-col justify-between bg-white dark:bg-surface-dark p-6 lg:p-10 relative">
-        {/* Logo / brand */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-primary to-primary-dark shadow-md shadow-primary/30 flex items-center justify-center text-white font-extrabold text-base">
-              A
-            </div>
-            <div>
-              <p className="font-extrabold text-lg leading-tight">Apex Solutions</p>
-              <p className="text-[10px] text-muted-light dark:text-muted-dark leading-tight">Admin Console</p>
-            </div>
+    <div className="min-h-screen bg-bg-light dark:bg-bg-dark flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Brand */}
+        <div className="flex flex-col items-center mb-8">
+          <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-primary to-primary-dark shadow-lg shadow-primary/30 flex items-center justify-center text-white font-extrabold text-2xl mb-3">
+            Q
           </div>
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-danger/10 text-danger text-[10px] font-bold uppercase tracking-wider">
-            <Shield className="h-3 w-3" />
-            للموظفين فقط
-          </span>
+          <h1 className="text-xl font-bold">Qhub</h1>
+          <p className="text-xs text-muted-light dark:text-muted-dark mt-0.5">لوحة تحكم واتساب CRM</p>
         </div>
 
-        {/* Form */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="my-auto max-w-md w-full mx-auto"
-        >
-          <h1 className="text-display font-extrabold mb-2">مرحباً بعودتك 👋</h1>
-          <p className="text-body text-muted-light dark:text-muted-dark mb-8">
-            سجّل دخولك للوصول إلى لوحة إدارة Apex Solutions
-          </p>
-
+        {/* Card */}
+        <div className="bg-white dark:bg-surface-dark rounded-2xl border border-border-light dark:border-border-dark shadow-sm p-6 sm:p-8">
           <form onSubmit={onSubmit} className="space-y-4">
             <div className="space-y-1.5">
-              <label className="text-small font-semibold text-[#374151] dark:text-[#D1D5DB]">البريد الإلكتروني</label>
+              <label className="text-sm font-medium">البريد الإلكتروني</label>
               <div className="relative">
                 <Mail className="h-4 w-4 absolute end-3 top-1/2 -translate-y-1/2 text-muted-light dark:text-muted-dark" />
                 <input
@@ -125,21 +89,27 @@ export default function Login(): JSX.Element {
                   value={email}
                   onChange={(e) => { setEmail(e.target.value); setEmailError(null); }}
                   className={cn(
-                    'w-full h-12 ps-4 pe-11 rounded-xl bg-bg-light dark:bg-bg-dark border text-body focus:outline-none focus:ring-4 focus:ring-primary/10 transition-all',
-                    emailError ? 'border-danger focus:border-danger focus:ring-danger/10' : 'border-border-light dark:border-border-dark focus:border-primary'
+                    'w-full h-11 ps-4 pe-10 rounded-xl bg-bg-light dark:bg-bg-dark border text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition',
+                    emailError ? 'border-danger focus:border-danger focus:ring-danger/20' : 'border-border-light dark:border-border-dark focus:border-primary'
                   )}
                   placeholder="you@company.com"
-                  aria-invalid={!!emailError}
-                  aria-describedby={emailError ? 'email-error' : undefined}
                 />
               </div>
-              {emailError && <p id="email-error" className="text-small text-danger flex items-center gap-1.5"><Shield className="h-3 w-3" />{emailError}</p>}
+              {emailError && (
+                <p className="text-xs text-danger flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" /> {emailError}
+                </p>
+              )}
             </div>
 
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <label className="text-small font-semibold text-[#374151] dark:text-[#D1D5DB]">كلمة المرور</label>
-                <button type="button" onClick={() => { setResetEmail(email); setResetSent(false); setForgotOpen(true); }} className="text-small text-primary font-medium hover:underline">
+                <label className="text-sm font-medium">كلمة المرور</label>
+                <button
+                  type="button"
+                  onClick={() => { setResetEmail(email); setResetSent(false); setForgotOpen(true); }}
+                  className="text-xs text-primary hover:underline"
+                >
                   نسيت كلمة المرور؟
                 </button>
               </div>
@@ -151,23 +121,25 @@ export default function Login(): JSX.Element {
                   value={password}
                   onChange={(e) => { setPassword(e.target.value); setPwdError(null); }}
                   className={cn(
-                    'w-full h-12 ps-11 pe-11 rounded-xl bg-bg-light dark:bg-bg-dark border text-body focus:outline-none focus:ring-4 focus:ring-primary/10 transition-all',
-                    pwdError ? 'border-danger focus:border-danger focus:ring-danger/10' : 'border-border-light dark:border-border-dark focus:border-primary'
+                    'w-full h-11 ps-11 pe-10 rounded-xl bg-bg-light dark:bg-bg-dark border text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition',
+                    pwdError ? 'border-danger focus:border-danger focus:ring-danger/20' : 'border-border-light dark:border-border-dark focus:border-primary'
                   )}
                   placeholder="••••••••"
-                  aria-invalid={!!pwdError}
-                  aria-describedby={pwdError ? 'pwd-error' : undefined}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPwd((v) => !v)}
-                  className="absolute start-3 top-1/2 -translate-y-1/2 text-muted-light dark:text-muted-dark hover:text-current p-1 rounded-md hover:bg-bg-light dark:hover:bg-bg-dark"
+                  className="absolute start-3 top-1/2 -translate-y-1/2 text-muted-light dark:text-muted-dark hover:text-current p-1"
                   aria-label={showPwd ? 'إخفاء' : 'إظهار'}
                 >
                   {showPwd ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
-              {pwdError && <p id="pwd-error" className="text-small text-danger flex items-center gap-1.5"><Shield className="h-3 w-3" />{pwdError}</p>}
+              {pwdError && (
+                <p className="text-xs text-danger flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" /> {pwdError}
+                </p>
+              )}
             </div>
 
             <label className="flex items-center gap-2 cursor-pointer select-none">
@@ -177,31 +149,27 @@ export default function Login(): JSX.Element {
                 onChange={(e) => setRemember(e.target.checked)}
                 className="h-4 w-4 accent-primary rounded"
               />
-              <span className="text-small text-muted-light dark:text-muted-dark">تذكّرني لمدة 30 يوم</span>
+              <span className="text-sm text-muted-light dark:text-muted-dark">تذكّرني</span>
             </label>
 
             {error && (
-              <motion.div
-                initial={{ opacity: 0, y: -8 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-danger/10 border border-danger/30 text-danger text-small px-3 py-2.5 rounded-xl flex items-center gap-2"
-              >
-                <Shield className="h-4 w-4 flex-shrink-0" />
+              <div className="bg-danger/10 border border-danger/30 text-danger text-sm px-3 py-2.5 rounded-xl flex items-center gap-2">
+                <AlertCircle className="h-4 w-4 flex-shrink-0" />
                 {error}
-              </motion.div>
+              </div>
             )}
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full h-12 rounded-xl text-white text-body font-semibold flex items-center justify-center gap-2 transition-all bg-gradient-to-r from-primary to-primary-dark hover:from-primary-dark hover:to-primary shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full h-11 rounded-xl text-white text-sm font-semibold flex items-center justify-center gap-2 bg-primary hover:bg-primary-dark transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <span className="h-5 w-5 rounded-full border-2 border-white border-t-transparent animate-spin" />
               ) : (
                 <>
                   تسجيل الدخول
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowLeft className="h-4 w-4" />
                 </>
               )}
             </button>
@@ -209,168 +177,66 @@ export default function Login(): JSX.Element {
 
           {/* Demo credentials */}
           <div className="mt-6 pt-5 border-t border-border-light dark:border-border-dark">
-            <div className="p-3 rounded-xl bg-bg-light dark:bg-bg-dark">
-              <p className="text-[10px] uppercase tracking-wider font-semibold text-muted-light dark:text-muted-dark mb-1.5">
-                بيانات تجريبية
-              </p>
-              <div className="space-y-0.5 text-small font-mono">
-                <p><span className="text-muted-light dark:text-muted-dark">📧</span> admin@apexes.click</p>
-                <p><span className="text-muted-light dark:text-muted-dark">🔑</span> admin123</p>
-              </div>
+            <p className="text-[10px] uppercase tracking-wider font-semibold text-muted-light dark:text-muted-dark mb-2">
+              بيانات تجريبية
+            </p>
+            <div className="text-xs font-mono space-y-0.5 text-muted-light dark:text-muted-dark">
+              <p>admin@apexes.click</p>
+              <p>admin123</p>
             </div>
           </div>
-        </motion.div>
-
-        {/* Forgot password modal */}
-        <Modal
-          open={forgotOpen}
-          onClose={() => setForgotOpen(false)}
-          title={resetSent ? 'تم الإرسال!' : 'استعادة كلمة المرور'}
-          size="sm"
-          footer={
-            resetSent ? (
-              <button onClick={() => setForgotOpen(false)} className="h-10 px-5 rounded-full bg-primary hover:bg-primary-dark text-white text-small font-medium">حسناً</button>
-            ) : (
-              <>
-                <button onClick={() => setForgotOpen(false)} className="h-10 px-5 rounded-full border border-border-light dark:border-border-dark text-small font-medium hover:bg-bg-light dark:hover:bg-bg-dark">إلغاء</button>
-                <button onClick={submitReset} className="h-10 px-5 rounded-full bg-primary hover:bg-primary-dark text-white text-small font-medium">إرسال رابط الاستعادة</button>
-              </>
-            )
-          }
-        >
-          {resetSent ? (
-            <div className="text-center">
-              <div className="h-14 w-14 rounded-full bg-success/15 text-success flex items-center justify-center mx-auto mb-3">
-                <CheckCircle2 className="h-7 w-7" />
-              </div>
-              <p className="text-body text-muted-light dark:text-muted-dark">
-                إذا كان البريد <strong className="text-current">{resetEmail}</strong> مسجّل لدينا، ستصلك رسالة فيها رابط لإعادة تعيين كلمة المرور خلال دقائق
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              <p className="text-body text-muted-light dark:text-muted-dark">
-                أدخل بريدك وسنرسل لك رابط إعادة تعيين كلمة المرور
-              </p>
-              <div className="space-y-1.5">
-                <label className="text-small font-medium text-muted-light dark:text-muted-dark">البريد الإلكتروني</label>
-                <div className="relative">
-                  <Mail className="h-4 w-4 absolute end-3 top-1/2 -translate-y-1/2 text-muted-light dark:text-muted-dark" />
-                  <input
-                    type="email"
-                    autoFocus
-                    value={resetEmail}
-                    onChange={(e) => setResetEmail(e.target.value)}
-                    className="w-full h-11 ps-3 pe-10 rounded-input bg-bg-light dark:bg-bg-dark border border-border-light dark:border-border-dark text-body focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
-                    placeholder="you@company.com"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-        </Modal>
-
-        {/* Footer */}
-        <div className="flex items-center justify-between text-small text-muted-light dark:text-muted-dark">
-          <p>© 2026 Apex Solutions</p>
-          <div className="flex items-center gap-3">
-            <a href="#" className="hover:text-current">الخصوصية</a>
-            <a href="#" className="hover:text-current">الشروط</a>
-            <a href="#" className="hover:text-current">المساعدة</a>
-          </div>
         </div>
-      </div>
 
-      {/* Right: hero column */}
-      <div className="hidden lg:flex flex-1 relative overflow-hidden">
-        <HeroPanel />
-      </div>
-    </div>
-  );
-}
-
-function HeroPanel(): JSX.Element {
-  const features = [
-    { icon: <Users className="h-5 w-5" />, title: 'إدارة العملاء', desc: '12 عميل عبر 8 دول' },
-    { icon: <CreditCard className="h-5 w-5" />, title: 'Paymob متصل', desc: 'دفع Visa آمن' },
-    { icon: <BarChart3 className="h-5 w-5" />, title: 'تحليلات لحظية', desc: 'MRR · ARPU · LTV' },
-    { icon: <Globe className="h-5 w-5" />, title: 'متعدد الدول', desc: '8 عملات مدعومة' },
-  ];
-
-  return (
-    <div className="flex-1 relative text-white p-12 flex flex-col justify-between bg-gradient-to-br from-[#1e3a8a] via-primary-dark to-[#2563EB]">
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute -top-32 -end-32 h-96 w-96 rounded-full bg-white/10 blur-3xl" />
-        <div className="absolute -bottom-32 -start-32 h-96 w-96 rounded-full bg-white/5 blur-3xl" />
-        <div className="absolute top-1/3 start-1/4 h-64 w-64 rounded-full bg-white/5 blur-3xl" />
-      </div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.1 }}
-        className="relative"
-      >
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur text-[10px] font-bold uppercase tracking-wider mb-4">
-          <Sparkles className="h-3 w-3" />
-          Admin Console v2.0
-        </div>
-        <h2 className="text-h1 lg:text-display font-extrabold leading-tight mb-3">
-          منصّة إدارة منتج SaaS متكاملة
-        </h2>
-        <p className="text-body lg:text-base opacity-90 max-w-md">
-          تابع عملاءك، أرباحك، واشتراكاتك من مكان واحد. كل ما تحتاجه لإدارة SaaS احترافي
+        <p className="text-center text-xs text-muted-light dark:text-muted-dark mt-6">
+          © 2026 Qhub
         </p>
-      </motion.div>
+      </div>
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-        className="relative grid grid-cols-2 gap-3 max-w-md"
+      {/* Forgot password modal */}
+      <Modal
+        open={forgotOpen}
+        onClose={() => setForgotOpen(false)}
+        title={resetSent ? 'تم الإرسال' : 'استعادة كلمة المرور'}
+        size="sm"
+        footer={
+          resetSent ? (
+            <button onClick={() => setForgotOpen(false)} className="h-10 px-5 rounded-full bg-primary hover:bg-primary-dark text-white text-sm font-medium">حسناً</button>
+          ) : (
+            <>
+              <button onClick={() => setForgotOpen(false)} className="h-10 px-5 rounded-full border border-border-light dark:border-border-dark text-sm font-medium hover:bg-bg-light dark:hover:bg-bg-dark">إلغاء</button>
+              <button onClick={submitReset} className="h-10 px-5 rounded-full bg-primary hover:bg-primary-dark text-white text-sm font-medium">إرسال</button>
+            </>
+          )
+        }
       >
-        {features.map((f, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.3 + i * 0.05 }}
-            className="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4"
-          >
-            <div className="h-9 w-9 rounded-xl bg-white/15 flex items-center justify-center mb-2.5">
-              {f.icon}
+        {resetSent ? (
+          <div className="text-center">
+            <div className="h-14 w-14 rounded-full bg-success/15 text-success flex items-center justify-center mx-auto mb-3">
+              <CheckCircle2 className="h-7 w-7" />
             </div>
-            <p className="text-body font-bold mb-0.5">{f.title}</p>
-            <p className="text-small opacity-80">{f.desc}</p>
-          </motion.div>
-        ))}
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.5 }}
-        className="relative"
-      >
-        <div className="grid grid-cols-3 gap-6 max-w-lg">
-          <div>
-            <p className="text-display font-extrabold leading-none">12+</p>
-            <p className="text-small opacity-80 mt-1">عميل نشط</p>
+            <p className="text-sm text-muted-light dark:text-muted-dark">
+              إذا كان البريد <strong className="text-current">{resetEmail}</strong> مسجّل لدينا، ستصلك رسالة فيها رابط لإعادة التعيين
+            </p>
           </div>
-          <div>
-            <p className="text-display font-extrabold leading-none">$3K</p>
-            <p className="text-small opacity-80 mt-1">MRR شهري</p>
+        ) : (
+          <div className="space-y-3">
+            <p className="text-sm text-muted-light dark:text-muted-dark">
+              أدخل بريدك وسنرسل لك رابط إعادة تعيين كلمة المرور
+            </p>
+            <div className="relative">
+              <Mail className="h-4 w-4 absolute end-3 top-1/2 -translate-y-1/2 text-muted-light dark:text-muted-dark" />
+              <input
+                type="email"
+                autoFocus
+                value={resetEmail}
+                onChange={(e) => setResetEmail(e.target.value)}
+                className="w-full h-11 ps-3 pe-10 rounded-xl bg-bg-light dark:bg-bg-dark border border-border-light dark:border-border-dark text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                placeholder="you@company.com"
+              />
+            </div>
           </div>
-          <div>
-            <p className="text-display font-extrabold leading-none">+18%</p>
-            <p className="text-small opacity-80 mt-1">نمو شهري</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2 mt-5 pt-5 border-t border-white/15 text-small opacity-90">
-          <CheckCircle2 className="h-4 w-4" />
-          <span>SSO + 2FA · SOC 2 Type II</span>
-        </div>
-      </motion.div>
+        )}
+      </Modal>
     </div>
   );
 }
