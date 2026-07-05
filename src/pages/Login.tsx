@@ -65,10 +65,9 @@ export default function Login(): JSX.Element {
   };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden bg-gradient-to-br from-sky-50 via-white to-blue-50 dark:from-bg-dark dark:via-bg-dark dark:to-bg-dark">
-      {/* Decorative background pattern */}
+    <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden bg-gradient-to-br from-slate-50 via-white to-sky-50/50 dark:from-bg-dark dark:via-bg-dark dark:to-bg-dark">
+      {/* Decorative network background */}
       <LoginBackdrop />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/20 via-white/50 to-white/85 dark:from-bg-dark/30 dark:via-bg-dark/60 dark:to-bg-dark/85" />
 
       <div className="w-full max-w-md relative">
         {/* Brand */}
@@ -232,38 +231,79 @@ export default function Login(): JSX.Element {
 }
 
 function LoginBackdrop(): JSX.Element {
-  // Positions scatter parts of the Qhub icon across the background as a pattern.
-  const shapes = [
-    { top: '-4%',  left: '-6%',  size: 420, rot: -12, op: 0.28 },
-    { top: '8%',   left: '62%',  size: 300, rot: 24,  op: 0.22 },
-    { top: '-8%',  left: '78%',  size: 360, rot: 40,  op: 0.30 },
-    { top: '30%',  left: '18%',  size: 200, rot: 60,  op: 0.18 },
-    { top: '48%',  left: '78%',  size: 260, rot: -30, op: 0.24 },
-    { top: '68%',  left: '4%',   size: 340, rot: 15,  op: 0.28 },
-    { top: '78%',  left: '55%',  size: 230, rot: -50, op: 0.22 },
-    { top: '92%',  left: '84%',  size: 290, rot: 80,  op: 0.26 },
-    { top: '20%',  left: '42%',  size: 160, rot: 120, op: 0.15 },
-    { top: '58%',  left: '38%',  size: 180, rot: -75, op: 0.18 },
+  // Channel nodes scattered around a central hub — the network illustrates
+  // multi-channel aggregation flowing into Qhub.
+  const hub = { x: 50, y: 50 };
+  const nodes = [
+    { x: 12, y: 18, r: 3.2, color: '#25D366' },
+    { x: 88, y: 22, r: 2.8, color: '#0084FF' },
+    { x: 20, y: 78, r: 3.0, color: '#E4405F' },
+    { x: 82, y: 76, r: 2.6, color: '#229ED9' },
+    { x: 50, y: 8,  r: 2.4, color: '#25D366' },
+    { x: 8,  y: 48, r: 2.8, color: '#4285F4' },
+    { x: 92, y: 50, r: 2.6, color: '#7A5AF8' },
+    { x: 50, y: 92, r: 2.4, color: '#FF7A00' },
+    { x: 30, y: 32, r: 1.8, color: '#94A3B8' },
+    { x: 70, y: 30, r: 1.8, color: '#94A3B8' },
+    { x: 32, y: 68, r: 1.8, color: '#94A3B8' },
+    { x: 68, y: 70, r: 1.8, color: '#94A3B8' },
+  ];
+  const secondaryLinks: [number, number][] = [
+    [0, 4], [4, 1], [1, 6], [6, 3], [3, 7], [7, 2], [2, 5], [5, 0],
+    [8, 9], [9, 10], [10, 11], [11, 8],
   ];
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
-      {shapes.map((s, i) => (
-        <img
-          key={i}
-          src="/qhub-icon.svg"
-          alt=""
-          aria-hidden="true"
-          className="absolute select-none"
-          style={{
-            top: s.top,
-            left: s.left,
-            width: s.size,
-            height: s.size,
-            opacity: s.op,
-            transform: `rotate(${s.rot}deg)`,
-          }}
-        />
-      ))}
+      <svg
+        className="absolute inset-0 w-full h-full"
+        viewBox="0 0 100 100"
+        preserveAspectRatio="xMidYMid slice"
+        aria-hidden="true"
+      >
+        <defs>
+          <radialGradient id="hub-glow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#2196F3" stopOpacity="0.20" />
+            <stop offset="60%" stopColor="#2196F3" stopOpacity="0.06" />
+            <stop offset="100%" stopColor="#2196F3" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+        <circle cx={hub.x} cy={hub.y} r="32" fill="url(#hub-glow)" />
+        {nodes.map((n, i) => (
+          <line
+            key={`l-${i}`}
+            x1={n.x}
+            y1={n.y}
+            x2={hub.x}
+            y2={hub.y}
+            stroke={n.color}
+            strokeOpacity="0.32"
+            strokeWidth="0.18"
+            strokeDasharray="0.6 0.6"
+          />
+        ))}
+        {secondaryLinks.map(([a, b], i) => (
+          <line
+            key={`s-${i}`}
+            x1={nodes[a].x}
+            y1={nodes[a].y}
+            x2={nodes[b].x}
+            y2={nodes[b].y}
+            stroke="#64748B"
+            strokeOpacity="0.14"
+            strokeWidth="0.12"
+          />
+        ))}
+        {nodes.map((n, i) => (
+          <g key={`n-${i}`}>
+            <circle cx={n.x} cy={n.y} r={n.r + 1.4} fill={n.color} fillOpacity="0.10" />
+            <circle cx={n.x} cy={n.y} r={n.r} fill={n.color} fillOpacity="0.55" />
+            <circle cx={n.x} cy={n.y} r={n.r * 0.45} fill="#ffffff" fillOpacity="0.85" />
+          </g>
+        ))}
+        <circle cx={hub.x} cy={hub.y} r="5" fill="#2196F3" fillOpacity="0.16" />
+        <circle cx={hub.x} cy={hub.y} r="3" fill="#2196F3" fillOpacity="0.45" />
+        <circle cx={hub.x} cy={hub.y} r="1.6" fill="#ffffff" />
+      </svg>
     </div>
   );
 }
