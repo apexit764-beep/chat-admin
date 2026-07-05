@@ -188,31 +188,29 @@ export default function AdminFinance(): JSX.Element {
       </div>
 
       {/* Tabs */}
-      <Tabs defaultValue="invoices">
-        <div className="flex justify-start">
-          <TabsList>
-            <TabsTrigger value="invoices">الفواتير ({invoices.length})</TabsTrigger>
-            <TabsTrigger value="transactions">المعاملات ({transactions.length})</TabsTrigger>
-            <TabsTrigger value="revenue">تحليلات الإيرادات</TabsTrigger>
-          </TabsList>
-        </div>
+      <Tabs defaultValue="invoices" dir="rtl">
+        <TabsList>
+          <TabsTrigger value="invoices">الفواتير ({invoices.length})</TabsTrigger>
+          <TabsTrigger value="transactions">المعاملات ({transactions.length})</TabsTrigger>
+          <TabsTrigger value="revenue">تحليلات الإيرادات</TabsTrigger>
+        </TabsList>
 
         {/* Invoices */}
         <TabsContent value="invoices">
           <Card className="overflow-hidden">
-            <CardHeader className="flex-row flex-wrap items-center gap-3 border-b">
-              <div className="relative flex-1 min-w-[200px]">
+            <CardHeader className="flex-row flex-wrap items-center gap-3 border-b justify-start">
+              <div className="relative w-64">
                 <Search className="h-4 w-4 absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   type="text"
                   placeholder="بحث برقم الفاتورة أو الشركة..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="pe-9"
+                  className="pe-9 h-9"
                 />
               </div>
               <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as 'all' | InvoiceStatus)}>
-                <SelectTrigger className="w-auto min-w-[140px]">
+                <SelectTrigger className="w-auto min-w-[140px] h-9">
                   <SelectValue placeholder="كل الحالات" />
                 </SelectTrigger>
                 <SelectContent>
@@ -223,7 +221,7 @@ export default function AdminFinance(): JSX.Element {
                   <SelectItem value="refunded">مرتجعة</SelectItem>
                 </SelectContent>
               </Select>
-              <Button variant="outline" onClick={handleExportInvoices}>
+              <Button variant="outline" size="sm" onClick={handleExportInvoices} className="h-9 ms-auto">
                 <Download className="h-4 w-4 me-2" /> CSV
               </Button>
             </CardHeader>
