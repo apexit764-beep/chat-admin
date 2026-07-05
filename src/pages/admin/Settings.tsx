@@ -275,12 +275,16 @@ export default function AdminSettings(): JSX.Element {
             {/* COUNTRIES */}
             {tab === 'countries' && (
               <div>
-                <Header icon={<Globe2 className="h-5 w-5" />} title="إدارة الدول" subtitle="أضف الدول المدعومة وحدّد عملتها" />
-                <div className="flex justify-end mb-3">
-                  <Button size="sm" onClick={() => setCountryModal({ code: '', name: '', nameAr: '', flag: '', currency: currencies[0]?.code ?? 'USD', symbol: '', usdRate: 1, isNew: true })}>
-                    <Plus className="h-4 w-4 me-2" /> إضافة دولة
-                  </Button>
-                </div>
+                <Header
+                  icon={<Globe2 className="h-5 w-5" />}
+                  title="إدارة الدول"
+                  subtitle="أضف الدول المدعومة وحدّد عملتها"
+                  action={
+                    <Button size="sm" onClick={() => setCountryModal({ code: '', name: '', nameAr: '', flag: '', currency: currencies[0]?.code ?? 'USD', symbol: '', usdRate: 1, isNew: true })}>
+                      <Plus className="h-4 w-4 me-2" /> إضافة دولة
+                    </Button>
+                  }
+                />
                 <div className="rounded-xl border overflow-hidden">
                   <table className="w-full text-sm">
                     <thead className="bg-muted/50 text-xs text-muted-foreground">
@@ -331,12 +335,16 @@ export default function AdminSettings(): JSX.Element {
             {/* CURRENCIES */}
             {tab === 'currencies' && (
               <div>
-                <Header icon={<Coins className="h-5 w-5" />} title="إدارة العملات" subtitle="العملات المدعومة وأسعار الصرف مقابل الدولار" />
-                <div className="flex justify-end mb-3">
-                  <Button size="sm" onClick={() => setCurrencyModal({ code: '', name: '', nameAr: '', symbol: '', usdRate: 1, isNew: true })}>
-                    <Plus className="h-4 w-4 me-2" /> إضافة عملة
-                  </Button>
-                </div>
+                <Header
+                  icon={<Coins className="h-5 w-5" />}
+                  title="إدارة العملات"
+                  subtitle="العملات المدعومة وأسعار الصرف مقابل الدولار"
+                  action={
+                    <Button size="sm" onClick={() => setCurrencyModal({ code: '', name: '', nameAr: '', symbol: '', usdRate: 1, isNew: true })}>
+                      <Plus className="h-4 w-4 me-2" /> إضافة عملة
+                    </Button>
+                  }
+                />
                 <div className="rounded-xl border overflow-hidden">
                   <table className="w-full text-sm">
                     <thead className="bg-muted/50 text-xs text-muted-foreground">
@@ -851,13 +859,18 @@ export default function AdminSettings(): JSX.Element {
   );
 }
 
-function Header({ icon, title, subtitle }: { icon: React.ReactNode; title: string; subtitle: string }): JSX.Element {
+function Header({ icon, title, subtitle, action }: { icon: React.ReactNode; title: string; subtitle: string; action?: React.ReactNode }): JSX.Element {
   return (
     <div className="mb-6 pb-5">
-      <h2 className="text-lg font-bold flex items-center gap-2">
-        <span className="text-primary">{icon}</span> {title}
-      </h2>
-      <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h2 className="text-lg font-bold flex items-center gap-2">
+            <span className="text-primary">{icon}</span> {title}
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>
+        </div>
+        {action}
+      </div>
       <Separator className="mt-5" />
     </div>
   );
