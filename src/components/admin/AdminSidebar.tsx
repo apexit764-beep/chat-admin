@@ -18,9 +18,7 @@ import {
   LogOut,
   X,
   Plug,
-  Briefcase,
   MessagesSquare,
-  ClipboardList,
   Sparkles,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -61,7 +59,6 @@ const navGroups: NavGroup[] = [
       { to: '/widget', label: 'إعدادات الويدجت', icon: MessagesSquare },
       { to: '/ai-settings', label: 'إعدادات الذكاء الاصطناعي', icon: Sparkles },
       { to: '/plans', label: 'الباقات', icon: Package },
-      { to: '/industries', label: 'مجالات العمل', icon: Briefcase },
       { to: '/feedback', label: 'الشكاوى والاقتراحات', icon: MessageSquareWarning },
     ],
   },
@@ -70,7 +67,6 @@ const navGroups: NavGroup[] = [
     items: [
       { to: '/finance', label: 'المالية', icon: Banknote },
       { to: '/subscriptions', label: 'الاشتراكات', icon: Repeat },
-      { to: '/plan-requests', label: 'طلبات الاشتراك', icon: ClipboardList },
     ],
   },
   {

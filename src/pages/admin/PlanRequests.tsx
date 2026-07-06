@@ -71,7 +71,7 @@ function timeAgo(dateStr: string): string {
   return `منذ ${days} يوم`;
 }
 
-export default function AdminPlanRequests(): JSX.Element {
+export default function AdminPlanRequests({ embedded }: { embedded?: boolean }): JSX.Element {
   const planRequests = useAdminStore((s) => s.planRequests);
   const plans = useAdminStore((s) => s.plans);
   const countries = useAdminStore((s) => s.countries);
@@ -121,13 +121,8 @@ export default function AdminPlanRequests(): JSX.Element {
     showToast('تم حذف الطلب', 'success');
   };
 
-  return (
-    <div className="p-4 lg:p-6 space-y-5">
-      <div>
-        <h2 className="text-2xl font-bold">طلبات الاشتراك</h2>
-        <p className="text-sm text-muted-foreground">طلبات الترقية والاشتراك الجديدة من العملاء</p>
-      </div>
-
+  const content = (
+    <>
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
@@ -315,6 +310,20 @@ export default function AdminPlanRequests(): JSX.Element {
           </DialogContent>
         )}
       </Dialog>
+    </>
+  );
+
+  if (embedded) {
+    return <div className="space-y-5">{content}</div>;
+  }
+
+  return (
+    <div className="p-4 lg:p-6 space-y-5">
+      <div>
+        <h2 className="text-2xl font-bold">طلبات الاشتراك</h2>
+        <p className="text-sm text-muted-foreground">طلبات الترقية والاشتراك الجديدة من العملاء</p>
+      </div>
+      {content}
     </div>
   );
 }

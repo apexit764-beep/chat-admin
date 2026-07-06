@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Plus,
@@ -13,7 +13,11 @@ import {
   Globe,
   X,
   HeartPulse,
+  Briefcase,
+  ArrowRight,
 } from 'lucide-react';
+
+const AdminIndustries = lazy(() => import('./Industries'));
 import {
   DataTable,
   StatCard,
@@ -72,6 +76,8 @@ const statusBadgeClass: Record<ClientStatus, string> = {
 };
 
 
+type View = 'clients' | 'industries';
+
 export default function AdminClients(): JSX.Element {
   const navigate = useNavigate();
   const clients = useAdminStore((s) => s.clients);
@@ -88,6 +94,7 @@ export default function AdminClients(): JSX.Element {
   const showToast = useUIStore((s) => s.showToast);
   const { confirm } = useConfirm();
 
+  const [view, setView] = useState<View>('clients');
   const [statusFilter, setStatusFilter] = useState<'all' | ClientStatus>('all');
   const [countryFilter, setCountryFilter] = useState<'all' | string>('all');
   const [planFilter, setPlanFilter] = useState<'all' | string>('all');
@@ -361,11 +368,26 @@ export default function AdminClients(): JSX.Element {
     },
   ];
 
+  if (view === 'industries') {
+    return (
+      <Suspense fallback={<div className="flex items-center justify-center py-20 text-muted-foreground">جارٍ التحميل...</div>}>
+        <AdminIndustries onBack={() => setView('clients')} />
+      </Suspense>
+    );
+  }
+
   return (
     <div className="p-4 lg:p-6 space-y-5">
-      <div>
-        <h2 className="text-2xl font-bold">العملاء</h2>
-        <p className="text-sm text-muted-foreground">إدارة حسابات العملاء</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold">العملاء</h2>
+          <p className="text-sm text-muted-foreground">إدارة حسابات العملاء</p>
+        </div>
+        <Button variant="outline" onClick={() => setView('industries')} className="gap-2">
+          <Briefcase className="h-4 w-4" />
+          مجالات العمل
+          <Badge variant="secondary" className="text-[10px]">{industries.length}</Badge>
+        </Button>
       </div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="إجمالي العملاء" value={stats.total} icon={<Globe className="h-5 w-5" />} iconBg="bg-primary/15" iconColor="text-primary" />

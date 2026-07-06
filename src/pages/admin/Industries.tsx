@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Edit2, Trash2, Briefcase } from 'lucide-react';
+import { Plus, Edit2, Trash2, Briefcase, ArrowRight } from 'lucide-react';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useConfirm } from '@components/ui';
 import { Button } from '@/components/ui/button';
@@ -23,7 +23,7 @@ import {
   TableCell,
 } from '@/components/ui/table';
 
-export default function Industries(): JSX.Element {
+export default function Industries({ onBack }: { onBack?: () => void }): JSX.Element {
   const industries = useAdminStore((s) => s.industries);
   const clients = useAdminStore((s) => s.clients);
   const addIndustry = useAdminStore((s) => s.addIndustry);
@@ -78,9 +78,16 @@ export default function Industries(): JSX.Element {
   return (
     <div className="p-4 lg:p-6 space-y-4 page-fade">
       <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">مجالات العمل</h2>
-          <p className="text-sm text-muted-foreground">إدارة مجالات عمل العملاء</p>
+        <div className="flex items-center gap-3">
+          {onBack && (
+            <Button variant="ghost" size="icon" onClick={onBack} className="h-9 w-9">
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          )}
+          <div>
+            <h2 className="text-2xl font-bold">مجالات العمل</h2>
+            <p className="text-sm text-muted-foreground">إدارة مجالات عمل العملاء</p>
+          </div>
         </div>
         <Button onClick={openAdd} className="gap-2">
           <Plus className="h-4 w-4" />

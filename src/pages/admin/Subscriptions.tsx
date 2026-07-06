@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Repeat,
@@ -16,6 +16,8 @@ import {
   RefreshCcw,
   ArrowRightLeft,
   ShieldAlert,
+  ClipboardList,
+  ArrowRight,
 } from 'lucide-react';
 import { StatCard, useConfirm } from '@components/ui';
 import { useAdminStore } from '@/store/useAdminStore';
@@ -59,6 +61,10 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
+
+const AdminPlanRequests = lazy(() => import('./PlanRequests'));
+
+type View = 'subscriptions' | 'requests';
 
 const statusLabel: Record<SubscriptionStatus, string> = {
   trial: 'تجريبي',
@@ -169,11 +175,45 @@ export default function AdminSubscriptions(): JSX.Element {
 
   const [switchModal, setSwitchModal] = useState<{ subId: string; clientId: string; currentPlanId: string; companyName: string } | null>(null);
 
+  const [view, setView] = useState<View>('subscriptions');
+  const planRequests = useAdminStore((s) => s.planRequests);
+  const pendingRequestsCount = planRequests.filter((r) => r.status === 'new' || r.status === 'contacted').length;
+
+  if (view === 'requests') {
+    return (
+      <div className="p-4 lg:p-8 space-y-6">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={() => setView('subscriptions')} className="h-9 w-9">
+            <ArrowRight className="h-4 w-4" />
+          </Button>
+          <div>
+            <h2 className="text-2xl font-bold">طلبات الاشتراك</h2>
+            <p className="text-sm text-muted-foreground">طلبات الترقية والاشتراك الجديدة من العملاء</p>
+          </div>
+        </div>
+        <Suspense fallback={<div className="flex items-center justify-center py-20 text-muted-foreground">جارٍ التحميل...</div>}>
+          <AdminPlanRequests embedded />
+        </Suspense>
+      </div>
+    );
+  }
+
   return (
     <div className="p-4 lg:p-8 space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">الاشتراكات</h2>
-        <p className="text-sm text-muted-foreground">إدارة اشتراكات العملاء والتجديدات</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold">الاشتراكات</h2>
+          <p className="text-sm text-muted-foreground">إدارة اشتراكات العملاء والتجديدات</p>
+        </div>
+        <Button variant="outline" onClick={() => setView('requests')} className="gap-2">
+          <ClipboardList className="h-4 w-4" />
+          طلبات الاشتراك
+          {pendingRequestsCount > 0 && (
+            <Badge className="h-5 min-w-[20px] px-1.5 text-[10px] bg-primary text-primary-foreground rounded-full">
+              {pendingRequestsCount}
+            </Badge>
+          )}
+        </Button>
       </div>
 
       {/* Stats */}
