@@ -106,6 +106,7 @@ export default function AdminSettings(): JSX.Element {
   const [currentPwd, setCurrentPwd] = useState('');
   const [newPwd, setNewPwd] = useState('');
   const [confirmPwd, setConfirmPwd] = useState('');
+  const [pwdOpen, setPwdOpen] = useState(false);
   const [notifyEmail, setNotifyEmail] = useState(true);
   const [notifyPush, setNotifyPush] = useState(false);
   const [notifyInApp, setNotifyInApp] = useState(true);
@@ -174,7 +175,17 @@ export default function AdminSettings(): JSX.Element {
             {/* PROFILE */}
             {tab === 'profile' && user && (
               <div className="space-y-6">
-                <Header icon={<UserIcon className="h-5 w-5" />} title="الملف الشخصي" subtitle="إدارة بيانات حسابك وتفضيلاتك" />
+                <Header
+                  icon={<UserIcon className="h-5 w-5" />}
+                  title="الملف الشخصي"
+                  subtitle="إدارة بيانات حسابك وتفضيلاتك"
+                  action={
+                    <Button variant="outline" size="sm" className="gap-2" onClick={() => setPwdOpen(true)}>
+                      <Lock className="h-4 w-4" />
+                      تغيير كلمة المرور
+                    </Button>
+                  }
+                />
 
                 {/* Basic info */}
                 <div className="space-y-5">
@@ -230,38 +241,45 @@ export default function AdminSettings(): JSX.Element {
 
                 <Separator />
 
-                {/* Password */}
-                <div className="space-y-4">
-                  <h3 className="text-base font-semibold flex items-center gap-2">
-                    <Lock className="h-4 w-4 text-primary" />
-                    كلمة المرور
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="space-y-1.5">
-                      <Label>كلمة المرور الحالية</Label>
-                      <Input type="password" value={currentPwd} onChange={(e) => setCurrentPwd(e.target.value)} />
+                {/* Password change dialog */}
+                <Dialog open={pwdOpen} onOpenChange={(o) => {
+                  setPwdOpen(o);
+                  if (!o) { setCurrentPwd(''); setNewPwd(''); setConfirmPwd(''); }
+                }}>
+                  <DialogContent className="sm:max-w-md" dir="rtl">
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2">
+                        <Lock className="h-4 w-4 text-primary" />
+                        تغيير كلمة المرور
+                      </DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 py-2">
+                      <div className="space-y-1.5">
+                        <Label>كلمة المرور الحالية</Label>
+                        <Input type="password" value={currentPwd} onChange={(e) => setCurrentPwd(e.target.value)} autoFocus />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label>كلمة المرور الجديدة</Label>
+                        <Input type="password" value={newPwd} onChange={(e) => setNewPwd(e.target.value)} />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label>تأكيد كلمة المرور</Label>
+                        <Input type="password" value={confirmPwd} onChange={(e) => setConfirmPwd(e.target.value)} />
+                      </div>
                     </div>
-                    <div className="space-y-1.5">
-                      <Label>كلمة المرور الجديدة</Label>
-                      <Input type="password" value={newPwd} onChange={(e) => setNewPwd(e.target.value)} />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label>تأكيد كلمة المرور</Label>
-                      <Input type="password" value={confirmPwd} onChange={(e) => setConfirmPwd(e.target.value)} />
-                    </div>
-                  </div>
-                  <div className="flex justify-end">
-                    <Button onClick={() => {
-                      if (!currentPwd || !newPwd || !confirmPwd) { showToast('املأ جميع الحقول', 'error'); return; }
-                      if (newPwd !== confirmPwd) { showToast('كلمة المرور الجديدة غير مطابقة', 'error'); return; }
-                      if (newPwd.length < 6) { showToast('كلمة المرور 6 أحرف على الأقل', 'error'); return; }
-                      setCurrentPwd(''); setNewPwd(''); setConfirmPwd('');
-                      showToast('تم تحديث كلمة المرور', 'success');
-                    }}>تحديث كلمة المرور</Button>
-                  </div>
-                </div>
-
-                <Separator />
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setPwdOpen(false)}>إلغاء</Button>
+                      <Button onClick={() => {
+                        if (!currentPwd || !newPwd || !confirmPwd) { showToast('املأ جميع الحقول', 'error'); return; }
+                        if (newPwd !== confirmPwd) { showToast('كلمة المرور الجديدة غير مطابقة', 'error'); return; }
+                        if (newPwd.length < 6) { showToast('كلمة المرور 6 أحرف على الأقل', 'error'); return; }
+                        setCurrentPwd(''); setNewPwd(''); setConfirmPwd('');
+                        setPwdOpen(false);
+                        showToast('تم تحديث كلمة المرور', 'success');
+                      }}>تحديث</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
 
                 {/* Notification preferences */}
                 <div className="space-y-4">
