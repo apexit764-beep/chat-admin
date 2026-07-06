@@ -1,5 +1,5 @@
 import { useLocation, Link, useNavigate } from 'react-router-dom';
-import { ChevronLeft, Moon, Sun, User, Settings, Shield, Bell, LogOut, Menu } from 'lucide-react';
+import { ChevronLeft, Moon, Sun, User, Settings, LogOut, Menu } from 'lucide-react';
 import { NotificationDropdown } from '@/components/admin/NotificationDropdown';
 import { HeaderSearch } from '@/components/admin/HeaderSearch';
 import { useThemeStore } from '@/store/useThemeStore';
@@ -147,20 +147,6 @@ export function AdminTopbar(): JSX.Element {
                 >
                   <Settings className="h-4 w-4" />
                   الإعدادات
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="cursor-pointer gap-2 px-3"
-                  onClick={() => navigate('/activity')}
-                >
-                  <Shield className="h-4 w-4" />
-                  سجل النشاط
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="cursor-pointer gap-2 px-3"
-                  onClick={() => navigate('/notifications')}
-                >
-                  <Bell className="h-4 w-4" />
-                  الإشعارات
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
