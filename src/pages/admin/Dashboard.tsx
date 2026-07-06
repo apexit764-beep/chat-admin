@@ -7,13 +7,9 @@ import {
   TrendingDown,
   UserPlus,
   Sparkles,
-  AlertTriangle,
   ArrowUpRight,
   Star,
   MessagesSquare,
-  Globe2,
-  Package,
-  Wallet,
   Clock,
   CheckCircle2,
   XCircle,
@@ -235,7 +231,6 @@ export default function AdminDashboard(): JSX.Element {
 
       {/* ══════════ Section 1: Financial KPIs ══════════ */}
       <section className="space-y-3">
-        <SectionTitle icon={<Wallet className="h-4 w-4" />} title="الأداء المالي" />
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <StatCard
             label="الإيراد الشهري (MRR)"
@@ -295,7 +290,6 @@ export default function AdminDashboard(): JSX.Element {
 
       {/* ══════════ Section 3: Customer Base ══════════ */}
       <section className="space-y-3">
-        <SectionTitle icon={<Users className="h-4 w-4" />} title="قاعدة العملاء" />
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <StatCard
             label="عملاء نشطون"
@@ -328,124 +322,107 @@ export default function AdminDashboard(): JSX.Element {
         </div>
       </section>
 
-      {/* ══════════ Section 4: Alerts (past due + expiring trials) ══════════ */}
-      <section className="space-y-3">
-        <div className="flex items-center justify-between">
-          <SectionTitle icon={<AlertTriangle className="h-4 w-4" />} title="تنبيهات تحتاج متابعة" />
-          {overdueInvoiceAmount > 0 && (
-            <span className="text-xs text-muted-foreground">
-              إجمالي الفواتير المتأخرة: <span className="font-bold text-danger">${Math.round(overdueInvoiceAmount).toLocaleString()}</span>
-            </span>
-          )}
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Past due */}
-          <Card>
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-base">متأخرون عن الدفع</CardTitle>
-                  <CardDescription>{pastDueCount} عميل</CardDescription>
-                </div>
+      {/* ══════════ Section 4: Alerts (past due + expiring trials) — stacked ══════════ */}
+      <div className="space-y-4">
+        {/* Past due */}
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <CardTitle className="text-base">متأخرون عن الدفع</CardTitle>
                 <Badge variant="warning" className="text-[10px]">{pastDueClients.length}</Badge>
               </div>
-            </CardHeader>
-            <CardContent className="p-0">
-              {pastDueClients.length === 0 ? (
-                <p className="text-sm text-muted-foreground py-8 text-center">لا يوجد متأخرين — كل الاشتراكات مسدّدة</p>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="text-start">العميل</TableHead>
-                      <TableHead className="text-start">المبلغ المستحق</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {pastDueClients.map(({ client, amount, currency }) => (
-                      <TableRow key={client.id}>
-                        <TableCell className="py-2.5">
-                          <Link to={`/clients/${client.id}`} className="flex items-center gap-2 min-w-0 hover:underline">
-                            <Avatar className="h-7 w-7">
-                              <AvatarFallback className={`text-[10px] font-semibold ${avatarColor(client.companyName)}`}>{initials(client.companyName)}</AvatarFallback>
-                            </Avatar>
-                            <span className="text-sm font-medium truncate">{client.companyName}</span>
-                          </Link>
-                        </TableCell>
-                        <TableCell className="py-2.5 text-sm font-bold text-danger">{formatMoney(amount, currency)}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
               {pastDueClients.length > 0 && (
-                <div className="p-2 text-center border-t">
-                  <Button variant="ghost" size="sm" asChild>
-                    <Link to="/clients?filter=past_due" className="text-xs">عرض الكل <ArrowUpRight className="h-3 w-3 ms-1 inline" /></Link>
-                  </Button>
-                </div>
+                <Button variant="link" size="sm" asChild>
+                  <Link to="/clients?filter=past_due" className="text-xs flex items-center gap-1">عرض الكل <ArrowUpRight className="h-3 w-3" /></Link>
+                </Button>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            {pastDueClients.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-8 text-center">لا يوجد متأخرين — كل الاشتراكات مسدّدة</p>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-start">العميل</TableHead>
+                    <TableHead className="text-start">المبلغ المستحق</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {pastDueClients.map(({ client, amount, currency }) => (
+                    <TableRow key={client.id}>
+                      <TableCell className="py-2.5">
+                        <Link to={`/clients/${client.id}`} className="flex items-center gap-2 min-w-0 hover:underline">
+                          <Avatar className="h-7 w-7">
+                            <AvatarFallback className={`text-[10px] font-semibold ${avatarColor(client.companyName)}`}>{initials(client.companyName)}</AvatarFallback>
+                          </Avatar>
+                          <span className="text-sm font-medium truncate">{client.companyName}</span>
+                        </Link>
+                      </TableCell>
+                      <TableCell className="py-2.5 text-sm font-bold text-danger">{formatMoney(amount, currency)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
 
-          {/* Expiring trials */}
-          <Card>
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-base">تجارب تنتهي قريباً</CardTitle>
-                  <CardDescription>خلال أقل من 7 أيام</CardDescription>
-                </div>
+        {/* Expiring trials */}
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <CardTitle className="text-base">تجارب تنتهي قريباً</CardTitle>
                 <Badge variant="default" className="text-[10px]">{expiringTrials.length}</Badge>
               </div>
-            </CardHeader>
-            <CardContent className="p-0">
-              {expiringTrials.length === 0 ? (
-                <p className="text-sm text-muted-foreground py-8 text-center">لا توجد تجارب قاربت على الانتهاء</p>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="text-start">العميل</TableHead>
-                      <TableHead className="text-start">المتبقي</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {expiringTrials.map(({ client, daysLeft }) => (
-                      <TableRow key={client.id}>
-                        <TableCell className="py-2.5">
-                          <Link to={`/clients/${client.id}`} className="flex items-center gap-2 min-w-0 hover:underline">
-                            <Avatar className="h-7 w-7">
-                              <AvatarFallback className={`text-[10px] font-semibold ${avatarColor(client.companyName)}`}>{initials(client.companyName)}</AvatarFallback>
-                            </Avatar>
-                            <span className="text-sm truncate">{client.companyName}</span>
-                          </Link>
-                        </TableCell>
-                        <TableCell className="py-2.5">
-                          <Badge variant={daysLeft <= 2 ? 'destructive' : daysLeft <= 5 ? 'warning' : 'secondary'} className="text-[10px]">
-                            {daysLeft === 0 ? 'اليوم' : daysLeft === 1 ? 'غداً' : `${daysLeft} أيام`}
-                          </Badge>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
               {expiringTrials.length > 0 && (
-                <div className="p-2 text-center border-t">
-                  <Button variant="ghost" size="sm" asChild>
-                    <Link to="/clients?filter=trial" className="text-xs">عرض الكل <ArrowUpRight className="h-3 w-3 ms-1 inline" /></Link>
-                  </Button>
-                </div>
+                <Button variant="link" size="sm" asChild>
+                  <Link to="/clients?filter=trial" className="text-xs flex items-center gap-1">عرض الكل <ArrowUpRight className="h-3 w-3" /></Link>
+                </Button>
               )}
-            </CardContent>
-          </Card>
-        </div>
-      </section>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            {expiringTrials.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-8 text-center">لا توجد تجارب قاربت على الانتهاء</p>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-start">العميل</TableHead>
+                    <TableHead className="text-start">المتبقي</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {expiringTrials.map(({ client, daysLeft }) => (
+                    <TableRow key={client.id}>
+                      <TableCell className="py-2.5">
+                        <Link to={`/clients/${client.id}`} className="flex items-center gap-2 min-w-0 hover:underline">
+                          <Avatar className="h-7 w-7">
+                            <AvatarFallback className={`text-[10px] font-semibold ${avatarColor(client.companyName)}`}>{initials(client.companyName)}</AvatarFallback>
+                          </Avatar>
+                          <span className="text-sm truncate">{client.companyName}</span>
+                        </Link>
+                      </TableCell>
+                      <TableCell className="py-2.5">
+                        <Badge variant={daysLeft <= 2 ? 'destructive' : daysLeft <= 5 ? 'warning' : 'secondary'} className="text-[10px]">
+                          {daysLeft === 0 ? 'اليوم' : daysLeft === 1 ? 'غداً' : `${daysLeft} أيام`}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
+      </div>
 
       {/* ══════════ Section 5: Distribution (countries + plans) ══════════ */}
       <section className="space-y-3">
-        <SectionTitle icon={<Globe2 className="h-4 w-4" />} title="التوزيع" />
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* By country */}
           <Card>
@@ -541,7 +518,6 @@ export default function AdminDashboard(): JSX.Element {
 
       {/* ══════════ Section 6: Platform Pulse ══════════ */}
       <section className="space-y-3">
-        <SectionTitle icon={<MessagesSquare className="h-4 w-4" />} title="نبض المنصة" />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Channels */}
           <Card>
@@ -628,7 +604,6 @@ export default function AdminDashboard(): JSX.Element {
 
       {/* ══════════ Section 7: Recent Activity ══════════ */}
       <section className="space-y-3">
-        <SectionTitle icon={<Clock className="h-4 w-4" />} title="النشاط الأخير" />
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
           {/* Recent clients */}
           <Card className="lg:col-span-3">
@@ -739,17 +714,6 @@ export default function AdminDashboard(): JSX.Element {
 }
 
 /* ══════════════════════ Helper Components ══════════════════════ */
-
-function SectionTitle({ icon, title }: { icon: React.ReactNode; title: string }): JSX.Element {
-  return (
-    <div className="flex items-center gap-2">
-      <div className="h-7 w-7 rounded-md bg-primary/10 text-primary flex items-center justify-center">
-        {icon}
-      </div>
-      <h3 className="text-base font-semibold">{title}</h3>
-    </div>
-  );
-}
 
 function MetricRow({ icon, iconBg, iconColor, label, value }: {
   icon: React.ReactNode;
