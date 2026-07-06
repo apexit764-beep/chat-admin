@@ -58,6 +58,36 @@ export interface Currency {
   usdRate: number;
 }
 
+export interface AISettings {
+  enabled: boolean;
+  provider: 'chatgpt' | 'claude' | 'gemini';
+  apiKey: string;
+  model: string;
+  maxTokens: number;
+  languages: string[];
+  tone: 'concise' | 'friendly' | 'formal' | 'luxury';
+  dialect: 'fus7a' | 'khaleeji' | 'masri' | 'shami';
+  companyPrompt: string;
+  learnFromDocs: boolean;
+  learnFromReplies: boolean;
+  learnFromKnowledge: boolean;
+  forbiddenTopics: string;
+  forbiddenReply: string;
+  handoffOnRequest: boolean;
+  handoffOnFailure: boolean;
+  handoffOnNegative: boolean;
+  handoffOnRepeat: boolean;
+  handoffOnPayment: boolean;
+  handoffOnUrgent: boolean;
+  handoffKeywords: string[];
+  handoffAssignee: string;
+  is24_7: boolean;
+  workDays: string[];
+  workFrom: string;
+  workTo: string;
+  offlineMessage: string;
+}
+
 export interface WidgetSettings {
   enabled: boolean;
   primaryColor: string;
@@ -83,12 +113,14 @@ interface SettingsState {
   social: SocialLinks;
   currencies: Currency[];
   widget: WidgetSettings;
+  ai: AISettings;
   setNotifications: (patch: Partial<NotificationPrefs>) => void;
   setSecurity: (patch: Partial<SecurityPrefs>) => void;
   setGeneral: (patch: Partial<GeneralPrefs>) => void;
   setCompany: (patch: Partial<CompanyInfo>) => void;
   setSocial: (patch: Partial<SocialLinks>) => void;
   setWidget: (patch: Partial<WidgetSettings>) => void;
+  setAI: (patch: Partial<AISettings>) => void;
   addCurrency: (c: Currency) => void;
   updateCurrency: (code: string, patch: Partial<Currency>) => void;
   removeCurrency: (code: string) => void;
@@ -97,7 +129,7 @@ interface SettingsState {
 
 const KEY = 'sekaa_settings_v1';
 
-type Persisted = Pick<SettingsState, 'notifications' | 'security' | 'general' | 'company' | 'social' | 'currencies' | 'widget'>;
+type Persisted = Pick<SettingsState, 'notifications' | 'security' | 'general' | 'company' | 'social' | 'currencies' | 'widget' | 'ai'>;
 
 const defaultState: Persisted = {
   notifications: { newConv: true, newMsg: true, campaigns: true, browser: false, sound: true },
@@ -151,6 +183,35 @@ const defaultState: Persisted = {
     offlineMessage: 'نحن غير متاحين حالياً. اترك رسالتك وسنرد عليك في أقرب وقت.',
     brandingHidden: false,
   },
+  ai: {
+    enabled: true,
+    provider: 'chatgpt',
+    apiKey: '',
+    model: 'gpt-4o-mini',
+    maxTokens: 600,
+    languages: ['ar', 'en'],
+    tone: 'friendly',
+    dialect: 'fus7a',
+    companyPrompt: '',
+    learnFromDocs: true,
+    learnFromReplies: true,
+    learnFromKnowledge: true,
+    forbiddenTopics: '',
+    forbiddenReply: 'عذراً لا أستطيع المساعدة في هذا الموضوع. للحصول على إجابة دقيقة سيتواصل معك أحد موظفينا قريباً 🙏',
+    handoffOnRequest: true,
+    handoffOnFailure: true,
+    handoffOnNegative: true,
+    handoffOnRepeat: false,
+    handoffOnPayment: true,
+    handoffOnUrgent: true,
+    handoffKeywords: ['شكوى', 'موظف', 'بشري', 'استرداد', 'مشكلة', 'speak to human'],
+    handoffAssignee: '',
+    is24_7: false,
+    workDays: ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday'],
+    workFrom: '09:00',
+    workTo: '17:00',
+    offlineMessage: 'أهلاً خارج ساعات الدوام حالياً، لكن سجّلنا طلبك وسيتواصل معك أحد الموظفين أول الدوام. لأي استفسار سريع تقدر تعتمد عليّ.',
+  },
   currencies: [
     { code: 'OMR', name: 'Omani Rial', nameAr: 'ريال عُماني', symbol: 'ر.ع', usdRate: 0.385 },
     { code: 'AED', name: 'UAE Dirham', nameAr: 'درهم إماراتي', symbol: 'د.إ', usdRate: 3.673 },
@@ -176,6 +237,7 @@ function read(): Persisted {
       company: { ...defaultState.company, ...(parsed.company ?? {}) },
       social: { ...defaultState.social, ...(parsed.social ?? {}) },
       widget: { ...defaultState.widget, ...(parsed.widget ?? {}) },
+      ai: { ...defaultState.ai, ...(parsed.ai ?? {}) },
       currencies: parsed.currencies?.length ? parsed.currencies : defaultState.currencies,
     };
   } catch {
@@ -193,6 +255,7 @@ function persist(state: Persisted): void {
       company: state.company,
       social: state.social,
       widget: state.widget,
+      ai: state.ai,
       currencies: state.currencies,
     }));
   } catch {/* ignore */}
@@ -224,6 +287,10 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   },
   setWidget: (patch) => {
     set((s) => ({ widget: { ...s.widget, ...patch } }));
+    persist(get());
+  },
+  setAI: (patch) => {
+    set((s) => ({ ai: { ...s.ai, ...patch } }));
     persist(get());
   },
   addCurrency: (c) => {
