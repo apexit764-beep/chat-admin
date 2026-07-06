@@ -1,24 +1,18 @@
 import { useState } from 'react';
 import {
   Building,
-  Shield,
   Palette,
-  Key,
   FileText,
-  Copy,
-  Eye,
-  EyeOff,
   CreditCard,
   Globe2,
   Coins,
-  Share2,
   Plus,
   Trash2,
   Edit2,
-  LogIn,
   FileStack,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
-import AdminPayments from './Payments';
 import { useConfirm } from '@components/ui';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
@@ -56,10 +50,18 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Checkbox } from '@/components/ui/checkbox';
 
-type Tab = 'general' | 'company' | 'countries' | 'currencies' | 'social' | 'security' | 'appearance' | 'emails' | 'api' | 'payments' | 'pages' | 'social_login';
+type Tab = 'general' | 'company' | 'countries' | 'currencies' | 'appearance' | 'emails' | 'payments' | 'pages';
 
-const validTabs: Tab[] = ['general', 'company', 'countries', 'currencies', 'social', 'security', 'appearance', 'emails', 'api', 'payments', 'pages', 'social_login'];
+const validTabs: Tab[] = ['general', 'company', 'countries', 'currencies', 'appearance', 'emails', 'payments', 'pages'];
+
+const PAYMENT_METHODS = [
+  { key: 'card', label: 'كارد (Visa / MasterCard)' },
+  { key: 'apple_pay', label: 'آبل باي (Apple Pay)' },
+  { key: 'google_pay', label: 'جوجل باي (Google Pay)' },
+  { key: 'bank_transfer', label: 'تحويل بنكي' },
+] as const;
 
 export default function AdminSettings(): JSX.Element {
   const initialTab = ((): Tab => {
@@ -75,8 +77,6 @@ export default function AdminSettings(): JSX.Element {
   const showToast = useUIStore((s) => s.showToast);
   const theme = useThemeStore((s) => s.theme);
   const setTheme = useThemeStore((s) => s.setTheme);
-  const securityPrefs = useSettingsStore((s) => s.security);
-  const setSecurityPrefs = useSettingsStore((s) => s.setSecurity);
   const company = useSettingsStore((s) => s.company);
   const setCompany = useSettingsStore((s) => s.setCompany);
   const social = useSettingsStore((s) => s.social);
@@ -94,7 +94,6 @@ export default function AdminSettings(): JSX.Element {
   const [productTagline, setProductTagline] = useState('منصة CRM متكاملة للشركات');
   const [supportEmail, setSupportEmail] = useState('support@apexes.click');
   const [supportPhone, setSupportPhone] = useState('+96891234567');
-  const [showApiKey, setShowApiKey] = useState(false);
   // Email templates CRUD
   type EmailTemplate = { id: string; name: string; subject: string; body: string; trigger: string };
   const [emailTemplates, setEmailTemplates] = useState<EmailTemplate[]>([
@@ -112,24 +111,23 @@ export default function AdminSettings(): JSX.Element {
   ]);
   const [pageModal, setPageModal] = useState<(PageItem & { isNew: boolean }) | null>(null);
 
-  // Social Login
-  const [googleLogin, setGoogleLogin] = useState({ enabled: false, clientId: '', clientSecret: '' });
-  const [facebookLogin, setFacebookLogin] = useState({ enabled: false, appId: '', appSecret: '' });
-
+  // Payment gateways CRUD
+  type PaymentGateway = { id: string; name: string; slug: string; environment: 'sandbox' | 'production'; enabled: boolean; publicKey: string; secretKey: string; email: string; jsonConfig: string; countries: string[]; methods: string[] };
+  const [gateways, setGateways] = useState<PaymentGateway[]>([
+    { id: '1', name: 'بايموب', slug: 'paymob', environment: 'sandbox', enabled: true, publicKey: 'pk_test_12345', secretKey: 'sk_test_67890', email: 'demo@company.com', jsonConfig: '{"e_pay_integration_id":67890,"hmac_secret":"YOUR_HMAC","param_3d":"non3d","use_intention_api":true,"api_base_url":"https://accept.paymob.com/api","integration_id":12345,"app1"}', countries: ['PS', 'EG', 'SA', 'IQ'], methods: ['card', 'apple_pay'] },
+  ]);
+  const [gatewayModal, setGatewayModal] = useState<(PaymentGateway & { isNew: boolean }) | null>(null);
+  const [showSecretKey, setShowSecretKey] = useState(false);
 
   const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
     { key: 'general', label: 'عام', icon: <Building className="h-4 w-4" /> },
     { key: 'company', label: 'الشركة', icon: <Building className="h-4 w-4" /> },
     { key: 'countries', label: 'الدول', icon: <Globe2 className="h-4 w-4" /> },
     { key: 'currencies', label: 'العملات', icon: <Coins className="h-4 w-4" /> },
-    { key: 'social', label: 'التواصل الاجتماعي', icon: <Share2 className="h-4 w-4" /> },
-    { key: 'security', label: 'الأمان', icon: <Shield className="h-4 w-4" /> },
     { key: 'emails', label: 'قوالب البريد', icon: <FileText className="h-4 w-4" /> },
-    { key: 'api', label: 'مفاتيح API', icon: <Key className="h-4 w-4" /> },
-    { key: 'payments', label: 'بوابة الدفع', icon: <CreditCard className="h-4 w-4" /> },
+    { key: 'payments', label: 'بوابات الدفع', icon: <CreditCard className="h-4 w-4" /> },
     { key: 'appearance', label: 'المظهر', icon: <Palette className="h-4 w-4" /> },
     { key: 'pages', label: 'الصفحات', icon: <FileStack className="h-4 w-4" /> },
-    { key: 'social_login', label: 'تسجيل اجتماعي', icon: <LogIn className="h-4 w-4" /> },
   ];
 
   return (
@@ -156,9 +154,6 @@ export default function AdminSettings(): JSX.Element {
           </CardContent>
         </Card>
 
-        {tab === 'payments' ? (
-          <AdminPayments />
-        ) : (
         <Card>
           <CardContent className="p-5 lg:p-6">
             {/* GENERAL */}
@@ -247,6 +242,30 @@ export default function AdminSettings(): JSX.Element {
                     <Label>رقم السجل التجاري</Label>
                     <Input value={company.registrationNumber} onChange={(e) => setCompany({ registrationNumber: e.target.value })} />
                   </div>
+                </div>
+                <Separator className="my-6" />
+                <p className="text-sm font-semibold mb-3">روابط التواصل الاجتماعي</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {([
+                    ['facebook', 'Facebook', 'https://facebook.com/...'],
+                    ['twitter', 'X (Twitter)', 'https://x.com/...'],
+                    ['instagram', 'Instagram', 'https://instagram.com/...'],
+                    ['linkedin', 'LinkedIn', 'https://linkedin.com/company/...'],
+                    ['youtube', 'YouTube', 'https://youtube.com/@...'],
+                    ['tiktok', 'TikTok', 'https://tiktok.com/@...'],
+                    ['telegram', 'Telegram', 'https://t.me/...'],
+                    ['snapchat', 'Snapchat', 'https://snapchat.com/add/...'],
+                  ] as const).map(([key, label, placeholder]) => (
+                    <div key={key} className="space-y-1.5">
+                      <Label>{label}</Label>
+                      <Input
+                        value={social[key]}
+                        onChange={(e) => setSocial({ [key]: e.target.value })}
+                        placeholder={placeholder}
+                        dir="ltr"
+                      />
+                    </div>
+                  ))}
                 </div>
                 <div className="flex justify-end pt-6">
                   <Button onClick={() => showToast('تم حفظ بيانات الشركة', 'success')}>حفظ التغييرات</Button>
@@ -369,81 +388,6 @@ export default function AdminSettings(): JSX.Element {
               </div>
             )}
 
-            {/* SOCIAL */}
-            {tab === 'social' && (
-              <div>
-                <Header icon={<Share2 className="h-5 w-5" />} title="روابط التواصل الاجتماعي" subtitle="روابط منصات الشركة على الشبكات الاجتماعية" />
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {([
-                    ['facebook', 'Facebook', 'https://facebook.com/...'],
-                    ['twitter', 'X (Twitter)', 'https://x.com/...'],
-                    ['instagram', 'Instagram', 'https://instagram.com/...'],
-                    ['linkedin', 'LinkedIn', 'https://linkedin.com/company/...'],
-                    ['youtube', 'YouTube', 'https://youtube.com/@...'],
-                    ['tiktok', 'TikTok', 'https://tiktok.com/@...'],
-                    ['telegram', 'Telegram', 'https://t.me/...'],
-                    ['snapchat', 'Snapchat', 'https://snapchat.com/add/...'],
-                  ] as const).map(([key, label, placeholder]) => (
-                    <div key={key} className="space-y-1.5">
-                      <Label>{label}</Label>
-                      <Input
-                        value={social[key]}
-                        onChange={(e) => setSocial({ [key]: e.target.value })}
-                        placeholder={placeholder}
-                        dir="ltr"
-                      />
-                    </div>
-                  ))}
-                </div>
-                <div className="flex justify-end pt-6">
-                  <Button onClick={() => showToast('تم حفظ الروابط', 'success')}>حفظ التغييرات</Button>
-                </div>
-              </div>
-            )}
-
-            {/* SECURITY */}
-            {tab === 'security' && (
-              <div>
-                <Header icon={<Shield className="h-5 w-5" />} title="الأمان" subtitle="تأمين الوصول للوحة الإدارة" />
-                <Row label="المصادقة الثنائية (2FA)" hint="طبقة أمان إضافية">
-                  <Switch
-                    checked={securityPrefs.twoFactor}
-                    onCheckedChange={(v) => {
-                      setSecurityPrefs({ twoFactor: v });
-                      showToast(v ? 'تم تفعيل 2FA' : 'تم تعطيل 2FA', 'success');
-                    }}
-                  />
-                </Row>
-                <Row label="انتهاء الجلسة" hint="بعد كم دقيقة بدون نشاط">
-                  <Select
-                    value={String(securityPrefs.sessionTimeoutMin)}
-                    onValueChange={(v) => {
-                      setSecurityPrefs({ sessionTimeoutMin: Number(v) });
-                      showToast('تم الحفظ', 'success');
-                    }}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="15">15 دقيقة</SelectItem>
-                      <SelectItem value="30">30 دقيقة</SelectItem>
-                      <SelectItem value="60">ساعة</SelectItem>
-                      <SelectItem value="480">8 ساعات</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </Row>
-                <Row label="تقييد IP" hint="السماح فقط من IPs محددة">
-                  <Switch
-                    checked={securityPrefs.ipRestriction}
-                    onCheckedChange={(v) => {
-                      setSecurityPrefs({ ipRestriction: v });
-                      showToast(v ? 'تم التفعيل' : 'تم التعطيل', 'success');
-                    }}
-                  />
-                </Row>
-              </div>
-            )}
 
             {/* EMAIL TEMPLATES CRUD */}
             {tab === 'emails' && (
@@ -495,120 +439,6 @@ export default function AdminSettings(): JSX.Element {
               </div>
             )}
 
-            {/* API KEYS */}
-            {tab === 'api' && (
-              <div>
-                <Header icon={<Key className="h-5 w-5" />} title="مفاتيح API" subtitle="مفاتيح الوصول للتكامل مع الأنظمة الخارجية" />
-                <div className="space-y-4">
-                  <div className="p-4 rounded-lg border bg-muted/30">
-                    <div className="flex items-center justify-between mb-2">
-                      <div>
-                        <p className="text-sm font-semibold">المفتاح العام (Public Key)</p>
-                        <p className="text-xs text-muted-foreground">للاستخدام في واجهة العميل</p>
-                      </div>
-                      <Badge variant="default" className="text-[10px]">نشط</Badge>
-                    </div>
-                    <div className="flex items-center gap-2 mt-3">
-                      <Input
-                        readOnly
-                        value="pk_live_qhub_8f3a2bd4c5e9a1b7d6f0"
-                        className="font-mono text-xs bg-background"
-                      />
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-9 w-9 flex-shrink-0"
-                        onClick={() => {
-                          void navigator.clipboard.writeText('pk_live_qhub_8f3a2bd4c5e9a1b7d6f0');
-                          showToast('تم النسخ', 'success');
-                        }}
-                      >
-                        <Copy className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="p-4 rounded-lg border bg-muted/30">
-                    <div className="flex items-center justify-between mb-2">
-                      <div>
-                        <p className="text-sm font-semibold">المفتاح السري (Secret Key)</p>
-                        <p className="text-xs text-muted-foreground">للاستخدام في الخادم فقط — لا تشاركه أبداً</p>
-                      </div>
-                      <Badge variant="destructive" className="text-[10px]">سري</Badge>
-                    </div>
-                    <div className="flex items-center gap-2 mt-3">
-                      <Input
-                        readOnly
-                        value={showApiKey ? 'sk_live_qhub_7e2f9c4d8a1b5e3f6d0a9c' : '••••••••••••••••••••••••••'}
-                        className="font-mono text-xs bg-background"
-                      />
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-9 w-9 flex-shrink-0"
-                        onClick={() => setShowApiKey(!showApiKey)}
-                      >
-                        {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-9 w-9 flex-shrink-0"
-                        onClick={() => {
-                          void navigator.clipboard.writeText('sk_live_qhub_7e2f9c4d8a1b5e3f6d0a9c');
-                          showToast('تم النسخ', 'success');
-                        }}
-                      >
-                        <Copy className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="p-4 rounded-lg border bg-muted/30">
-                    <div className="flex items-center justify-between mb-2">
-                      <div>
-                        <p className="text-sm font-semibold">Webhook URL</p>
-                        <p className="text-xs text-muted-foreground">عنوان استقبال الأحداث من النظام</p>
-                      </div>
-                      <Badge variant="secondary" className="text-[10px]">مُعد</Badge>
-                    </div>
-                    <div className="flex items-center gap-2 mt-3">
-                      <Input
-                        readOnly
-                        value="https://api.apexes.click/webhooks/qhub"
-                        className="font-mono text-xs bg-background"
-                      />
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-9 w-9 flex-shrink-0"
-                        onClick={() => {
-                          void navigator.clipboard.writeText('https://api.apexes.click/webhooks/qhub');
-                          showToast('تم النسخ', 'success');
-                        }}
-                      >
-                        <Copy className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  <Separator />
-                  <div className="flex items-center justify-between p-4 rounded-lg border border-amber-500/30 bg-amber-500/5">
-                    <div>
-                      <p className="text-sm font-semibold">إعادة توليد المفتاح السري</p>
-                      <p className="text-xs text-muted-foreground">سيتم إلغاء المفتاح الحالي فوراً</p>
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => showToast('تم توليد مفتاح جديد (تجريبي)', 'info')}
-                    >
-                      إعادة التوليد
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            )}
 
             {/* APPEARANCE */}
             {tab === 'appearance' && (
@@ -695,69 +525,68 @@ export default function AdminSettings(): JSX.Element {
               </div>
             )}
 
-            {/* SOCIAL LOGIN */}
-            {tab === 'social_login' && (
+            {/* PAYMENTS CRUD */}
+            {tab === 'payments' && (
               <div>
-                <Header icon={<LogIn className="h-5 w-5" />} title="تسجيل الدخول الاجتماعي" subtitle="تفعيل تسجيل الدخول عبر حسابات التواصل الاجتماعي" />
-                <div className="space-y-6">
-                  <div className="p-4 rounded-lg border">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500 font-bold text-lg">G</div>
-                        <div>
-                          <p className="text-sm font-semibold">Google</p>
-                          <p className="text-xs text-muted-foreground">تسجيل دخول عبر حساب جوجل</p>
-                        </div>
-                      </div>
-                      <Switch checked={googleLogin.enabled} onCheckedChange={(v) => setGoogleLogin({ ...googleLogin, enabled: v })} />
-                    </div>
-                    {googleLogin.enabled && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div className="space-y-1.5">
-                          <Label>Client ID</Label>
-                          <Input value={googleLogin.clientId} onChange={(e) => setGoogleLogin({ ...googleLogin, clientId: e.target.value })} dir="ltr" />
-                        </div>
-                        <div className="space-y-1.5">
-                          <Label>Client Secret</Label>
-                          <Input type="password" value={googleLogin.clientSecret} onChange={(e) => setGoogleLogin({ ...googleLogin, clientSecret: e.target.value })} dir="ltr" />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-4 rounded-lg border">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500 font-bold text-lg">f</div>
-                        <div>
-                          <p className="text-sm font-semibold">Facebook</p>
-                          <p className="text-xs text-muted-foreground">تسجيل دخول عبر فيسبوك</p>
-                        </div>
-                      </div>
-                      <Switch checked={facebookLogin.enabled} onCheckedChange={(v) => setFacebookLogin({ ...facebookLogin, enabled: v })} />
-                    </div>
-                    {facebookLogin.enabled && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div className="space-y-1.5">
-                          <Label>App ID</Label>
-                          <Input value={facebookLogin.appId} onChange={(e) => setFacebookLogin({ ...facebookLogin, appId: e.target.value })} dir="ltr" />
-                        </div>
-                        <div className="space-y-1.5">
-                          <Label>App Secret</Label>
-                          <Input type="password" value={facebookLogin.appSecret} onChange={(e) => setFacebookLogin({ ...facebookLogin, appSecret: e.target.value })} dir="ltr" />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex justify-end">
-                    <Button onClick={() => showToast('تم حفظ إعدادات تسجيل الدخول', 'success')}>حفظ التغييرات</Button>
-                  </div>
-                </div>
+                <Header
+                  icon={<CreditCard className="h-5 w-5" />}
+                  title="بوابات الدفع"
+                  subtitle="إدارة بوابات الدفع المتصلة بالنظام"
+                  action={
+                    <Button size="sm" onClick={() => setGatewayModal({ id: String(Date.now()), name: '', slug: '', environment: 'sandbox', enabled: true, publicKey: '', secretKey: '', email: '', jsonConfig: '', countries: [], methods: [], isNew: true })}>
+                      <Plus className="h-4 w-4 me-2" /> إضافة بوابة
+                    </Button>
+                  }
+                />
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-12">#</TableHead>
+                      <TableHead>اسم البوابة</TableHead>
+                      <TableHead>رمز البوابة</TableHead>
+                      <TableHead>البيئة</TableHead>
+                      <TableHead>الحالة</TableHead>
+                      <TableHead className="text-end">إجراءات</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {gateways.map((g, idx) => (
+                      <TableRow key={g.id}>
+                        <TableCell className="text-xs text-muted-foreground font-mono">{idx + 1}</TableCell>
+                        <TableCell className="font-medium">{g.name}</TableCell>
+                        <TableCell className="font-mono text-xs text-muted-foreground">{g.slug}</TableCell>
+                        <TableCell>
+                          <Badge variant={g.environment === 'production' ? 'default' : 'secondary'} className="text-[10px]">
+                            {g.environment === 'production' ? 'إنتاج' : 'تجريبي'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={g.enabled ? 'default' : 'destructive'} className="text-[10px]">
+                            {g.enabled ? 'مفعّل' : 'معطّل'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-0.5 justify-end">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => setGatewayModal({ ...g, isNew: false })}>
+                              <Edit2 className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={async () => {
+                              const ok = await confirm({ title: `حذف "${g.name}"؟`, variant: 'danger', confirmText: 'حذف' });
+                              if (ok) { setGateways((prev) => prev.filter((x) => x.id !== g.id)); showToast('تم الحذف', 'success'); }
+                            }}>
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
             )}
 
           </CardContent>
         </Card>
-        )}
       </div>
 
       {/* Country Modal */}
@@ -1019,6 +848,151 @@ export default function AdminSettings(): JSX.Element {
                 showToast('تم الحفظ', 'success');
               }
               setPageModal(null);
+            }}>حفظ</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Gateway Modal */}
+      <Dialog open={!!gatewayModal} onOpenChange={(o) => { if (!o) setGatewayModal(null); }}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{gatewayModal?.isNew ? 'إضافة بوابة دفع' : 'تعديل بوابة دفع'}</DialogTitle>
+          </DialogHeader>
+          {gatewayModal && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label>اسم البوابة *</Label>
+                  <Input value={gatewayModal.name} onChange={(e) => setGatewayModal({ ...gatewayModal, name: e.target.value })} placeholder="بايموب" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>رمز البوابة (Slug) *</Label>
+                  <Input value={gatewayModal.slug} onChange={(e) => setGatewayModal({ ...gatewayModal, slug: e.target.value })} placeholder="paymob" dir="ltr" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label>البيئة *</Label>
+                  <Select value={gatewayModal.environment} onValueChange={(v) => setGatewayModal({ ...gatewayModal, environment: v as 'sandbox' | 'production' })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="sandbox">Sandbox (تجريبي)</SelectItem>
+                      <SelectItem value="production">Production (إنتاج)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label>الحالة</Label>
+                  <div className="flex items-center gap-2 h-10">
+                    <Switch checked={gatewayModal.enabled} onCheckedChange={(v) => setGatewayModal({ ...gatewayModal, enabled: v })} />
+                    <span className="text-sm">{gatewayModal.enabled ? 'مفعّل' : 'معطّل'}</span>
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label>Public Key</Label>
+                  <Input value={gatewayModal.publicKey} onChange={(e) => setGatewayModal({ ...gatewayModal, publicKey: e.target.value })} dir="ltr" className="font-mono text-xs" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Secret Key</Label>
+                  <div className="flex items-center gap-1">
+                    <Input
+                      type={showSecretKey ? 'text' : 'password'}
+                      value={gatewayModal.secretKey}
+                      onChange={(e) => setGatewayModal({ ...gatewayModal, secretKey: e.target.value })}
+                      dir="ltr"
+                      className="font-mono text-xs flex-1"
+                    />
+                    <Button variant="ghost" size="icon" className="h-9 w-9 flex-shrink-0" onClick={() => setShowSecretKey((v) => !v)}>
+                      {showSecretKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label>البريد الإلكتروني</Label>
+                <Input type="email" value={gatewayModal.email} onChange={(e) => setGatewayModal({ ...gatewayModal, email: e.target.value })} dir="ltr" />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label>إعدادات JSON</Label>
+                <Textarea value={gatewayModal.jsonConfig} onChange={(e) => setGatewayModal({ ...gatewayModal, jsonConfig: e.target.value })} rows={4} className="font-mono text-xs" dir="ltr" placeholder='{"integration_id": 12345, ...}' />
+              </div>
+
+              <Separator />
+
+              <div className="space-y-2">
+                <Label>الدول المدعومة</Label>
+                <div className="flex flex-wrap gap-2">
+                  {countries.map((c) => {
+                    const selected = gatewayModal.countries.includes(c.code);
+                    return (
+                      <button
+                        key={c.code}
+                        type="button"
+                        onClick={() => setGatewayModal({
+                          ...gatewayModal,
+                          countries: selected
+                            ? gatewayModal.countries.filter((x) => x !== c.code)
+                            : [...gatewayModal.countries, c.code],
+                        })}
+                        className={cn(
+                          'px-3 py-1.5 rounded-full text-xs border transition-colors',
+                          selected ? 'bg-primary text-primary-foreground border-primary' : 'bg-muted hover:bg-muted/80'
+                        )}
+                      >
+                        {c.flag} {c.nameAr}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>طرق الدفع</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  {PAYMENT_METHODS.map((m) => {
+                    const checked = gatewayModal.methods.includes(m.key);
+                    return (
+                      <label key={m.key} className="flex items-center gap-2 p-2.5 rounded-lg border cursor-pointer hover:bg-muted/50">
+                        <Checkbox
+                          checked={checked}
+                          onCheckedChange={(v) => setGatewayModal({
+                            ...gatewayModal,
+                            methods: v
+                              ? [...gatewayModal.methods, m.key]
+                              : gatewayModal.methods.filter((x) => x !== m.key),
+                          })}
+                        />
+                        <span className="text-sm">{m.label}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setGatewayModal(null)}>إلغاء</Button>
+            <Button onClick={() => {
+              if (!gatewayModal) return;
+              if (!gatewayModal.name || !gatewayModal.slug) { showToast('الاسم والرمز مطلوبان', 'error'); return; }
+              const { isNew, ...data } = gatewayModal;
+              if (isNew) {
+                setGateways((prev) => [...prev, data]);
+                showToast('تمت الإضافة', 'success');
+              } else {
+                setGateways((prev) => prev.map((g) => g.id === data.id ? data : g));
+                showToast('تم الحفظ', 'success');
+              }
+              setGatewayModal(null);
             }}>حفظ</Button>
           </DialogFooter>
         </DialogContent>
