@@ -15,7 +15,6 @@ import {
   PanelRightOpen,
   BookOpen,
   MessageCircle,
-  Bell,
   LogOut,
   X,
 } from 'lucide-react';
@@ -71,7 +70,6 @@ const navGroups: NavGroup[] = [
       { to: '/reports', label: 'التقارير', icon: BarChart3 },
       { to: '/activity', label: 'سجل النشاط', icon: Activity },
       { to: '/knowledge', label: 'قاعدة المعرفة', icon: BookOpen },
-      { to: '/notifications', label: 'الإشعارات', icon: Bell },
       { to: '/settings', label: 'الإعدادات', icon: Settings },
     ],
   },
