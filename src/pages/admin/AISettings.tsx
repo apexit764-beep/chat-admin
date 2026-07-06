@@ -36,9 +36,9 @@ import {
   SelectItem,
 } from '@/components/ui/select';
 
-type Tab = 'connection' | 'language' | 'knowledge' | 'handoff';
+export type AITab = 'connection' | 'language' | 'knowledge' | 'handoff';
 
-const TABS: { key: Tab; label: string; icon: React.ElementType }[] = [
+export const AI_TABS: { key: AITab; label: string; icon: React.ElementType }[] = [
   { key: 'connection', label: 'إعدادات الربط', icon: Link2 },
   { key: 'language', label: 'اللغة والأسلوب', icon: Mic },
   { key: 'knowledge', label: 'المعرفة والقيود', icon: BookOpen },
@@ -101,7 +101,7 @@ export default function AISettingsPage(): JSX.Element {
   const setAI = useSettingsStore((s) => s.setAI);
   const showToast = useUIStore((s) => s.showToast);
 
-  const [tab, setTab] = useState<Tab>('connection');
+  const [tab, setTab] = useState<AITab>('connection');
   const [showKey, setShowKey] = useState(false);
   const [newKeyword, setNewKeyword] = useState('');
 
@@ -177,7 +177,7 @@ export default function AISettingsPage(): JSX.Element {
       {/* Tabs */}
       <div className="border-b border-border">
         <nav className="flex gap-0 -mb-px overflow-x-auto">
-          {TABS.map((t) => {
+          {AI_TABS.map((t) => {
             const Icon = t.icon;
             return (
               <button
@@ -218,7 +218,7 @@ export default function AISettingsPage(): JSX.Element {
 }
 
 /* ─── Tab 1: Connection ─── */
-function ConnectionTab({
+export function ConnectionTab({
   ai, setAI, showKey, setShowKey,
 }: {
   ai: AISettings;
@@ -353,7 +353,7 @@ function ConnectionTab({
 }
 
 /* ─── Tab 2: Language & Style ─── */
-function LanguageTab({
+export function LanguageTab({
   ai, setAI, toggleLang,
 }: {
   ai: AISettings;
@@ -471,7 +471,7 @@ function LanguageTab({
 }
 
 /* ─── Tab 3: Knowledge & Restrictions ─── */
-function KnowledgeTab({
+export function KnowledgeTab({
   ai, setAI,
 }: {
   ai: AISettings;
@@ -576,7 +576,7 @@ function KnowledgeTab({
 }
 
 /* ─── Tab 4: Handoff & Scheduling ─── */
-function HandoffTab({
+export function HandoffTab({
   ai, setAI, newKeyword, setNewKeyword, addKeyword, removeKeyword, toggleDay,
 }: {
   ai: AISettings;

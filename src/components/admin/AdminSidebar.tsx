@@ -18,7 +18,6 @@ import {
   LogOut,
   X,
   Plug,
-  MessagesSquare,
   Sparkles,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -56,8 +55,7 @@ const navGroups: NavGroup[] = [
     items: [
       { to: '/clients', label: 'العملاء', icon: Users },
       { to: '/conversations', label: 'الدردشة المباشرة', icon: MessageCircle },
-      { to: '/widget', label: 'إعدادات الويدجت', icon: MessagesSquare },
-      { to: '/ai-settings', label: 'إعدادات الذكاء الاصطناعي', icon: Sparkles },
+      { to: '/widget', label: 'إعدادات المساعد الذكي', icon: Sparkles },
       { to: '/plans', label: 'الباقات', icon: Package },
       { to: '/feedback', label: 'الشكاوى والاقتراحات', icon: MessageSquareWarning },
     ],

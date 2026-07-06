@@ -39,7 +39,7 @@ const breadcrumbMap: Record<string, string> = {
   '/knowledge': 'قاعدة المعرفة',
   '/conversations': 'الدردشة المباشرة',
   '/notifications': 'الإشعارات',
-  '/ai-settings': 'إعدادات الذكاء الاصطناعي',
+  '/widget': 'إعدادات المساعد الذكي',
   '/settings': 'الإعدادات',
 };
 
