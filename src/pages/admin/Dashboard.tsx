@@ -8,9 +8,6 @@ import {
   UserPlus,
   Sparkles,
   ArrowUpRight,
-  Star,
-  MessagesSquare,
-  Clock,
   CheckCircle2,
   XCircle,
 } from 'lucide-react';
@@ -18,7 +15,6 @@ import { StatCard } from '@components/ui';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   Table,
@@ -29,7 +25,6 @@ import {
   TableCell,
 } from '@/components/ui/table';
 import { LineChart } from '@components/charts/LineChart';
-import { DoughnutChart } from '@components/charts/DoughnutChart';
 import { useAdminStore } from '@/store/useAdminStore';
 import { formatMoney, approxUSD } from '@/utils/money';
 import { timeAgo, initials, avatarColor } from '@/utils/format';
@@ -44,9 +39,6 @@ export default function AdminDashboard(): JSX.Element {
   const invoices = useAdminStore((s) => s.invoices);
   const plans = useAdminStore((s) => s.plans);
   const countries = useAdminStore((s) => s.countries);
-  const liveChatConversations = useAdminStore((s) => s.liveChatConversations);
-  const platformStatsData = useAdminStore((s) => s.platformStats);
-  const satisfactionStatsData = useAdminStore((s) => s.satisfactionStats);
 
   /* ══════════════════════ Financial metrics ══════════════════════ */
 
@@ -192,22 +184,6 @@ export default function AdminDashboard(): JSX.Element {
       .sort((a, b) => b.mrr - a.mrr)
       .slice(0, 5);
   }, [countries, clients, subscriptions]);
-
-  /* ══════════════════════ Platform pulse ══════════════════════ */
-
-  const openConversations = useMemo(() =>
-    liveChatConversations.filter((c) => c.status === 'open' || c.status === 'assigned').length,
-    [liveChatConversations]
-  );
-
-  const channelData = [
-    { label: 'واتساب', value: platformStatsData.channelDistribution.whatsapp, color: '#25D366' },
-    { label: 'ماسنجر', value: platformStatsData.channelDistribution.messenger, color: '#0084FF' },
-    { label: 'انستقرام', value: platformStatsData.channelDistribution.instagram, color: '#E1306C' },
-    { label: 'تلغرام', value: platformStatsData.channelDistribution.telegram, color: '#0088CC' },
-    { label: 'ويدجت', value: platformStatsData.channelDistribution.widget, color: '#6366F1' },
-    { label: 'إيميل', value: platformStatsData.channelDistribution.email, color: '#F59E0B' },
-  ].filter((c) => c.value > 0);
 
   /* ══════════════════════ Recent activity ══════════════════════ */
 
@@ -516,93 +492,7 @@ export default function AdminDashboard(): JSX.Element {
         </div>
       </section>
 
-      {/* ══════════ Section 6: Platform Pulse ══════════ */}
-      <section className="space-y-3">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          {/* Channels */}
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">توزيع القنوات</CardTitle>
-              <CardDescription>{platformStatsData.totalChannels} قناة نشطة</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <DoughnutChart size={180} data={channelData} />
-            </CardContent>
-          </Card>
-
-          {/* Conversations */}
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">المحادثات</CardTitle>
-              <CardDescription>حالة الدعم المباشر</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <MetricRow
-                icon={<MessagesSquare className="h-4 w-4" />}
-                iconBg="bg-primary/15"
-                iconColor="text-primary"
-                label="إجمالي المحادثات"
-                value={platformStatsData.totalConversations.toLocaleString()}
-              />
-              <MetricRow
-                icon={<Clock className="h-4 w-4" />}
-                iconBg="bg-warning/15"
-                iconColor="text-warning"
-                label="مفتوحة الآن"
-                value={openConversations.toLocaleString()}
-              />
-              <MetricRow
-                icon={<Users className="h-4 w-4" />}
-                iconBg="bg-info/15"
-                iconColor="text-info"
-                label="وكلاء متصلون"
-                value={`${platformStatsData.onlineAgents} / ${platformStatsData.totalAgents}`}
-              />
-              <MetricRow
-                icon={<Clock className="h-4 w-4" />}
-                iconBg="bg-success/15"
-                iconColor="text-success"
-                label="متوسط الرد"
-                value={`${platformStatsData.avgResponseTime} د`}
-              />
-            </CardContent>
-          </Card>
-
-          {/* Satisfaction */}
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">رضا العملاء</CardTitle>
-              <CardDescription>{satisfactionStatsData.totalRatings.toLocaleString()} تقييم</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="h-12 w-12 rounded-xl bg-warning/15 flex items-center justify-center">
-                  <Star className="h-6 w-6 text-warning fill-warning" />
-                </div>
-                <div>
-                  <p className="text-3xl font-extrabold leading-none">{satisfactionStatsData.avgRating}</p>
-                  <p className="text-xs text-muted-foreground mt-1">من 5 نجوم</p>
-                </div>
-              </div>
-              <div className="space-y-1.5">
-                {[5, 4, 3, 2, 1].map((star) => {
-                  const count = satisfactionStatsData.distribution[star as 1 | 2 | 3 | 4 | 5];
-                  const pct = satisfactionStatsData.totalRatings ? (count / satisfactionStatsData.totalRatings) * 100 : 0;
-                  return (
-                    <div key={star} className="flex items-center gap-2 text-xs">
-                      <span className="w-4 text-muted-foreground">{star}★</span>
-                      <Progress value={pct} className="flex-1 h-1.5" />
-                      <span className="w-8 text-end text-muted-foreground">{Math.round(pct)}%</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      {/* ══════════ Section 7: Recent Activity ══════════ */}
+      {/* ══════════ Section 6: Recent Activity ══════════ */}
       <section className="space-y-3">
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
           {/* Recent clients */}
@@ -714,26 +604,6 @@ export default function AdminDashboard(): JSX.Element {
 }
 
 /* ══════════════════════ Helper Components ══════════════════════ */
-
-function MetricRow({ icon, iconBg, iconColor, label, value }: {
-  icon: React.ReactNode;
-  iconBg: string;
-  iconColor: string;
-  label: string;
-  value: string | number;
-}): JSX.Element {
-  return (
-    <div className="flex items-center gap-3">
-      <div className={`h-8 w-8 rounded-md flex items-center justify-center flex-shrink-0 ${iconBg} ${iconColor}`}>
-        {icon}
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-xs text-muted-foreground">{label}</p>
-        <p className="text-sm font-bold">{value}</p>
-      </div>
-    </div>
-  );
-}
 
 function StatusPill({ status }: { status: Client['status'] }): JSX.Element {
   const map: Record<Client['status'], { label: string; variant: 'success' | 'default' | 'warning' | 'destructive' | 'secondary' | 'outline' }> = {
