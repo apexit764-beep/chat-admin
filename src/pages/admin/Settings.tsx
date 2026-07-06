@@ -12,22 +12,31 @@ import {
   FileStack,
   Eye,
   EyeOff,
+  User as UserIcon,
+  Mail,
+  Lock,
+  Camera,
+  Bell,
+  Save,
 } from 'lucide-react';
 import { useConfirm } from '@components/ui';
 import { useAdminStore } from '@/store/useAdminStore';
+import { useAuthStore } from '@/store/useAuthStore';
 import { useUIStore } from '@/store/useUIStore';
 import { useThemeStore } from '@/store/useThemeStore';
 import { useSettingsStore } from '@/store/useSettingsStore';
+import { initials, avatarColor } from '@/utils/format';
 import { cn } from '@/lib/utils';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   Select,
   SelectTrigger,
@@ -52,9 +61,9 @@ import {
 } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
 
-type Tab = 'general' | 'company' | 'countries' | 'currencies' | 'appearance' | 'emails' | 'payments' | 'pages';
+type Tab = 'profile' | 'company' | 'countries' | 'currencies' | 'appearance' | 'emails' | 'payments' | 'pages';
 
-const validTabs: Tab[] = ['general', 'company', 'countries', 'currencies', 'appearance', 'emails', 'payments', 'pages'];
+const validTabs: Tab[] = ['profile', 'company', 'countries', 'currencies', 'appearance', 'emails', 'payments', 'pages'];
 
 const PAYMENT_METHODS = [
   { key: 'card', label: 'كارد (Visa / MasterCard)' },
@@ -66,9 +75,10 @@ const PAYMENT_METHODS = [
 export default function AdminSettings(): JSX.Element {
   const initialTab = ((): Tab => {
     const h = typeof window !== 'undefined' ? window.location.hash.replace('#', '') : '';
-    return validTabs.includes(h as Tab) ? (h as Tab) : 'general';
+    return validTabs.includes(h as Tab) ? (h as Tab) : 'profile';
   })();
   const [tab, setTab] = useState<Tab>(initialTab);
+  const user = useAuthStore((s) => s.user);
   const clients = useAdminStore((s) => s.clients);
   const countries = useAdminStore((s) => s.countries);
   const addCountry = useAdminStore((s) => s.addCountry);
@@ -90,10 +100,15 @@ export default function AdminSettings(): JSX.Element {
   const [countryModal, setCountryModal] = useState<{ code: string; name: string; nameAr: string; flag: string; currency: string; symbol: string; usdRate: number; isNew: boolean } | null>(null);
   const [currencyModal, setCurrencyModal] = useState<{ code: string; name: string; nameAr: string; symbol: string; usdRate: number; isNew: boolean } | null>(null);
 
-  const [productName, setProductName] = useState('Apex Solutions');
-  const [productTagline, setProductTagline] = useState('منصة CRM متكاملة للشركات');
-  const [supportEmail, setSupportEmail] = useState('support@apexes.click');
-  const [supportPhone, setSupportPhone] = useState('+96891234567');
+  const [profileName, setProfileName] = useState(user?.name ?? '');
+  const [profileEmail, setProfileEmail] = useState(user?.email ?? '');
+  const [profilePhone, setProfilePhone] = useState('');
+  const [currentPwd, setCurrentPwd] = useState('');
+  const [newPwd, setNewPwd] = useState('');
+  const [confirmPwd, setConfirmPwd] = useState('');
+  const [notifyEmail, setNotifyEmail] = useState(true);
+  const [notifyPush, setNotifyPush] = useState(false);
+  const [notifyInApp, setNotifyInApp] = useState(true);
   // Email templates CRUD
   type EmailTemplate = { id: string; name: string; subject: string; body: string; trigger: string };
   const [emailTemplates, setEmailTemplates] = useState<EmailTemplate[]>([
@@ -120,7 +135,7 @@ export default function AdminSettings(): JSX.Element {
   const [showSecretKey, setShowSecretKey] = useState(false);
 
   const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
-    { key: 'general', label: 'عام', icon: <Building className="h-4 w-4" /> },
+    { key: 'profile', label: 'الملف الشخصي', icon: <UserIcon className="h-4 w-4" /> },
     { key: 'company', label: 'الشركة', icon: <Building className="h-4 w-4" /> },
     { key: 'countries', label: 'الدول', icon: <Globe2 className="h-4 w-4" /> },
     { key: 'currencies', label: 'العملات', icon: <Coins className="h-4 w-4" /> },
@@ -156,24 +171,130 @@ export default function AdminSettings(): JSX.Element {
 
         <Card>
           <CardContent className="p-5 lg:p-6">
-            {/* GENERAL */}
-            {tab === 'general' && (
-              <div>
-                <Header icon={<Building className="h-5 w-5" />} title="إعدادات عامة" subtitle="معلومات المنتج الأساسية" />
-                <Row label="اسم المنتج" hint="يظهر في الفواتير والإيميلات">
-                  <Input value={productName} onChange={(e) => setProductName(e.target.value)} />
-                </Row>
-                <Row label="الشعار النصي" hint="جملة قصيرة عن المنتج">
-                  <Input value={productTagline} onChange={(e) => setProductTagline(e.target.value)} />
-                </Row>
-                <Row label="بريد الدعم">
-                  <Input type="email" value={supportEmail} onChange={(e) => setSupportEmail(e.target.value)} />
-                </Row>
-                <Row label="رقم الدعم">
-                  <Input value={supportPhone} onChange={(e) => setSupportPhone(e.target.value)} />
-                </Row>
-                <div className="flex justify-end pt-4">
-                  <Button onClick={() => showToast('تم الحفظ', 'success')}>حفظ التغييرات</Button>
+            {/* PROFILE */}
+            {tab === 'profile' && user && (
+              <div className="space-y-6">
+                <Header icon={<UserIcon className="h-5 w-5" />} title="الملف الشخصي" subtitle="إدارة بيانات حسابك وتفضيلاتك" />
+
+                {/* Basic info */}
+                <div className="space-y-5">
+                  <div className="flex items-center gap-4">
+                    <div className="relative">
+                      <Avatar className="h-20 w-20">
+                        <AvatarFallback className={`text-xl font-bold ${avatarColor(user.name)}`}>
+                          {initials(user.name)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <button
+                        className="absolute -bottom-1 -end-1 h-8 w-8 rounded-full bg-primary text-white flex items-center justify-center shadow-md hover:bg-primary/90 transition-colors"
+                        title="تغيير الصورة"
+                        onClick={() => showToast('تحميل الصورة (تجريبي)', 'info')}
+                      >
+                        <Camera className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold">{user.name}</p>
+                      <p className="text-xs text-muted-foreground">{user.email}</p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">مدير النظام</p>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <Label>الاسم الكامل</Label>
+                      <Input value={profileName} onChange={(e) => setProfileName(e.target.value)} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label>البريد الإلكتروني</Label>
+                      <div className="relative">
+                        <Mail className="h-4 w-4 absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                        <Input type="email" value={profileEmail} onChange={(e) => setProfileEmail(e.target.value)} className="pe-9" />
+                      </div>
+                    </div>
+                    <div className="space-y-1.5 md:col-span-2">
+                      <Label>رقم الهاتف</Label>
+                      <Input value={profilePhone} onChange={(e) => setProfilePhone(e.target.value)} placeholder="+96891234567" />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end">
+                    <Button onClick={() => showToast('تم حفظ البيانات', 'success')}>
+                      <Save className="h-4 w-4 me-2" />
+                      حفظ التغييرات
+                    </Button>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Password */}
+                <div className="space-y-4">
+                  <h3 className="text-base font-semibold flex items-center gap-2">
+                    <Lock className="h-4 w-4 text-primary" />
+                    كلمة المرور
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-1.5">
+                      <Label>كلمة المرور الحالية</Label>
+                      <Input type="password" value={currentPwd} onChange={(e) => setCurrentPwd(e.target.value)} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label>كلمة المرور الجديدة</Label>
+                      <Input type="password" value={newPwd} onChange={(e) => setNewPwd(e.target.value)} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label>تأكيد كلمة المرور</Label>
+                      <Input type="password" value={confirmPwd} onChange={(e) => setConfirmPwd(e.target.value)} />
+                    </div>
+                  </div>
+                  <div className="flex justify-end">
+                    <Button onClick={() => {
+                      if (!currentPwd || !newPwd || !confirmPwd) { showToast('املأ جميع الحقول', 'error'); return; }
+                      if (newPwd !== confirmPwd) { showToast('كلمة المرور الجديدة غير مطابقة', 'error'); return; }
+                      if (newPwd.length < 6) { showToast('كلمة المرور 6 أحرف على الأقل', 'error'); return; }
+                      setCurrentPwd(''); setNewPwd(''); setConfirmPwd('');
+                      showToast('تم تحديث كلمة المرور', 'success');
+                    }}>تحديث كلمة المرور</Button>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Notification preferences */}
+                <div className="space-y-4">
+                  <h3 className="text-base font-semibold flex items-center gap-2">
+                    <Bell className="h-4 w-4 text-primary" />
+                    تفضيلات الإشعارات
+                  </h3>
+                  <div className="flex items-center justify-between py-2">
+                    <div>
+                      <p className="text-sm font-medium">إشعارات البريد الإلكتروني</p>
+                      <p className="text-xs text-muted-foreground">تلقّي إشعارات على بريدك</p>
+                    </div>
+                    <Switch checked={notifyEmail} onCheckedChange={setNotifyEmail} />
+                  </div>
+                  <Separator />
+                  <div className="flex items-center justify-between py-2">
+                    <div>
+                      <p className="text-sm font-medium">إشعارات المتصفح (Push)</p>
+                      <p className="text-xs text-muted-foreground">إشعارات فورية في المتصفح</p>
+                    </div>
+                    <Switch checked={notifyPush} onCheckedChange={setNotifyPush} />
+                  </div>
+                  <Separator />
+                  <div className="flex items-center justify-between py-2">
+                    <div>
+                      <p className="text-sm font-medium">إشعارات داخل التطبيق</p>
+                      <p className="text-xs text-muted-foreground">إشعارات في جرس اللوحة</p>
+                    </div>
+                    <Switch checked={notifyInApp} onCheckedChange={setNotifyInApp} />
+                  </div>
+                  <div className="flex justify-end">
+                    <Button onClick={() => showToast('تم حفظ تفضيلات الإشعارات', 'success')}>حفظ التفضيلات</Button>
+                  </div>
                 </div>
               </div>
             )}
