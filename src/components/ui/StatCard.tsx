@@ -21,9 +21,9 @@ export function StatCard({
   trend,
 }: StatCardProps): JSX.Element {
   return (
-    <Card className="p-5 hover:shadow-md transition-shadow">
-      <div className="flex items-start justify-between mb-3">
-        <div className={cn('h-11 w-11 rounded-xl flex items-center justify-center', iconBg, iconColor)}>
+    <Card className="p-3 hover:shadow-md transition-shadow">
+      <div className="flex items-start justify-between mb-2">
+        <div className={cn('h-9 w-9 rounded-lg flex items-center justify-center', iconBg, iconColor)}>
           {icon}
         </div>
         {trend && (
@@ -40,7 +40,7 @@ export function StatCard({
       </div>
       <div className="space-y-1">
         <p className="text-xs text-muted-foreground">{label}</p>
-        <p className="text-2xl font-bold">{value}</p>
+        <p className="text-xl font-bold">{value}</p>
       </div>
     </Card>
   );

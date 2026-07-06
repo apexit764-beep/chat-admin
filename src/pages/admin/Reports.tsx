@@ -188,32 +188,32 @@ export default function AdminReports(): JSX.Element {
       </Card>
 
       {/* KPIs */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 gap-3">
         <StatCard
-          label="MRR"
+          label="الإيراد الشهري"
           value={`$${Math.round(mrrTotal).toLocaleString()}`}
-          icon={<TrendingUp className="h-5 w-5" />}
+          icon={<TrendingUp className="h-4 w-4" />}
           iconBg="bg-success/15"
           iconColor="text-success"
         />
         <StatCard
-          label="ARPU"
+          label="متوسط الإيراد للعميل"
           value={`$${arpu}`}
-          icon={<Users className="h-5 w-5" />}
+          icon={<Users className="h-4 w-4" />}
           iconBg="bg-primary/15"
           iconColor="text-primary"
         />
         <StatCard
           label="إجمالي العملاء"
           value={clients.length}
-          icon={<Users className="h-5 w-5" />}
+          icon={<Users className="h-4 w-4" />}
           iconBg="bg-info/15"
           iconColor="text-info"
         />
         <StatCard
           label="معدل الإلغاء"
           value={`${churnRate}%`}
-          icon={<TrendingDown className="h-5 w-5" />}
+          icon={<TrendingDown className="h-4 w-4" />}
           iconBg="bg-danger/15"
           iconColor="text-danger"
         />
