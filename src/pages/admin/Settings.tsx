@@ -16,6 +16,11 @@ import {
   Plus,
   Trash2,
   Edit2,
+  Mail,
+  Scale,
+  Search,
+  LogIn,
+  Gift,
 } from 'lucide-react';
 import AdminPayments from './Payments';
 import { useConfirm } from '@components/ui';
@@ -47,10 +52,18 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 
-type Tab = 'general' | 'company' | 'countries' | 'currencies' | 'social' | 'security' | 'appearance' | 'emails' | 'api' | 'payments' | 'danger';
+type Tab = 'general' | 'company' | 'countries' | 'currencies' | 'social' | 'security' | 'appearance' | 'emails' | 'api' | 'payments' | 'danger' | 'smtp' | 'legal' | 'seo' | 'social_login' | 'referral';
 
-const validTabs: Tab[] = ['general', 'company', 'countries', 'currencies', 'social', 'security', 'appearance', 'emails', 'api', 'payments', 'danger'];
+const validTabs: Tab[] = ['general', 'company', 'countries', 'currencies', 'social', 'security', 'appearance', 'emails', 'api', 'payments', 'danger', 'smtp', 'legal', 'seo', 'social_login', 'referral'];
 
 export default function AdminSettings(): JSX.Element {
   const initialTab = ((): Tab => {
@@ -93,6 +106,32 @@ export default function AdminSettings(): JSX.Element {
   const [invoiceTemplate, setInvoiceTemplate] = useState('مرحباً {{client_name}},\n\nتم إصدار فاتورة جديدة بمبلغ {{amount}} {{currency}}.\nرقم الفاتورة: {{invoice_number}}\n\nشكراً لثقتكم.');
   const [renewalTemplate, setRenewalTemplate] = useState('مرحباً {{client_name}},\n\nاشتراكك في باقة {{plan_name}} سيتجدد خلال 3 أيام.\nالمبلغ: {{amount}} {{currency}}\n\nللتعديل أو الإلغاء تواصل معنا.');
 
+  // SMTP
+  const [smtpHost, setSmtpHost] = useState('');
+  const [smtpPort, setSmtpPort] = useState('587');
+  const [smtpUser, setSmtpUser] = useState('');
+  const [smtpPass, setSmtpPass] = useState('');
+  const [smtpFrom, setSmtpFrom] = useState('');
+  const [smtpTls, setSmtpTls] = useState(true);
+
+  // Legal
+  const [termsContent, setTermsContent] = useState('# شروط الاستخدام\n\nمرحباً بكم في Qhub. باستخدامك لهذه الخدمة فإنك توافق على الشروط التالية...');
+  const [privacyContent, setPrivacyContent] = useState('# سياسة الخصوصية\n\nنحن نحترم خصوصيتك ونلتزم بحماية بياناتك الشخصية...');
+
+  // SEO
+  const [seoTitle, setSeoTitle] = useState('Qhub — لوحة تحكم واتساب CRM');
+  const [seoDescription, setSeoDescription] = useState('منصة إدارة محادثات واتساب للشركات');
+  const [seoOgImage, setSeoOgImage] = useState('');
+
+  // Social Login
+  const [googleLogin, setGoogleLogin] = useState({ enabled: false, clientId: '', clientSecret: '' });
+  const [facebookLogin, setFacebookLogin] = useState({ enabled: false, appId: '', appSecret: '' });
+
+  // Referral
+  const [referralEnabled, setReferralEnabled] = useState(false);
+  const [referralReward, setReferralReward] = useState('10');
+  const [referralType, setReferralType] = useState<'percentage' | 'fixed'>('percentage');
+
   const handleExportAll = (): void => {
     const dump = {
       exportedAt: new Date().toISOString(),
@@ -134,6 +173,11 @@ export default function AdminSettings(): JSX.Element {
     { key: 'api', label: 'مفاتيح API', icon: <Key className="h-4 w-4" /> },
     { key: 'payments', label: 'بوابة الدفع', icon: <CreditCard className="h-4 w-4" /> },
     { key: 'appearance', label: 'المظهر', icon: <Palette className="h-4 w-4" /> },
+    { key: 'smtp' as Tab, label: 'SMTP', icon: <Mail className="h-4 w-4" /> },
+    { key: 'legal' as Tab, label: 'الشروط والخصوصية', icon: <Scale className="h-4 w-4" /> },
+    { key: 'seo' as Tab, label: 'SEO', icon: <Search className="h-4 w-4" /> },
+    { key: 'social_login' as Tab, label: 'تسجيل اجتماعي', icon: <LogIn className="h-4 w-4" /> },
+    { key: 'referral' as Tab, label: 'برنامج الإحالة', icon: <Gift className="h-4 w-4" /> },
     { key: 'danger', label: 'منطقة الخطر', icon: <AlertTriangle className="h-4 w-4" /> },
   ];
 
@@ -275,50 +319,48 @@ export default function AdminSettings(): JSX.Element {
                     </Button>
                   }
                 />
-                <div className="rounded-xl border overflow-hidden">
-                  <table className="w-full text-sm">
-                    <thead className="bg-muted/50 text-xs text-muted-foreground">
-                      <tr>
-                        <th className="text-start px-3 py-2.5 w-12">#</th>
-                        <th className="text-start px-3 py-2.5">الدولة</th>
-                        <th className="text-start px-3 py-2.5">الرمز</th>
-                        <th className="text-start px-3 py-2.5">العملة</th>
-                        <th className="text-start px-3 py-2.5">سعر الصرف (USD)</th>
-                        <th className="text-end px-3 py-2.5">إجراءات</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y">
-                      {countries.map((c, idx) => (
-                        <tr key={c.code} className="hover:bg-muted/30">
-                          <td className="px-3 py-2.5 text-xs text-muted-foreground font-mono">{idx + 1}</td>
-                          <td className="px-3 py-2.5">
-                            <span className="text-lg me-1.5">{c.flag}</span>
-                            <span className="font-medium">{c.nameAr}</span>
-                            <span className="text-xs text-muted-foreground ms-2">{c.name}</span>
-                          </td>
-                          <td className="px-3 py-2.5 font-mono text-xs">{c.code}</td>
-                          <td className="px-3 py-2.5">{c.currency} <span className="text-muted-foreground text-xs">({c.symbol})</span></td>
-                          <td className="px-3 py-2.5 font-mono text-xs">{c.usdRate}</td>
-                          <td className="px-3 py-2.5">
-                            <div className="flex items-center gap-0.5 justify-end">
-                              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => setCountryModal({ ...c, isNew: false })}>
-                                <Edit2 className="h-3.5 w-3.5" />
-                              </Button>
-                              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={async () => {
-                                const inUse = clients.some((cl) => cl.country === c.code);
-                                if (inUse) { showToast('لا يمكن الحذف — الدولة مرتبطة بعملاء', 'error'); return; }
-                                const ok = await confirm({ title: `حذف ${c.nameAr}؟`, variant: 'danger', confirmText: 'حذف' });
-                                if (ok) { deleteCountry(c.code); showToast('تم الحذف', 'success'); }
-                              }}>
-                                <Trash2 className="h-3.5 w-3.5" />
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-12">#</TableHead>
+                      <TableHead>الدولة</TableHead>
+                      <TableHead>الرمز</TableHead>
+                      <TableHead>العملة</TableHead>
+                      <TableHead>سعر الصرف (USD)</TableHead>
+                      <TableHead className="text-end">إجراءات</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {countries.map((c, idx) => (
+                      <TableRow key={c.code}>
+                        <TableCell className="text-xs text-muted-foreground font-mono">{idx + 1}</TableCell>
+                        <TableCell>
+                          <span className="text-lg me-1.5">{c.flag}</span>
+                          <span className="font-medium">{c.nameAr}</span>
+                          <span className="text-xs text-muted-foreground ms-2">{c.name}</span>
+                        </TableCell>
+                        <TableCell className="font-mono text-xs">{c.code}</TableCell>
+                        <TableCell>{c.currency} <span className="text-muted-foreground text-xs">({c.symbol})</span></TableCell>
+                        <TableCell className="font-mono text-xs">{c.usdRate}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-0.5 justify-end">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => setCountryModal({ ...c, isNew: false })}>
+                              <Edit2 className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={async () => {
+                              const inUse = clients.some((cl) => cl.country === c.code);
+                              if (inUse) { showToast('لا يمكن الحذف — الدولة مرتبطة بعملاء', 'error'); return; }
+                              const ok = await confirm({ title: `حذف ${c.nameAr}؟`, variant: 'danger', confirmText: 'حذف' });
+                              if (ok) { deleteCountry(c.code); showToast('تم الحذف', 'success'); }
+                            }}>
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
             )}
 
@@ -335,49 +377,47 @@ export default function AdminSettings(): JSX.Element {
                     </Button>
                   }
                 />
-                <div className="rounded-xl border overflow-hidden">
-                  <table className="w-full text-sm">
-                    <thead className="bg-muted/50 text-xs text-muted-foreground">
-                      <tr>
-                        <th className="text-start px-3 py-2.5 w-12">#</th>
-                        <th className="text-start px-3 py-2.5">العملة</th>
-                        <th className="text-start px-3 py-2.5">الرمز</th>
-                        <th className="text-start px-3 py-2.5">علامة</th>
-                        <th className="text-start px-3 py-2.5">1 USD =</th>
-                        <th className="text-end px-3 py-2.5">إجراءات</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y">
-                      {currencies.map((cur, idx) => (
-                        <tr key={cur.code} className="hover:bg-muted/30">
-                          <td className="px-3 py-2.5 text-xs text-muted-foreground font-mono">{idx + 1}</td>
-                          <td className="px-3 py-2.5">
-                            <p className="font-medium">{cur.nameAr}</p>
-                            <p className="text-xs text-muted-foreground">{cur.name}</p>
-                          </td>
-                          <td className="px-3 py-2.5 font-mono text-xs">{cur.code}</td>
-                          <td className="px-3 py-2.5">{cur.symbol}</td>
-                          <td className="px-3 py-2.5 font-mono text-xs">{cur.usdRate} {cur.code}</td>
-                          <td className="px-3 py-2.5">
-                            <div className="flex items-center gap-0.5 justify-end">
-                              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => setCurrencyModal({ ...cur, isNew: false })}>
-                                <Edit2 className="h-3.5 w-3.5" />
-                              </Button>
-                              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={async () => {
-                                const inUse = countries.some((c) => c.currency === cur.code);
-                                if (inUse) { showToast('لا يمكن الحذف — العملة مستخدمة في دول', 'error'); return; }
-                                const ok = await confirm({ title: `حذف ${cur.nameAr}؟`, variant: 'danger', confirmText: 'حذف' });
-                                if (ok) { removeCurrency(cur.code); showToast('تم الحذف', 'success'); }
-                              }}>
-                                <Trash2 className="h-3.5 w-3.5" />
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-12">#</TableHead>
+                      <TableHead>العملة</TableHead>
+                      <TableHead>الرمز</TableHead>
+                      <TableHead>علامة</TableHead>
+                      <TableHead>1 USD =</TableHead>
+                      <TableHead className="text-end">إجراءات</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {currencies.map((cur, idx) => (
+                      <TableRow key={cur.code}>
+                        <TableCell className="text-xs text-muted-foreground font-mono">{idx + 1}</TableCell>
+                        <TableCell>
+                          <p className="font-medium">{cur.nameAr}</p>
+                          <p className="text-xs text-muted-foreground">{cur.name}</p>
+                        </TableCell>
+                        <TableCell className="font-mono text-xs">{cur.code}</TableCell>
+                        <TableCell>{cur.symbol}</TableCell>
+                        <TableCell className="font-mono text-xs">{cur.usdRate} {cur.code}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-0.5 justify-end">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => setCurrencyModal({ ...cur, isNew: false })}>
+                              <Edit2 className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={async () => {
+                              const inUse = countries.some((c) => c.currency === cur.code);
+                              if (inUse) { showToast('لا يمكن الحذف — العملة مستخدمة في دول', 'error'); return; }
+                              const ok = await confirm({ title: `حذف ${cur.nameAr}؟`, variant: 'danger', confirmText: 'حذف' });
+                              if (ok) { removeCurrency(cur.code); showToast('تم الحذف', 'success'); }
+                            }}>
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
             )}
 
@@ -672,6 +712,204 @@ export default function AdminSettings(): JSX.Element {
                 <div className="space-y-3">
                   <DangerAction title="إعادة ضبط الإعدادات" hint="إرجاع جميع الإعدادات للقيم الافتراضية" onConfirm={handleResetSettings} cta="إعادة ضبط" />
                   <DangerAction title="تصدير كل البيانات" hint="JSON بكل العملاء والفواتير والمستخدمين" onConfirm={handleExportAll} cta="تصدير الآن" variant="secondary" />
+                </div>
+              </div>
+            )}
+
+            {/* SMTP */}
+            {tab === 'smtp' && (
+              <div>
+                <Header icon={<Mail className="h-5 w-5" />} title="إعدادات SMTP" subtitle="إعداد خادم البريد الإلكتروني لإرسال الإيميلات" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label>خادم SMTP</Label>
+                    <Input value={smtpHost} onChange={(e) => setSmtpHost(e.target.value)} placeholder="smtp.gmail.com" dir="ltr" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>المنفذ (Port)</Label>
+                    <Select value={smtpPort} onValueChange={setSmtpPort}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="25">25</SelectItem>
+                        <SelectItem value="465">465 (SSL)</SelectItem>
+                        <SelectItem value="587">587 (TLS)</SelectItem>
+                        <SelectItem value="2525">2525</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>اسم المستخدم</Label>
+                    <Input value={smtpUser} onChange={(e) => setSmtpUser(e.target.value)} placeholder="user@example.com" dir="ltr" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>كلمة المرور</Label>
+                    <Input type="password" value={smtpPass} onChange={(e) => setSmtpPass(e.target.value)} dir="ltr" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>عنوان المرسل</Label>
+                    <Input value={smtpFrom} onChange={(e) => setSmtpFrom(e.target.value)} placeholder="noreply@qhub.app" dir="ltr" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>تشفير TLS</Label>
+                    <div className="flex items-center gap-3 h-10">
+                      <Switch checked={smtpTls} onCheckedChange={setSmtpTls} />
+                      <span className="text-sm text-muted-foreground">{smtpTls ? 'مفعّل' : 'معطّل'}</span>
+                    </div>
+                  </div>
+                </div>
+                <Separator className="my-6" />
+                <div className="flex items-center justify-between">
+                  <Button variant="outline" onClick={() => showToast('تم إرسال رسالة تجريبية', 'success')}>
+                    إرسال رسالة تجريبية
+                  </Button>
+                  <Button onClick={() => showToast('تم حفظ إعدادات SMTP', 'success')}>حفظ التغييرات</Button>
+                </div>
+              </div>
+            )}
+
+            {/* LEGAL */}
+            {tab === 'legal' && (
+              <div>
+                <Header icon={<Scale className="h-5 w-5" />} title="الشروط والخصوصية" subtitle="تحرير صفحات الشروط وسياسة الخصوصية" />
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm font-semibold">شروط الاستخدام</Label>
+                      <Badge variant="secondary" className="text-[10px]">Markdown</Badge>
+                    </div>
+                    <Textarea
+                      value={termsContent}
+                      onChange={(e) => setTermsContent(e.target.value)}
+                      rows={10}
+                      className="font-mono text-sm"
+                      dir="rtl"
+                    />
+                  </div>
+                  <Separator />
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm font-semibold">سياسة الخصوصية</Label>
+                      <Badge variant="secondary" className="text-[10px]">Markdown</Badge>
+                    </div>
+                    <Textarea
+                      value={privacyContent}
+                      onChange={(e) => setPrivacyContent(e.target.value)}
+                      rows={10}
+                      className="font-mono text-sm"
+                      dir="rtl"
+                    />
+                  </div>
+                  <div className="flex justify-end">
+                    <Button onClick={() => showToast('تم حفظ الصفحات القانونية', 'success')}>حفظ التغييرات</Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* SEO */}
+            {tab === 'seo' && (
+              <div>
+                <Header icon={<Search className="h-5 w-5" />} title="إعدادات SEO" subtitle="تحسين محركات البحث والظهور في النتائج" />
+                <Row label="عنوان الموقع (Meta Title)" hint="يظهر في تبويب المتصفح ونتائج البحث">
+                  <Input value={seoTitle} onChange={(e) => setSeoTitle(e.target.value)} />
+                </Row>
+                <Row label="وصف الموقع (Meta Description)" hint="يظهر أسفل العنوان في نتائج البحث">
+                  <Textarea value={seoDescription} onChange={(e) => setSeoDescription(e.target.value)} rows={3} />
+                </Row>
+                <Row label="صورة المشاركة (OG Image)" hint="تظهر عند مشاركة الرابط على وسائل التواصل">
+                  <Input value={seoOgImage} onChange={(e) => setSeoOgImage(e.target.value)} placeholder="https://..." dir="ltr" />
+                </Row>
+                <div className="flex justify-end pt-4">
+                  <Button onClick={() => showToast('تم حفظ إعدادات SEO', 'success')}>حفظ التغييرات</Button>
+                </div>
+              </div>
+            )}
+
+            {/* SOCIAL LOGIN */}
+            {tab === 'social_login' && (
+              <div>
+                <Header icon={<LogIn className="h-5 w-5" />} title="تسجيل الدخول الاجتماعي" subtitle="تفعيل تسجيل الدخول عبر حسابات التواصل الاجتماعي" />
+                <div className="space-y-6">
+                  <div className="p-4 rounded-lg border">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500 font-bold text-lg">G</div>
+                        <div>
+                          <p className="text-sm font-semibold">Google</p>
+                          <p className="text-xs text-muted-foreground">تسجيل دخول عبر حساب جوجل</p>
+                        </div>
+                      </div>
+                      <Switch checked={googleLogin.enabled} onCheckedChange={(v) => setGoogleLogin({ ...googleLogin, enabled: v })} />
+                    </div>
+                    {googleLogin.enabled && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div className="space-y-1.5">
+                          <Label>Client ID</Label>
+                          <Input value={googleLogin.clientId} onChange={(e) => setGoogleLogin({ ...googleLogin, clientId: e.target.value })} dir="ltr" />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label>Client Secret</Label>
+                          <Input type="password" value={googleLogin.clientSecret} onChange={(e) => setGoogleLogin({ ...googleLogin, clientSecret: e.target.value })} dir="ltr" />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-4 rounded-lg border">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500 font-bold text-lg">f</div>
+                        <div>
+                          <p className="text-sm font-semibold">Facebook</p>
+                          <p className="text-xs text-muted-foreground">تسجيل دخول عبر فيسبوك</p>
+                        </div>
+                      </div>
+                      <Switch checked={facebookLogin.enabled} onCheckedChange={(v) => setFacebookLogin({ ...facebookLogin, enabled: v })} />
+                    </div>
+                    {facebookLogin.enabled && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div className="space-y-1.5">
+                          <Label>App ID</Label>
+                          <Input value={facebookLogin.appId} onChange={(e) => setFacebookLogin({ ...facebookLogin, appId: e.target.value })} dir="ltr" />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label>App Secret</Label>
+                          <Input type="password" value={facebookLogin.appSecret} onChange={(e) => setFacebookLogin({ ...facebookLogin, appSecret: e.target.value })} dir="ltr" />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex justify-end">
+                    <Button onClick={() => showToast('تم حفظ إعدادات تسجيل الدخول', 'success')}>حفظ التغييرات</Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* REFERRAL */}
+            {tab === 'referral' && (
+              <div>
+                <Header icon={<Gift className="h-5 w-5" />} title="برنامج الإحالة" subtitle="إعداد برنامج الإحالة والمكافآت للعملاء" />
+                <Row label="تفعيل البرنامج" hint="تمكين العملاء من دعوة أصدقائهم">
+                  <Switch checked={referralEnabled} onCheckedChange={setReferralEnabled} />
+                </Row>
+                {referralEnabled && (
+                  <>
+                    <Row label="نوع المكافأة">
+                      <Select value={referralType} onValueChange={(v) => setReferralType(v as 'percentage' | 'fixed')}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="percentage">نسبة مئوية من الاشتراك</SelectItem>
+                          <SelectItem value="fixed">مبلغ ثابت (USD)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </Row>
+                    <Row label={referralType === 'percentage' ? 'نسبة المكافأة (%)' : 'مبلغ المكافأة ($)'}>
+                      <Input type="number" value={referralReward} onChange={(e) => setReferralReward(e.target.value)} />
+                    </Row>
+                  </>
+                )}
+                <div className="flex justify-end pt-4">
+                  <Button onClick={() => showToast('تم حفظ إعدادات الإحالة', 'success')}>حفظ التغييرات</Button>
                 </div>
               </div>
             )}

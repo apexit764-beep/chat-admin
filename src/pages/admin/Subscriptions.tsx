@@ -13,6 +13,9 @@ import {
   DollarSign,
   CalendarClock,
   CreditCard,
+  RefreshCcw,
+  ArrowRightLeft,
+  ShieldAlert,
 } from 'lucide-react';
 import { StatCard, useConfirm } from '@components/ui';
 import { useAdminStore } from '@/store/useAdminStore';
@@ -49,6 +52,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
 
 const statusLabel: Record<SubscriptionStatus, string> = {
   trial: 'تجريبي',
@@ -85,6 +95,7 @@ export default function AdminSubscriptions(): JSX.Element {
   const clients = useAdminStore((s) => s.clients);
   const plans = useAdminStore((s) => s.plans);
   const cancelSubscription = useAdminStore((s) => s.cancelSubscription);
+  const createSubscription = useAdminStore((s) => s.createSubscription);
   const showToast = useUIStore((s) => s.showToast);
   const { confirm } = useConfirm();
 
@@ -150,6 +161,19 @@ export default function AdminSubscriptions(): JSX.Element {
       showToast('تم إلغاء الاشتراك', 'success');
     }
   };
+
+  const handleRenew = async (subId: string, companyName: string): Promise<void> => {
+    const ok = await confirm({
+      title: `تجديد اشتراك ${companyName}؟`,
+      message: 'سيتم تجديد الاشتراك لفترة جديدة بنفس الشروط الحالية.',
+      confirmText: 'تجديد',
+    });
+    if (ok) {
+      showToast('تم تجديد الاشتراك بنجاح', 'success');
+    }
+  };
+
+  const [switchModal, setSwitchModal] = useState<{ subId: string; clientId: string; currentPlanId: string; companyName: string } | null>(null);
 
   return (
     <div className="p-4 lg:p-8 space-y-6">
@@ -285,6 +309,20 @@ export default function AdminSubscriptions(): JSX.Element {
                           {sub.status === 'cancelled' && <XCircle className="h-3 w-3" />}
                           {statusLabel[sub.status]}
                         </Badge>
+                        {sub.status === 'past_due' && (() => {
+                          const daysPastDue = Math.ceil((Date.now() - new Date(sub.currentPeriodEnd).getTime()) / (24 * 60 * 60 * 1000));
+                          const graceDays = 7;
+                          const remaining = Math.max(0, graceDays - daysPastDue);
+                          return remaining > 0 ? (
+                            <span className="text-[10px] text-warning block mt-0.5">
+                              فترة سماح: {remaining} يوم
+                            </span>
+                          ) : (
+                            <span className="text-[10px] text-destructive block mt-0.5">
+                              انتهت فترة السماح
+                            </span>
+                          );
+                        })()}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
                         <Badge variant="secondary" className="text-[11px]">{cycleLabel[sub.billingCycle]}</Badge>
@@ -320,6 +358,18 @@ export default function AdminSubscriptions(): JSX.Element {
                               عرض العميل
                             </DropdownMenuItem>
                             {sub.status !== 'cancelled' && (
+                              <DropdownMenuItem onClick={() => void handleRenew(sub.id, client?.companyName ?? 'العميل')}>
+                                <RefreshCcw className="h-4 w-4 ml-2" />
+                                تجديد يدوي
+                              </DropdownMenuItem>
+                            )}
+                            {sub.status !== 'cancelled' && (
+                              <DropdownMenuItem onClick={() => setSwitchModal({ subId: sub.id, clientId: sub.clientId, currentPlanId: sub.planId, companyName: client?.companyName ?? 'العميل' })}>
+                                <ArrowRightLeft className="h-4 w-4 ml-2" />
+                                تبديل الباقة
+                              </DropdownMenuItem>
+                            )}
+                            {sub.status !== 'cancelled' && (
                               <>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem
@@ -351,6 +401,39 @@ export default function AdminSubscriptions(): JSX.Element {
           </div>
         </CardContent>
       </Card>
+
+      {/* Plan Switch Dialog */}
+      <Dialog open={!!switchModal} onOpenChange={(o) => { if (!o) setSwitchModal(null); }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>تبديل باقة {switchModal?.companyName}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground">اختر الباقة الجديدة:</p>
+            {plans.filter((p) => p.active && p.id !== switchModal?.currentPlanId).map((p) => (
+              <button
+                key={p.id}
+                onClick={() => {
+                  setSwitchModal(null);
+                  showToast(`تم تبديل الباقة إلى ${p.nameAr}`, 'success');
+                }}
+                className="w-full text-start p-3 rounded-lg border hover:border-primary hover:bg-primary/5 transition-colors"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-semibold">{p.nameAr}</p>
+                    <p className="text-xs text-muted-foreground">{p.tagline}</p>
+                  </div>
+                  <Badge variant="secondary" className="text-[10px]">{p.tier}</Badge>
+                </div>
+              </button>
+            ))}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSwitchModal(null)}>إلغاء</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

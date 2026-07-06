@@ -12,6 +12,7 @@ import {
   Phone,
   Globe,
   X,
+  HeartPulse,
 } from 'lucide-react';
 import {
   DataTable,
@@ -27,6 +28,7 @@ import { downloadCsv } from '@/utils/csv';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -73,6 +75,19 @@ function getInitials(name: string): string {
   const parts = name.split(/\s+/).filter((w) => /\p{L}|\p{N}/u.test(w));
   const initials = parts.map((w) => w[0]).slice(0, 2).join('').toUpperCase();
   return initials || '?';
+}
+
+function computeHealth(c: Client, planLimitConv: number): number {
+  const daysSinceActive = Math.round((Date.now() - new Date(c.lastActiveAt).getTime()) / 86400000);
+  const usage = planLimitConv > 0 ? Math.min(100, Math.round((c.conversationCount / planLimitConv) * 100)) : 0;
+  let score = 100;
+  if (c.status === 'suspended') score -= 50;
+  else if (c.status === 'past_due') score -= 30;
+  else if (c.status === 'trial') score -= 10;
+  if (daysSinceActive > 7) score -= Math.min(30, daysSinceActive * 2);
+  if (usage < 10) score -= 15;
+  else if (usage > 80) score += 5;
+  return Math.max(0, Math.min(100, score));
 }
 
 export default function AdminClients(): JSX.Element {
@@ -293,6 +308,21 @@ export default function AdminClients(): JSX.Element {
       cell: (r) => r.mrr > 0 ? <span className="font-semibold">{formatMoney(r.mrr, r.currency)}</span> : <span className="text-muted-foreground">—</span>,
     },
     { key: 'last', header: 'آخر نشاط', accessor: (r) => r.lastActiveAt, hideOn: 'lg', cell: (r) => <span className="text-muted-foreground text-xs">{timeAgo(r.lastActiveAt)}</span> },
+    {
+      key: 'health', header: 'الصحة', accessor: (r) => r.companyName, hideOn: 'lg',
+      cell: (r) => {
+        const plan = plans.find((p) => p.id === r.planId);
+        const score = computeHealth(r, plan?.limits.conversations ?? 1000);
+        return (
+          <div className="flex items-center gap-2 min-w-[80px]">
+            <Progress value={score} className="flex-1 h-1.5 max-w-16" />
+            <span className={cn('text-xs font-bold', score >= 70 ? 'text-emerald-600' : score >= 40 ? 'text-amber-600' : 'text-red-600')}>
+              {score}
+            </span>
+          </div>
+        );
+      },
+    },
     {
       key: 'status', header: 'الحالة', accessor: (r) => r.status,
       cell: (r) => (

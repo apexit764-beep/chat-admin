@@ -111,6 +111,11 @@ export default function AdminFinance(): JSX.Element {
     return total ? Math.round((succ / total) * 100) : 0;
   })();
 
+  const overdueInvoices = useMemo(() =>
+    invoices.filter((inv) => inv.status === 'pending' && new Date(inv.dueDate) < new Date()),
+    [invoices]
+  );
+
   const filteredInvoices = invoices.filter((inv) => {
     if (statusFilter !== 'all' && inv.status !== statusFilter) return false;
     if (search) {
@@ -187,6 +192,27 @@ export default function AdminFinance(): JSX.Element {
         <StatCard label="نسبة النجاح" value={`${successRate}%`} icon={<TrendingUp className="h-5 w-5" />} iconBg="bg-info/15" iconColor="text-info" />
       </div>
 
+      {overdueInvoices.length > 0 && (
+        <Card className="border-amber-500/30 bg-amber-500/5">
+          <CardContent className="p-4">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="h-5 w-5 text-amber-500 mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-amber-700 dark:text-amber-400">
+                  {overdueInvoices.length} فاتورة متأخرة تحتاج متابعة
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  إجمالي المبالغ المتأخرة: {overdueInvoices.map((inv) => `${formatMoney(inv.total, inv.currency)}`).join(' · ')}
+                </p>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => setStatusFilter('pending')} className="flex-shrink-0">
+                عرض المتأخرة
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Tabs */}
       <Tabs defaultValue="invoices" dir="rtl">
         <TabsList>
@@ -223,6 +249,25 @@ export default function AdminFinance(): JSX.Element {
               </Select>
               <Button variant="outline" size="sm" onClick={handleExportInvoices} className="h-9 ms-auto">
                 <Download className="h-4 w-4 me-2" /> CSV
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => {
+                const html = `
+                  <h1>تقرير الفواتير</h1>
+                  <p class="muted">${new Date().toLocaleDateString('ar-EG')}</p>
+                  <table>
+                    <thead><tr><th>رقم الفاتورة</th><th>العميل</th><th class="right">الإجمالي</th><th>الحالة</th><th>تاريخ الاستحقاق</th></tr></thead>
+                    <tbody>
+                      ${filteredInvoices.map((inv) => {
+                        const client = clients.find((c) => c.id === inv.clientId);
+                        return `<tr><td>${inv.number}</td><td>${client?.companyName ?? '—'}</td><td class="right">${formatMoney(inv.total, inv.currency)}</td><td>${invStatusLabel[inv.status]}</td><td>${formatDate(inv.dueDate)}</td></tr>`;
+                      }).join('')}
+                    </tbody>
+                  </table>
+                  <p class="muted">إجمالي: ${filteredInvoices.length} فاتورة</p>
+                `;
+                printAsPdf('تقرير الفواتير', html);
+              }} className="h-9">
+                <FileText className="h-4 w-4 me-2" /> PDF
               </Button>
             </CardHeader>
             <CardContent className="p-0">
@@ -273,10 +318,12 @@ export default function AdminFinance(): JSX.Element {
                                   title="استرجاع"
                                   onClick={() => {
                                     void (async () => {
-                                      const ok = await confirm({ title: `استرجاع فاتورة ${inv.number}؟`, message: `سيتم إرجاع ${inv.total} ${inv.currency} للعميل`, variant: 'warning', confirmText: 'استرجاع' });
+                                      const reason = window.prompt('سبب الاسترجاع:');
+                                      if (!reason) return;
+                                      const ok = await confirm({ title: `استرجاع فاتورة ${inv.number}؟`, message: `سيتم إرجاع ${formatMoney(inv.total, inv.currency)} للعميل\nالسبب: ${reason}`, variant: 'warning', confirmText: 'استرجاع' });
                                       if (ok) {
                                         refundInvoice(inv.id);
-                                        showToast('تم استرجاع الفاتورة', 'success');
+                                        showToast(`تم استرجاع الفاتورة — السبب: ${reason}`, 'success');
                                       }
                                     })();
                                   }}

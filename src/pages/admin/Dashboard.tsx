@@ -15,6 +15,9 @@ import {
   Clock,
   CreditCard,
   Crown,
+  UserPlus,
+  FileWarning,
+  MessagesSquare,
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -48,6 +51,8 @@ export default function AdminDashboard(): JSX.Element {
   const transactions = useAdminStore((s) => s.transactions);
   const plans = useAdminStore((s) => s.plans);
   const countries = useAdminStore((s) => s.countries);
+  const invoices = useAdminStore((s) => s.invoices);
+  const liveChatConversations = useAdminStore((s) => s.liveChatConversations);
   const platformStatsData = useAdminStore((s) => s.platformStats);
   const campaignStatsData = useAdminStore((s) => s.campaignStats);
   const satisfactionStatsData = useAdminStore((s) => s.satisfactionStats);
@@ -96,6 +101,19 @@ export default function AdminDashboard(): JSX.Element {
     const prevActive = Math.max(0, activeCount - newThisMonth);
     return prevActive > 0 ? Math.round((newThisMonth / prevActive) * 100) : null;
   }, [clients, activeCount]);
+
+  const newClientsThisMonth = useMemo(() => {
+    const thisMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    return clients.filter((c) => new Date(c.joinedAt) >= thisMonth).length;
+  }, [clients]);
+
+  const overdueInvoices = useMemo(() => {
+    return invoices.filter((inv) => inv.status === 'pending' && new Date(inv.dueDate) < new Date()).length;
+  }, [invoices]);
+
+  const openConversations = useMemo(() => {
+    return liveChatConversations.filter((c) => c.status === 'open' || c.status === 'assigned').length;
+  }, [liveChatConversations]);
 
   /* ─────── Expiring trials ─────── */
   const expiringTrials = useMemo(() => {
@@ -245,6 +263,32 @@ export default function AdminDashboard(): JSX.Element {
             icon={<Star className="h-4 w-4" />}
             color="text-yellow-600 dark:text-yellow-400"
             iconBg="bg-yellow-500/10"
+          />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <MiniStat
+            label="عملاء جدد هذا الشهر"
+            value={newClientsThisMonth}
+            sub={`من إجمالي ${clients.length}`}
+            icon={<UserPlus className="h-4 w-4" />}
+            color="text-teal-600 dark:text-teal-400"
+            iconBg="bg-teal-500/10"
+          />
+          <MiniStat
+            label="فواتير متأخرة"
+            value={overdueInvoices}
+            sub={overdueInvoices > 0 ? 'تحتاج متابعة' : 'لا يوجد متأخرات'}
+            icon={<FileWarning className="h-4 w-4" />}
+            color="text-orange-600 dark:text-orange-400"
+            iconBg="bg-orange-500/10"
+          />
+          <MiniStat
+            label="محادثات مفتوحة"
+            value={openConversations}
+            sub="دعم مباشر"
+            icon={<MessagesSquare className="h-4 w-4" />}
+            color="text-indigo-600 dark:text-indigo-400"
+            iconBg="bg-indigo-500/10"
           />
         </div>
       </section>

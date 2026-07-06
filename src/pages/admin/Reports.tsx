@@ -5,6 +5,7 @@ import {
   Users,
   Globe2,
   Download,
+  FileText,
   HeartPulse,
   AlertTriangle,
   CheckCircle2,
@@ -17,7 +18,7 @@ import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
 import { approxUSD } from '@/utils/money';
 import { timeAgo } from '@/utils/format';
-import { downloadCsv } from '@/utils/csv';
+import { downloadCsv, printAsPdf } from '@/utils/csv';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
@@ -142,6 +143,31 @@ export default function AdminReports(): JSX.Element {
     showToast('تم تصدير الملخص', 'success');
   };
 
+  const exportPdf = (): void => {
+    const html = `
+      <h1>تقرير أداء المنصة</h1>
+      <p class="muted">${new Date().toLocaleDateString('ar-EG')} · الفترة: ${ranges.find((r) => r.key === range)?.label ?? range}</p>
+      <table>
+        <tr><td>MRR</td><td class="right"><strong>$${Math.round(mrrTotal).toLocaleString()}</strong></td></tr>
+        <tr><td>ARPU</td><td class="right">$${Math.round(arpu)}</td></tr>
+        <tr><td>LTV (تقدير)</td><td class="right">$${Math.round(ltv)}</td></tr>
+        <tr><td>معدل التحويل</td><td class="right">${conversionRate}%</td></tr>
+        <tr><td>معدل الإلغاء</td><td class="right">${churnRate}%</td></tr>
+        <tr><td>إجمالي العملاء</td><td class="right">${clients.length}</td></tr>
+        <tr><td>عملاء نشطون</td><td class="right">${activeCustomers}</td></tr>
+      </table>
+      <h2>الأداء حسب الدولة</h2>
+      <table>
+        <thead><tr><th>الدولة</th><th class="right">العملاء</th><th class="right">الإيراد الشهري</th><th class="right">متوسط الإيراد</th></tr></thead>
+        <tbody>
+          ${byCountry.map((x) => `<tr><td>${x.country.flag} ${x.country.nameAr}</td><td class="right">${x.count}</td><td class="right">$${Math.round(x.revenue).toLocaleString()}</td><td class="right">$${x.count ? Math.round(x.revenue / x.count) : 0}</td></tr>`).join('')}
+        </tbody>
+      </table>
+    `;
+    printAsPdf('تقرير أداء المنصة', html);
+    showToast('جاري تجهيز PDF...', 'info');
+  };
+
   return (
     <div className="p-4 lg:p-6 space-y-5">
       <div>
@@ -163,9 +189,14 @@ export default function AdminReports(): JSX.Element {
               </Button>
             ))}
           </div>
-          <Button variant="outline" onClick={exportSummary}>
-            <Download className="h-4 w-4" /> تصدير الملخص
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={exportSummary}>
+              <Download className="h-4 w-4" /> تصدير CSV
+            </Button>
+            <Button variant="outline" onClick={exportPdf}>
+              <FileText className="h-4 w-4" /> تصدير PDF
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
