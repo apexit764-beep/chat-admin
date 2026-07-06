@@ -19,6 +19,7 @@ import {
   X,
   Plug,
   Briefcase,
+  MessagesSquare,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useUIStore } from '@/store/useUIStore';
@@ -55,6 +56,7 @@ const navGroups: NavGroup[] = [
     items: [
       { to: '/clients', label: 'العملاء', icon: Users },
       { to: '/conversations', label: 'الدردشة المباشرة', icon: MessageCircle },
+      { to: '/widget', label: 'إعدادات الويدجت', icon: MessagesSquare },
       { to: '/plans', label: 'الباقات', icon: Package },
       { to: '/industries', label: 'مجالات العمل', icon: Briefcase },
       { to: '/feedback', label: 'الشكاوى والاقتراحات', icon: MessageSquareWarning },

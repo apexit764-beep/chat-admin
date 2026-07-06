@@ -58,6 +58,23 @@ export interface Currency {
   usdRate: number;
 }
 
+export interface WidgetSettings {
+  enabled: boolean;
+  primaryColor: string;
+  position: 'bottom-right' | 'bottom-left';
+  bubbleIcon: 'chat' | 'message' | 'help';
+  welcomeMessage: string;
+  teamName: string;
+  responseTime: string;
+  showAvatar: boolean;
+  collectEmail: boolean;
+  collectPhone: boolean;
+  autoReply: boolean;
+  autoReplyMessage: string;
+  offlineMessage: string;
+  brandingHidden: boolean;
+}
+
 interface SettingsState {
   notifications: NotificationPrefs;
   security: SecurityPrefs;
@@ -65,11 +82,13 @@ interface SettingsState {
   company: CompanyInfo;
   social: SocialLinks;
   currencies: Currency[];
+  widget: WidgetSettings;
   setNotifications: (patch: Partial<NotificationPrefs>) => void;
   setSecurity: (patch: Partial<SecurityPrefs>) => void;
   setGeneral: (patch: Partial<GeneralPrefs>) => void;
   setCompany: (patch: Partial<CompanyInfo>) => void;
   setSocial: (patch: Partial<SocialLinks>) => void;
+  setWidget: (patch: Partial<WidgetSettings>) => void;
   addCurrency: (c: Currency) => void;
   updateCurrency: (code: string, patch: Partial<Currency>) => void;
   removeCurrency: (code: string) => void;
@@ -78,7 +97,7 @@ interface SettingsState {
 
 const KEY = 'sekaa_settings_v1';
 
-type Persisted = Pick<SettingsState, 'notifications' | 'security' | 'general' | 'company' | 'social' | 'currencies'>;
+type Persisted = Pick<SettingsState, 'notifications' | 'security' | 'general' | 'company' | 'social' | 'currencies' | 'widget'>;
 
 const defaultState: Persisted = {
   notifications: { newConv: true, newMsg: true, campaigns: true, browser: false, sound: true },
@@ -116,6 +135,22 @@ const defaultState: Persisted = {
     telegram: '',
     snapchat: '',
   },
+  widget: {
+    enabled: true,
+    primaryColor: '#1565A0',
+    position: 'bottom-right',
+    bubbleIcon: 'chat',
+    welcomeMessage: 'مرحباً! كيف يمكننا مساعدتك؟',
+    teamName: 'فريق الدعم',
+    responseTime: 'نرد عادةً خلال دقائق',
+    showAvatar: true,
+    collectEmail: true,
+    collectPhone: false,
+    autoReply: true,
+    autoReplyMessage: 'شكراً لتواصلك! سيقوم أحد أفراد فريقنا بالرد عليك قريباً.',
+    offlineMessage: 'نحن غير متاحين حالياً. اترك رسالتك وسنرد عليك في أقرب وقت.',
+    brandingHidden: false,
+  },
   currencies: [
     { code: 'OMR', name: 'Omani Rial', nameAr: 'ريال عُماني', symbol: 'ر.ع', usdRate: 0.385 },
     { code: 'AED', name: 'UAE Dirham', nameAr: 'درهم إماراتي', symbol: 'د.إ', usdRate: 3.673 },
@@ -140,6 +175,7 @@ function read(): Persisted {
       ...parsed,
       company: { ...defaultState.company, ...(parsed.company ?? {}) },
       social: { ...defaultState.social, ...(parsed.social ?? {}) },
+      widget: { ...defaultState.widget, ...(parsed.widget ?? {}) },
       currencies: parsed.currencies?.length ? parsed.currencies : defaultState.currencies,
     };
   } catch {
@@ -156,6 +192,7 @@ function persist(state: Persisted): void {
       general: state.general,
       company: state.company,
       social: state.social,
+      widget: state.widget,
       currencies: state.currencies,
     }));
   } catch {/* ignore */}
@@ -183,6 +220,10 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   },
   setSocial: (patch) => {
     set((s) => ({ social: { ...s.social, ...patch } }));
+    persist(get());
+  },
+  setWidget: (patch) => {
+    set((s) => ({ widget: { ...s.widget, ...patch } }));
     persist(get());
   },
   addCurrency: (c) => {
