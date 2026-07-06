@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import {
   Plus,
   Search,
@@ -98,6 +98,92 @@ const emptyForm: Omit<Platform, 'id'> = {
   logo: '',
   countries: [],
 };
+
+import type { Country } from '@/types';
+
+interface CountryTagsInputProps {
+  countries: Country[];
+  selected: string[];
+  onToggle: (code: string) => void;
+}
+
+function CountryTagsInput({ countries, selected, onToggle }: CountryTagsInputProps) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function handleClick(e: MouseEvent) {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [open]);
+
+  const available = countries.filter(
+    (c) => !selected.includes(c.code) && (
+      !query.trim() ||
+      c.nameAr.includes(query) ||
+      c.name.toLowerCase().includes(query.toLowerCase()) ||
+      c.code.toLowerCase().includes(query.toLowerCase())
+    ),
+  );
+
+  return (
+    <div className="space-y-2">
+      <Label>الدول</Label>
+      <div ref={wrapperRef} className="relative">
+        <div
+          className={cn(
+            'flex flex-wrap items-center gap-1.5 min-h-[40px] px-3 py-1.5 border rounded-md bg-background cursor-text transition-colors',
+            open && 'ring-2 ring-ring',
+          )}
+          onClick={() => setOpen(true)}
+        >
+          {selected.map((code) => {
+            const co = countries.find((c) => c.code === code);
+            return co ? (
+              <span key={code} className="inline-flex items-center gap-1 bg-primary/10 text-primary text-sm px-2 py-0.5 rounded-md">
+                {co.flag} {co.nameAr}
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); onToggle(code); }}
+                  className="hover:text-destructive"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            ) : null;
+          })}
+          <input
+            className="flex-1 min-w-[80px] bg-transparent outline-none text-sm placeholder:text-muted-foreground"
+            placeholder={selected.length === 0 ? 'اختر الدول...' : ''}
+            value={query}
+            onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
+            onFocus={() => setOpen(true)}
+          />
+        </div>
+        {open && available.length > 0 && (
+          <div className="absolute z-50 mt-1 w-full max-h-48 overflow-y-auto rounded-md border bg-popover shadow-lg">
+            {available.map((c) => (
+              <button
+                key={c.code}
+                type="button"
+                className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-accent transition-colors text-start"
+                onClick={() => { onToggle(c.code); setQuery(''); }}
+              >
+                <span>{c.flag}</span>
+                <span>{c.nameAr}</span>
+                <span className="text-muted-foreground text-xs ms-auto">{c.code}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function Integrations() {
   const [platforms, setPlatforms] = useState<Platform[]>(defaultPlatforms);
@@ -372,34 +458,11 @@ export default function Integrations() {
               />
             </div>
 
-            <div className="space-y-2">
-              <Label>الدول</Label>
-              <div className="flex flex-wrap gap-2 min-h-[40px] p-2 border rounded-md">
-                {form.countries.map((code) => {
-                  const co = countries.find((c) => c.code === code);
-                  return co ? (
-                    <span key={code} className="inline-flex items-center gap-1 bg-primary/10 text-primary text-sm px-2.5 py-1 rounded-full">
-                      {co.flag} {co.nameAr}
-                      <button type="button" onClick={() => toggleCountry(code)} className="hover:text-destructive">
-                        <X className="h-3 w-3" />
-                      </button>
-                    </span>
-                  ) : null;
-                })}
-              </div>
-              <div className="flex flex-wrap gap-1.5 mt-1">
-                {countries.filter((c) => !form.countries.includes(c.code)).map((c) => (
-                  <button
-                    key={c.code}
-                    type="button"
-                    onClick={() => toggleCountry(c.code)}
-                    className="text-xs px-2 py-1 rounded-full border border-dashed border-muted-foreground/40 text-muted-foreground hover:border-primary hover:text-primary transition-colors"
-                  >
-                    {c.flag} {c.nameAr}
-                  </button>
-                ))}
-              </div>
-            </div>
+            <CountryTagsInput
+              countries={countries}
+              selected={form.countries}
+              onToggle={toggleCountry}
+            />
           </div>
 
           <DialogFooter>
