@@ -3,17 +3,13 @@ import {
   MessageCircle,
   MessageSquare,
   HelpCircle,
-  Copy,
-  Check,
   Send,
   X,
   Minus,
   Smile,
   Paperclip,
   ChevronDown,
-  Code2,
   Palette,
-  Layout,
   Type,
   ToggleRight,
   Globe,
@@ -35,7 +31,6 @@ import {
   SelectContent,
   SelectItem,
 } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 
 const ICON_OPTIONS: { value: WidgetSettingsType['bubbleIcon']; label: string; icon: React.ElementType }[] = [
@@ -64,32 +59,9 @@ export default function WidgetSettingsPage(): JSX.Element {
   const setWidget = useSettingsStore((s) => s.setWidget);
   const showToast = useUIStore((s) => s.showToast);
 
-  const [copied, setCopied] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(true);
 
   const BubbleIcon = ICON_OPTIONS.find((o) => o.value === widget.bubbleIcon)?.icon ?? MessageCircle;
-
-  const embedCode = `<!-- Qhub Live Chat Widget -->
-<script>
-  (function(w,d,s,o){
-    var j=d.createElement(s);j.async=true;
-    j.src='https://cdn.qhub.app/widget.js';
-    j.onload=function(){w.QhubWidget.init(o)};
-    d.head.appendChild(j);
-  })(window,document,'script',{
-    tenantId: 'YOUR_TENANT_ID',
-    color: '${widget.primaryColor}',
-    position: '${widget.position}',
-    icon: '${widget.bubbleIcon}'
-  });
-</script>`;
-
-  const handleCopyCode = (): void => {
-    navigator.clipboard.writeText(embedCode).catch(() => {});
-    setCopied(true);
-    showToast('تم نسخ كود التضمين', 'success');
-    setTimeout(() => setCopied(false), 2000);
-  };
 
   return (
     <div className="p-4 lg:p-6 space-y-5">
@@ -305,40 +277,6 @@ export default function WidgetSettingsPage(): JSX.Element {
             </CardContent>
           </Card>
 
-          {/* Embed Code */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Code2 className="h-5 w-5 text-primary" />
-                  <h3 className="text-lg font-semibold">كود التضمين</h3>
-                </div>
-                <Badge variant="secondary" className="text-xs">يُنسخ للعملاء</Badge>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                يضيفه العميل في موقعه قبل وسم {'<'}/body{'>'} لتفعيل الويدجت
-              </p>
-            </CardHeader>
-            <CardContent>
-              <div className="relative">
-                <pre
-                  dir="ltr"
-                  className="bg-muted rounded-xl p-4 text-xs font-mono overflow-x-auto leading-relaxed text-foreground/80 border"
-                >
-                  {embedCode}
-                </pre>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="absolute top-3 end-3 h-8 gap-1.5"
-                  onClick={handleCopyCode}
-                >
-                  {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                  {copied ? 'تم النسخ' : 'نسخ'}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
         {/* Preview Column */}
