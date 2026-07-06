@@ -350,100 +350,137 @@ export default function AdminDashboard(): JSX.Element {
       </div>
 
       {/* ═══════ Bento Row 4: Attention cards ═══════ */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Top plans - wider */}
-        <Card className="border-emerald-500/30">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">أكثر الباقات اشتراكاً</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2.5">
-            {topPlans.length === 0 && <p className="text-xs text-muted-foreground py-6 text-center">لا توجد اشتراكات نشطة</p>}
-            {topPlans.map(({ plan, subscribers, revenue }, i) => {
-              const max = topPlans[0].subscribers;
-              const pct = Math.round((subscribers / max) * 100);
-              return (
-                <div key={plan.id}>
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span className="text-[10px] text-muted-foreground font-mono w-3">{i + 1}</span>
-                      <span className="text-sm font-medium truncate">{plan.nameAr}</span>
-                    </div>
-                    <span className="text-xs text-muted-foreground flex-shrink-0">
-                      <span className="font-bold text-foreground">{subscribers}</span> · ${revenue.toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-                    <div className="h-full rounded-full bg-gradient-to-l from-emerald-500 to-emerald-400" style={{ width: `${pct}%` }} />
-                  </div>
-                </div>
-              );
-            })}
-            {topPlans.length > 0 && (
-              <Button variant="ghost" size="sm" asChild className="w-full mt-1">
-                <Link to="/plans" className="text-xs">إدارة الباقات</Link>
-              </Button>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Expiring trials */}
-        <Card className="border-blue-500/30">
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-base">تجارب تنتهي قريباً</CardTitle>
-              <Badge variant="default" className="text-[10px]">{expiringTrials.length}</Badge>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {expiringTrials.length === 0 && <p className="text-xs text-muted-foreground py-6 text-center">لا توجد تجارب قاربت على الانتهاء</p>}
-            {expiringTrials.map(({ client, daysLeft }) => (
-              <Link key={client.id} to={`/clients/${client.id}`}
-                className="flex items-center justify-between gap-2 py-1.5 px-2 -mx-2 rounded-md hover:bg-muted/60 transition-colors">
-                <div className="flex items-center gap-2 min-w-0">
-                  <Avatar className="h-7 w-7">
-                    <AvatarFallback className={`text-[10px] font-semibold ${avatarColor(client.companyName)}`}>{initials(client.companyName)}</AvatarFallback>
-                  </Avatar>
-                  <span className="text-sm truncate">{client.companyName}</span>
-                </div>
-                <Badge variant={daysLeft <= 2 ? 'destructive' : daysLeft <= 5 ? 'warning' : 'secondary'} className="text-[10px] flex-shrink-0">
-                  {daysLeft === 0 ? 'اليوم' : daysLeft === 1 ? 'غداً' : `${daysLeft} أيام`}
-                </Badge>
-              </Link>
-            ))}
-            {expiringTrials.length > 0 && (
-              <Button variant="ghost" size="sm" asChild className="w-full mt-1">
-                <Link to="/clients?filter=trial" className="text-xs">عرض الكل</Link>
-              </Button>
-            )}
-          </CardContent>
-        </Card>
-
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Past due */}
-        <Card className="border-amber-500/30">
-          <CardHeader className="pb-2">
+        <Card>
+          <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-base">متأخرون عن الدفع</CardTitle>
               <Badge variant="warning" className="text-[10px]">{pastDueClients.length}</Badge>
             </div>
           </CardHeader>
-          <CardContent className="space-y-2">
-            {pastDueClients.length === 0 && <p className="text-xs text-muted-foreground py-6 text-center">لا يوجد متأخرين</p>}
-            {pastDueClients.map(({ client, amount, currency }) => (
-              <Link key={client.id} to={`/clients/${client.id}`}
-                className="flex items-center justify-between gap-2 py-1.5 px-2 -mx-2 rounded-md hover:bg-muted/60 transition-colors">
-                <div className="flex items-center gap-2 min-w-0">
-                  <Avatar className="h-7 w-7">
-                    <AvatarFallback className={`text-[10px] font-semibold ${avatarColor(client.companyName)}`}>{initials(client.companyName)}</AvatarFallback>
-                  </Avatar>
-                  <span className="text-sm truncate">{client.companyName}</span>
-                </div>
-                <span className="text-sm font-bold text-amber-600 dark:text-amber-400 flex-shrink-0">{formatMoney(amount, currency)}</span>
-              </Link>
-            ))}
+          <CardContent className="p-0">
+            {pastDueClients.length === 0 ? (
+              <p className="text-xs text-muted-foreground py-6 text-center">لا يوجد متأخرين</p>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-start">العميل</TableHead>
+                    <TableHead className="text-start">المبلغ المستحق</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {pastDueClients.map(({ client, amount, currency }) => (
+                    <TableRow key={client.id}>
+                      <TableCell className="py-2.5">
+                        <Link to={`/clients/${client.id}`} className="flex items-center gap-2 min-w-0 hover:underline">
+                          <Avatar className="h-7 w-7">
+                            <AvatarFallback className={`text-[10px] font-semibold ${avatarColor(client.companyName)}`}>{initials(client.companyName)}</AvatarFallback>
+                          </Avatar>
+                          <span className="text-sm font-medium truncate">{client.companyName}</span>
+                        </Link>
+                      </TableCell>
+                      <TableCell className="py-2.5 text-sm font-bold text-amber-600 dark:text-amber-400">{formatMoney(amount, currency)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
             {pastDueClients.length > 0 && (
-              <Button variant="ghost" size="sm" asChild className="w-full mt-1">
-                <Link to="/clients?filter=past_due" className="text-xs">عرض الكل</Link>
+              <div className="p-2 text-center border-t">
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to="/clients?filter=past_due" className="text-xs">عرض الكل</Link>
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Expiring trials */}
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base">تجارب تنتهي قريباً</CardTitle>
+              <Badge variant="default" className="text-[10px]">{expiringTrials.length}</Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            {expiringTrials.length === 0 ? (
+              <p className="text-xs text-muted-foreground py-6 text-center">لا توجد تجارب قاربت على الانتهاء</p>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-start">العميل</TableHead>
+                    <TableHead className="text-start">المتبقي</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {expiringTrials.map(({ client, daysLeft }) => (
+                    <TableRow key={client.id}>
+                      <TableCell className="py-2.5">
+                        <Link to={`/clients/${client.id}`} className="flex items-center gap-2 min-w-0 hover:underline">
+                          <Avatar className="h-7 w-7">
+                            <AvatarFallback className={`text-[10px] font-semibold ${avatarColor(client.companyName)}`}>{initials(client.companyName)}</AvatarFallback>
+                          </Avatar>
+                          <span className="text-sm truncate">{client.companyName}</span>
+                        </Link>
+                      </TableCell>
+                      <TableCell className="py-2.5">
+                        <Badge variant={daysLeft <= 2 ? 'destructive' : daysLeft <= 5 ? 'warning' : 'secondary'} className="text-[10px]">
+                          {daysLeft === 0 ? 'اليوم' : daysLeft === 1 ? 'غداً' : `${daysLeft} أيام`}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+            {expiringTrials.length > 0 && (
+              <div className="p-2 text-center border-t">
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to="/clients?filter=trial" className="text-xs">عرض الكل</Link>
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Top plans */}
+        <Card className="md:col-span-2">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base">أكثر الباقات اشتراكاً</CardTitle>
+              <Button variant="link" size="sm" asChild>
+                <Link to="/plans" className="flex items-center gap-1">إدارة الباقات <ArrowUpRight className="h-3.5 w-3.5" /></Link>
               </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            {topPlans.length === 0 ? (
+              <p className="text-xs text-muted-foreground py-6 text-center">لا توجد اشتراكات نشطة</p>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-start w-8">#</TableHead>
+                    <TableHead className="text-start">الباقة</TableHead>
+                    <TableHead className="text-start">المشتركين</TableHead>
+                    <TableHead className="text-start">الإيراد</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {topPlans.map(({ plan, subscribers, revenue }, i) => (
+                    <TableRow key={plan.id}>
+                      <TableCell className="py-2.5 text-xs text-muted-foreground font-mono">{i + 1}</TableCell>
+                      <TableCell className="py-2.5 text-sm font-medium">{plan.nameAr}</TableCell>
+                      <TableCell className="py-2.5 text-sm font-bold">{subscribers}</TableCell>
+                      <TableCell className="py-2.5 text-sm text-muted-foreground">${revenue.toLocaleString()}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             )}
           </CardContent>
         </Card>
