@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Plus,
   Edit2,
@@ -10,14 +11,9 @@ import {
   Database,
   Infinity as InfinityIcon,
   Globe2,
-  Power,
   Copy,
-  MessageCircle,
-  Bot,
-  Zap,
-  Shield,
-  Sparkles,
   X,
+  Sparkles,
   MoreHorizontal,
 } from 'lucide-react';
 import { useConfirm } from '@components/ui';
@@ -28,7 +24,7 @@ import { cn } from '@/lib/utils';
 import type { Plan, PlanTier } from '@/types';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
@@ -38,7 +34,6 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -47,7 +42,6 @@ import {
   SelectContent,
   SelectItem,
 } from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
 import {
   Table,
   TableHeader,
@@ -56,7 +50,6 @@ import {
   TableRow,
   TableCell,
 } from '@/components/ui/table';
-import { Switch } from '@/components/ui/switch';
 import {
   Tooltip,
   TooltipTrigger,
@@ -103,63 +96,9 @@ const tierOrder: Record<PlanTier, number> = {
   enterprise: 3,
 };
 
-type FeatureGroup = { label: string; icon: React.ComponentType<{ className?: string }>; items: string[] };
-
-const FEATURE_CATALOG: FeatureGroup[] = [
-  {
-    label: 'قنوات التواصل',
-    icon: MessageCircle,
-    items: [
-      'تكامل واتساب',
-      'تكامل ماسنجر',
-      'تكامل انستقرام',
-      'تكامل تلقرام',
-      'Live Chat Widget',
-      'دعم عبر البريد',
-    ],
-  },
-  {
-    label: 'الذكاء والأتمتة',
-    icon: Bot,
-    items: [
-      'ردود جاهزة',
-      'ردود ذكية بالـ AI',
-      'قوالب رسائل',
-      'الحملات (Outreach)',
-      'التوجيه التلقائي',
-      'ساعات العمل',
-    ],
-  },
-  {
-    label: 'التقارير والتكامل',
-    icon: Zap,
-    items: [
-      'تقارير أساسية',
-      'تقارير متقدمة',
-      'تصدير CSV',
-      'API access',
-      'Webhooks',
-      'تكامل Zapier',
-    ],
-  },
-  {
-    label: 'الدعم والمؤسسات',
-    icon: Shield,
-    items: [
-      'دعم فني قياسي',
-      'دعم فني ٢٤/٧',
-      'SLA مضمون ٩٩.٩٪',
-      'مدير حساب مخصص',
-      'تدريب مجاني للفريق',
-      'Whitelabel',
-      'SSO',
-    ],
-  },
-];
-
-const ALL_CATALOG_FEATURES: string[] = FEATURE_CATALOG.flatMap((g) => g.items);
 
 export default function AdminPlans(): JSX.Element {
+  const navigate = useNavigate();
   const plans = useAdminStore((s) => s.plans);
   const clients = useAdminStore((s) => s.clients);
   const countries = useAdminStore((s) => s.countries);
@@ -171,8 +110,6 @@ export default function AdminPlans(): JSX.Element {
   const { confirm } = useConfirm();
 
   const [previewCountry, setPreviewCountry] = useState('OM');
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editing, setEditing] = useState<Plan | null>(null);
   const [tierFilter, setTierFilter] = useState<'all' | PlanTier>('all');
   const [activeFilter, setActiveFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -210,64 +147,6 @@ export default function AdminPlans(): JSX.Element {
     const t = setTimeout(() => setCopiedId(null), 1700);
     return () => clearTimeout(t);
   }, [copiedId]);
-  const [form, setForm] = useState<{
-    tier: PlanTier;
-    name: string;
-    nameAr: string;
-    tagline: string;
-    features: string[];
-    limitAgents: number;
-    limitChannels: number;
-    limitConversations: number;
-    limitContacts: number;
-    pricesPerCountry: Record<string, { monthly: number; yearly: number }>;
-    popular: boolean;
-    active: boolean;
-  }>({
-    tier: 'pro',
-    name: '',
-    nameAr: '',
-    tagline: '',
-    features: [],
-    limitAgents: 5,
-    limitChannels: 2,
-    limitConversations: 5000,
-    limitContacts: 1000,
-    pricesPerCountry: {},
-    popular: false,
-    active: true,
-  });
-
-  const openCreate = (): void => {
-    setEditing(null);
-    const defaults: Record<string, { monthly: number; yearly: number }> = {};
-    countries.forEach((c) => { defaults[c.code] = { monthly: 0, yearly: 0 }; });
-    setForm({
-      tier: 'pro', name: '', nameAr: '', tagline: '', features: [],
-      limitAgents: 5, limitChannels: 2, limitConversations: 5000, limitContacts: 1000,
-      pricesPerCountry: defaults, popular: false, active: true,
-    });
-    setModalOpen(true);
-  };
-
-  const openEdit = (p: Plan): void => {
-    setEditing(p);
-    setForm({
-      tier: p.tier,
-      name: p.name,
-      nameAr: p.nameAr,
-      tagline: p.tagline,
-      features: [...p.features],
-      limitAgents: p.limits.agents,
-      limitChannels: p.limits.channels,
-      limitConversations: p.limits.conversations,
-      limitContacts: p.limits.contacts,
-      pricesPerCountry: { ...p.pricesPerCountry },
-      popular: p.popular ?? false,
-      active: p.active,
-    });
-    setModalOpen(true);
-  };
 
   const duplicate = (p: Plan): void => {
     const newPlan = addPlan({
@@ -282,48 +161,6 @@ export default function AdminPlans(): JSX.Element {
     });
     setCopiedId(newPlan.id);
     showToast(`تم إنشاء نسخة "${newPlan.nameAr}" — معطّلة، فعّلها من الأزرار السفلية`, 'success');
-  };
-
-  const submit = (): void => {
-    if (!form.name.trim() || !form.nameAr.trim()) {
-      showToast('الاسم بالعربية والإنجليزية مطلوبان', 'error');
-      return;
-    }
-    if (form.features.length === 0) {
-      showToast('اختر ميزة واحدة على الأقل', 'error');
-      return;
-    }
-    if (form.popular) {
-      plans.forEach((other) => {
-        if (other.popular && other.id !== editing?.id) {
-          updatePlan(other.id, { popular: false });
-        }
-      });
-    }
-    const payload = {
-      tier: form.tier,
-      name: form.name,
-      nameAr: form.nameAr,
-      tagline: form.tagline,
-      features: form.features,
-      limits: {
-        agents: form.limitAgents,
-        channels: form.limitChannels,
-        conversations: form.limitConversations,
-        contacts: form.limitContacts,
-      },
-      pricesPerCountry: form.pricesPerCountry,
-      popular: form.popular,
-      active: form.active,
-    };
-    if (editing) {
-      updatePlan(editing.id, payload);
-      showToast('تم تحديث الباقة', 'success');
-    } else {
-      addPlan(payload);
-      showToast('تمت إضافة الباقة', 'success');
-    }
-    setModalOpen(false);
   };
 
   const remove = async (p: Plan): Promise<void> => {
@@ -354,23 +191,6 @@ export default function AdminPlans(): JSX.Element {
     setReassignModal(null);
   };
 
-  const setMonthlyPrice = (countryCode: string, monthly: number): void => {
-    const current = form.pricesPerCountry[countryCode] ?? { monthly: 0, yearly: 0 };
-    const autoYearly = current.yearly === 0 || current.yearly === current.monthly * 10
-      ? monthly * 10
-      : current.yearly;
-    setForm({
-      ...form,
-      pricesPerCountry: { ...form.pricesPerCountry, [countryCode]: { monthly, yearly: autoYearly } },
-    });
-  };
-
-  const toggleFeature = (feature: string): void => {
-    const s = new Set(form.features);
-    if (s.has(feature)) s.delete(feature);
-    else s.add(feature);
-    setForm({ ...form, features: Array.from(s) });
-  };
 
   const previewC = countries.find((c) => c.code === previewCountry);
 
@@ -434,7 +254,7 @@ export default function AdminPlans(): JSX.Element {
                 </Badge>
               </Button>
             )}
-            <Button onClick={openCreate} size="sm" className="h-9 rounded-lg ms-auto">
+            <Button onClick={() => navigate('/plans/new')} size="sm" className="h-9 rounded-lg ms-auto">
               <Plus className="h-4 w-4 me-2" /> باقة جديدة
             </Button>
           </div>
@@ -450,7 +270,7 @@ export default function AdminPlans(): JSX.Element {
                 {plans.length === 0 ? 'ابدأ بإنشاء باقة جديدة لعملائك' : 'جرّب تعديل الفلاتر أعلاه'}
               </p>
               {plans.length === 0 ? (
-                <Button onClick={openCreate}>
+                <Button onClick={() => navigate('/plans/new')}>
                   <Plus className="h-4 w-4 me-2" /> إنشاء أول باقة
                 </Button>
               ) : (
@@ -592,7 +412,7 @@ export default function AdminPlans(): JSX.Element {
                                   variant="ghost"
                                   size="icon"
                                   className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted"
-                                  onClick={() => openEdit(p)}
+                                  onClick={() => navigate(`/plans/${p.id}/edit`)}
                                 >
                                   <Edit2 className="h-3.5 w-3.5" />
                                 </Button>
@@ -700,163 +520,6 @@ export default function AdminPlans(): JSX.Element {
           </CardContent>
         </Card>
 
-        {/* Dialog */}
-        <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>{editing ? `تعديل: ${editing.nameAr}` : 'باقة جديدة'}</DialogTitle>
-              <DialogDescription>
-                {editing ? 'عدّل بيانات الباقة ثم اضغط حفظ' : 'أدخل بيانات الباقة الجديدة'}
-              </DialogDescription>
-            </DialogHeader>
-
-            <div className="space-y-4 py-2">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="space-y-2">
-                  <Label>الاسم بالعربية</Label>
-                  <Input value={form.nameAr} onChange={(e) => setForm({ ...form, nameAr: e.target.value })} placeholder="مثال: الاحترافي" />
-                </div>
-                <div className="space-y-2">
-                  <Label>Name (EN)</Label>
-                  <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Pro" />
-                </div>
-                <div className="space-y-2">
-                  <Label>الفئة (Tier)</Label>
-                  <Select value={form.tier} onValueChange={(v) => setForm({ ...form, tier: v as PlanTier })}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="starter">Starter</SelectItem>
-                      <SelectItem value="pro">Pro</SelectItem>
-                      <SelectItem value="business">Business</SelectItem>
-                      <SelectItem value="enterprise">Enterprise</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label>وصف قصير (Tagline)</Label>
-                <Input value={form.tagline} onChange={(e) => setForm({ ...form, tagline: e.target.value })} placeholder="للشركات النامية" />
-              </div>
-
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <Label>الميزات</Label>
-                  <span className="text-xs text-muted-foreground">
-                    {form.features.length} ميزة مفعّلة
-                  </span>
-                </div>
-                <div className="space-y-3 rounded-xl border bg-muted/30 p-3 max-h-72 overflow-y-auto">
-                  {FEATURE_CATALOG.map((group) => (
-                    <div key={group.label} className="space-y-2">
-                      <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                        <group.icon className="h-3.5 w-3.5" />
-                        {group.label}
-                      </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        {group.items.map((feature) => {
-                          const enabled = form.features.includes(feature);
-                          return (
-                            <label
-                              key={feature}
-                              className={cn(
-                                'flex items-center justify-between gap-2 p-2.5 rounded-lg border bg-background cursor-pointer transition-colors',
-                                enabled && 'border-primary/40 bg-primary/5'
-                              )}
-                            >
-                              <span className="text-sm">{feature}</span>
-                              <Switch checked={enabled} onCheckedChange={() => toggleFeature(feature)} />
-                            </label>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="space-y-2">
-                  <Label>حد الموظفين (-1 = ∞)</Label>
-                  <Input type="number" min={-1} value={form.limitAgents} onChange={(e) => setForm({ ...form, limitAgents: Number(e.target.value) || 0 })} />
-                </div>
-                <div className="space-y-2">
-                  <Label>حد القنوات (-1 = ∞)</Label>
-                  <Input type="number" min={-1} value={form.limitChannels} onChange={(e) => setForm({ ...form, limitChannels: Number(e.target.value) || 0 })} />
-                </div>
-                <div className="space-y-2">
-                  <Label>محادثات/شهر (-1 = ∞)</Label>
-                  <Input type="number" min={-1} value={form.limitConversations} onChange={(e) => setForm({ ...form, limitConversations: Number(e.target.value) || 0 })} />
-                </div>
-                <div className="space-y-2">
-                  <Label>جهات اتصال (-1 = ∞)</Label>
-                  <Input type="number" min={-1} value={form.limitContacts} onChange={(e) => setForm({ ...form, limitContacts: Number(e.target.value) || 0 })} />
-                </div>
-              </div>
-
-              <div>
-                <Label className="mb-2 block">الأسعار حسب الدولة</Label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-72 overflow-y-auto p-1">
-                  {countries.map((co) => {
-                    const price = form.pricesPerCountry[co.code] ?? { monthly: 0, yearly: 0 };
-                    return (
-                      <div key={co.code} className="grid grid-cols-[auto_1fr_1fr] items-center gap-2 p-2.5 rounded-lg bg-muted">
-                        <span className="font-medium whitespace-nowrap"><span className="text-lg me-1">{co.flag}</span>{co.code}</span>
-                        <div className="relative">
-                          <Input
-                            type="number"
-                            min={0}
-                            value={price.monthly}
-                            onChange={(e) => setMonthlyPrice(co.code, Number(e.target.value) || 0)}
-                            placeholder="شهري"
-                            className="font-mono"
-                          />
-                          <span className="absolute end-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground pointer-events-none">/شهر {co.symbol}</span>
-                        </div>
-                        <div className="relative">
-                          <Input
-                            type="number"
-                            min={0}
-                            value={price.yearly}
-                            onChange={(e) => setForm({ ...form, pricesPerCountry: { ...form.pricesPerCountry, [co.code]: { ...price, yearly: Number(e.target.value) || 0 } } })}
-                            placeholder="سنوي"
-                            className="font-mono"
-                          />
-                          <span className="absolute end-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground pointer-events-none">/سنة</span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
-                  <div>
-                    <p className="text-sm font-medium">الأكثر شعبية</p>
-                    <p className="text-xs text-muted-foreground">تمييز خاص</p>
-                  </div>
-                  <Switch checked={form.popular} onCheckedChange={(checked) => setForm({ ...form, popular: checked })} />
-                </div>
-                <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
-                  <div>
-                    <p className="text-sm font-medium">نشطة</p>
-                    <p className="text-xs text-muted-foreground">متاحة للاشتراك</p>
-                  </div>
-                  <Switch checked={form.active} onCheckedChange={(checked) => setForm({ ...form, active: checked })} />
-                </div>
-              </div>
-            </div>
-
-            <DialogFooter className="gap-2 sm:gap-0">
-              <Button variant="outline" onClick={() => setModalOpen(false)}>إلغاء</Button>
-              <Button onClick={submit}>{editing ? 'حفظ' : 'إنشاء'}</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
         {/* Reassign clients before delete */}
         <Dialog open={!!reassignModal} onOpenChange={(open) => { if (!open) setReassignModal(null); }}>
           <DialogContent className="max-w-md">
@@ -915,13 +578,3 @@ function LimitPill({ icon, value }: { icon: React.ReactNode; value: string | num
   );
 }
 
-function LimitChip({ icon, value, label }: { icon: React.ReactNode; value: string | number; label: string }): JSX.Element {
-  const isInfinite = value === '∞';
-  return (
-    <div className="flex items-center gap-1.5 p-1.5 rounded-lg bg-white/60 dark:bg-black/20 text-sm">
-      <span className="text-muted-foreground">{icon}</span>
-      <span className="font-bold">{isInfinite ? <InfinityIcon className="h-3.5 w-3.5 inline" /> : value}</span>
-      <span className="text-muted-foreground">{label}</span>
-    </div>
-  );
-}
