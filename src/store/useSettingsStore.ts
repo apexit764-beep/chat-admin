@@ -58,6 +58,14 @@ export interface Currency {
   usdRate: number;
 }
 
+export interface AIDocument {
+  id: string;
+  name: string;
+  size: number;
+  type: string;
+  uploadedAt: string;
+}
+
 export interface AISettings {
   enabled: boolean;
   provider: 'chatgpt' | 'claude' | 'gemini';
@@ -68,6 +76,7 @@ export interface AISettings {
   tone: 'concise' | 'friendly' | 'formal' | 'luxury';
   dialect: 'fus7a' | 'khaleeji' | 'masri' | 'shami';
   companyPrompt: string;
+  documents: AIDocument[];
   learnFromDocs: boolean;
   learnFromReplies: boolean;
   learnFromKnowledge: boolean;
@@ -193,6 +202,7 @@ const defaultState: Persisted = {
     tone: 'friendly',
     dialect: 'fus7a',
     companyPrompt: '',
+    documents: [],
     learnFromDocs: true,
     learnFromReplies: true,
     learnFromKnowledge: true,

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
   Sparkles,
   Link2,
@@ -16,8 +16,13 @@ import {
   Ban,
   MessageSquareText,
   Mic,
+  Upload,
+  FileText,
+  FileImage,
+  File as FileIcon,
+  Trash2,
 } from 'lucide-react';
-import { useSettingsStore, type AISettings } from '@/store/useSettingsStore';
+import { useSettingsStore, type AISettings, type AIDocument } from '@/store/useSettingsStore';
 import { useUIStore } from '@/store/useUIStore';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -539,6 +544,9 @@ export function KnowledgeTab({
         </CardContent>
       </Card>
 
+      {/* Documents */}
+      <DocumentsCard ai={ai} setAI={setAI} />
+
       {/* Forbidden Topics */}
       <Card>
         <CardHeader>
@@ -754,4 +762,161 @@ export function HandoffTab({
       </Card>
     </div>
   );
+}
+
+/* ─── Documents Card ─── */
+const ACCEPTED = '.pdf,.doc,.docx,.txt,.md,.csv,.xls,.xlsx,.png,.jpg,.jpeg';
+const MAX_SIZE = 20 * 1024 * 1024;
+
+function DocumentsCard({
+  ai,
+  setAI,
+}: {
+  ai: AISettings;
+  setAI: (p: Partial<AISettings>) => void;
+}): JSX.Element {
+  const showToast = useUIStore((s) => s.showToast);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [dragging, setDragging] = useState(false);
+
+  const totalSize = ai.documents.reduce((sum, d) => sum + d.size, 0);
+
+  const addFiles = (files: FileList | null): void => {
+    if (!files || !files.length) return;
+    const added: AIDocument[] = [];
+    for (const f of Array.from(files)) {
+      if (f.size > MAX_SIZE) {
+        showToast(`الملف "${f.name}" أكبر من 20MB`, 'error');
+        continue;
+      }
+      if (ai.documents.some((d) => d.name === f.name && d.size === f.size)) {
+        showToast(`الملف "${f.name}" مرفوع مسبقاً`, 'info');
+        continue;
+      }
+      const ext = f.name.split('.').pop()?.toLowerCase() ?? '';
+      added.push({
+        id: `${f.name}-${f.size}-${f.lastModified}`,
+        name: f.name,
+        size: f.size,
+        type: ext,
+        uploadedAt: new Date().toISOString(),
+      });
+    }
+    if (added.length) {
+      setAI({ documents: [...ai.documents, ...added] });
+      showToast(`تم رفع ${added.length} ${added.length === 1 ? 'وثيقة' : 'وثائق'}`, 'success');
+    }
+  };
+
+  const removeDoc = (id: string): void => {
+    setAI({ documents: ai.documents.filter((d) => d.id !== id) });
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <div className="flex items-center gap-2">
+              <FileText className="h-5 w-5 text-primary" />
+              <h3 className="text-lg font-semibold">الوثائق المرفوعة</h3>
+            </div>
+            <p className="text-sm text-muted-foreground mt-1">
+              ارفع كتالوجات، أسعار، سياسات، أو أي مستندات يستفيد منها المساعد.
+              أنواع مقبولة: PDF, DOC, DOCX, TXT, MD, CSV, XLS, XLSX, صور — بحد أقصى 20MB لكل ملف.
+            </p>
+          </div>
+          <Badge variant="secondary" className="whitespace-nowrap">
+            {ai.documents.length} · {formatSize(totalSize)}
+          </Badge>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Dropzone */}
+        <label
+          onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setDragging(false);
+            addFiles(e.dataTransfer.files);
+          }}
+          className={cn(
+            'flex flex-col items-center justify-center gap-2 py-8 px-4 rounded-xl border-2 border-dashed cursor-pointer transition-colors',
+            dragging
+              ? 'border-primary bg-primary/5'
+              : 'border-border hover:border-primary/40 hover:bg-muted/40'
+          )}
+        >
+          <div className={cn('h-11 w-11 rounded-xl flex items-center justify-center', dragging ? 'bg-primary/15 text-primary' : 'bg-muted text-muted-foreground')}>
+            <Upload className="h-5 w-5" />
+          </div>
+          <p className="text-sm font-medium">اسحب الملفات هنا أو اضغط للاختيار</p>
+          <p className="text-xs text-muted-foreground">دعم رفع متعدد</p>
+          <input
+            ref={inputRef}
+            type="file"
+            multiple
+            accept={ACCEPTED}
+            className="hidden"
+            onChange={(e) => {
+              addFiles(e.target.files);
+              if (inputRef.current) inputRef.current.value = '';
+            }}
+          />
+        </label>
+
+        {/* List */}
+        {ai.documents.length === 0 ? (
+          <p className="text-center text-xs text-muted-foreground py-4">
+            لا توجد وثائق مرفوعة بعد.
+          </p>
+        ) : (
+          <div className="space-y-2">
+            {ai.documents.map((doc) => (
+              <div
+                key={doc.id}
+                className="flex items-center gap-3 p-3 rounded-lg border bg-card"
+              >
+                <div className="h-9 w-9 rounded-lg bg-muted flex items-center justify-center text-muted-foreground flex-shrink-0">
+                  {docIcon(doc.type)}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">{doc.name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {formatSize(doc.size)} · {new Date(doc.uploadedAt).toLocaleDateString('ar-EG', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  </p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                  onClick={() => removeDoc(doc.id)}
+                  aria-label="حذف"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function formatSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function docIcon(type: string): JSX.Element {
+  if (['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'].includes(type)) {
+    return <FileImage className="h-4 w-4" />;
+  }
+  if (['pdf', 'doc', 'docx', 'txt', 'md', 'csv', 'xls', 'xlsx'].includes(type)) {
+    return <FileText className="h-4 w-4" />;
+  }
+  return <FileIcon className="h-4 w-4" />;
 }
