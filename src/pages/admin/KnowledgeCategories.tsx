@@ -6,6 +6,7 @@ import { useUIStore } from '@/store/useUIStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import {
@@ -92,13 +93,16 @@ export default function KnowledgeCategories(): JSX.Element {
       <Card>
         <CardContent className="p-0">
           {sorted.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-              <FolderOpen className="h-12 w-12 mb-3 opacity-20" />
-              <p className="text-sm">لا توجد تصنيفات</p>
-              <Button variant="link" onClick={openNew}>
-                <Plus className="h-4 w-4 me-1" /> إنشاء أول تصنيف
-              </Button>
-            </div>
+            <EmptyState
+              icon={FolderOpen}
+              title="لا توجد تصنيفات"
+              message="ابدأ بإضافة تصنيف لتنظيم مقالاتك"
+              action={
+                <Button onClick={openNew}>
+                  <Plus className="h-4 w-4 me-1" /> إنشاء أول تصنيف
+                </Button>
+              }
+            />
           ) : (
             <div className="overflow-x-auto" dir="rtl">
               <table dir="rtl" className="w-full text-sm">

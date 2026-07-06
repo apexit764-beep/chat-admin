@@ -22,6 +22,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { EmptyState } from '@/components/ui/empty-state';
 import { RichEditor } from '@/components/ui/rich-editor';
 import {
   Select,
@@ -308,10 +309,11 @@ export default function KnowledgeBase(): JSX.Element {
           </CardHeader>
           <CardContent className="pt-0">
             {filtered.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-                <FileText className="h-12 w-12 mb-3 opacity-20" />
-                <p className="text-sm">لا توجد مقالات</p>
-              </div>
+              <EmptyState
+                icon={FileText}
+                title="لا توجد مقالات"
+                message={search ? 'جرّب تعديل بحثك' : 'ابدأ بإضافة مقالك الأول'}
+              />
             ) : (
               <div className="overflow-x-auto">
                 <Table>

@@ -1,9 +1,10 @@
 import { useLocation, Link, useNavigate } from 'react-router-dom';
-import { ChevronLeft, Moon, Sun, User, Settings, Shield, Bell, LogOut } from 'lucide-react';
+import { ChevronLeft, Moon, Sun, User, Settings, Shield, Bell, LogOut, Menu } from 'lucide-react';
 import { NotificationDropdown } from '@/components/admin/NotificationDropdown';
 import { HeaderSearch } from '@/components/admin/HeaderSearch';
 import { useThemeStore } from '@/store/useThemeStore';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useUIStore } from '@/store/useUIStore';
 import { Button } from '@/components/ui/button';
 import {
   Avatar,
@@ -56,13 +57,24 @@ export function AdminTopbar(): JSX.Element {
   const toggleTheme = useThemeStore((s) => s.toggle);
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
+  const openMobileSidebar = useUIStore((s) => s.toggleMobileSidebar);
 
   const segments = location.pathname.split('/').filter(Boolean);
   const currentLabel = breadcrumbMap[location.pathname] ?? breadcrumbMap['/' + segments[0]] ?? 'لوحة التحكم';
 
   return (
     <TooltipProvider delayDuration={300}>
-      <header className="sticky top-0 z-10 px-6 py-3 flex items-center gap-4 bg-background/80 backdrop-blur-sm border-b border-border/40">
+      <header className="sticky top-0 z-10 px-4 lg:px-6 py-3 flex items-center gap-3 lg:gap-4 bg-background/80 backdrop-blur-sm border-b border-border/40">
+        {/* Mobile hamburger */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-9 w-9 rounded-xl lg:hidden"
+          onClick={openMobileSidebar}
+          aria-label="القائمة"
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
         {/* Breadcrumb */}
         <nav className="flex items-center gap-1.5 text-sm min-w-0">
           <Link to="/dashboard" className="text-muted-foreground hover:text-foreground transition-colors">
@@ -132,7 +144,7 @@ export function AdminTopbar(): JSX.Element {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="cursor-pointer gap-2 px-3"
-                  onClick={() => navigate('/settings')}
+                  onClick={() => navigate('/profile')}
                 >
                   <User className="h-4 w-4" />
                   الملف الشخصي

@@ -6,15 +6,10 @@ import {
   Phone,
   CheckCircle2,
   User,
-  Smile,
-  Paperclip,
-  Image,
-  Star,
   Hash,
   Clock,
   Tag,
   ChevronDown,
-  SlidersHorizontal,
   Globe,
   ArrowRightLeft,
   StickyNote,
@@ -208,9 +203,6 @@ export default function LiveChat() {
                 className="pr-9 h-9 text-sm bg-muted/50 border"
               />
             </div>
-            <Button variant="outline" size="icon" className="h-9 w-9 shrink-0">
-              <SlidersHorizontal className="h-4 w-4" />
-            </Button>
           </div>
 
           {/* Sort + Filter */}
@@ -518,23 +510,8 @@ export default function LiveChat() {
                 />
               </div>
 
-              {/* Toolbar - attachments on right, send on left */}
-              <div className={cn('flex items-center justify-between px-3 py-2 border-t border-border/40', activeTab === 'note' && 'bg-amber-50/30 dark:bg-amber-900/5')}>
-                <div className="flex items-center gap-0.5">
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
-                    <Paperclip className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
-                    <Smile className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
-                    <Image className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
-                    <Star className="h-4 w-4" />
-                  </Button>
-                </div>
-
+              {/* Toolbar - send button */}
+              <div className={cn('flex items-center justify-end px-3 py-2 border-t border-border/40', activeTab === 'note' && 'bg-amber-50/30 dark:bg-amber-900/5')}>
                 <Button
                   size="sm"
                   onClick={handleSend}

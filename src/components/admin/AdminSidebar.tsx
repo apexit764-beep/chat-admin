@@ -1,5 +1,5 @@
-import { NavLink, useLocation } from 'react-router-dom';
-import { useState } from 'react';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import {
   LayoutDashboard,
   Users,
@@ -15,8 +15,12 @@ import {
   PanelRightOpen,
   BookOpen,
   MessageCircle,
+  Bell,
+  LogOut,
+  X,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useUIStore } from '@/store/useUIStore';
 import { cn } from '@/lib/utils';
 import {
   Tooltip,
@@ -67,6 +71,7 @@ const navGroups: NavGroup[] = [
       { to: '/reports', label: 'التقارير', icon: BarChart3 },
       { to: '/activity', label: 'سجل النشاط', icon: Activity },
       { to: '/knowledge', label: 'قاعدة المعرفة', icon: BookOpen },
+      { to: '/notifications', label: 'الإشعارات', icon: Bell },
       { to: '/settings', label: 'الإعدادات', icon: Settings },
     ],
   },
@@ -81,125 +86,141 @@ function getInitials(name: string): string {
     .toUpperCase();
 }
 
-export function AdminSidebar(): JSX.Element {
-  const user = useAuthStore((s) => s.user);
-  const location = useLocation();
-  const [collapsed, setCollapsed] = useState(false);
+interface SidebarInnerProps {
+  collapsed: boolean;
+  onToggleCollapse: () => void;
+  onNavigate?: () => void;
+  mobile?: boolean;
+  onCloseMobile?: () => void;
+}
 
-  const sidebarWidth = collapsed ? 'w-[68px]' : 'w-[240px]';
+function SidebarInner({ collapsed, onToggleCollapse, onNavigate, mobile, onCloseMobile }: SidebarInnerProps): JSX.Element {
+  const user = useAuthStore((s) => s.user);
+  const logout = useAuthStore((s) => s.logout);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const toggleBtn = (
     <button
-      onClick={() => setCollapsed((v) => !v)}
-      className={cn(
-        'h-8 w-8 rounded-lg bg-white/8 hover:bg-white/15 flex items-center justify-center text-white/60 hover:text-white transition-all flex-shrink-0'
-      )}
+      onClick={onToggleCollapse}
+      className="h-8 w-8 rounded-lg bg-white/8 hover:bg-white/15 flex items-center justify-center text-white/60 hover:text-white transition-all flex-shrink-0"
     >
-      {collapsed ? (
-        <PanelRightClose className="h-4 w-4" />
-      ) : (
-        <PanelRightOpen className="h-4 w-4" />
-      )}
+      {collapsed ? <PanelRightClose className="h-4 w-4" /> : <PanelRightOpen className="h-4 w-4" />}
     </button>
   );
 
+  const goToProfile = (): void => {
+    navigate('/profile');
+    onNavigate?.();
+  };
+
   return (
-    <TooltipProvider delayDuration={0}>
-      <aside
-        dir="rtl"
-        className={cn(
-          'h-[calc(100vh-24px)] sticky top-3 rounded-2xl flex flex-col z-30 transition-[width] duration-300 ease-in-out overflow-hidden',
-          sidebarWidth
-        )}
-        style={{
-          background: 'linear-gradient(180deg, #0A1E3D 0%, #0D2B52 40%, #113B6E 70%, #1565A0 100%)',
-        }}
-      >
-        {/* Logo area + collapse toggle */}
-        <div className={cn(
-          'flex items-center gap-3 pt-6 pb-4',
-          collapsed ? 'justify-center px-3' : 'px-5'
-        )}>
-          {collapsed ? (
-            <div className="group relative h-10 w-10 flex-shrink-0">
-              <NavLink to="/dashboard" className="block h-10 w-10">
-                <img src="/qhub-icon.png" alt="Qhub" className="h-10 w-10" />
-              </NavLink>
-              <button
-                onClick={() => setCollapsed(false)}
-                className="absolute inset-0 h-10 w-10 rounded-lg bg-black/50 backdrop-blur-sm flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-              >
-                <PanelRightClose className="h-4 w-4" />
-              </button>
+    <>
+      {/* Logo area */}
+      <div className={cn('flex items-center gap-3 pt-6 pb-4', collapsed ? 'justify-center px-3' : 'px-5')}>
+        {collapsed ? (
+          <div className="group relative h-10 w-10 flex-shrink-0">
+            <NavLink to="/dashboard" className="block h-10 w-10">
+              <img src="/qhub-icon.png" alt="Qhub" className="h-10 w-10" />
+            </NavLink>
+            <button
+              onClick={onToggleCollapse}
+              className="absolute inset-0 h-10 w-10 rounded-lg bg-black/50 backdrop-blur-sm flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+            >
+              <PanelRightClose className="h-4 w-4" />
+            </button>
+          </div>
+        ) : (
+          <>
+            <NavLink to="/dashboard" className="h-10 w-10 flex-shrink-0" onClick={onNavigate}>
+              <img src="/qhub-icon.png" alt="Qhub" className="h-10 w-10" />
+            </NavLink>
+            <div className="flex flex-col min-w-0 flex-1">
+              <span className="text-sm font-bold text-white tracking-wide">Qhub</span>
+              <span className="text-[10px] text-white/50">لوحة التحكم</span>
             </div>
-          ) : (
-            <>
-              <NavLink to="/dashboard" className="h-10 w-10 flex-shrink-0">
-                <img src="/qhub-icon.png" alt="Qhub" className="h-10 w-10" />
-              </NavLink>
-              <div className="flex flex-col min-w-0 flex-1">
-                <span className="text-sm font-bold text-white tracking-wide">Qhub</span>
-                <span className="text-[10px] text-white/50">لوحة التحكم</span>
-              </div>
-              {toggleBtn}
-            </>
-          )}
-        </div>
+            {mobile ? (
+              <button
+                onClick={onCloseMobile}
+                className="h-8 w-8 rounded-lg bg-white/8 hover:bg-white/15 flex items-center justify-center text-white/60 hover:text-white transition-all flex-shrink-0"
+                aria-label="إغلاق"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            ) : (
+              toggleBtn
+            )}
+          </>
+        )}
+      </div>
 
-        {/* Main nav items */}
-        <ScrollArea className="flex-1 px-3">
-          <nav className="flex flex-col gap-0.5">
-            {navGroups.map((group, gi) => (
-              <div key={gi}>
-                {group.title && !collapsed && (
-                  <div className="px-3 pt-4 pb-1.5 first:pt-0">
-                    <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider">{group.title}</span>
-                  </div>
-                )}
-                {group.title && collapsed && gi > 0 && (
-                  <div className="mx-auto my-2 w-6 border-t border-white/10" />
-                )}
-                {group.items.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = location.pathname === item.to || location.pathname.startsWith(item.to + '/');
-
-                  const linkEl = (
-                    <NavLink
-                      key={item.to}
-                      to={item.to}
-                      className={cn(
-                        'flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-200',
-                        collapsed ? 'h-10 w-10 justify-center mx-auto' : 'h-10 px-3',
-                        isActive
-                          ? 'bg-white/15 text-white shadow-lg shadow-black/10 backdrop-blur-sm'
-                          : 'text-white/60 hover:text-white hover:bg-white/8'
-                      )}
-                    >
-                      <Icon className="h-[18px] w-[18px] flex-shrink-0" />
-                      {!collapsed && <span className="truncate">{item.label}</span>}
-                    </NavLink>
+      {/* Main nav items */}
+      <ScrollArea className="flex-1 px-3">
+        <nav className="flex flex-col gap-0.5">
+          {navGroups.map((group, gi) => (
+            <div key={gi}>
+              {group.title && !collapsed && (
+                <div className="px-3 pt-4 pb-1.5 first:pt-0">
+                  <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider">
+                    {group.title}
+                  </span>
+                </div>
+              )}
+              {group.title && collapsed && gi > 0 && (
+                <div className="mx-auto my-2 w-6 border-t border-white/10" />
+              )}
+              {group.items.map((item) => {
+                const Icon = item.icon;
+                const isActive =
+                  location.pathname === item.to || location.pathname.startsWith(item.to + '/');
+                const linkEl = (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    onClick={onNavigate}
+                    className={cn(
+                      'flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-200',
+                      collapsed ? 'h-10 w-10 justify-center mx-auto' : 'h-10 px-3',
+                      isActive
+                        ? 'bg-white/15 text-white shadow-lg shadow-black/10 backdrop-blur-sm'
+                        : 'text-white/60 hover:text-white hover:bg-white/8'
+                    )}
+                  >
+                    <Icon className="h-[18px] w-[18px] flex-shrink-0" />
+                    {!collapsed && <span className="truncate">{item.label}</span>}
+                  </NavLink>
+                );
+                if (collapsed) {
+                  return (
+                    <Tooltip key={item.to}>
+                      <TooltipTrigger asChild>{linkEl}</TooltipTrigger>
+                      <TooltipContent side="left" className="font-medium">
+                        {item.label}
+                      </TooltipContent>
+                    </Tooltip>
                   );
+                }
+                return linkEl;
+              })}
+            </div>
+          ))}
+        </nav>
+      </ScrollArea>
 
-                  if (collapsed) {
-                    return (
-                      <Tooltip key={item.to}>
-                        <TooltipTrigger asChild>{linkEl}</TooltipTrigger>
-                        <TooltipContent side="left" className="font-medium">{item.label}</TooltipContent>
-                      </Tooltip>
-                    );
-                  }
-
-                  return linkEl;
-                })}
-              </div>
-            ))}
-          </nav>
-        </ScrollArea>
-
-        {/* User section */}
-        <div className={cn('p-3 flex items-center', collapsed ? 'justify-center' : 'gap-3')}>
-          {user && !collapsed && (
-            <div className="flex items-center gap-3 flex-1 min-w-0">
+      {/* User section + Logout */}
+      <div
+        className={cn(
+          'p-3 mt-2 border-t border-white/10 flex items-center gap-2',
+          collapsed ? 'flex-col' : ''
+        )}
+      >
+        {user && !collapsed && (
+          <>
+            <button
+              onClick={goToProfile}
+              className="flex items-center gap-3 flex-1 min-w-0 rounded-xl px-2 py-1.5 hover:bg-white/8 transition-colors text-start"
+              title="الملف الشخصي"
+            >
               <div className="h-9 w-9 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 ring-1 ring-white/20">
                 <span className="text-xs font-bold text-white">{getInitials(user.name)}</span>
               </div>
@@ -207,21 +228,115 @@ export function AdminSidebar(): JSX.Element {
                 <span className="text-sm font-medium text-white truncate">{user.name}</span>
                 <span className="text-[10px] text-white/50">مدير النظام</span>
               </div>
-            </div>
-          )}
-          {user && collapsed && (
+            </button>
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="h-9 w-9 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 ring-1 ring-white/20 cursor-default">
-                  <span className="text-xs font-bold text-white">{getInitials(user.name)}</span>
-                </div>
+                <button
+                  onClick={logout}
+                  className="h-9 w-9 rounded-xl bg-white/8 hover:bg-red-500/25 flex items-center justify-center text-white/70 hover:text-white transition-colors flex-shrink-0"
+                  aria-label="تسجيل الخروج"
+                >
+                  <LogOut className="h-4 w-4" />
+                </button>
               </TooltipTrigger>
-              <TooltipContent side="left" className="font-medium">{user.name}</TooltipContent>
+              <TooltipContent side="left" className="font-medium">تسجيل الخروج</TooltipContent>
             </Tooltip>
-          )}
-        </div>
+          </>
+        )}
+        {user && collapsed && (
+          <>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={goToProfile}
+                  className="h-9 w-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center flex-shrink-0 ring-1 ring-white/20 transition-colors"
+                >
+                  <span className="text-xs font-bold text-white">{getInitials(user.name)}</span>
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="left" className="font-medium">
+                الملف الشخصي — {user.name}
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={logout}
+                  className="h-9 w-9 rounded-xl bg-white/8 hover:bg-red-500/25 flex items-center justify-center text-white/70 hover:text-white transition-colors"
+                  aria-label="تسجيل الخروج"
+                >
+                  <LogOut className="h-4 w-4" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="left" className="font-medium">تسجيل الخروج</TooltipContent>
+            </Tooltip>
+          </>
+        )}
+      </div>
+    </>
+  );
+}
+
+export function AdminSidebar(): JSX.Element {
+  const [collapsed, setCollapsed] = useState(false);
+  const mobileOpen = useUIStore((s) => s.mobileSidebarOpen);
+  const setMobileOpen = useUIStore((s) => s.setMobileSidebarOpen);
+
+  const sidebarWidth = collapsed ? 'w-[68px]' : 'w-[240px]';
+
+  // Close mobile sidebar on route change (handled inside SidebarInner via onNavigate)
+  // Close on Escape
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onKey = (e: KeyboardEvent): void => {
+      if (e.key === 'Escape') setMobileOpen(false);
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [mobileOpen, setMobileOpen]);
+
+  return (
+    <TooltipProvider delayDuration={0}>
+      {/* Desktop sidebar */}
+      <aside
+        dir="rtl"
+        className={cn(
+          'hidden lg:flex h-[calc(100vh-24px)] sticky top-3 rounded-2xl flex-col z-30 transition-[width] duration-300 ease-in-out overflow-hidden',
+          sidebarWidth
+        )}
+        style={{
+          background: 'linear-gradient(180deg, #0A1E3D 0%, #0D2B52 40%, #113B6E 70%, #1565A0 100%)',
+        }}
+      >
+        <SidebarInner collapsed={collapsed} onToggleCollapse={() => setCollapsed((v) => !v)} />
       </aside>
 
+      {/* Mobile drawer overlay */}
+      <div
+        className={cn(
+          'lg:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity',
+          mobileOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        )}
+        onClick={() => setMobileOpen(false)}
+      />
+      <aside
+        dir="rtl"
+        className={cn(
+          'lg:hidden fixed top-0 right-0 h-full w-[280px] z-50 flex flex-col overflow-hidden transition-transform duration-300 ease-in-out',
+          mobileOpen ? 'translate-x-0' : 'translate-x-full'
+        )}
+        style={{
+          background: 'linear-gradient(180deg, #0A1E3D 0%, #0D2B52 40%, #113B6E 70%, #1565A0 100%)',
+        }}
+      >
+        <SidebarInner
+          collapsed={false}
+          onToggleCollapse={() => setMobileOpen(false)}
+          onNavigate={() => setMobileOpen(false)}
+          mobile
+          onCloseMobile={() => setMobileOpen(false)}
+        />
+      </aside>
     </TooltipProvider>
   );
 }

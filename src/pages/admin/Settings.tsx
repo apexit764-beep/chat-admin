@@ -123,16 +123,6 @@ export default function AdminSettings(): JSX.Element {
     }
   };
 
-  const handleWipeDemo = async (): Promise<void> => {
-    const ok = await confirm({
-      title: 'مسح البيانات التجريبية؟',
-      message: 'هذا الإجراء عرض توضيحي فقط — لن يحذف شيئاً فعلياً في هذا الـ Demo.',
-      variant: 'danger',
-      confirmText: 'تأكيد المسح',
-    });
-    if (ok) showToast('تم المسح (تجريبي)', 'info');
-  };
-
   const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
     { key: 'general', label: 'عام', icon: <Building className="h-4 w-4" /> },
     { key: 'company', label: 'الشركة', icon: <Building className="h-4 w-4" /> },
@@ -680,7 +670,6 @@ export default function AdminSettings(): JSX.Element {
               <div>
                 <Header icon={<AlertTriangle className="h-5 w-5 text-destructive" />} title="منطقة الخطر" subtitle="إجراءات لا يمكن التراجع عنها" />
                 <div className="space-y-3">
-                  <DangerAction title="مسح البيانات التجريبية" hint="حذف كل العملاء والفواتير المنشأة للتجربة" onConfirm={handleWipeDemo} cta="مسح" />
                   <DangerAction title="إعادة ضبط الإعدادات" hint="إرجاع جميع الإعدادات للقيم الافتراضية" onConfirm={handleResetSettings} cta="إعادة ضبط" />
                   <DangerAction title="تصدير كل البيانات" hint="JSON بكل العملاء والفواتير والمستخدمين" onConfirm={handleExportAll} cta="تصدير الآن" variant="secondary" />
                 </div>

@@ -9,6 +9,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
+import { EmptyState } from '@/components/ui/empty-state';
 
 export interface Column<T> {
   key: string;
@@ -294,15 +295,12 @@ export function DataTable<T>({
               <tr>
                 <td colSpan={columns.length + 1 + (selectable ? 1 : 0)} className="px-3 py-12 text-center">
                   {emptyState ?? (
-                    <div className="flex flex-col items-center text-center">
-                      <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground mb-2">
-                        <InboxIcon className="h-6 w-6" />
-                      </div>
-                      <p className="text-sm font-medium">لا توجد نتائج</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {search ? 'جرّب تعديل بحثك أو الفلاتر' : 'لا توجد بيانات لعرضها'}
-                      </p>
-                    </div>
+                    <EmptyState
+                      icon={InboxIcon}
+                      title="لا توجد نتائج"
+                      message={search ? 'جرّب تعديل بحثك أو الفلاتر' : 'لا توجد بيانات لعرضها'}
+                      compact
+                    />
                   )}
                 </td>
               </tr>
