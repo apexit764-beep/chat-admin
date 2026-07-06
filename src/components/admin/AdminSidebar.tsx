@@ -17,6 +17,7 @@ import {
   MessageCircle,
   LogOut,
   X,
+  Plug,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useUIStore } from '@/store/useUIStore';
@@ -71,6 +72,7 @@ const navGroups: NavGroup[] = [
       { to: '/reports', label: 'التقارير', icon: BarChart3 },
       { to: '/activity', label: 'سجل النشاط', icon: Activity },
       { to: '/knowledge', label: 'قاعدة المعرفة', icon: BookOpen },
+      { to: '/integrations', label: 'منصات التكامل', icon: Plug },
       { to: '/settings', label: 'الإعدادات', icon: Settings },
     ],
   },
