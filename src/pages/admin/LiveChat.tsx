@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useAuthStore } from '@/store/useAuthStore';
-import { timeAgo } from '@/utils/format';
+import { timeAgo, initials, avatarColor } from '@/utils/format';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -38,33 +38,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import type { LiveChatConversation, LiveChatStatus } from '@/types';
-
-const avatarColors = [
-  'bg-blue-500',
-  'bg-green-500',
-  'bg-purple-500',
-  'bg-orange-500',
-  'bg-pink-500',
-  'bg-teal-500',
-  'bg-indigo-500',
-  'bg-rose-500',
-  'bg-cyan-500',
-  'bg-amber-500',
-];
-
-function getAvatarColor(name: string): string {
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return avatarColors[Math.abs(hash) % avatarColors.length];
-}
-
-function getInitials(name: string): string {
-  const parts = name.split(' ');
-  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
-  return name.slice(0, 2).toUpperCase();
-}
 
 const statusConfig: Record<LiveChatStatus, { label: string; color: string; dotColor: string }> = {
   open: { label: 'جديدة', color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', dotColor: 'bg-green-500' },
@@ -264,10 +237,10 @@ export default function LiveChat() {
                     <div className="flex items-start gap-2.5">
                       {/* Avatar */}
                       <div className={cn(
-                        'h-10 w-10 rounded-full flex items-center justify-center shrink-0 text-white font-bold text-sm',
-                        getAvatarColor(conv.visitorName)
+                        'h-10 w-10 rounded-full flex items-center justify-center shrink-0 font-bold text-sm',
+                        avatarColor(conv.visitorName)
                       )}>
-                        {getInitials(conv.visitorName)}
+                        {initials(conv.visitorName)}
                       </div>
 
                       <div className="flex-1 min-w-0">
@@ -327,10 +300,10 @@ export default function LiveChat() {
             <div className="flex items-center justify-between px-4 py-2.5 border-b bg-background">
               <div className="flex items-center gap-3 min-w-0">
                 <div className={cn(
-                  'h-10 w-10 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0',
-                  getAvatarColor(selected.visitorName)
+                  'h-10 w-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0',
+                  avatarColor(selected.visitorName)
                 )}>
-                  {getInitials(selected.visitorName)}
+                  {initials(selected.visitorName)}
                 </div>
                 <div className="min-w-0">
                   <span className="font-bold text-sm">{selected.visitorName}</span>
@@ -395,10 +368,10 @@ export default function LiveChat() {
                     return (
                       <div key={msg.id} className={cn('flex gap-2 items-end', 'justify-start')}>
                         <div className={cn(
-                          'h-8 w-8 rounded-full flex items-center justify-center shrink-0 text-white font-bold text-xs mb-1',
-                          getAvatarColor(msg.senderName)
+                          'h-8 w-8 rounded-full flex items-center justify-center shrink-0 font-bold text-xs mb-1',
+                          avatarColor(msg.senderName)
                         )}>
-                          {getInitials(msg.senderName)}
+                          {initials(msg.senderName)}
                         </div>
                         <div className="max-w-[65%]">
                           <div className="rounded-2xl rounded-tl-md px-4 py-2.5 shadow-sm bg-gradient-to-br from-amber-50 to-amber-100/80 dark:from-amber-900/30 dark:to-amber-800/20 border border-amber-200/40 dark:border-amber-700/30">
@@ -422,10 +395,10 @@ export default function LiveChat() {
                     >
                       {!isVisitor && (
                         <div className={cn(
-                          'h-8 w-8 rounded-full flex items-center justify-center shrink-0 text-white font-bold text-xs mb-1',
-                          getAvatarColor(msg.senderName)
+                          'h-8 w-8 rounded-full flex items-center justify-center shrink-0 font-bold text-xs mb-1',
+                          avatarColor(msg.senderName)
                         )}>
-                          {getInitials(msg.senderName)}
+                          {initials(msg.senderName)}
                         </div>
                       )}
 
@@ -452,10 +425,10 @@ export default function LiveChat() {
 
                       {isVisitor && (
                         <div className={cn(
-                          'h-8 w-8 rounded-full flex items-center justify-center shrink-0 text-white font-bold text-xs mb-1',
-                          getAvatarColor(selected.visitorName)
+                          'h-8 w-8 rounded-full flex items-center justify-center shrink-0 font-bold text-xs mb-1',
+                          avatarColor(selected.visitorName)
                         )}>
-                          {getInitials(selected.visitorName)}
+                          {initials(selected.visitorName)}
                         </div>
                       )}
                     </div>
@@ -542,10 +515,10 @@ export default function LiveChat() {
               {/* Contact card */}
               <div className="flex flex-col items-center text-center pb-4 border-b">
                 <div className={cn(
-                  'h-16 w-16 rounded-full flex items-center justify-center text-white font-bold text-xl mb-3',
-                  getAvatarColor(selected.visitorName)
+                  'h-16 w-16 rounded-full flex items-center justify-center font-bold text-xl mb-3',
+                  avatarColor(selected.visitorName)
                 )}>
-                  {getInitials(selected.visitorName)}
+                  {initials(selected.visitorName)}
                 </div>
                 <h4 className="font-bold text-base">{selected.visitorName}</h4>
                 {selected.visitorEmail && (
@@ -603,9 +576,9 @@ export default function LiveChat() {
                       <>
                         <div className={cn(
                           'h-5 w-5 rounded-full flex items-center justify-center text-white text-[9px] font-bold',
-                          getAvatarColor(selected.assignedTo)
+                          avatarColor(selected.assignedTo)
                         )}>
-                          {getInitials(selected.assignedTo)}
+                          {initials(selected.assignedTo)}
                         </div>
                         <span className="text-sm font-medium">{selected.assignedTo}</span>
                       </>
@@ -736,10 +709,10 @@ export default function LiveChat() {
                   className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-muted/70 transition-colors text-start"
                 >
                   <div className={cn(
-                    'h-9 w-9 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0',
-                    getAvatarColor(agent.name)
+                    'h-9 w-9 rounded-full flex items-center justify-center font-bold text-sm shrink-0',
+                    avatarColor(agent.name)
                   )}>
-                    {getInitials(agent.name)}
+                    {initials(agent.name)}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium">{agent.name}</p>
@@ -773,10 +746,10 @@ export default function LiveChat() {
                   className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-muted/70 transition-colors text-start"
                 >
                   <div className={cn(
-                    'h-9 w-9 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0',
-                    getAvatarColor(agent.name)
+                    'h-9 w-9 rounded-full flex items-center justify-center font-bold text-sm shrink-0',
+                    avatarColor(agent.name)
                   )}>
-                    {getInitials(agent.name)}
+                    {initials(agent.name)}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium">{agent.name}</p>

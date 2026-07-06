@@ -17,7 +17,7 @@ import { BarChart } from '@components/charts/BarChart';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
 import { formatMoney, approxUSD } from '@/utils/money';
-import { formatDate, timeAgo } from '@/utils/format';
+import { formatDate, timeAgo, initials, avatarColor } from '@/utils/format';
 import { downloadCsv, printAsPdf } from '@/utils/csv';
 import { cn } from '@/lib/utils';
 import type { Invoice, InvoiceStatus, Transaction, TransactionStatus } from '@/types';
@@ -74,13 +74,6 @@ const txnStatusVariant: Record<TransactionStatus, 'success' | 'destructive' | 'w
   refunded: 'outline',
 };
 
-function getInitials(name: string): string {
-  return name
-    .split(' ')
-    .map((w) => w[0])
-    .join('')
-    .slice(0, 2);
-}
 
 export default function AdminFinance(): JSX.Element {
   const clients = useAdminStore((s) => s.clients);
@@ -294,7 +287,7 @@ export default function AdminFinance(): JSX.Element {
                           <TableCell>
                             <div className="flex items-center gap-2">
                               <Avatar className="h-6 w-6 text-xs">
-                                <AvatarFallback>{getInitials(client?.companyName ?? '?')}</AvatarFallback>
+                                <AvatarFallback className={`text-xs font-bold ${avatarColor(client?.companyName ?? '?')}`}>{initials(client?.companyName ?? '?')}</AvatarFallback>
                               </Avatar>
                               <span className="font-medium">{client?.companyName ?? '—'}</span>
                             </div>
@@ -379,7 +372,7 @@ export default function AdminFinance(): JSX.Element {
                           <TableCell>
                             <div className="flex items-center gap-2">
                               <Avatar className="h-6 w-6 text-xs">
-                                <AvatarFallback>{getInitials(client?.companyName ?? '?')}</AvatarFallback>
+                                <AvatarFallback className={`text-xs font-bold ${avatarColor(client?.companyName ?? '?')}`}>{initials(client?.companyName ?? '?')}</AvatarFallback>
                               </Avatar>
                               <span className="font-medium truncate">{client?.companyName ?? '—'}</span>
                             </div>

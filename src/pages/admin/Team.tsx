@@ -22,7 +22,7 @@ import { useConfirm } from '@components/ui';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useUIStore } from '@/store/useUIStore';
-import { timeAgo } from '@/utils/format';
+import { timeAgo, initials, avatarColor } from '@/utils/format';
 import { cn } from '@/lib/utils';
 import type { AdminRole, AdminUser } from '@/types';
 
@@ -239,12 +239,6 @@ const initialRoles: RoleConfig[] = [
     ]),
   },
 ];
-
-function getInitials(name: string): string {
-  const parts = name.trim().split(/\s+/);
-  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
-  return name.slice(0, 2).toUpperCase();
-}
 
 export default function AdminTeam(): JSX.Element {
   const [view, setView] = useState<View>('members');
@@ -768,7 +762,7 @@ export default function AdminTeam(): JSX.Element {
                         <div className="flex items-center gap-3">
                           <div className="relative">
                             <Avatar className="h-9 w-9">
-                              <AvatarFallback className="text-xs font-bold">{getInitials(u.name)}</AvatarFallback>
+                              <AvatarFallback className={`text-xs font-bold ${avatarColor(u.name)}`}>{initials(u.name)}</AvatarFallback>
                             </Avatar>
                             <span
                               className={cn(

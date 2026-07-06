@@ -21,7 +21,7 @@ import { StatCard, useConfirm } from '@components/ui';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
 import { formatMoney, approxUSD } from '@/utils/money';
-import { formatDate } from '@/utils/format';
+import { formatDate, initials, avatarColor } from '@/utils/format';
 import { cn } from '@/lib/utils';
 import type { SubscriptionStatus } from '@/types';
 
@@ -78,12 +78,6 @@ const cycleLabel: Record<'monthly' | 'yearly', string> = {
   monthly: 'شهري',
   yearly: 'سنوي',
 };
-
-function getInitials(name: string): string {
-  const parts = name.trim().split(/\s+/);
-  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
-  return name.slice(0, 2).toUpperCase();
-}
 
 function daysUntil(iso: string): number {
   return Math.ceil((new Date(iso).getTime() - Date.now()) / (24 * 60 * 60 * 1000));
@@ -286,8 +280,8 @@ export default function AdminSubscriptions(): JSX.Element {
                           className="flex items-center gap-3 text-start"
                         >
                           <Avatar className="h-9 w-9">
-                            <AvatarFallback className="text-xs font-bold">
-                              {getInitials(client?.companyName ?? '؟')}
+                            <AvatarFallback className={`text-xs font-bold ${avatarColor(client?.companyName ?? '؟')}`}>
+                              {initials(client?.companyName ?? '؟')}
                             </AvatarFallback>
                           </Avatar>
                           <div className="min-w-0">

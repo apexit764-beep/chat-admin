@@ -21,6 +21,7 @@ import {
 import { useAuthStore } from '@/store/useAuthStore';
 import { useUIStore } from '@/store/useUIStore';
 import { cn } from '@/lib/utils';
+import { initials } from '@/utils/format';
 import {
   Tooltip,
   TooltipContent,
@@ -74,15 +75,6 @@ const navGroups: NavGroup[] = [
     ],
   },
 ];
-
-function getInitials(name: string): string {
-  return name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
-}
 
 interface SidebarInnerProps {
   collapsed: boolean;
@@ -220,7 +212,7 @@ function SidebarInner({ collapsed, onToggleCollapse, onNavigate, mobile, onClose
               title="الملف الشخصي"
             >
               <div className="h-9 w-9 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 ring-1 ring-white/20">
-                <span className="text-xs font-bold text-white">{getInitials(user.name)}</span>
+                <span className="text-xs font-bold text-white">{initials(user.name)}</span>
               </div>
               <div className="flex flex-col min-w-0">
                 <span className="text-sm font-medium text-white truncate">{user.name}</span>
@@ -249,7 +241,7 @@ function SidebarInner({ collapsed, onToggleCollapse, onNavigate, mobile, onClose
                   onClick={goToProfile}
                   className="h-9 w-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center flex-shrink-0 ring-1 ring-white/20 transition-colors"
                 >
-                  <span className="text-xs font-bold text-white">{getInitials(user.name)}</span>
+                  <span className="text-xs font-bold text-white">{initials(user.name)}</span>
                 </button>
               </TooltipTrigger>
               <TooltipContent side="left" className="font-medium">

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { User as UserIcon, Mail, Lock, Camera, Bell, Save } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useUIStore } from '@/store/useUIStore';
+import { initials, avatarColor } from '@/utils/format';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,10 +10,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
-
-function getInitials(name: string): string {
-  return name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase();
-}
 
 export default function Profile(): JSX.Element {
   const user = useAuthStore((s) => s.user);
@@ -77,8 +74,8 @@ export default function Profile(): JSX.Element {
           <div className="flex items-center gap-4">
             <div className="relative">
               <Avatar className="h-20 w-20">
-                <AvatarFallback className="text-xl bg-primary/10 text-primary font-bold">
-                  {getInitials(user.name)}
+                <AvatarFallback className={`text-xl font-bold ${avatarColor(user.name)}`}>
+                  {initials(user.name)}
                 </AvatarFallback>
               </Avatar>
               <button

@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { initials } from '@/utils/format';
+import { initials, avatarColor } from '@/utils/format';
 
 interface LegacyAvatarProps {
   name: string;
@@ -14,23 +14,6 @@ const sizeMap = {
   md: 'h-10 w-10 text-sm',
   lg: 'h-14 w-14 text-lg',
 };
-
-const colorPalette = [
-  'bg-primary/20 text-primary',
-  'bg-blue-500/20 text-blue-600',
-  'bg-emerald-500/20 text-emerald-600',
-  'bg-amber-500/20 text-amber-600',
-  'bg-rose-500/20 text-rose-600',
-  'bg-whatsapp/20 text-whatsapp',
-];
-
-function avatarColor(name: string): string {
-  let hash = 0;
-  for (let i = 0; i < name.length; i += 1) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return colorPalette[Math.abs(hash) % colorPalette.length];
-}
 
 const statusDot = {
   online: 'bg-emerald-500',

@@ -5,6 +5,7 @@ import { HeaderSearch } from '@/components/admin/HeaderSearch';
 import { useThemeStore } from '@/store/useThemeStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useUIStore } from '@/store/useUIStore';
+import { initials, avatarColor } from '@/utils/format';
 import { Button } from '@/components/ui/button';
 import {
   Avatar,
@@ -40,15 +41,6 @@ const breadcrumbMap: Record<string, string> = {
   '/notifications': 'الإشعارات',
   '/settings': 'الإعدادات',
 };
-
-function getInitials(name: string): string {
-  return name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
-}
 
 export function AdminTopbar(): JSX.Element {
   const location = useLocation();
@@ -128,8 +120,8 @@ export function AdminTopbar(): JSX.Element {
                   className="gap-2 ms-1 h-9 px-2 rounded-xl"
                 >
                   <Avatar className="h-8 w-8">
-                    <AvatarFallback className="text-xs bg-primary/10 text-primary font-bold">
-                      {getInitials(user.name)}
+                    <AvatarFallback className={`text-xs font-bold ${avatarColor(user.name)}`}>
+                      {initials(user.name)}
                     </AvatarFallback>
                   </Avatar>
                 </Button>

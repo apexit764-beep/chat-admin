@@ -23,7 +23,7 @@ import {
 import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
 import { formatMoney } from '@/utils/money';
-import { formatDate, timeAgo } from '@/utils/format';
+import { formatDate, timeAgo, initials, avatarColor } from '@/utils/format';
 import { downloadCsv } from '@/utils/csv';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -70,12 +70,6 @@ const statusBadgeClass: Record<ClientStatus, string> = {
   suspended: 'bg-danger/15 text-danger border-transparent',
   cancelled: 'bg-muted text-muted-foreground border-transparent',
 };
-
-function getInitials(name: string): string {
-  const parts = name.split(/\s+/).filter((w) => /\p{L}|\p{N}/u.test(w));
-  const initials = parts.map((w) => w[0]).slice(0, 2).join('').toUpperCase();
-  return initials || '?';
-}
 
 function computeHealth(c: Client, planLimitConv: number): number {
   const daysSinceActive = Math.round((Date.now() - new Date(c.lastActiveAt).getTime()) / 86400000);
@@ -274,7 +268,7 @@ export default function AdminClients(): JSX.Element {
       cell: (r) => (
         <div className="flex items-center gap-3 min-w-0">
           <Avatar className="h-8 w-8">
-            <AvatarFallback className="text-xs">{getInitials(r.companyName)}</AvatarFallback>
+            <AvatarFallback className={`text-xs font-bold ${avatarColor(r.companyName)}`}>{initials(r.companyName)}</AvatarFallback>
           </Avatar>
           <div className="min-w-0">
             <p className="font-semibold truncate">{r.companyName}</p>
@@ -662,7 +656,7 @@ function ClientDrawerBody({ client, onEdit, onDelete }: { client: Client; onEdit
     <div className="space-y-5 pt-4">
       <div className="text-center">
         <Avatar className="h-16 w-16 mx-auto">
-          <AvatarFallback className="text-lg">{getInitials(client.companyName)}</AvatarFallback>
+          <AvatarFallback className={`text-lg font-bold ${avatarColor(client.companyName)}`}>{initials(client.companyName)}</AvatarFallback>
         </Avatar>
         <p className="text-xl font-bold mt-3">{client.companyName} <span className="text-xl">{country?.flag}</span></p>
         <p className="text-xs text-muted-foreground">{client.contactName}</p>

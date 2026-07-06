@@ -33,7 +33,7 @@ import {
 import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
 import { formatMoney } from '@/utils/money';
-import { formatDate, timeAgo } from '@/utils/format';
+import { formatDate, timeAgo, initials, avatarColor } from '@/utils/format';
 import { cn } from '@/lib/utils';
 import { useConfirm } from '@components/ui';
 import { Button } from '@/components/ui/button';
@@ -76,14 +76,6 @@ const statusBadgeClass: Record<ClientStatus, string> = {
   cancelled: 'bg-muted text-muted-foreground border-transparent',
 };
 
-function getInitials(name: string): string {
-  return name
-    .split(/\s+/)
-    .map((w) => w[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
-}
 
 export default function ClientDetail(): JSX.Element {
   const { id } = useParams<{ id: string }>();
@@ -201,7 +193,7 @@ export default function ClientDetail(): JSX.Element {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <Avatar className="h-14 w-14 border-2 border-primary/20">
-              <AvatarFallback className="text-lg font-bold bg-primary/10 text-primary">{getInitials(client.companyName)}</AvatarFallback>
+              <AvatarFallback className={`text-lg font-bold ${avatarColor(client.companyName)}`}>{initials(client.companyName)}</AvatarFallback>
             </Avatar>
             <div>
               <div className="flex items-center gap-3">

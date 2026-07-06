@@ -39,7 +39,7 @@ import { DoughnutChart } from '@components/charts/DoughnutChart';
 import { BarChart } from '@components/charts/BarChart';
 import { useAdminStore } from '@/store/useAdminStore';
 import { formatMoney, approxUSD } from '@/utils/money';
-import { timeAgo } from '@/utils/format';
+import { timeAgo, initials, avatarColor } from '@/utils/format';
 import { cn } from '@/lib/utils';
 import type { Client } from '@/types';
 
@@ -417,7 +417,7 @@ export default function AdminDashboard(): JSX.Element {
                 >
                   <div className="flex items-center gap-2 min-w-0">
                     <Avatar className="h-7 w-7">
-                      <AvatarFallback className="text-[10px] font-semibold">{client.companyName.slice(0, 2)}</AvatarFallback>
+                      <AvatarFallback className={`text-[10px] font-semibold ${avatarColor(client.companyName)}`}>{initials(client.companyName)}</AvatarFallback>
                     </Avatar>
                     <span className="text-sm truncate">{client.companyName}</span>
                   </div>
@@ -454,7 +454,7 @@ export default function AdminDashboard(): JSX.Element {
                 >
                   <div className="flex items-center gap-2 min-w-0">
                     <Avatar className="h-7 w-7">
-                      <AvatarFallback className="text-[10px] font-semibold">{client.companyName.slice(0, 2)}</AvatarFallback>
+                      <AvatarFallback className={`text-[10px] font-semibold ${avatarColor(client.companyName)}`}>{initials(client.companyName)}</AvatarFallback>
                     </Avatar>
                     <span className="text-sm truncate">{client.companyName}</span>
                   </div>
@@ -549,8 +549,8 @@ export default function AdminDashboard(): JSX.Element {
                         <TableCell className="py-2.5">
                           <div className="flex items-center gap-2.5 min-w-0">
                             <Avatar className="h-7 w-7">
-                              <AvatarFallback className="text-[10px] font-semibold">
-                                {r.companyName.slice(0, 2)}
+                              <AvatarFallback className={`text-[10px] font-semibold ${avatarColor(r.companyName)}`}>
+                                {initials(r.companyName)}
                               </AvatarFallback>
                             </Avatar>
                             <div className="min-w-0">
@@ -610,8 +610,8 @@ export default function AdminDashboard(): JSX.Element {
                         <TableCell className="py-2.5">
                           <div className="flex items-center gap-2 min-w-0">
                             <Avatar className="h-7 w-7">
-                              <AvatarFallback className="text-[10px] font-semibold">
-                                {(client?.companyName ?? '?').slice(0, 2)}
+                              <AvatarFallback className={`text-[10px] font-semibold ${avatarColor(client?.companyName ?? '?')}`}>
+                                {initials(client?.companyName ?? '?')}
                               </AvatarFallback>
                             </Avatar>
                             <span className="text-sm font-medium truncate">{client?.companyName ?? '—'}</span>
