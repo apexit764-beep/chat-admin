@@ -4,7 +4,6 @@ import {
   Search,
   Edit2,
   Trash2,
-  MoreHorizontal,
   MessageCircle,
   Mail,
   ShoppingBag,
@@ -42,12 +41,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 
 type PlatformCategory = 'communication' | 'email' | 'ecommerce';
 
@@ -181,7 +174,7 @@ export default function Integrations() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="p-4 md:p-6 space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -256,7 +249,7 @@ export default function Integrations() {
                   <TableHead>الفئة</TableHead>
                   <TableHead>الوصف</TableHead>
                   <TableHead className="text-center">الحالة</TableHead>
-                  <TableHead className="w-16" />
+                  <TableHead className="w-24" />
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -296,23 +289,14 @@ export default function Integrations() {
                           />
                         </TableCell>
                         <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => openEdit(p)}>
-                                <Edit2 className="h-4 w-4 me-2" />
-                                تعديل
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleDelete(p)} className="text-destructive focus:text-destructive">
-                                <Trash2 className="h-4 w-4 me-2" />
-                                حذف
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          <div className="flex items-center gap-1">
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(p)}>
+                              <Edit2 className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => handleDelete(p)}>
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     );
