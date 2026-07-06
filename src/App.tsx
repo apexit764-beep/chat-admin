@@ -21,6 +21,7 @@ const AdminProfile = lazy(() => import('@pages/admin/Profile'));
 const AdminLiveChat = lazy(() => import('@pages/admin/LiveChat'));
 const AdminNotifications = lazy(() => import('@pages/admin/Notifications'));
 const AdminIntegrations = lazy(() => import('@pages/admin/Integrations'));
+const AdminIndustries = lazy(() => import('@pages/admin/Industries'));
 
 function PageLoader(): JSX.Element {
   return (
@@ -59,6 +60,7 @@ export default function App(): JSX.Element {
           <Route path="/conversations" element={<AdminLiveChat />} />
           <Route path="/notifications" element={<AdminNotifications />} />
           <Route path="/integrations" element={<AdminIntegrations />} />
+          <Route path="/industries" element={<AdminIndustries />} />
           <Route path="/profile" element={<AdminProfile />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Route>

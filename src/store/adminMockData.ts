@@ -2,6 +2,7 @@ import type {
   AdminUser,
   Client,
   Country,
+  Industry,
   Invoice,
   KnowledgeArticle,
   KnowledgeCategory,
@@ -44,6 +45,24 @@ function pricesFromUSD(usd: number): Record<string, { monthly: number; yearly: n
   });
   return out;
 }
+
+export const industries: Industry[] = [
+  { id: 'ind_1', name: 'عقارات' },
+  { id: 'ind_2', name: 'مطاعم' },
+  { id: 'ind_3', name: 'تعليم' },
+  { id: 'ind_4', name: 'صحة' },
+  { id: 'ind_5', name: 'تقنية' },
+  { id: 'ind_6', name: 'سياحة' },
+  { id: 'ind_7', name: 'سيارات' },
+  { id: 'ind_8', name: 'تجزئة' },
+  { id: 'ind_9', name: 'لوجستيات' },
+  { id: 'ind_10', name: 'تجميل' },
+  { id: 'ind_11', name: 'زراعة' },
+  { id: 'ind_12', name: 'تمويل وبنوك' },
+  { id: 'ind_13', name: 'إعلام ونشر' },
+  { id: 'ind_14', name: 'بناء ومقاولات' },
+  { id: 'ind_15', name: 'تصنيع' },
+];
 
 export const plans: Plan[] = [
   {

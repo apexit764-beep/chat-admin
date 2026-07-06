@@ -183,6 +183,11 @@ export interface Plan {
   createdAt: string;
 }
 
+export interface Industry {
+  id: string;
+  name: string;
+}
+
 export type ClientStatus = 'trial' | 'active' | 'past_due' | 'suspended' | 'cancelled';
 
 export interface Client {

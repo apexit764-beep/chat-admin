@@ -3,6 +3,7 @@ import type {
   AdminUser,
   Client,
   Country,
+  Industry,
   Invoice,
   KnowledgeArticle,
   KnowledgeCategory,
@@ -30,11 +31,13 @@ import {
   liveChatConversations as initialLiveChatConversations,
   knowledgeCategories as initialKnowledgeCategories,
   knowledgeArticles as initialKnowledgeArticles,
+  industries as initialIndustries,
 } from './adminMockData';
 import type { ActivityEntry, FeedbackEntry, FeedbackStatus } from './adminMockData';
 
 interface AdminState {
   countries: Country[];
+  industries: Industry[];
   plans: Plan[];
   clients: Client[];
   subscriptions: Subscription[];
@@ -90,6 +93,11 @@ interface AdminState {
   updateCountry: (code: string, patch: Partial<Country>) => void;
   deleteCountry: (code: string) => void;
 
+  // Industry actions
+  addIndustry: (name: string) => Industry;
+  updateIndustry: (id: string, name: string) => void;
+  deleteIndustry: (id: string) => void;
+
   // Subscription actions
   createSubscription: (clientId: string, planId: string, billingCycle: 'monthly' | 'yearly') => Subscription;
   cancelSubscription: (id: string) => void;
@@ -131,6 +139,7 @@ const hydratedArticles: KnowledgeArticle[] = (initialKnowledgeArticles as Array<
 
 export const useAdminStore = create<AdminState>((set, get) => ({
   countries: initialCountries,
+  industries: initialIndustries,
   plans: initialPlans,
   clients: initialClients,
   subscriptions: initialSubscriptions,
@@ -402,6 +411,18 @@ export const useAdminStore = create<AdminState>((set, get) => ({
 
   deleteCountry: (code) =>
     set((s) => ({ countries: s.countries.filter((c) => c.code !== code) })),
+
+  addIndustry: (name) => {
+    const ind: Industry = { id: newId('ind'), name };
+    set((s) => ({ industries: [...s.industries, ind] }));
+    return ind;
+  },
+
+  updateIndustry: (id, name) =>
+    set((s) => ({ industries: s.industries.map((i) => (i.id === id ? { ...i, name } : i)) })),
+
+  deleteIndustry: (id) =>
+    set((s) => ({ industries: s.industries.filter((i) => i.id !== id) })),
 
   createSubscription: (clientId, planId, billingCycle) => {
     const client = get().clients.find((c) => c.id === clientId);

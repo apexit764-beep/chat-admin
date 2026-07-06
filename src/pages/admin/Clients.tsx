@@ -90,6 +90,7 @@ export default function AdminClients(): JSX.Element {
   const plans = useAdminStore((s) => s.plans);
   const countries = useAdminStore((s) => s.countries);
   const subscriptions = useAdminStore((s) => s.subscriptions);
+  const industries = useAdminStore((s) => s.industries);
   const addClient = useAdminStore((s) => s.addClient);
   const updateClient = useAdminStore((s) => s.updateClient);
   const deleteClient = useAdminStore((s) => s.deleteClient);
@@ -249,7 +250,7 @@ export default function AdminClients(): JSX.Element {
           'البريد': c.email,
           'الهاتف': c.phone,
           'الدولة': country?.nameAr ?? c.country,
-          'القطاع': c.industry,
+          'مجال العمل': c.industry,
           'الحالة': statusLabel[c.status],
           'الباقة': plan?.nameAr ?? '—',
           'MRR': c.mrr,
@@ -289,7 +290,7 @@ export default function AdminClients(): JSX.Element {
         );
       },
     },
-    { key: 'industry', header: 'القطاع', accessor: (r) => r.industry, hideOn: 'lg', cell: (r) => <span className="text-muted-foreground text-xs">{r.industry}</span> },
+    { key: 'industry', header: 'مجال العمل', accessor: (r) => r.industry, hideOn: 'lg', cell: (r) => <span className="text-muted-foreground text-xs">{r.industry}</span> },
     {
       key: 'plan', header: 'الباقة', accessor: (r) => r.planId ?? '',
       cell: (r) => {
@@ -583,13 +584,17 @@ export default function AdminClients(): JSX.Element {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="industry">القطاع</Label>
-              <Input
-                id="industry"
-                value={form.industry}
-                onChange={(e) => setForm({ ...form, industry: e.target.value })}
-                placeholder="مثلاً: عقارات، تجزئة..."
-              />
+              <Label>مجال العمل</Label>
+              <Select value={form.industry} onValueChange={(v) => setForm({ ...form, industry: v })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="اختر مجال العمل" />
+                </SelectTrigger>
+                <SelectContent>
+                  {industries.map((ind) => (
+                    <SelectItem key={ind.id} value={ind.name}>{ind.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label>الحالة</Label>
