@@ -55,9 +55,11 @@ interface AdminState {
   addKnowledgeCategory: (name: string) => KnowledgeCategory;
   updateKnowledgeCategory: (id: string, name: string) => void;
   deleteKnowledgeCategory: (id: string) => void;
-  addKnowledgeArticle: (article: Omit<KnowledgeArticle, 'id' | 'views' | 'helpful' | 'notHelpful' | 'createdAt' | 'updatedAt'>) => KnowledgeArticle;
+  addKnowledgeArticle: (article: Omit<KnowledgeArticle, 'id' | 'views' | 'helpful' | 'notHelpful' | 'createdAt' | 'updatedAt' | 'sortOrder'> & { sortOrder?: number }) => KnowledgeArticle;
   updateKnowledgeArticle: (id: string, patch: Partial<KnowledgeArticle>) => void;
   deleteKnowledgeArticle: (id: string) => void;
+  moveKnowledgeArticle: (id: string, direction: 'up' | 'down') => void;
+  reorderKnowledgeCategory: (id: string, direction: 'up' | 'down') => void;
 
   // Live Chat actions
   assignLiveChat: (id: string, agentName: string) => void;
@@ -106,6 +108,26 @@ interface AdminState {
 
 const newId = (prefix: string): string => `${prefix}_${Math.random().toString(36).slice(2, 10)}`;
 
+const slugify = (s: string): string =>
+  s.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w\-ء-ي]/g, '');
+
+const hydratedArticles: KnowledgeArticle[] = (initialKnowledgeArticles as Array<Partial<KnowledgeArticle> & { title: string; content: string }>).map((a, i) => ({
+  id: a.id ?? `ka_${i}`,
+  title: a.title,
+  content: a.content,
+  categoryId: a.categoryId ?? '',
+  status: a.status ?? 'draft',
+  views: a.views ?? 0,
+  helpful: a.helpful ?? 0,
+  notHelpful: a.notHelpful ?? 0,
+  createdAt: a.createdAt ?? new Date().toISOString(),
+  updatedAt: a.updatedAt ?? new Date().toISOString(),
+  slug: a.slug ?? slugify(a.title),
+  sortOrder: a.sortOrder ?? i + 1,
+  metaTitle: a.metaTitle ?? a.title,
+  metaDescription: a.metaDescription ?? a.content.slice(0, 155),
+}));
+
 export const useAdminStore = create<AdminState>((set, get) => ({
   countries: initialCountries,
   plans: initialPlans,
@@ -122,7 +144,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   feedback: initialFeedback,
   liveChatConversations: initialLiveChatConversations,
   knowledgeCategories: initialKnowledgeCategories,
-  knowledgeArticles: initialKnowledgeArticles,
+  knowledgeArticles: hydratedArticles,
 
   addKnowledgeCategory: (name) => {
     const slug = name.replace(/\s+/g, '-').toLowerCase();
@@ -152,12 +174,16 @@ export const useAdminStore = create<AdminState>((set, get) => ({
 
   addKnowledgeArticle: (article) => {
     const now = new Date().toISOString();
+    const maxOrder = get().knowledgeArticles
+      .filter((a) => a.categoryId === article.categoryId)
+      .reduce((m, a) => Math.max(m, a.sortOrder ?? 0), 0);
     const a: KnowledgeArticle = {
       ...article,
       id: newId('ka'),
       views: 0,
       helpful: 0,
       notHelpful: 0,
+      sortOrder: article.sortOrder ?? maxOrder + 1,
       createdAt: now,
       updatedAt: now,
     };
@@ -185,6 +211,40 @@ export const useAdminStore = create<AdminState>((set, get) => ({
         knowledgeCategories: s.knowledgeCategories.map((c) =>
           c.id === article?.categoryId ? { ...c, articleCount: Math.max(0, c.articleCount - 1) } : c
         ),
+      };
+    }),
+
+  moveKnowledgeArticle: (id, direction) =>
+    set((s) => {
+      const current = s.knowledgeArticles.find((a) => a.id === id);
+      if (!current) return s;
+      const siblings = s.knowledgeArticles
+        .filter((a) => a.categoryId === current.categoryId)
+        .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+      const idx = siblings.findIndex((a) => a.id === id);
+      const swapWith = direction === 'up' ? siblings[idx - 1] : siblings[idx + 1];
+      if (!swapWith) return s;
+      return {
+        knowledgeArticles: s.knowledgeArticles.map((a) => {
+          if (a.id === current.id) return { ...a, sortOrder: swapWith.sortOrder };
+          if (a.id === swapWith.id) return { ...a, sortOrder: current.sortOrder };
+          return a;
+        }),
+      };
+    }),
+
+  reorderKnowledgeCategory: (id, direction) =>
+    set((s) => {
+      const sorted = [...s.knowledgeCategories].sort((a, b) => a.order - b.order);
+      const idx = sorted.findIndex((c) => c.id === id);
+      const swapWith = direction === 'up' ? sorted[idx - 1] : sorted[idx + 1];
+      if (!swapWith) return s;
+      return {
+        knowledgeCategories: s.knowledgeCategories.map((c) => {
+          if (c.id === id) return { ...c, order: swapWith.order };
+          if (c.id === swapWith.id) return { ...c, order: sorted[idx].order };
+          return c;
+        }),
       };
     }),
 

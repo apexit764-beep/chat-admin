@@ -306,12 +306,16 @@ export interface KnowledgeCategory {
 export interface KnowledgeArticle {
   id: string;
   title: string;
+  slug: string;
   content: string;
   categoryId: string;
   status: ArticleStatus;
   views: number;
   helpful: number;
   notHelpful: number;
+  sortOrder: number;
+  metaTitle: string;
+  metaDescription: string;
   createdAt: string;
   updatedAt: string;
 }

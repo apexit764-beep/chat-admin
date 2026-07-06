@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Search,
   Plus,
@@ -10,6 +11,9 @@ import {
   Trash2,
   FolderOpen,
   BookOpen,
+  ChevronUp,
+  ChevronDown,
+  Settings2,
 } from 'lucide-react';
 import { useAdminStore } from '@/store/useAdminStore';
 import { timeAgo } from '@/utils/format';
@@ -17,8 +21,8 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { RichEditor } from '@/components/ui/rich-editor';
 import {
   Select,
   SelectTrigger,
@@ -50,14 +54,19 @@ import {
 } from '@/components/ui/tooltip';
 import type { ArticleStatus, KnowledgeArticle } from '@/types';
 
+const slugify = (s: string): string =>
+  s.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w\-ء-ي]/g, '');
+
+const stripHtml = (html: string): string => html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+
 export default function KnowledgeBase(): JSX.Element {
+  const navigate = useNavigate();
   const categories = useAdminStore((s) => s.knowledgeCategories);
   const articles = useAdminStore((s) => s.knowledgeArticles);
-  const addCategory = useAdminStore((s) => s.addKnowledgeCategory);
-  const deleteCategory = useAdminStore((s) => s.deleteKnowledgeCategory);
   const addArticle = useAdminStore((s) => s.addKnowledgeArticle);
   const updateArticle = useAdminStore((s) => s.updateKnowledgeArticle);
   const deleteArticle = useAdminStore((s) => s.deleteKnowledgeArticle);
+  const moveArticle = useAdminStore((s) => s.moveKnowledgeArticle);
 
   const [search, setSearch] = useState('');
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
@@ -66,16 +75,16 @@ export default function KnowledgeBase(): JSX.Element {
   const [articleModalOpen, setArticleModalOpen] = useState(false);
   const [editingArticle, setEditingArticle] = useState<KnowledgeArticle | null>(null);
   const [articleTitle, setArticleTitle] = useState('');
+  const [articleSlug, setArticleSlug] = useState('');
   const [articleContent, setArticleContent] = useState('');
   const [articleCategoryId, setArticleCategoryId] = useState('');
   const [articleStatus, setArticleStatus] = useState<ArticleStatus>('draft');
-
-  // Category modal
-  const [categoryModalOpen, setCategoryModalOpen] = useState(false);
-  const [categoryName, setCategoryName] = useState('');
+  const [articleMetaTitle, setArticleMetaTitle] = useState('');
+  const [articleMetaDescription, setArticleMetaDescription] = useState('');
+  const [showSeo, setShowSeo] = useState(false);
 
   // Delete confirm
-  const [deleteTarget, setDeleteTarget] = useState<{ type: 'article' | 'category'; id: string; name: string } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<KnowledgeArticle | null>(null);
 
   // Stats
   const stats = useMemo(() => ({
@@ -84,7 +93,7 @@ export default function KnowledgeBase(): JSX.Element {
     totalViews: articles.reduce((sum, a) => sum + a.views, 0),
   }), [articles]);
 
-  // Filtered articles
+  // Filtered articles — search covers title + content
   const filtered = useMemo(() => {
     let list = [...articles];
     if (selectedCategoryId) {
@@ -92,7 +101,14 @@ export default function KnowledgeBase(): JSX.Element {
     }
     if (search.trim()) {
       const q = search.toLowerCase();
-      list = list.filter((a) => a.title.toLowerCase().includes(q));
+      list = list.filter((a) =>
+        a.title.toLowerCase().includes(q) ||
+        stripHtml(a.content).toLowerCase().includes(q)
+      );
+    }
+    // Sort: within a category by sortOrder ascending; otherwise by updatedAt desc
+    if (selectedCategoryId) {
+      return list.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
     }
     return list.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
   }, [articles, selectedCategoryId, search]);
@@ -100,59 +116,64 @@ export default function KnowledgeBase(): JSX.Element {
   const getCategoryName = (catId: string): string =>
     categories.find((c) => c.id === catId)?.name ?? '—';
 
-  // Open article modal
   const openNewArticle = (): void => {
     setEditingArticle(null);
     setArticleTitle('');
+    setArticleSlug('');
     setArticleContent('');
-    setArticleCategoryId(categories[0]?.id ?? '');
+    setArticleCategoryId(selectedCategoryId ?? categories[0]?.id ?? '');
     setArticleStatus('draft');
+    setArticleMetaTitle('');
+    setArticleMetaDescription('');
+    setShowSeo(false);
     setArticleModalOpen(true);
   };
 
   const openEditArticle = (article: KnowledgeArticle): void => {
     setEditingArticle(article);
     setArticleTitle(article.title);
+    setArticleSlug(article.slug);
     setArticleContent(article.content);
     setArticleCategoryId(article.categoryId);
     setArticleStatus(article.status);
+    setArticleMetaTitle(article.metaTitle);
+    setArticleMetaDescription(article.metaDescription);
+    setShowSeo(false);
     setArticleModalOpen(true);
   };
 
   const handleSaveArticle = (): void => {
     if (!articleTitle.trim() || !articleCategoryId) return;
+    const finalSlug = articleSlug.trim() || slugify(articleTitle);
+    const finalMetaTitle = articleMetaTitle.trim() || articleTitle;
+    const finalMetaDesc = articleMetaDescription.trim() || stripHtml(articleContent).slice(0, 155);
     if (editingArticle) {
       updateArticle(editingArticle.id, {
         title: articleTitle.trim(),
-        content: articleContent.trim(),
+        slug: finalSlug,
+        content: articleContent,
         categoryId: articleCategoryId,
         status: articleStatus,
+        metaTitle: finalMetaTitle,
+        metaDescription: finalMetaDesc,
       });
     } else {
       addArticle({
         title: articleTitle.trim(),
-        content: articleContent.trim(),
+        slug: finalSlug,
+        content: articleContent,
         categoryId: articleCategoryId,
         status: articleStatus,
+        metaTitle: finalMetaTitle,
+        metaDescription: finalMetaDesc,
       });
     }
     setArticleModalOpen(false);
   };
 
-  const handleSaveCategory = (): void => {
-    if (!categoryName.trim()) return;
-    addCategory(categoryName.trim());
-    setCategoryName('');
-    setCategoryModalOpen(false);
-  };
-
   const handleConfirmDelete = (): void => {
     if (!deleteTarget) return;
-    if (deleteTarget.type === 'article') {
-      deleteArticle(deleteTarget.id);
-    } else {
-      deleteCategory(deleteTarget.id);
-    }
+    deleteArticle(deleteTarget.id);
     setDeleteTarget(null);
   };
 
@@ -161,6 +182,8 @@ export default function KnowledgeBase(): JSX.Element {
       status: article.status === 'published' ? 'draft' : 'published',
     });
   };
+
+  const canReorder = !!selectedCategoryId;
 
   return (
     <div className="p-4 lg:p-6 space-y-5 page-fade">
@@ -171,9 +194,9 @@ export default function KnowledgeBase(): JSX.Element {
           <p className="text-sm text-muted-foreground">المقالات التي تظهر للعملاء في نافذة المساعدة</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => setCategoryModalOpen(true)}>
-            <Plus className="h-4 w-4 me-1" />
-            تصنيف جديد
+          <Button variant="outline" onClick={() => navigate('/knowledge/categories')}>
+            <Settings2 className="h-4 w-4 me-1" />
+            التصنيفات
           </Button>
           <Button onClick={openNewArticle}>
             <Plus className="h-4 w-4 me-1" />
@@ -244,7 +267,7 @@ export default function KnowledgeBase(): JSX.Element {
                 {articles.length}
               </Badge>
             </button>
-            {categories.map((cat) => (
+            {[...categories].sort((a, b) => a.order - b.order).map((cat) => (
               <button
                 key={cat.id}
                 className={cn(
@@ -276,7 +299,7 @@ export default function KnowledgeBase(): JSX.Element {
             <div className="relative max-w-xs">
               <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="بحث في المقالات..."
+                placeholder="بحث في العنوان أو المحتوى..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="ps-9"
@@ -294,6 +317,7 @@ export default function KnowledgeBase(): JSX.Element {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      {canReorder && <TableHead className="w-20">الترتيب</TableHead>}
                       <TableHead className="w-12">#</TableHead>
                       <TableHead>العنوان</TableHead>
                       <TableHead>التصنيف</TableHead>
@@ -307,6 +331,30 @@ export default function KnowledgeBase(): JSX.Element {
                   <TableBody>
                     {filtered.map((article, idx) => (
                       <TableRow key={article.id}>
+                        {canReorder && (
+                          <TableCell>
+                            <div className="flex items-center gap-0.5">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7"
+                                disabled={idx === 0}
+                                onClick={() => moveArticle(article.id, 'up')}
+                              >
+                                <ChevronUp className="h-3.5 w-3.5" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7"
+                                disabled={idx === filtered.length - 1}
+                                onClick={() => moveArticle(article.id, 'down')}
+                              >
+                                <ChevronDown className="h-3.5 w-3.5" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        )}
                         <TableCell className="text-xs text-muted-foreground font-mono">{idx + 1}</TableCell>
                         <TableCell className="font-medium max-w-[250px] truncate">
                           {article.title}
@@ -365,7 +413,7 @@ export default function KnowledgeBase(): JSX.Element {
                               variant="ghost"
                               size="icon"
                               className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-500/10"
-                              onClick={() => setDeleteTarget({ type: 'article', id: article.id, name: article.title })}
+                              onClick={() => setDeleteTarget(article)}
                             >
                               <Trash2 className="h-3.5 w-3.5" />
                             </Button>
@@ -383,68 +431,113 @@ export default function KnowledgeBase(): JSX.Element {
 
       {/* Article modal */}
       <Dialog open={articleModalOpen} onOpenChange={setArticleModalOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-3xl max-h-[92vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingArticle ? 'تعديل المقال' : 'مقال جديد'}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">العنوان</label>
-              <Input
-                value={articleTitle}
-                onChange={(e) => setArticleTitle(e.target.value)}
-                placeholder="عنوان المقال"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium">العنوان</label>
+                <Input
+                  value={articleTitle}
+                  onChange={(e) => {
+                    setArticleTitle(e.target.value);
+                    if (!editingArticle) setArticleSlug(slugify(e.target.value));
+                  }}
+                  placeholder="عنوان المقال"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium">Slug</label>
+                <Input
+                  value={articleSlug}
+                  onChange={(e) => setArticleSlug(slugify(e.target.value))}
+                  placeholder="article-slug"
+                  dir="ltr"
+                />
+              </div>
             </div>
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">التصنيف</label>
-              <Select value={articleCategoryId} onValueChange={setArticleCategoryId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="اختر التصنيف" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium">التصنيف</label>
+                <Select value={articleCategoryId} onValueChange={setArticleCategoryId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="اختر التصنيف" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((cat) => (
+                      <SelectItem key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium">الحالة</label>
+                <Select value={articleStatus} onValueChange={(v) => setArticleStatus(v as ArticleStatus)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="draft">مسودة</SelectItem>
+                    <SelectItem value="published">منشور</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
+
             <div className="space-y-1.5">
               <label className="text-sm font-medium">المحتوى</label>
-              <Textarea
+              <RichEditor
                 value={articleContent}
-                onChange={(e) => setArticleContent(e.target.value)}
-                placeholder="محتوى المقال..."
-                rows={6}
-                dir="rtl"
+                onChange={setArticleContent}
+                placeholder="اكتب محتوى المقال هنا..."
+                minHeight={280}
               />
             </div>
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">الحالة</label>
-              <div className="flex items-center gap-4">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="status"
-                    checked={articleStatus === 'published'}
-                    onChange={() => setArticleStatus('published')}
-                    className="accent-primary"
-                  />
-                  <span className="text-sm">منشور</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="status"
-                    checked={articleStatus === 'draft'}
-                    onChange={() => setArticleStatus('draft')}
-                    className="accent-primary"
-                  />
-                  <span className="text-sm">مسودة</span>
-                </label>
-              </div>
+
+            <div className="border rounded-xl">
+              <button
+                type="button"
+                className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium hover:bg-muted/40 transition-colors"
+                onClick={() => setShowSeo((v) => !v)}
+              >
+                <span className="flex items-center gap-2">
+                  <Settings2 className="h-4 w-4 text-muted-foreground" />
+                  إعدادات SEO
+                </span>
+                {showSeo ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </button>
+              {showSeo && (
+                <div className="p-4 border-t space-y-3">
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium">Meta Title</label>
+                    <Input
+                      value={articleMetaTitle}
+                      onChange={(e) => setArticleMetaTitle(e.target.value)}
+                      placeholder={articleTitle || 'يستخدم عنوان المقال إذا تُرك فارغاً'}
+                      maxLength={70}
+                    />
+                    <p className="text-[11px] text-muted-foreground">{articleMetaTitle.length}/70 حرف</p>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium">Meta Description</label>
+                    <textarea
+                      value={articleMetaDescription}
+                      onChange={(e) => setArticleMetaDescription(e.target.value)}
+                      placeholder="وصف مختصر يظهر في نتائج البحث"
+                      rows={3}
+                      maxLength={160}
+                      className="w-full rounded-lg border bg-background px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                      dir="rtl"
+                    />
+                    <p className="text-[11px] text-muted-foreground">{articleMetaDescription.length}/160 حرف</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
           <DialogFooter className="gap-2">
@@ -458,33 +551,6 @@ export default function KnowledgeBase(): JSX.Element {
         </DialogContent>
       </Dialog>
 
-      {/* Category modal */}
-      <Dialog open={categoryModalOpen} onOpenChange={setCategoryModalOpen}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle>تصنيف جديد</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">اسم التصنيف</label>
-              <Input
-                value={categoryName}
-                onChange={(e) => setCategoryName(e.target.value)}
-                placeholder="اسم التصنيف"
-              />
-            </div>
-          </div>
-          <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setCategoryModalOpen(false)}>
-              إلغاء
-            </Button>
-            <Button onClick={handleSaveCategory} disabled={!categoryName.trim()}>
-              إنشاء
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
       {/* Delete confirmation */}
       <Dialog open={!!deleteTarget} onOpenChange={(v) => { if (!v) setDeleteTarget(null); }}>
         <DialogContent className="max-w-sm">
@@ -492,11 +558,8 @@ export default function KnowledgeBase(): JSX.Element {
             <DialogTitle>تأكيد الحذف</DialogTitle>
           </DialogHeader>
           <p className="text-sm text-muted-foreground py-2">
-            هل أنت متأكد من حذف {deleteTarget?.type === 'article' ? 'المقال' : 'التصنيف'}{' '}
-            <span className="font-semibold text-foreground">&ldquo;{deleteTarget?.name}&rdquo;</span>؟
-            {deleteTarget?.type === 'category' && (
-              <span className="block mt-1 text-red-500">سيتم حذف جميع المقالات المرتبطة بهذا التصنيف.</span>
-            )}
+            هل أنت متأكد من حذف المقال{' '}
+            <span className="font-semibold text-foreground">&ldquo;{deleteTarget?.title}&rdquo;</span>؟
           </p>
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => setDeleteTarget(null)}>

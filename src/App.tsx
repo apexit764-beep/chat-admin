@@ -16,6 +16,7 @@ const AdminFeedback = lazy(() => import('@pages/admin/Feedback'));
 const AdminTeam = lazy(() => import('@pages/admin/Team'));
 const AdminClientDetail = lazy(() => import('@pages/admin/ClientDetail'));
 const AdminKnowledgeBase = lazy(() => import('@pages/admin/KnowledgeBase'));
+const AdminKnowledgeCategories = lazy(() => import('@pages/admin/KnowledgeCategories'));
 const AdminLiveChat = lazy(() => import('@pages/admin/LiveChat'));
 const AdminNotifications = lazy(() => import('@pages/admin/Notifications'));
 
@@ -52,6 +53,7 @@ export default function App(): JSX.Element {
           <Route path="/feedback" element={<AdminFeedback />} />
           <Route path="/team" element={<AdminTeam />} />
           <Route path="/knowledge" element={<AdminKnowledgeBase />} />
+          <Route path="/knowledge/categories" element={<AdminKnowledgeCategories />} />
           <Route path="/conversations" element={<AdminLiveChat />} />
           <Route path="/notifications" element={<AdminNotifications />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

@@ -1002,7 +1002,7 @@ export const knowledgeCategories: KnowledgeCategory[] = [
   { id: 'kc_5', name: 'API والتكامل', slug: 'api-integration', articleCount: 2, order: 5 },
 ];
 
-export const knowledgeArticles: KnowledgeArticle[] = [
+export const knowledgeArticles: Array<Omit<KnowledgeArticle, 'slug' | 'sortOrder' | 'metaTitle' | 'metaDescription'>> = [
   {
     id: 'ka_1',
     title: 'كيف أبدأ باستخدام Qhub؟',
