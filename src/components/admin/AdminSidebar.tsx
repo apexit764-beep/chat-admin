@@ -20,6 +20,7 @@ import {
   Plug,
   Briefcase,
   MessagesSquare,
+  ClipboardList,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useUIStore } from '@/store/useUIStore';
@@ -67,6 +68,7 @@ const navGroups: NavGroup[] = [
     items: [
       { to: '/finance', label: 'المالية', icon: Banknote },
       { to: '/subscriptions', label: 'الاشتراكات', icon: Repeat },
+      { to: '/plan-requests', label: 'طلبات الاشتراك', icon: ClipboardList },
     ],
   },
   {

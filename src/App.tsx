@@ -24,6 +24,7 @@ const AdminNotifications = lazy(() => import('@pages/admin/Notifications'));
 const AdminIntegrations = lazy(() => import('@pages/admin/Integrations'));
 const AdminIndustries = lazy(() => import('@pages/admin/Industries'));
 const AdminWidgetSettings = lazy(() => import('@pages/admin/WidgetSettings'));
+const AdminPlanRequests = lazy(() => import('@pages/admin/PlanRequests'));
 
 function PageLoader(): JSX.Element {
   return (
@@ -54,6 +55,7 @@ export default function App(): JSX.Element {
           <Route path="/plans/:id/edit" element={<AdminPlanForm />} />
           <Route path="/finance" element={<AdminFinance />} />
           <Route path="/subscriptions" element={<AdminSubscriptions />} />
+          <Route path="/plan-requests" element={<AdminPlanRequests />} />
           <Route path="/reports" element={<AdminReports />} />
           <Route path="/settings" element={<AdminSettings />} />
           <Route path="/activity" element={<AdminActivityLog />} />

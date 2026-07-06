@@ -11,6 +11,8 @@ import type {
   LiveChatMessage,
   PaymobConfig,
   Plan,
+  PlanRequest,
+  PlanRequestStatus,
   Subscription,
   Transaction,
 } from '@/types';
@@ -32,6 +34,7 @@ import {
   knowledgeCategories as initialKnowledgeCategories,
   knowledgeArticles as initialKnowledgeArticles,
   industries as initialIndustries,
+  planRequests as initialPlanRequests,
 } from './adminMockData';
 import type { ActivityEntry, FeedbackEntry, FeedbackStatus } from './adminMockData';
 
@@ -53,6 +56,11 @@ interface AdminState {
   liveChatConversations: LiveChatConversation[];
   knowledgeCategories: KnowledgeCategory[];
   knowledgeArticles: KnowledgeArticle[];
+  planRequests: PlanRequest[];
+
+  // Plan Request actions
+  updatePlanRequestStatus: (id: string, status: PlanRequestStatus) => void;
+  deletePlanRequest: (id: string) => void;
 
   // Knowledge Base actions
   addKnowledgeCategory: (name: string) => KnowledgeCategory;
@@ -155,6 +163,13 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   liveChatConversations: initialLiveChatConversations,
   knowledgeCategories: initialKnowledgeCategories,
   knowledgeArticles: hydratedArticles,
+  planRequests: initialPlanRequests,
+
+  updatePlanRequestStatus: (id, status) =>
+    set((s) => ({ planRequests: s.planRequests.map((r) => (r.id === id ? { ...r, status } : r)) })),
+
+  deletePlanRequest: (id) =>
+    set((s) => ({ planRequests: s.planRequests.filter((r) => r.id !== id) })),
 
   addKnowledgeCategory: (name) => {
     const slug = name.replace(/\s+/g, '-').toLowerCase();

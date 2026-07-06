@@ -286,6 +286,26 @@ export interface PaymobConfig {
   integrationsByCountry: Record<string, string>;
 }
 
+export type PlanRequestStatus = 'new' | 'contacted' | 'converted' | 'rejected';
+export type OrderVolume = '1-5000' | '5000-20000' | '20000-50000' | '50000-100000' | '100000-200000' | '200000+';
+export type BusinessType = 'fixed' | 'seasonal';
+
+export interface PlanRequest {
+  id: string;
+  planId: string;
+  contactName: string;
+  email: string;
+  phone: string;
+  whatsapp?: string;
+  country: string;
+  companyName?: string;
+  orderVolume: OrderVolume;
+  businessType: BusinessType;
+  notes?: string;
+  status: PlanRequestStatus;
+  createdAt: string;
+}
+
 export type AdminRole = 'super_admin' | 'admin' | 'support' | 'finance';
 
 export interface AdminUser {
