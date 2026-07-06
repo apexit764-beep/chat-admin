@@ -60,6 +60,7 @@ interface AdminState {
   deleteKnowledgeArticle: (id: string) => void;
   moveKnowledgeArticle: (id: string, direction: 'up' | 'down') => void;
   reorderKnowledgeCategory: (id: string, direction: 'up' | 'down') => void;
+  moveKnowledgeCategoryTo: (id: string, targetIndex: number) => void;
 
   // Live Chat actions
   assignLiveChat: (id: string, agentName: string) => void;
@@ -245,6 +246,23 @@ export const useAdminStore = create<AdminState>((set, get) => ({
           if (c.id === swapWith.id) return { ...c, order: sorted[idx].order };
           return c;
         }),
+      };
+    }),
+
+  moveKnowledgeCategoryTo: (id, targetIndex) =>
+    set((s) => {
+      const sorted = [...s.knowledgeCategories].sort((a, b) => a.order - b.order);
+      const fromIndex = sorted.findIndex((c) => c.id === id);
+      if (fromIndex === -1 || fromIndex === targetIndex) return s;
+      const clamped = Math.max(0, Math.min(sorted.length - 1, targetIndex));
+      const [moved] = sorted.splice(fromIndex, 1);
+      sorted.splice(clamped, 0, moved);
+      const orderById = new Map(sorted.map((c, i) => [c.id, i + 1]));
+      return {
+        knowledgeCategories: s.knowledgeCategories.map((c) => ({
+          ...c,
+          order: orderById.get(c.id) ?? c.order,
+        })),
       };
     }),
 

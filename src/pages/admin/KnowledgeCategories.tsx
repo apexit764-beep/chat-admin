@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Plus, Pencil, Trash2, ChevronUp, ChevronDown, FolderOpen } from 'lucide-react';
+import { ArrowRight, Plus, Pencil, Trash2, FolderOpen, GripVertical } from 'lucide-react';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 import {
   Dialog,
   DialogContent,
@@ -23,13 +24,24 @@ export default function KnowledgeCategories(): JSX.Element {
   const addCategory = useAdminStore((s) => s.addKnowledgeCategory);
   const updateCategory = useAdminStore((s) => s.updateKnowledgeCategory);
   const deleteCategory = useAdminStore((s) => s.deleteKnowledgeCategory);
-  const reorderCategory = useAdminStore((s) => s.reorderKnowledgeCategory);
+  const moveCategoryTo = useAdminStore((s) => s.moveKnowledgeCategoryTo);
   const showToast = useUIStore((s) => s.showToast);
 
   const [editModal, setEditModal] = useState<{ mode: 'new' | 'edit'; id?: string; name: string } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<KnowledgeCategory | null>(null);
+  const [dragId, setDragId] = useState<string | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
 
   const sorted = [...categories].sort((a, b) => a.order - b.order);
+
+  const handleDrop = (targetId: string): void => {
+    if (dragId && dragId !== targetId) {
+      const targetIdx = sorted.findIndex((c) => c.id === targetId);
+      moveCategoryTo(dragId, targetIdx);
+    }
+    setDragId(null);
+    setDragOverId(null);
+  };
 
   const openNew = (): void => setEditModal({ mode: 'new', name: '' });
   const openEdit = (c: KnowledgeCategory): void => setEditModal({ mode: 'edit', id: c.id, name: c.name });
@@ -92,7 +104,7 @@ export default function KnowledgeCategories(): JSX.Element {
               <table dir="rtl" className="w-full text-sm">
                 <thead className="bg-muted/50 text-xs text-muted-foreground">
                   <tr>
-                    <th className="text-start px-4 py-3 w-16">الترتيب</th>
+                    <th className="text-start px-2 py-3 w-10"></th>
                     <th className="text-start px-4 py-3 w-12">#</th>
                     <th className="text-start px-4 py-3">اسم التصنيف</th>
                     <th className="text-start px-4 py-3">Slug</th>
@@ -101,53 +113,64 @@ export default function KnowledgeCategories(): JSX.Element {
                   </tr>
                 </thead>
                 <tbody className="divide-y">
-                  {sorted.map((cat, idx) => (
-                    <tr key={cat.id} className="hover:bg-muted/30">
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-0.5">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7"
-                            disabled={idx === 0}
-                            onClick={() => reorderCategory(cat.id, 'up')}
+                  {sorted.map((cat, idx) => {
+                    const isDragging = dragId === cat.id;
+                    const isDragOver = dragOverId === cat.id && dragId !== cat.id;
+                    return (
+                      <tr
+                        key={cat.id}
+                        draggable
+                        onDragStart={(e) => {
+                          setDragId(cat.id);
+                          e.dataTransfer.effectAllowed = 'move';
+                          e.dataTransfer.setData('text/plain', cat.id);
+                        }}
+                        onDragOver={(e) => {
+                          e.preventDefault();
+                          e.dataTransfer.dropEffect = 'move';
+                          if (dragOverId !== cat.id) setDragOverId(cat.id);
+                        }}
+                        onDragLeave={() => { if (dragOverId === cat.id) setDragOverId(null); }}
+                        onDrop={(e) => { e.preventDefault(); handleDrop(cat.id); }}
+                        onDragEnd={() => { setDragId(null); setDragOverId(null); }}
+                        className={cn(
+                          'transition-colors',
+                          isDragging && 'opacity-40',
+                          isDragOver ? 'bg-primary/10' : 'hover:bg-muted/30'
+                        )}
+                      >
+                        <td className="px-2 py-3">
+                          <span
+                            className="inline-flex items-center justify-center h-7 w-7 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted cursor-grab active:cursor-grabbing"
+                            title="اسحب لإعادة الترتيب"
                           >
-                            <ChevronUp className="h-3.5 w-3.5" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7"
-                            disabled={idx === sorted.length - 1}
-                            onClick={() => reorderCategory(cat.id, 'down')}
-                          >
-                            <ChevronDown className="h-3.5 w-3.5" />
-                          </Button>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 text-xs text-muted-foreground font-mono">{idx + 1}</td>
-                      <td className="px-4 py-3 font-medium">{cat.name}</td>
-                      <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{cat.slug}</td>
-                      <td className="px-4 py-3 text-center">
-                        <Badge variant="secondary">{cat.articleCount}</Badge>
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-0.5 justify-end">
-                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => openEdit(cat)}>
-                            <Pencil className="h-3.5 w-3.5" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 rounded-lg text-red-500 hover:text-red-600 hover:bg-red-500/10"
-                            onClick={() => setDeleteTarget(cat)}
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                            <GripVertical className="h-4 w-4" />
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-xs text-muted-foreground font-mono">{idx + 1}</td>
+                        <td className="px-4 py-3 font-medium">{cat.name}</td>
+                        <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{cat.slug}</td>
+                        <td className="px-4 py-3 text-center">
+                          <Badge variant="secondary">{cat.articleCount}</Badge>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-0.5 justify-end">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => openEdit(cat)}>
+                              <Pencil className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 rounded-lg text-red-500 hover:text-red-600 hover:bg-red-500/10"
+                              onClick={() => setDeleteTarget(cat)}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
