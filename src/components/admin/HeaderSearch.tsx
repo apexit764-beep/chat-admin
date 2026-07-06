@@ -70,7 +70,7 @@ export function HeaderSearch(): JSX.Element {
       nav('/plans', 'الباقات', <Package className="h-4 w-4" />, 'الباقات والأسعار'),
       nav('/finance', 'المالية', <CreditCard className="h-4 w-4" />, 'الفواتير والمعاملات'),
       nav('/subscriptions', 'الاشتراكات', <Repeat className="h-4 w-4" />, 'اشتراكات العملاء والتجديدات'),
-      nav('/team', 'الفريق', <UserCog className="h-4 w-4" />, 'أعضاء الفريق والصلاحيات'),
+      nav('/team', 'الموظفين والصلاحيات', <UserCog className="h-4 w-4" />, 'أعضاء الفريق والصلاحيات'),
       nav('/reports', 'التقارير', <BarChart3 className="h-4 w-4" />, 'تحليلات المنصة'),
       nav('/settings', 'الإعدادات', <Settings className="h-4 w-4" />, 'إعدادات النظام'),
     );
@@ -93,7 +93,7 @@ export function HeaderSearch(): JSX.Element {
         label: u.name,
         hint: u.email,
         icon: <UserCog className="h-4 w-4" />,
-        section: 'الفريق',
+        section: 'الموظفين والصلاحيات',
         action: () => navigate('/team'),
         keywords: `${u.name} ${u.email} ${u.role}`.toLowerCase(),
       });

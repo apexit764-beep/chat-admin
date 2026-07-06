@@ -169,7 +169,7 @@ const permissionGroups: PermissionGroup[] = [
       { id: 'settings.general', label: 'إعدادات عامة' },
       { id: 'settings.security', label: 'إعدادات الأمان' },
       { id: 'settings.api', label: 'مفاتيح API' },
-      { id: 'settings.team', label: 'إدارة الفريق' },
+      { id: 'settings.team', label: 'الموظفين والصلاحيات' },
     ],
   },
 ];
@@ -282,14 +282,6 @@ export default function AdminTeam(): JSX.Element {
     return list;
   }, [adminUsers, search, roleFilter]);
 
-  const stats = useMemo(() => ({
-    total: adminUsers.length,
-    active: adminUsers.filter((u) => u.active).length,
-    superAdmin: adminUsers.filter((u) => u.role === 'super_admin').length,
-    admin: adminUsers.filter((u) => u.role === 'admin').length,
-    support: adminUsers.filter((u) => u.role === 'support').length,
-    finance: adminUsers.filter((u) => u.role === 'finance').length,
-  }), [adminUsers]);
 
   const openAddUser = (): void => {
     setEditingUser(null);
@@ -700,7 +692,7 @@ export default function AdminTeam(): JSX.Element {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold">إدارة الفريق</h2>
+          <h2 className="text-2xl font-bold">الموظفين والصلاحيات</h2>
           <p className="text-sm text-muted-foreground">إدارة أعضاء فريق الإدارة وأدوارهم</p>
         </div>
         <div className="flex items-center gap-2">
@@ -715,15 +707,6 @@ export default function AdminTeam(): JSX.Element {
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        <StatMini label="إجمالي الأعضاء" value={stats.total} color="bg-primary/10 text-primary" />
-        <StatMini label="نشط" value={stats.active} color="bg-emerald-500/10 text-emerald-600" />
-        <StatMini label="مدير نظام" value={stats.superAdmin} color="bg-red-500/10 text-red-600" />
-        <StatMini label="مدير" value={stats.admin} color="bg-blue-500/10 text-blue-600" />
-        <StatMini label="دعم فني" value={stats.support} color="bg-gray-500/10 text-gray-600" />
-        <StatMini label="مالية" value={stats.finance} color="bg-amber-500/10 text-amber-600" />
-      </div>
 
       {/* Members table */}
       <Card>
@@ -970,15 +953,3 @@ export default function AdminTeam(): JSX.Element {
   );
 }
 
-function StatMini({ label, value, color }: { label: string; value: number; color: string }): JSX.Element {
-  return (
-    <Card>
-      <CardContent className="p-3 flex items-center gap-3">
-        <div className={cn('h-9 w-9 rounded-lg flex items-center justify-center text-sm font-bold', color)}>
-          {value}
-        </div>
-        <span className="text-xs text-muted-foreground">{label}</span>
-      </CardContent>
-    </Card>
-  );
-}

@@ -67,7 +67,7 @@ const navGroups: NavGroup[] = [
   {
     title: 'النظام',
     items: [
-      { to: '/team', label: 'الفريق', icon: UsersRound },
+      { to: '/team', label: 'الموظفين والصلاحيات', icon: UsersRound },
       { to: '/reports', label: 'التقارير', icon: BarChart3 },
       { to: '/activity', label: 'سجل النشاط', icon: Activity },
       { to: '/knowledge', label: 'قاعدة المعرفة', icon: BookOpen },

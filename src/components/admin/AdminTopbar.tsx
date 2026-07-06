@@ -34,7 +34,7 @@ const breadcrumbMap: Record<string, string> = {
   '/reports': 'التقارير',
   '/feedback': 'الشكاوى والاقتراحات',
   '/activity': 'سجل النشاط',
-  '/team': 'الفريق',
+  '/team': 'الموظفين والصلاحيات',
   '/knowledge': 'قاعدة المعرفة',
   '/conversations': 'الدردشة المباشرة',
   '/notifications': 'الإشعارات',
