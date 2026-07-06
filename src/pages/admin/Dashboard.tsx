@@ -8,13 +8,7 @@ import {
   AlertTriangle,
   Sparkles,
   ArrowUpRight,
-  MessageSquare,
-  Radio,
-  Send,
   Star,
-  Clock,
-  CreditCard,
-  Crown,
   UserPlus,
   FileWarning,
   MessagesSquare,
@@ -185,462 +179,374 @@ export default function AdminDashboard(): JSX.Element {
     [transactions]
   );
 
+  const channelData = [
+    { label: 'واتساب', value: platformStatsData.channelDistribution.whatsapp, color: '#25D366' },
+    { label: 'ماسنجر', value: platformStatsData.channelDistribution.messenger, color: '#0084FF' },
+    { label: 'انستقرام', value: platformStatsData.channelDistribution.instagram, color: '#E1306C' },
+    { label: 'تلغرام', value: platformStatsData.channelDistribution.telegram, color: '#0088CC' },
+    { label: 'ويدجت', value: platformStatsData.channelDistribution.widget, color: '#6366F1' },
+    { label: 'إيميل', value: platformStatsData.channelDistribution.email, color: '#F59E0B' },
+  ];
+  const channelTotal = channelData.reduce((a, c) => a + c.value, 0);
+
   return (
-    <div className="p-4 lg:p-6 space-y-5 page-fade">
+    <div className="p-4 lg:p-6 space-y-4 page-fade">
       <div>
         <h2 className="text-2xl font-bold">نظرة عامة</h2>
         <p className="text-sm text-muted-foreground">نظرة عامة على أداء النظام</p>
       </div>
-      {/* ═══════════════ Section 1: KPIs الأساسية ═══════════════ */}
-      <section className="space-y-3">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <Kpi
-            label="الإيراد الشهري (MRR)"
-            value={`$${currentMrr.toLocaleString()}`}
-            delta={mrrGrowth}
-            deltaLabel={mrrGrowth !== null ? 'مقارنة بالشهر الماضي' : 'لا توجد بيانات مقارنة'}
-            icon={<DollarSign className="h-4 w-4" />}
-            color="text-emerald-600 dark:text-emerald-400"
-            iconBg="bg-emerald-500/10"
-          />
-          <Kpi
-            label="عملاء نشطون"
-            value={activeCount}
-            delta={activeGrowth}
-            deltaLabel={`من إجمالي ${clients.length} عميل`}
-            icon={<Users className="h-4 w-4" />}
-            color="text-primary"
-            iconBg="bg-primary/10"
-          />
-          <Kpi
-            label="حسابات تجريبية"
-            value={trialCount}
-            delta={null}
-            deltaLabel={expiringTrials.length > 0 ? `${expiringTrials.length} ينتهي خلال 7 أيام` : 'لا تنتهي قريباً'}
-            icon={<Sparkles className="h-4 w-4" />}
-            color="text-blue-600 dark:text-blue-400"
-            iconBg="bg-blue-500/10"
-          />
-          <Kpi
-            label="معدل الإلغاء"
-            value={`${churnRate}%`}
-            delta={null}
-            deltaLabel={`${cancelledCount} ملغي · ${pastDueCount} متأخر`}
-            icon={<AlertTriangle className="h-4 w-4" />}
-            color="text-amber-600 dark:text-amber-400"
-            iconBg="bg-amber-500/10"
-          />
-        </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <MiniStat
-            label="إجمالي المحادثات"
-            value={platformStatsData.totalConversations.toLocaleString()}
-            sub={`${platformStatsData.activeConversations.toLocaleString()} نشطة الآن`}
-            icon={<MessageSquare className="h-4 w-4" />}
-            color="text-violet-600 dark:text-violet-400"
-            iconBg="bg-violet-500/10"
-          />
-          <MiniStat
-            label="إجمالي القنوات"
-            value={platformStatsData.totalChannels}
-            sub={`${platformStatsData.onlineAgents} وكيل متصل`}
-            icon={<Radio className="h-4 w-4" />}
-            color="text-cyan-600 dark:text-cyan-400"
-            iconBg="bg-cyan-500/10"
-          />
-          <MiniStat
-            label="الحملات النشطة"
-            value={campaignStatsData.activeCampaigns}
-            sub={`من ${campaignStatsData.totalCampaigns} حملة`}
-            icon={<Send className="h-4 w-4" />}
-            color="text-rose-600 dark:text-rose-400"
-            iconBg="bg-rose-500/10"
-          />
-          <MiniStat
-            label="رضا العملاء"
-            value={`${satisfactionStatsData.avgRating}/5`}
-            sub={`${satisfactionStatsData.totalRatings.toLocaleString()} تقييم`}
-            icon={<Star className="h-4 w-4" />}
-            color="text-yellow-600 dark:text-yellow-400"
-            iconBg="bg-yellow-500/10"
-          />
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <MiniStat
-            label="عملاء جدد هذا الشهر"
-            value={newClientsThisMonth}
-            sub={`من إجمالي ${clients.length}`}
-            icon={<UserPlus className="h-4 w-4" />}
-            color="text-teal-600 dark:text-teal-400"
-            iconBg="bg-teal-500/10"
-          />
-          <MiniStat
-            label="فواتير متأخرة"
-            value={overdueInvoices}
-            sub={overdueInvoices > 0 ? 'تحتاج متابعة' : 'لا يوجد متأخرات'}
-            icon={<FileWarning className="h-4 w-4" />}
-            color="text-orange-600 dark:text-orange-400"
-            iconBg="bg-orange-500/10"
-          />
-          <MiniStat
-            label="محادثات مفتوحة"
-            value={openConversations}
-            sub="دعم مباشر"
-            icon={<MessagesSquare className="h-4 w-4" />}
-            color="text-indigo-600 dark:text-indigo-400"
-            iconBg="bg-indigo-500/10"
-          />
-        </div>
-      </section>
 
-      {/* ═══════════════ Section 2: الأداء المالي ═══════════════ */}
-      <section className="space-y-3">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <div className="flex items-start justify-between">
-                <div>
-                  <CardTitle className="text-base">تطور الإيراد الشهري</CardTitle>
-                  <div className="flex items-baseline gap-2 mt-1.5">
-                    <span className="text-3xl font-extrabold tracking-tight">${currentMrr.toLocaleString()}</span>
-                    {mrrGrowth !== null && (
-                      <Badge variant={mrrGrowth >= 0 ? 'success' : 'destructive'} className="text-[10px] px-1.5 py-0">
-                        {mrrGrowth >= 0 ? <TrendingUp className="h-3 w-3 me-0.5" /> : <TrendingDown className="h-3 w-3 me-0.5" />}
-                        {mrrGrowth >= 0 ? '+' : ''}{mrrGrowth}%
-                      </Badge>
-                    )}
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1">آخر 6 أشهر · بالدولار الأمريكي</p>
+      {/* ═══════ Bento Row 1: MRR Hero + 4 KPIs ═══════ */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="col-span-2 row-span-2">
+          <CardContent className="p-5">
+            <div className="flex items-center gap-3 mb-1">
+              <div className="h-10 w-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                <DollarSign className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">الإيراد الشهري (MRR)</p>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-3xl font-extrabold tracking-tight">${currentMrr.toLocaleString()}</span>
+                  {mrrGrowth !== null && (
+                    <Badge variant={mrrGrowth >= 0 ? 'success' : 'destructive'} className="text-[10px] px-1.5 py-0">
+                      {mrrGrowth >= 0 ? <TrendingUp className="h-3 w-3 me-0.5" /> : <TrendingDown className="h-3 w-3 me-0.5" />}
+                      {mrrGrowth >= 0 ? '+' : ''}{mrrGrowth}%
+                    </Badge>
+                  )}
                 </div>
               </div>
-            </CardHeader>
-            <CardContent>
-              <LineChart
-                labels={mrrHistory.labels}
-                series={[{ name: 'MRR', color: '#2563EB', data: mrrHistory.values }]}
-                height={220}
-                formatValue={(v) => `$${v.toLocaleString()}`}
-              />
-            </CardContent>
-          </Card>
+            </div>
+            <p className="text-[11px] text-muted-foreground mb-2">آخر 6 أشهر · بالدولار الأمريكي</p>
+            <LineChart
+              labels={mrrHistory.labels}
+              series={[{ name: 'MRR', color: '#2563EB', data: mrrHistory.values }]}
+              height={200}
+              formatValue={(v) => `$${v.toLocaleString()}`}
+            />
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base">العملاء حسب الدولة</CardTitle>
-                <span className="text-xs text-muted-foreground">{byCountry.length} دول</span>
-              </div>
-            </CardHeader>
-            <CardContent className="p-3">
-              {byCountry.length === 0 ? (
-                <div className="h-[260px] flex items-center justify-center text-sm text-muted-foreground">
-                  لا توجد بيانات
-                </div>
-              ) : (
-                <BarChart
-                  labels={byCountry.map((c) => c.name)}
-                  data={byCountry.map((c) => c.count)}
-                  color="#2563EB"
-                  height={260}
-                />
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </section>
+        <Kpi label="عملاء نشطون" value={activeCount} delta={activeGrowth}
+          deltaLabel={`من إجمالي ${clients.length} عميل`}
+          icon={<Users className="h-4 w-4" />} color="text-primary" iconBg="bg-primary/10" />
+        <Kpi label="حسابات تجريبية" value={trialCount} delta={null}
+          deltaLabel={expiringTrials.length > 0 ? `${expiringTrials.length} ينتهي خلال 7 أيام` : 'لا تنتهي قريباً'}
+          icon={<Sparkles className="h-4 w-4" />} color="text-blue-600 dark:text-blue-400" iconBg="bg-blue-500/10" />
+        <Kpi label="معدل الإلغاء" value={`${churnRate}%`} delta={null}
+          deltaLabel={`${cancelledCount} ملغي · ${pastDueCount} متأخر`}
+          icon={<AlertTriangle className="h-4 w-4" />} color="text-amber-600 dark:text-amber-400" iconBg="bg-amber-500/10" />
+        <Kpi label="عملاء جدد هذا الشهر" value={newClientsThisMonth} delta={null}
+          deltaLabel={`من إجمالي ${clients.length}`}
+          icon={<UserPlus className="h-4 w-4" />} color="text-teal-600 dark:text-teal-400" iconBg="bg-teal-500/10" />
+      </div>
 
-      {/* ═══════════════ Section 3: نشاط المنصّة ═══════════════ */}
-      <section className="space-y-3">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">توزيع المحادثات حسب القناة</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <DoughnutChart
-                data={[
-                  { label: 'واتساب', value: platformStatsData.channelDistribution.whatsapp, color: '#25D366' },
-                  { label: 'ماسنجر', value: platformStatsData.channelDistribution.messenger, color: '#0084FF' },
-                  { label: 'انستقرام', value: platformStatsData.channelDistribution.instagram, color: '#E1306C' },
-                  { label: 'تلغرام', value: platformStatsData.channelDistribution.telegram, color: '#0088CC' },
-                  { label: 'ويدجت', value: platformStatsData.channelDistribution.widget, color: '#6366F1' },
-                  { label: 'إيميل', value: platformStatsData.channelDistribution.email, color: '#F59E0B' },
-                ]}
-              />
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <div className="flex items-start justify-between">
-                <div>
-                  <CardTitle className="text-base">أداء حملات الـ Outreach</CardTitle>
-                  <p className="text-xs text-muted-foreground mt-1">آخر 6 أشهر · مرسلة، مستلمة، ومفتوحة</p>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <LineChart
-                labels={campaignStatsData.monthlyCampaigns.map((m) => m.month)}
-                series={[
-                  { name: 'مرسلة', color: '#3B82F6', data: campaignStatsData.monthlyCampaigns.map((m) => m.sent) },
-                  { name: 'مستلمة', color: '#10B981', data: campaignStatsData.monthlyCampaigns.map((m) => m.delivered) },
-                  { name: 'مفتوحة', color: '#F59E0B', data: campaignStatsData.monthlyCampaigns.map((m) => m.opened) },
-                ]}
-                height={200}
-              />
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      {/* ═══════════════ Section 4: يحتاج اهتمامك ═══════════════ */}
-      <section className="space-y-3">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          {/* Past due */}
-          <Card className="border-amber-500/30">
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base">متأخرون عن الدفع</CardTitle>
-                <Badge variant="warning" className="text-[10px]">{pastDueClients.length}</Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {pastDueClients.length === 0 && (
-                <p className="text-xs text-muted-foreground py-6 text-center">لا يوجد متأخرين · ممتاز 👌</p>
-              )}
-              {pastDueClients.map(({ client, amount, currency }) => (
-                <Link
-                  key={client.id}
-                  to={`/clients/${client.id}`}
-                  className="flex items-center justify-between gap-2 py-1.5 px-2 -mx-2 rounded-md hover:bg-muted/60 transition-colors"
-                >
-                  <div className="flex items-center gap-2 min-w-0">
-                    <Avatar className="h-7 w-7">
-                      <AvatarFallback className={`text-[10px] font-semibold ${avatarColor(client.companyName)}`}>{initials(client.companyName)}</AvatarFallback>
-                    </Avatar>
-                    <span className="text-sm truncate">{client.companyName}</span>
-                  </div>
-                  <span className="text-sm font-bold text-amber-600 dark:text-amber-400 flex-shrink-0">
-                    {formatMoney(amount, currency)}
-                  </span>
-                </Link>
+      {/* ═══════ Bento Row 2: Highlights + Donut + Quick Stats ═══════ */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Platform highlights - spans 2 */}
+        <Card className="md:col-span-2">
+          <CardContent className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-sm font-semibold">أداء المنصة</p>
+              <span className="text-xs text-muted-foreground">{platformStatsData.totalChannels} قناة</span>
+            </div>
+            <div className="flex items-baseline gap-2 mb-1">
+              <span className="text-2xl font-extrabold">{platformStatsData.totalConversations.toLocaleString()}</span>
+              <span className="text-xs text-muted-foreground">محادثة</span>
+            </div>
+            <p className="text-xs text-muted-foreground mb-3">{platformStatsData.activeConversations.toLocaleString()} نشطة الآن · {platformStatsData.onlineAgents} وكيل متصل</p>
+            {/* Stacked bar */}
+            <div className="flex h-2.5 rounded-full overflow-hidden mb-3">
+              {channelData.map((ch) => (
+                <div key={ch.label} style={{ width: `${(ch.value / channelTotal) * 100}%`, backgroundColor: ch.color }} />
               ))}
-              {pastDueClients.length > 0 && (
-                <Button variant="ghost" size="sm" asChild className="w-full mt-1">
-                  <Link to="/clients?filter=past_due" className="text-xs">عرض الكل</Link>
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Expiring trials */}
-          <Card className="border-blue-500/30">
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base">تجارب تنتهي قريباً</CardTitle>
-                <Badge variant="default" className="text-[10px]">{expiringTrials.length}</Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {expiringTrials.length === 0 && (
-                <p className="text-xs text-muted-foreground py-6 text-center">لا توجد تجارب قاربت على الانتهاء</p>
-              )}
-              {expiringTrials.map(({ client, daysLeft }) => (
-                <Link
-                  key={client.id}
-                  to={`/clients/${client.id}`}
-                  className="flex items-center justify-between gap-2 py-1.5 px-2 -mx-2 rounded-md hover:bg-muted/60 transition-colors"
-                >
-                  <div className="flex items-center gap-2 min-w-0">
-                    <Avatar className="h-7 w-7">
-                      <AvatarFallback className={`text-[10px] font-semibold ${avatarColor(client.companyName)}`}>{initials(client.companyName)}</AvatarFallback>
-                    </Avatar>
-                    <span className="text-sm truncate">{client.companyName}</span>
-                  </div>
-                  <Badge variant={daysLeft <= 2 ? 'destructive' : daysLeft <= 5 ? 'warning' : 'secondary'} className="text-[10px] flex-shrink-0">
-                    {daysLeft === 0 ? 'اليوم' : daysLeft === 1 ? 'غداً' : `${daysLeft} أيام`}
-                  </Badge>
-                </Link>
+            </div>
+            <div className="flex flex-wrap gap-x-4 gap-y-1">
+              {channelData.map((ch) => (
+                <div key={ch.label} className="flex items-center gap-1.5 text-xs">
+                  <span className="h-2 w-2 rounded-full flex-shrink-0" style={{ backgroundColor: ch.color }} />
+                  <span className="text-muted-foreground">{ch.label}</span>
+                  <span className="font-semibold">{ch.value}</span>
+                </div>
               ))}
-              {expiringTrials.length > 0 && (
-                <Button variant="ghost" size="sm" asChild className="w-full mt-1">
-                  <Link to="/clients?filter=trial" className="text-xs">عرض الكل</Link>
-                </Button>
-              )}
-            </CardContent>
-          </Card>
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Top plans */}
-          <Card className="border-emerald-500/30">
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base">أكثر الباقات اشتراكاً</CardTitle>
+        {/* Channel donut */}
+        <Card>
+          <CardContent className="p-4">
+            <p className="text-sm font-semibold mb-2">توزيع القنوات</p>
+            <DoughnutChart data={channelData} />
+          </CardContent>
+        </Card>
+
+        {/* Quick stats stacked */}
+        <Card>
+          <CardContent className="p-4 flex flex-col justify-between h-full gap-3">
+            <QuickStatItem icon={<Star className="h-4 w-4" />} iconBg="bg-yellow-500/10" color="text-yellow-600 dark:text-yellow-400"
+              label="رضا العملاء" value={`${satisfactionStatsData.avgRating}/5`} sub={`${satisfactionStatsData.totalRatings.toLocaleString()} تقييم`} />
+            <div className="border-t" />
+            <QuickStatItem icon={<FileWarning className="h-4 w-4" />} iconBg="bg-orange-500/10" color="text-orange-600 dark:text-orange-400"
+              label="فواتير متأخرة" value={overdueInvoices} sub={overdueInvoices > 0 ? 'تحتاج متابعة' : 'لا متأخرات'} />
+            <div className="border-t" />
+            <QuickStatItem icon={<MessagesSquare className="h-4 w-4" />} iconBg="bg-indigo-500/10" color="text-indigo-600 dark:text-indigo-400"
+              label="محادثات مفتوحة" value={openConversations} sub="دعم مباشر" />
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* ═══════ Bento Row 3: Countries + Campaigns ═══════ */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+        <Card className="lg:col-span-3">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base">العملاء حسب الدولة</CardTitle>
+              <span className="text-xs text-muted-foreground">{byCountry.length} دول</span>
+            </div>
+          </CardHeader>
+          <CardContent className="p-3">
+            {byCountry.length === 0 ? (
+              <div className="h-[220px] flex items-center justify-center text-sm text-muted-foreground">لا توجد بيانات</div>
+            ) : (
+              <BarChart labels={byCountry.map((c) => c.name)} data={byCountry.map((c) => c.count)} color="#2563EB" height={220} />
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="lg:col-span-2">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">أداء الحملات</CardTitle>
+            <p className="text-xs text-muted-foreground">آخر 6 أشهر</p>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-4 mb-3">
+              <div>
+                <p className="text-2xl font-extrabold">{campaignStatsData.activeCampaigns}</p>
+                <p className="text-[10px] text-muted-foreground">حملة نشطة</p>
               </div>
-            </CardHeader>
-            <CardContent className="space-y-2.5">
-              {topPlans.length === 0 && (
-                <p className="text-xs text-muted-foreground py-6 text-center">لا توجد اشتراكات نشطة</p>
-              )}
-              {topPlans.map(({ plan, subscribers, revenue }, i) => {
-                const max = topPlans[0].subscribers;
-                const pct = Math.round((subscribers / max) * 100);
-                return (
-                  <div key={plan.id}>
-                    <div className="flex items-center justify-between mb-1">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className="text-[10px] text-muted-foreground font-mono w-3">{i + 1}</span>
-                        <span className="text-sm font-medium truncate">{plan.nameAr}</span>
-                      </div>
-                      <span className="text-xs text-muted-foreground flex-shrink-0">
-                        <span className="font-bold text-foreground">{subscribers}</span> · ${revenue.toLocaleString()}
-                      </span>
+              <div className="border-e h-8" />
+              <div>
+                <p className="text-2xl font-extrabold">{campaignStatsData.avgOpenRate}%</p>
+                <p className="text-[10px] text-muted-foreground">معدل الفتح</p>
+              </div>
+              <div className="border-e h-8" />
+              <div>
+                <p className="text-2xl font-extrabold">{campaignStatsData.totalMessagesSent.toLocaleString()}</p>
+                <p className="text-[10px] text-muted-foreground">رسالة مرسلة</p>
+              </div>
+            </div>
+            <LineChart
+              labels={campaignStatsData.monthlyCampaigns.map((m) => m.month)}
+              series={[
+                { name: 'مرسلة', color: '#3B82F6', data: campaignStatsData.monthlyCampaigns.map((m) => m.sent) },
+                { name: 'مستلمة', color: '#10B981', data: campaignStatsData.monthlyCampaigns.map((m) => m.delivered) },
+                { name: 'مفتوحة', color: '#F59E0B', data: campaignStatsData.monthlyCampaigns.map((m) => m.opened) },
+              ]}
+              height={160}
+            />
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* ═══════ Bento Row 4: Attention cards ═══════ */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Top plans - wider */}
+        <Card className="border-emerald-500/30">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">أكثر الباقات اشتراكاً</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2.5">
+            {topPlans.length === 0 && <p className="text-xs text-muted-foreground py-6 text-center">لا توجد اشتراكات نشطة</p>}
+            {topPlans.map(({ plan, subscribers, revenue }, i) => {
+              const max = topPlans[0].subscribers;
+              const pct = Math.round((subscribers / max) * 100);
+              return (
+                <div key={plan.id}>
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="text-[10px] text-muted-foreground font-mono w-3">{i + 1}</span>
+                      <span className="text-sm font-medium truncate">{plan.nameAr}</span>
                     </div>
-                    <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-                      <div
-                        className="h-full rounded-full bg-gradient-to-l from-emerald-500 to-emerald-400"
-                        style={{ width: `${pct}%` }}
-                      />
-                    </div>
+                    <span className="text-xs text-muted-foreground flex-shrink-0">
+                      <span className="font-bold text-foreground">{subscribers}</span> · ${revenue.toLocaleString()}
+                    </span>
                   </div>
-                );
-              })}
-              {topPlans.length > 0 && (
-                <Button variant="ghost" size="sm" asChild className="w-full mt-1">
-                  <Link to="/plans" className="text-xs">إدارة الباقات</Link>
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </section>
+                  <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                    <div className="h-full rounded-full bg-gradient-to-l from-emerald-500 to-emerald-400" style={{ width: `${pct}%` }} />
+                  </div>
+                </div>
+              );
+            })}
+            {topPlans.length > 0 && (
+              <Button variant="ghost" size="sm" asChild className="w-full mt-1">
+                <Link to="/plans" className="text-xs">إدارة الباقات</Link>
+              </Button>
+            )}
+          </CardContent>
+        </Card>
 
-      {/* ═══════════════ Section 5: النشاط الأخير ═══════════════ */}
-      <section className="space-y-3">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base">أحدث العملاء المسجلين</CardTitle>
-                <Button variant="link" size="sm" asChild>
-                  <Link to="/clients" className="flex items-center gap-1">
-                    عرض الكل <ArrowUpRight className="h-3.5 w-3.5" />
-                  </Link>
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-start">العميل</TableHead>
-                    <TableHead className="text-start">الباقة</TableHead>
-                    <TableHead className="text-start">MRR</TableHead>
-                    <TableHead className="text-start">الحالة</TableHead>
-                    <TableHead className="text-start hidden md:table-cell">انضم</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {recentClients.map((r) => {
-                    const country = countries.find((co) => co.code === r.country);
-                    const plan = plans.find((p) => p.id === r.planId);
-                    return (
-                      <TableRow key={r.id}>
-                        <TableCell className="py-2.5">
-                          <div className="flex items-center gap-2.5 min-w-0">
-                            <Avatar className="h-7 w-7">
-                              <AvatarFallback className={`text-[10px] font-semibold ${avatarColor(r.companyName)}`}>
-                                {initials(r.companyName)}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="min-w-0">
-                              <p className="text-sm font-medium truncate">
-                                {r.companyName}{' '}
-                                <span className="text-xs">{country?.flag}</span>
-                              </p>
-                              <p className="text-[10px] text-muted-foreground truncate">{r.industry}</p>
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell className="py-2.5 text-sm">{plan?.nameAr ?? '—'}</TableCell>
-                        <TableCell className="py-2.5 text-sm font-semibold">
-                          {r.mrr > 0 ? formatMoney(r.mrr, r.currency) : <span className="text-muted-foreground">—</span>}
-                        </TableCell>
-                        <TableCell className="py-2.5">
-                          <StatusPill status={r.status} />
-                        </TableCell>
-                        <TableCell className="py-2.5 hidden md:table-cell text-sm text-muted-foreground">
-                          {timeAgo(r.joinedAt)}
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+        {/* Expiring trials */}
+        <Card className="border-blue-500/30">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base">تجارب تنتهي قريباً</CardTitle>
+              <Badge variant="default" className="text-[10px]">{expiringTrials.length}</Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {expiringTrials.length === 0 && <p className="text-xs text-muted-foreground py-6 text-center">لا توجد تجارب قاربت على الانتهاء</p>}
+            {expiringTrials.map(({ client, daysLeft }) => (
+              <Link key={client.id} to={`/clients/${client.id}`}
+                className="flex items-center justify-between gap-2 py-1.5 px-2 -mx-2 rounded-md hover:bg-muted/60 transition-colors">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Avatar className="h-7 w-7">
+                    <AvatarFallback className={`text-[10px] font-semibold ${avatarColor(client.companyName)}`}>{initials(client.companyName)}</AvatarFallback>
+                  </Avatar>
+                  <span className="text-sm truncate">{client.companyName}</span>
+                </div>
+                <Badge variant={daysLeft <= 2 ? 'destructive' : daysLeft <= 5 ? 'warning' : 'secondary'} className="text-[10px] flex-shrink-0">
+                  {daysLeft === 0 ? 'اليوم' : daysLeft === 1 ? 'غداً' : `${daysLeft} أيام`}
+                </Badge>
+              </Link>
+            ))}
+            {expiringTrials.length > 0 && (
+              <Button variant="ghost" size="sm" asChild className="w-full mt-1">
+                <Link to="/clients?filter=trial" className="text-xs">عرض الكل</Link>
+              </Button>
+            )}
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base">أحدث المعاملات المالية</CardTitle>
-                <Button variant="link" size="sm" asChild>
-                  <Link to="/finance" className="flex items-center gap-1">
-                    التفاصيل <ArrowUpRight className="h-3.5 w-3.5" />
-                  </Link>
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-start">العميل</TableHead>
-                    <TableHead className="text-start">المبلغ</TableHead>
-                    <TableHead className="text-start hidden md:table-cell">البطاقة</TableHead>
-                    <TableHead className="text-start">الحالة</TableHead>
-                    <TableHead className="text-start">منذ</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {recentTransactions.map((t) => {
-                    const client = clients.find((c) => c.id === t.clientId);
-                    return (
-                      <TableRow key={t.id}>
-                        <TableCell className="py-2.5">
-                          <div className="flex items-center gap-2 min-w-0">
-                            <Avatar className="h-7 w-7">
-                              <AvatarFallback className={`text-[10px] font-semibold ${avatarColor(client?.companyName ?? '?')}`}>
-                                {initials(client?.companyName ?? '?')}
-                              </AvatarFallback>
-                            </Avatar>
-                            <span className="text-sm font-medium truncate">{client?.companyName ?? '—'}</span>
+        {/* Past due */}
+        <Card className="border-amber-500/30">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base">متأخرون عن الدفع</CardTitle>
+              <Badge variant="warning" className="text-[10px]">{pastDueClients.length}</Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {pastDueClients.length === 0 && <p className="text-xs text-muted-foreground py-6 text-center">لا يوجد متأخرين</p>}
+            {pastDueClients.map(({ client, amount, currency }) => (
+              <Link key={client.id} to={`/clients/${client.id}`}
+                className="flex items-center justify-between gap-2 py-1.5 px-2 -mx-2 rounded-md hover:bg-muted/60 transition-colors">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Avatar className="h-7 w-7">
+                    <AvatarFallback className={`text-[10px] font-semibold ${avatarColor(client.companyName)}`}>{initials(client.companyName)}</AvatarFallback>
+                  </Avatar>
+                  <span className="text-sm truncate">{client.companyName}</span>
+                </div>
+                <span className="text-sm font-bold text-amber-600 dark:text-amber-400 flex-shrink-0">{formatMoney(amount, currency)}</span>
+              </Link>
+            ))}
+            {pastDueClients.length > 0 && (
+              <Button variant="ghost" size="sm" asChild className="w-full mt-1">
+                <Link to="/clients?filter=past_due" className="text-xs">عرض الكل</Link>
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* ═══════ Bento Row 5: Tables ═══════ */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+        <Card className="lg:col-span-3">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base">أحدث العملاء المسجلين</CardTitle>
+              <Button variant="link" size="sm" asChild>
+                <Link to="/clients" className="flex items-center gap-1">عرض الكل <ArrowUpRight className="h-3.5 w-3.5" /></Link>
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-start">العميل</TableHead>
+                  <TableHead className="text-start">الباقة</TableHead>
+                  <TableHead className="text-start">MRR</TableHead>
+                  <TableHead className="text-start">الحالة</TableHead>
+                  <TableHead className="text-start hidden md:table-cell">انضم</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {recentClients.map((r) => {
+                  const country = countries.find((co) => co.code === r.country);
+                  const plan = plans.find((p) => p.id === r.planId);
+                  return (
+                    <TableRow key={r.id}>
+                      <TableCell className="py-2.5">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <Avatar className="h-7 w-7">
+                            <AvatarFallback className={`text-[10px] font-semibold ${avatarColor(r.companyName)}`}>{initials(r.companyName)}</AvatarFallback>
+                          </Avatar>
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium truncate">{r.companyName} <span className="text-xs">{country?.flag}</span></p>
+                            <p className="text-[10px] text-muted-foreground truncate">{r.industry}</p>
                           </div>
-                        </TableCell>
-                        <TableCell className="py-2.5 text-sm font-semibold">{formatMoney(t.amount, t.currency)}</TableCell>
-                        <TableCell className="py-2.5 hidden md:table-cell font-mono text-sm">•••• {t.last4}</TableCell>
-                        <TableCell className="py-2.5">
-                          <Badge
-                            variant={
-                              t.status === 'succeeded' ? 'success'
-                              : t.status === 'failed' ? 'destructive'
-                              : 'secondary'
-                            }
-                            className="text-[10px] px-2 py-0.5"
-                          >
-                            {t.status === 'succeeded' ? 'نجحت' : t.status === 'failed' ? 'فشلت' : 'مرتجعة'}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="py-2.5 text-sm text-muted-foreground">{timeAgo(t.createdAt)}</TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-2.5 text-sm">{plan?.nameAr ?? '—'}</TableCell>
+                      <TableCell className="py-2.5 text-sm font-semibold">
+                        {r.mrr > 0 ? formatMoney(r.mrr, r.currency) : <span className="text-muted-foreground">—</span>}
+                      </TableCell>
+                      <TableCell className="py-2.5"><StatusPill status={r.status} /></TableCell>
+                      <TableCell className="py-2.5 hidden md:table-cell text-sm text-muted-foreground">{timeAgo(r.joinedAt)}</TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+
+        <Card className="lg:col-span-2">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base">أحدث المعاملات</CardTitle>
+              <Button variant="link" size="sm" asChild>
+                <Link to="/finance" className="flex items-center gap-1">التفاصيل <ArrowUpRight className="h-3.5 w-3.5" /></Link>
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-start">العميل</TableHead>
+                  <TableHead className="text-start">المبلغ</TableHead>
+                  <TableHead className="text-start">الحالة</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {recentTransactions.map((t) => {
+                  const client = clients.find((c) => c.id === t.clientId);
+                  return (
+                    <TableRow key={t.id}>
+                      <TableCell className="py-2.5">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <Avatar className="h-7 w-7">
+                            <AvatarFallback className={`text-[10px] font-semibold ${avatarColor(client?.companyName ?? '?')}`}>{initials(client?.companyName ?? '?')}</AvatarFallback>
+                          </Avatar>
+                          <span className="text-sm font-medium truncate">{client?.companyName ?? '—'}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-2.5 text-sm font-semibold">{formatMoney(t.amount, t.currency)}</TableCell>
+                      <TableCell className="py-2.5">
+                        <Badge variant={t.status === 'succeeded' ? 'success' : t.status === 'failed' ? 'destructive' : 'secondary'} className="text-[10px] px-2 py-0.5">
+                          {t.status === 'succeeded' ? 'نجحت' : t.status === 'failed' ? 'فشلت' : 'مرتجعة'}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
@@ -681,7 +587,7 @@ function Kpi({ label, value, delta, deltaLabel, icon, color, iconBg }: {
   );
 }
 
-function MiniStat({ label, value, sub, icon, color, iconBg }: {
+function QuickStatItem({ label, value, sub, icon, color, iconBg }: {
   label: string;
   value: string | number;
   sub: string;
@@ -690,18 +596,16 @@ function MiniStat({ label, value, sub, icon, color, iconBg }: {
   iconBg: string;
 }): JSX.Element {
   return (
-    <Card>
-      <CardContent className="p-4">
-        <div className="flex items-center justify-between mb-2">
-          <div className={cn('h-8 w-8 rounded-md flex items-center justify-center', iconBg, color)}>
-            {icon}
-          </div>
-        </div>
-        <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">{label}</p>
-        <p className="text-2xl font-extrabold tracking-tight mt-0.5">{value}</p>
-        <p className="text-[11px] text-muted-foreground mt-1">{sub}</p>
-      </CardContent>
-    </Card>
+    <div className="flex items-center gap-3">
+      <div className={cn('h-8 w-8 rounded-md flex items-center justify-center flex-shrink-0', iconBg, color)}>
+        {icon}
+      </div>
+      <div className="min-w-0">
+        <p className="text-[11px] text-muted-foreground">{label}</p>
+        <p className="text-base font-bold leading-tight">{value}</p>
+        <p className="text-[10px] text-muted-foreground">{sub}</p>
+      </div>
+    </div>
   );
 }
 
