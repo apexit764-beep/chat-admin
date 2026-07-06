@@ -127,7 +127,6 @@ export default function AdminReports(): JSX.Element {
   // Funnel
   const paidCount = activeClients.length;
   const totalSignups = clients.length;
-  const activatedCount = clients.filter((c) => c.status !== 'trial' && c.status !== 'cancelled').length;
 
   const exportSummary = (): void => {
     downloadCsv(`reports-${new Date().toISOString().slice(0, 10)}.csv`, [
@@ -219,31 +218,53 @@ export default function AdminReports(): JSX.Element {
         />
       </div>
 
-      {/* Signups vs Churn chart */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-base">التسجيلات مقابل الإلغاءات</CardTitle>
-              <CardDescription>آخر 6 أشهر</CardDescription>
+      {/* Signups chart + Conversion funnel side-by-side */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-sm">الاشتراكات مقابل الإلغاءات</CardTitle>
+                <CardDescription className="text-xs">آخر 6 أشهر</CardDescription>
+              </div>
+              <div className="flex items-center gap-2 text-[10px]">
+                <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-sm bg-success" /> اشتراكات</span>
+                <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-sm bg-danger" /> إلغاءات</span>
+              </div>
             </div>
-            <div className="flex items-center gap-3 text-xs">
-              <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-success" /> تسجيلات</span>
-              <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-danger" /> إلغاءات</span>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <LineChart
-            labels={chartData.labels}
-            series={[
-              { name: 'تسجيلات', color: '#10B981', data: chartData.signups },
-              { name: 'إلغاءات', color: '#EF4444', data: chartData.cancellations },
-            ]}
-            height={260}
-          />
-        </CardContent>
-      </Card>
+          </CardHeader>
+          <CardContent>
+            <LineChart
+              labels={chartData.labels}
+              series={[
+                { name: 'اشتراكات', color: '#10B981', data: chartData.signups },
+                { name: 'إلغاءات', color: '#EF4444', data: chartData.cancellations },
+              ]}
+              height={180}
+            />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm">مسار التحويل</CardTitle>
+            <CardDescription className="text-xs">توزيع العملاء على الباقات</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <FunnelStep label="إجمالي المسجلين" value={totalSignups} color="bg-info" share={100} />
+            {planDist.map((p) => (
+              <FunnelStep
+                key={p.label}
+                label={p.label}
+                value={p.value}
+                color=""
+                colorHex={p.color}
+                share={totalSignups ? (p.value / totalSignups) * 100 : 0}
+              />
+            ))}
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Doughnuts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -317,36 +338,26 @@ export default function AdminReports(): JSX.Element {
         </CardContent>
       </Card>
 
-      {/* Funnel */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">مسار التحويل</CardTitle>
-          <CardDescription>من التسجيل إلى الدفع</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <FunnelStep label="إجمالي المسجلين" value={totalSignups} color="bg-info" share={100} />
-          <FunnelStep label="تجارب جديدة" value={trialClients.length} color="bg-primary" share={totalSignups ? (trialClients.length / totalSignups) * 100 : 0} />
-          <FunnelStep label="نشطوا الحساب" value={activatedCount} color="bg-violet-500" share={totalSignups ? (activatedCount / totalSignups) * 100 : 0} />
-          <FunnelStep label="اشتراك مدفوع" value={paidCount} color="bg-success" share={totalSignups ? (paidCount / totalSignups) * 100 : 0} />
-        </CardContent>
-      </Card>
     </div>
   );
 }
 
-function FunnelStep({ label, value, color, share }: { label: string; value: number; color: string; share: number }): JSX.Element {
+function FunnelStep({ label, value, color, colorHex, share }: { label: string; value: number; color: string; colorHex?: string; share: number }): JSX.Element {
   return (
-    <div className="flex items-center gap-3">
-      <p className="w-10 text-xs text-muted-foreground text-start">{share.toFixed(1)}%</p>
-      <div className="flex-1 h-9 rounded-lg bg-muted overflow-hidden relative">
-        <div className={cn('h-full rounded-lg transition-all', color)} style={{ width: `${Math.max(share, 2)}%` }} />
-        <div className="absolute inset-0 flex items-center justify-end px-3">
-          <span className="text-sm font-bold text-foreground">
+    <div className="flex items-center gap-2">
+      <p className="w-10 text-[10px] text-muted-foreground text-start">{share.toFixed(1)}%</p>
+      <div className="flex-1 h-7 rounded-lg bg-muted overflow-hidden relative">
+        <div
+          className={cn('h-full rounded-lg transition-all', color)}
+          style={{ width: `${Math.max(share, 2)}%`, ...(colorHex ? { backgroundColor: colorHex } : {}) }}
+        />
+        <div className="absolute inset-0 flex items-center justify-end px-2">
+          <span className="text-xs font-bold text-foreground">
             {value.toLocaleString()}
           </span>
         </div>
       </div>
-      <p className="w-28 text-sm font-medium text-end">{label}</p>
+      <p className="w-24 text-xs font-medium text-end truncate">{label}</p>
     </div>
   );
 }

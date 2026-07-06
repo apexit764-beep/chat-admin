@@ -105,13 +105,11 @@ export function DoughnutChart({ data, size = 200, centerLabel = 'المجموع'
                 style={{ background: arc.color, transform: hoveredIdx === i ? 'scale(1.3)' : 'scale(1)' }}
               />
               <span className="text-sm truncate">{arc.label}</span>
-            </div>
-            <div className="flex items-center gap-2 flex-shrink-0">
-              <span className="text-sm font-semibold">{arc.value}</span>
-              <span className="text-[11px] text-muted-foreground">
+              <span className="text-[11px] text-muted-foreground flex-shrink-0">
                 {Math.round(arc.fraction * 100)}%
               </span>
             </div>
+            <span className="text-sm font-semibold flex-shrink-0">{arc.value}</span>
           </div>
         ))}
       </div>
