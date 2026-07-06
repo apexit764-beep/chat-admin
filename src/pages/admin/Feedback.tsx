@@ -60,10 +60,10 @@ const statusConfig: Record<FeedbackStatus, { label: string; icon: React.ElementT
   closed: { label: 'مغلق', icon: XCircle, color: 'text-slate-400' },
 };
 
-const priorityConfig: Record<FeedbackPriority, { label: string; variant: 'destructive' | 'default' | 'secondary' }> = {
-  high: { label: 'عالية', variant: 'destructive' },
-  medium: { label: 'متوسطة', variant: 'default' },
-  low: { label: 'منخفضة', variant: 'secondary' },
+const priorityConfig: Record<FeedbackPriority, { label: string; dot: string; text: string; bg: string; border: string }> = {
+  high: { label: 'عالية', dot: 'bg-red-500', text: 'text-red-700 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-950/30', border: 'border-red-200 dark:border-red-800' },
+  medium: { label: 'متوسطة', dot: 'bg-amber-500', text: 'text-amber-700 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-950/30', border: 'border-amber-200 dark:border-amber-800' },
+  low: { label: 'منخفضة', dot: 'bg-slate-400', text: 'text-slate-600 dark:text-slate-400', bg: 'bg-slate-50 dark:bg-slate-900/30', border: 'border-slate-200 dark:border-slate-700' },
 };
 
 type TypeFilter = 'all' | FeedbackType;
@@ -195,9 +195,10 @@ export default function AdminFeedback(): JSX.Element {
                         <p className="text-sm font-medium max-w-[200px] truncate">{entry.subject}</p>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={pConfig.variant} className="text-[10px]">
+                        <span className={cn('inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-medium', pConfig.bg, pConfig.border, pConfig.text)}>
+                          <span className={cn('h-1.5 w-1.5 rounded-full', pConfig.dot)} />
                           {pConfig.label}
-                        </Badge>
+                        </span>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1.5">
@@ -251,9 +252,10 @@ export default function AdminFeedback(): JSX.Element {
                   <Badge variant={typeConfig[selected.type].badgeVariant}>
                     {typeConfig[selected.type].label}
                   </Badge>
-                  <Badge variant={priorityConfig[selected.priority].variant}>
+                  <span className={cn('inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-medium', priorityConfig[selected.priority].bg, priorityConfig[selected.priority].border, priorityConfig[selected.priority].text)}>
+                    <span className={cn('h-1.5 w-1.5 rounded-full', priorityConfig[selected.priority].dot)} />
                     {priorityConfig[selected.priority].label}
-                  </Badge>
+                  </span>
                   <Select
                     value={selected.status}
                     onValueChange={(v) => handleStatusChange(selected.id, v as FeedbackStatus)}
