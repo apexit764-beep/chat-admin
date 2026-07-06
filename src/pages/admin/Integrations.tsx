@@ -8,8 +8,10 @@ import {
   Mail,
   ShoppingBag,
   Plug,
+  X,
 } from 'lucide-react';
 import { useConfirm } from '@components/ui';
+import { useAdminStore } from '@/store/useAdminStore';
 import { cn } from '@/lib/utils';
 
 import { Button } from '@/components/ui/button';
@@ -18,7 +20,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Dialog,
   DialogContent,
@@ -49,18 +50,15 @@ interface Platform {
   name: string;
   slug: string;
   category: PlatformCategory;
-  description: string;
   enabled: boolean;
-  apiKey: string;
-  apiSecret: string;
-  webhookUrl: string;
-  notes: string;
+  logo: string;
+  countries: string[];
 }
 
 const categoryLabels: Record<PlatformCategory, string> = {
   communication: 'قنوات التواصل',
   email: 'البريد الإلكتروني',
-  ecommerce: 'منصات التجارة الإلكترونية',
+  ecommerce: 'منصات التجارة الإلكترونية وشركات الشحن',
 };
 
 const categoryIcons: Record<PlatformCategory, React.ElementType> = {
@@ -76,32 +74,29 @@ const categoryBadgeColors: Record<PlatformCategory, string> = {
 };
 
 const defaultPlatforms: Platform[] = [
-  { id: 'p1', name: 'WhatsApp Business', slug: 'whatsapp', category: 'communication', description: 'ربط واتساب بزنس API للتواصل مع العملاء', enabled: true, apiKey: '', apiSecret: '', webhookUrl: '', notes: '' },
-  { id: 'p2', name: 'Facebook Messenger', slug: 'facebook-messenger', category: 'communication', description: 'استقبال رسائل فيسبوك ماسنجر', enabled: true, apiKey: '', apiSecret: '', webhookUrl: '', notes: '' },
-  { id: 'p3', name: 'Instagram Direct', slug: 'instagram', category: 'communication', description: 'إدارة رسائل إنستغرام المباشرة', enabled: false, apiKey: '', apiSecret: '', webhookUrl: '', notes: '' },
-  { id: 'p4', name: 'Telegram', slug: 'telegram', category: 'communication', description: 'ربط بوت تيليغرام لاستقبال المحادثات', enabled: false, apiKey: '', apiSecret: '', webhookUrl: '', notes: '' },
-  { id: 'p5', name: 'Live Chat Widget', slug: 'livechat', category: 'communication', description: 'أداة الدردشة المباشرة للموقع الإلكتروني', enabled: true, apiKey: '', apiSecret: '', webhookUrl: '', notes: '' },
-  { id: 'p6', name: 'X (Twitter)', slug: 'twitter', category: 'communication', description: 'إدارة الرسائل المباشرة على تويتر', enabled: false, apiKey: '', apiSecret: '', webhookUrl: '', notes: '' },
-  { id: 'p7', name: 'Gmail', slug: 'gmail', category: 'email', description: 'ربط حسابات Gmail لإرسال واستقبال البريد', enabled: true, apiKey: '', apiSecret: '', webhookUrl: '', notes: '' },
-  { id: 'p8', name: 'Outlook', slug: 'outlook', category: 'email', description: 'ربط حسابات Outlook و Microsoft 365', enabled: false, apiKey: '', apiSecret: '', webhookUrl: '', notes: '' },
-  { id: 'p9', name: 'Yahoo Mail', slug: 'yahoo', category: 'email', description: 'ربط حسابات Yahoo Mail', enabled: false, apiKey: '', apiSecret: '', webhookUrl: '', notes: '' },
-  { id: 'p10', name: 'SMTP', slug: 'smtp', category: 'email', description: 'خادم SMTP مخصص لإرسال البريد', enabled: false, apiKey: '', apiSecret: '', webhookUrl: '', notes: '' },
-  { id: 'p11', name: 'سلة', slug: 'salla', category: 'ecommerce', description: 'ربط متجر سلة لإدارة الطلبات والعملاء', enabled: true, apiKey: '', apiSecret: '', webhookUrl: '', notes: '' },
-  { id: 'p12', name: 'Zid', slug: 'zid', category: 'ecommerce', description: 'ربط متجر زد لمتابعة الطلبات', enabled: false, apiKey: '', apiSecret: '', webhookUrl: '', notes: '' },
-  { id: 'p13', name: 'Shopify', slug: 'shopify', category: 'ecommerce', description: 'ربط متجر Shopify لإدارة التجارة', enabled: false, apiKey: '', apiSecret: '', webhookUrl: '', notes: '' },
-  { id: 'p14', name: 'WooCommerce', slug: 'woocommerce', category: 'ecommerce', description: 'ربط متجر WooCommerce على ووردبريس', enabled: true, apiKey: '', apiSecret: '', webhookUrl: '', notes: '' },
+  { id: 'p1', name: 'WhatsApp Business', slug: 'whatsapp', category: 'communication', enabled: true, logo: '', countries: ['SA', 'EG', 'AE'] },
+  { id: 'p2', name: 'Facebook Messenger', slug: 'facebook-messenger', category: 'communication', enabled: true, logo: '', countries: ['SA', 'EG'] },
+  { id: 'p3', name: 'Instagram Direct', slug: 'instagram', category: 'communication', enabled: false, logo: '', countries: [] },
+  { id: 'p4', name: 'Telegram', slug: 'telegram', category: 'communication', enabled: false, logo: '', countries: [] },
+  { id: 'p5', name: 'Live Chat Widget', slug: 'livechat', category: 'communication', enabled: true, logo: '', countries: ['SA', 'EG', 'AE', 'OM'] },
+  { id: 'p6', name: 'X (Twitter)', slug: 'twitter', category: 'communication', enabled: false, logo: '', countries: [] },
+  { id: 'p7', name: 'Gmail', slug: 'gmail', category: 'email', enabled: true, logo: '', countries: ['SA', 'EG'] },
+  { id: 'p8', name: 'Outlook', slug: 'outlook', category: 'email', enabled: false, logo: '', countries: [] },
+  { id: 'p9', name: 'Yahoo Mail', slug: 'yahoo', category: 'email', enabled: false, logo: '', countries: [] },
+  { id: 'p10', name: 'SMTP', slug: 'smtp', category: 'email', enabled: false, logo: '', countries: [] },
+  { id: 'p11', name: 'سلة', slug: 'salla', category: 'ecommerce', enabled: true, logo: '', countries: ['SA'] },
+  { id: 'p12', name: 'Zid', slug: 'zid', category: 'ecommerce', enabled: false, logo: '', countries: ['SA'] },
+  { id: 'p13', name: 'Shopify', slug: 'shopify', category: 'ecommerce', enabled: false, logo: '', countries: [] },
+  { id: 'p14', name: 'WooCommerce', slug: 'woocommerce', category: 'ecommerce', enabled: true, logo: '', countries: ['SA', 'EG'] },
 ];
 
 const emptyForm: Omit<Platform, 'id'> = {
   name: '',
   slug: '',
   category: 'communication',
-  description: '',
   enabled: true,
-  apiKey: '',
-  apiSecret: '',
-  webhookUrl: '',
-  notes: '',
+  logo: '',
+  countries: [],
 };
 
 export default function Integrations() {
@@ -112,13 +107,14 @@ export default function Integrations() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<Omit<Platform, 'id'>>(emptyForm);
   const { confirm } = useConfirm();
+  const countries = useAdminStore((s) => s.countries);
 
   const filtered = useMemo(() => {
     let list = platforms;
     if (filterCategory !== 'all') list = list.filter((p) => p.category === filterCategory);
     if (search.trim()) {
       const q = search.trim().toLowerCase();
-      list = list.filter((p) => p.name.toLowerCase().includes(q) || p.slug.toLowerCase().includes(q) || p.description.toLowerCase().includes(q));
+      list = list.filter((p) => p.name.toLowerCase().includes(q) || p.slug.toLowerCase().includes(q));
     }
     return list;
   }, [platforms, search, filterCategory]);
@@ -143,12 +139,9 @@ export default function Integrations() {
       name: p.name,
       slug: p.slug,
       category: p.category,
-      description: p.description,
       enabled: p.enabled,
-      apiKey: p.apiKey,
-      apiSecret: p.apiSecret,
-      webhookUrl: p.webhookUrl,
-      notes: p.notes,
+      logo: p.logo,
+      countries: [...p.countries],
     });
     setModalOpen(true);
   }
@@ -171,6 +164,15 @@ export default function Integrations() {
 
   function toggleEnabled(id: string) {
     setPlatforms((prev) => prev.map((p) => (p.id === id ? { ...p, enabled: !p.enabled } : p)));
+  }
+
+  function toggleCountry(code: string) {
+    setForm((prev) => ({
+      ...prev,
+      countries: prev.countries.includes(code)
+        ? prev.countries.filter((c) => c !== code)
+        : [...prev.countries, code],
+    }));
   }
 
   return (
@@ -215,7 +217,7 @@ export default function Integrations() {
             <div className="relative flex-1">
               <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="بحث بالاسم أو الرمز..."
+                placeholder="بحث بالاسم أو الكود..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="ps-9"
@@ -245,9 +247,9 @@ export default function Integrations() {
                 <TableRow>
                   <TableHead className="w-12 text-center">#</TableHead>
                   <TableHead>المنصة</TableHead>
-                  <TableHead>الرمز</TableHead>
-                  <TableHead>الفئة</TableHead>
-                  <TableHead>الوصف</TableHead>
+                  <TableHead>الكود</TableHead>
+                  <TableHead>النوع</TableHead>
+                  <TableHead>الدول</TableHead>
                   <TableHead className="text-center">الحالة</TableHead>
                   <TableHead className="w-24" />
                 </TableRow>
@@ -281,7 +283,17 @@ export default function Integrations() {
                             {categoryLabels[p.category]}
                           </Badge>
                         </TableCell>
-                        <TableCell className="max-w-[200px] truncate text-muted-foreground text-sm">{p.description}</TableCell>
+                        <TableCell>
+                          <div className="flex flex-wrap gap-1">
+                            {p.countries.map((code) => {
+                              const co = countries.find((c) => c.code === code);
+                              return co ? (
+                                <span key={code} className="text-xs bg-muted px-1.5 py-0.5 rounded">{co.flag} {co.nameAr}</span>
+                              ) : null;
+                            })}
+                            {p.countries.length === 0 && <span className="text-xs text-muted-foreground">—</span>}
+                          </div>
+                        </TableCell>
                         <TableCell className="text-center">
                           <Switch
                             checked={p.enabled}
@@ -318,66 +330,82 @@ export default function Integrations() {
           <div className="space-y-4 py-2">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>اسم المنصة</Label>
-                <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="مثال: WhatsApp Business" />
+                <Label>الاسم <span className="text-destructive">*</span></Label>
+                <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="الاسم" />
               </div>
               <div className="space-y-2">
-                <Label>الرمز (Slug)</Label>
-                <Input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} placeholder="مثال: whatsapp" dir="ltr" />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>الفئة</Label>
-                <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v as PlatformCategory })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="communication">قنوات التواصل</SelectItem>
-                    <SelectItem value="email">البريد الإلكتروني</SelectItem>
-                    <SelectItem value="ecommerce">التجارة الإلكترونية</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2 flex items-end gap-3 pb-1">
-                <Label>مفعّلة</Label>
-                <Switch checked={form.enabled} onCheckedChange={(v) => setForm({ ...form, enabled: v })} />
+                <Label>كود</Label>
+                <Input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} placeholder="salla, zid, shopify..." dir="ltr" />
+                <p className="text-xs text-muted-foreground">slug بحروف صغيرة لنماذج إعداد التاجر (اختياري)</p>
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label>الوصف</Label>
-              <Input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="وصف مختصر للمنصة" />
+              <Label>النوع <span className="text-destructive">*</span></Label>
+              <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v as PlatformCategory })}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="communication">قنوات التواصل</SelectItem>
+                  <SelectItem value="email">البريد الإلكتروني</SelectItem>
+                  <SelectItem value="ecommerce">تخزين</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">تكاملات منصات التجارة الإلكترونية وشركات الشحن</p>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>API Key</Label>
-                <Input value={form.apiKey} onChange={(e) => setForm({ ...form, apiKey: e.target.value })} placeholder="مفتاح API" dir="ltr" />
-              </div>
-              <div className="space-y-2">
-                <Label>API Secret</Label>
-                <Input value={form.apiSecret} onChange={(e) => setForm({ ...form, apiSecret: e.target.value })} placeholder="المفتاح السري" dir="ltr" type="password" />
-              </div>
+            <div className="flex items-center gap-3">
+              <Label>فعال</Label>
+              <Switch checked={form.enabled} onCheckedChange={(v) => setForm({ ...form, enabled: v })} />
             </div>
 
             <div className="space-y-2">
-              <Label>Webhook URL</Label>
-              <Input value={form.webhookUrl} onChange={(e) => setForm({ ...form, webhookUrl: e.target.value })} placeholder="https://..." dir="ltr" />
+              <Label>الشعار <span className="text-destructive">*</span></Label>
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) setForm({ ...form, logo: URL.createObjectURL(file) });
+                }}
+              />
             </div>
 
             <div className="space-y-2">
-              <Label>ملاحظات</Label>
-              <Textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} placeholder="ملاحظات إضافية..." rows={3} />
+              <Label>الدول</Label>
+              <div className="flex flex-wrap gap-2 min-h-[40px] p-2 border rounded-md">
+                {form.countries.map((code) => {
+                  const co = countries.find((c) => c.code === code);
+                  return co ? (
+                    <span key={code} className="inline-flex items-center gap-1 bg-primary/10 text-primary text-sm px-2.5 py-1 rounded-full">
+                      {co.flag} {co.nameAr}
+                      <button type="button" onClick={() => toggleCountry(code)} className="hover:text-destructive">
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  ) : null;
+                })}
+              </div>
+              <div className="flex flex-wrap gap-1.5 mt-1">
+                {countries.filter((c) => !form.countries.includes(c.code)).map((c) => (
+                  <button
+                    key={c.code}
+                    type="button"
+                    onClick={() => toggleCountry(c.code)}
+                    className="text-xs px-2 py-1 rounded-full border border-dashed border-muted-foreground/40 text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+                  >
+                    {c.flag} {c.nameAr}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setModalOpen(false)}>إلغاء</Button>
-            <Button onClick={submit} disabled={!form.name.trim() || !form.slug.trim()}>
-              {editingId ? 'حفظ التعديلات' : 'إضافة المنصة'}
+            <Button onClick={submit} disabled={!form.name.trim()}>
+              {editingId ? 'حفظ التغييرات' : 'إضافة المنصة'}
             </Button>
           </DialogFooter>
         </DialogContent>
