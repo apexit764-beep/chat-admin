@@ -82,7 +82,7 @@ const channelConfig: Record<string, { icon: React.ElementType; label: string; co
 type FilterStatus = 'all' | 'open' | 'assigned' | 'resolved';
 
 export default function LiveChat() {
-  const { liveChatConversations, clients, adminUsers, assignLiveChat, transferLiveChat, resolveLiveChat, sendLiveChatMessage, sendLiveChatNote } = useAdminStore();
+  const { liveChatConversations, clients, plans, subscriptions, adminUsers, assignLiveChat, transferLiveChat, resolveLiveChat, sendLiveChatMessage, sendLiveChatNote } = useAdminStore();
   const user = useAuthStore((s) => s.user);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -555,6 +555,44 @@ export default function LiveChat() {
                   {clientMap[selected.clientId] || '—'}
                 </p>
               </div>
+
+              {/* Client Plan / Subscription */}
+              {(() => {
+                const client = clients.find((c) => c.id === selected.clientId);
+                const plan = client?.planId ? plans.find((p) => p.id === client.planId) : null;
+                const sub = subscriptions.find((s) => s.clientId === selected.clientId && s.status !== 'cancelled');
+                const statusLabel: Record<string, { label: string; class: string }> = {
+                  trial: { label: 'فترة تجريبية', class: 'bg-info/15 text-info' },
+                  active: { label: 'نشط', class: 'bg-success/15 text-success' },
+                  past_due: { label: 'متأخر', class: 'bg-warning/15 text-warning' },
+                  suspended: { label: 'موقوف', class: 'bg-danger/15 text-danger' },
+                  cancelled: { label: 'ملغي', class: 'bg-muted text-muted-foreground' },
+                };
+                const clientStatus = client ? statusLabel[client.status] : null;
+                return client ? (
+                  <div className="border-b pb-4 space-y-2.5">
+                    <h5 className="text-xs font-semibold text-muted-foreground">معلومات الاشتراك</h5>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground">الباقة</span>
+                      <span className="text-sm font-medium">{plan?.nameAr ?? 'بدون باقة'}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground">حالة العميل</span>
+                      {clientStatus && (
+                        <Badge className={cn('text-[10px] px-2 py-0.5 border-transparent', clientStatus.class)}>
+                          {clientStatus.label}
+                        </Badge>
+                      )}
+                    </div>
+                    {sub && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground">الدورة</span>
+                        <span className="text-xs">{sub.billingCycle === 'monthly' ? 'شهري' : 'سنوي'}</span>
+                      </div>
+                    )}
+                  </div>
+                ) : null;
+              })()}
 
               {/* Assignment */}
               <div className="space-y-3">
