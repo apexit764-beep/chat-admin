@@ -104,7 +104,6 @@ export default function KnowledgeCategories(): JSX.Element {
               <table dir="rtl" className="w-full text-sm">
                 <thead className="bg-muted/50 text-xs text-muted-foreground">
                   <tr>
-                    <th className="text-start px-4 py-3 w-12">#</th>
                     <th className="text-start px-2 py-3 w-10"></th>
                     <th className="text-start px-4 py-3">اسم التصنيف</th>
                     <th className="text-start px-4 py-3">Slug</th>
@@ -139,7 +138,6 @@ export default function KnowledgeCategories(): JSX.Element {
                           isDragOver ? 'bg-primary/10' : 'hover:bg-muted/30'
                         )}
                       >
-                        <td className="px-4 py-3 text-xs text-muted-foreground font-mono">{idx + 1}</td>
                         <td className="px-2 py-3">
                           <span
                             className="inline-flex items-center justify-center h-7 w-7 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted cursor-grab active:cursor-grabbing"
