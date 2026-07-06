@@ -75,19 +75,6 @@ const tierStyle: Record<PlanTier, { bg: string; ring: string; text: string }> = 
   enterprise: { bg: 'from-amber-50 to-amber-100/50 dark:from-amber-900/20 dark:to-amber-900/10', ring: 'ring-amber-300 dark:ring-amber-700', text: 'text-amber-700 dark:text-amber-300' },
 };
 
-const tierBadgeVariant: Record<PlanTier, 'default' | 'secondary' | 'outline' | 'warning'> = {
-  starter: 'secondary',
-  pro: 'default',
-  business: 'outline',
-  enterprise: 'warning',
-};
-
-const tierLabel: Record<PlanTier, string> = {
-  starter: 'مبتدئ',
-  pro: 'احترافي',
-  business: 'أعمال',
-  enterprise: 'مؤسسات',
-};
 
 const tierOrder: Record<PlanTier, number> = {
   starter: 0,
@@ -110,16 +97,12 @@ export default function AdminPlans(): JSX.Element {
   const { confirm } = useConfirm();
 
   const [previewCountry, setPreviewCountry] = useState('OM');
-  const [tierFilter, setTierFilter] = useState<'all' | PlanTier>('all');
   const [activeFilter, setActiveFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const activeFilterCount =
-    (tierFilter !== 'all' ? 1 : 0) +
-    (activeFilter !== 'all' ? 1 : 0);
+  const activeFilterCount = activeFilter !== 'all' ? 1 : 0;
 
   const clearFilters = (): void => {
-    setTierFilter('all');
     setActiveFilter('all');
   };
   const [reassignModal, setReassignModal] = useState<{ plan: Plan; targetPlanId: string } | null>(null);
@@ -132,12 +115,11 @@ export default function AdminPlans(): JSX.Element {
 
   const filteredPlans = useMemo(
     () => sortedPlans.filter((p) => {
-      if (tierFilter !== 'all' && p.tier !== tierFilter) return false;
       if (activeFilter === 'active' && !p.active) return false;
       if (activeFilter === 'inactive' && p.active) return false;
       return true;
     }),
-    [sortedPlans, tierFilter, activeFilter]
+    [sortedPlans, activeFilter]
   );
 
   useEffect(() => {
@@ -208,18 +190,6 @@ export default function AdminPlans(): JSX.Element {
         <div className="bg-card border border-border rounded-xl overflow-hidden">
           {/* Toolbar */}
           <div className="p-3 flex flex-wrap items-center gap-3 border-b border-border">
-            <Select value={tierFilter} onValueChange={(v) => setTierFilter(v as 'all' | PlanTier)}>
-              <SelectTrigger className="h-9 w-[130px] rounded-lg text-sm">
-                <SelectValue placeholder="كل الفئات" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">كل الفئات</SelectItem>
-                <SelectItem value="starter">مبتدئ</SelectItem>
-                <SelectItem value="pro">احترافي</SelectItem>
-                <SelectItem value="business">أعمال</SelectItem>
-                <SelectItem value="enterprise">مؤسسات</SelectItem>
-              </SelectContent>
-            </Select>
             <Select value={activeFilter} onValueChange={(v) => setActiveFilter(v as 'all' | 'active' | 'inactive')}>
               <SelectTrigger className="h-9 w-[130px] rounded-lg text-sm">
                 <SelectValue placeholder="كل الحالات" />
@@ -330,10 +300,7 @@ export default function AdminPlans(): JSX.Element {
                               <p className={cn('font-bold', style.text)}>{p.nameAr}</p>
                               <p className="text-xs text-muted-foreground line-clamp-1">{p.tagline}</p>
                             </div>
-                            <Badge variant={tierBadgeVariant[p.tier]} className="text-[10px] shrink-0">
-                              {tierLabel[p.tier]}
-                            </Badge>
-                          </div>
+                                          </div>
                         </TableCell>
                         <TableCell className="text-center">
                           <button
@@ -548,7 +515,7 @@ export default function AdminPlans(): JSX.Element {
                   <SelectContent>
                     {plans.filter((pl) => pl.id !== reassignModal.plan.id).map((pl) => (
                       <SelectItem key={pl.id} value={pl.id}>
-                        {pl.nameAr} ({tierLabel[pl.tier]})
+                        {pl.nameAr}
                       </SelectItem>
                     ))}
                   </SelectContent>
