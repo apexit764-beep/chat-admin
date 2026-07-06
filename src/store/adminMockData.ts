@@ -654,9 +654,9 @@ export const activityLog: ActivityEntry[] = [
 // =====================================================================
 // Feedback & Complaints
 // =====================================================================
-export type FeedbackType = 'complaint' | 'suggestion' | 'bug' | 'praise';
+export type FeedbackType = 'complaint' | 'suggestion';
 export type FeedbackStatus = 'open' | 'in_progress' | 'resolved' | 'closed';
-export type FeedbackPriority = 'low' | 'medium' | 'high' | 'urgent';
+export type FeedbackPriority = 'low' | 'medium' | 'high';
 
 export interface FeedbackEntry {
   id: string;
@@ -681,7 +681,7 @@ export const feedbackEntries: FeedbackEntry[] = [
     clientName: 'Royal Auto Kuwait',
     type: 'complaint',
     status: 'open',
-    priority: 'urgent',
+    priority: 'high',
     subject: 'توقف الواتساب عن الاستقبال',
     message: 'منذ أمس الرسائل الواردة لا تصل للوحة. الرقم الأساسي +965999888777 متوقف عن استقبال المحادثات الجديدة. نرجو الحل العاجل لأننا نخسر عملاء.',
     timestamp: nowMinus(25),
@@ -729,7 +729,7 @@ export const feedbackEntries: FeedbackEntry[] = [
     id: 'fb_5',
     clientId: 'client_10',
     clientName: 'Qatar Logistics Group',
-    type: 'bug',
+    type: 'complaint',
     status: 'open',
     priority: 'high',
     subject: 'الإشعارات لا تصل للموظفين الجدد',
@@ -740,7 +740,7 @@ export const feedbackEntries: FeedbackEntry[] = [
     id: 'fb_6',
     clientId: 'client_7',
     clientName: 'الفجيرة للسياحة',
-    type: 'praise',
+    type: 'suggestion',
     status: 'closed',
     priority: 'low',
     subject: 'شكراً على التحديث الأخير',
@@ -780,7 +780,7 @@ export const feedbackEntries: FeedbackEntry[] = [
     id: 'fb_9',
     clientId: 'client_3',
     clientName: 'Dubai Real Estate Co.',
-    type: 'bug',
+    type: 'complaint',
     status: 'in_progress',
     priority: 'medium',
     subject: 'خطأ في احتساب الإحصائيات',
@@ -819,7 +819,7 @@ export const feedbackEntries: FeedbackEntry[] = [
     id: 'fb_12',
     clientId: 'client_5',
     clientName: 'عيادة الحياة الطبية',
-    type: 'praise',
+    type: 'suggestion',
     status: 'closed',
     priority: 'low',
     subject: 'الدعم الفني ممتاز',

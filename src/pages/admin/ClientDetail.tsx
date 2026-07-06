@@ -597,19 +597,16 @@ export default function ClientDetail(): JSX.Element {
                           <div className="flex items-center gap-2">
                             <Badge className={cn('text-[10px] border-transparent',
                               fb.type === 'complaint' && 'bg-danger/15 text-danger',
-                              fb.type === 'bug' && 'bg-warning/15 text-warning',
                               fb.type === 'suggestion' && 'bg-info/15 text-info',
-                              fb.type === 'praise' && 'bg-success/15 text-success',
                             )}>
-                              {fb.type === 'complaint' ? 'شكوى' : fb.type === 'bug' ? 'خلل' : fb.type === 'suggestion' ? 'اقتراح' : 'إشادة'}
+                              {fb.type === 'complaint' ? 'شكوى' : 'اقتراح'}
                             </Badge>
                             <Badge className={cn('text-[10px] border-transparent',
-                              fb.priority === 'urgent' && 'bg-danger/15 text-danger',
                               fb.priority === 'high' && 'bg-warning/15 text-warning',
                               fb.priority === 'medium' && 'bg-info/15 text-info',
                               fb.priority === 'low' && 'bg-muted text-muted-foreground',
                             )}>
-                              {fb.priority === 'urgent' ? 'عاجل' : fb.priority === 'high' ? 'مرتفع' : fb.priority === 'medium' ? 'متوسط' : 'منخفض'}
+                              {fb.priority === 'high' ? 'عالية' : fb.priority === 'medium' ? 'متوسطة' : 'منخفضة'}
                             </Badge>
                           </div>
                           <p className="font-semibold text-sm mt-1">{fb.subject}</p>
