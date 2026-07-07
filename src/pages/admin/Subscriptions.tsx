@@ -262,7 +262,7 @@ export default function AdminSubscriptions(): JSX.Element {
             </div>
             <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as SubscriptionStatus | 'all')}>
               <SelectTrigger className="w-full sm:w-[160px]">
-                <Filter className="h-4 w-4 ml-2 text-muted-foreground" />
+                <Filter className="h-4 w-4 me-2 text-muted-foreground" />
                 <SelectValue placeholder="كل الحالات" />
               </SelectTrigger>
               <SelectContent>

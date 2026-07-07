@@ -16,6 +16,7 @@ import {
   Sparkles,
   RotateCcw,
   LayoutTemplate,
+  Save,
 } from 'lucide-react';
 import { useSettingsStore, type WidgetSettings as WidgetSettingsType } from '@/store/useSettingsStore';
 import { useUIStore } from '@/store/useUIStore';
@@ -116,6 +117,10 @@ export default function WidgetSettingsPage(): JSX.Element {
     showToast('تم إعادة ضبط الإعدادات', 'success');
   };
 
+  const handleSave = (): void => {
+    showToast('تم حفظ التغييرات بنجاح', 'success');
+  };
+
   return (
     <div className="p-4 lg:p-6 space-y-5">
       {/* Header */}
@@ -124,10 +129,16 @@ export default function WidgetSettingsPage(): JSX.Element {
           <h2 className="text-2xl font-bold">إعدادات المساعد الذكي</h2>
           <p className="text-sm text-muted-foreground">تخصيص شكل الويدجت وسلوك المساعد الذكي الذي يرد على عملاء المشتركين</p>
         </div>
-        <Button variant="outline" size="sm" className="gap-1.5 text-xs" onClick={handleReset}>
-          <RotateCcw className="h-3.5 w-3.5" />
-          إعادة ضبط
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" className="gap-1.5 text-xs" onClick={handleReset}>
+            <RotateCcw className="h-3.5 w-3.5" />
+            إعادة ضبط
+          </Button>
+          <Button size="sm" className="gap-1.5 text-xs" onClick={handleSave}>
+            <Save className="h-3.5 w-3.5" />
+            حفظ التغييرات
+          </Button>
+        </div>
       </div>
 
       {/* AI Master Toggle */}

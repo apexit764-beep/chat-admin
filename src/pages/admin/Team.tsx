@@ -718,7 +718,7 @@ export default function AdminTeam(): JSX.Element {
             </div>
             <Select value={roleFilter} onValueChange={(v) => setRoleFilter(v as AdminRole | 'all')}>
               <SelectTrigger className="w-full sm:w-[180px]">
-                <Filter className="h-4 w-4 ml-2 text-muted-foreground" />
+                <Filter className="h-4 w-4 me-2 text-muted-foreground" />
                 <SelectValue placeholder="كل الأدوار" />
               </SelectTrigger>
               <SelectContent>
