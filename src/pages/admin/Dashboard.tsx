@@ -360,7 +360,7 @@ export default function AdminDashboard(): JSX.Element {
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <CardTitle className="text-sm">تجارب تنتهي قريباً</CardTitle>
+                <CardTitle className="text-sm">فترات تجريبية تنتهي قريباً</CardTitle>
                 <Badge variant="default" className="text-[10px]">{expiringTrials.length}</Badge>
               </div>
               {expiringTrials.length > 0 && (
@@ -372,7 +372,7 @@ export default function AdminDashboard(): JSX.Element {
           </CardHeader>
           <CardContent className="p-0">
             {expiringTrials.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-8 text-center">لا توجد تجارب قاربت على الانتهاء</p>
+              <p className="text-sm text-muted-foreground py-8 text-center">لا توجد فترات تجريبية قاربت على الانتهاء</p>
             ) : (
               <Table>
                 <TableHeader>
