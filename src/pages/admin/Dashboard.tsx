@@ -294,7 +294,7 @@ export default function AdminDashboard(): JSX.Element {
 
       {/* ══════════ Section 2: MRR Chart + Top Plans side by side ══════════ */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Card>
+        <Card className="min-h-[340px]">
           <CardHeader className="pb-1">
             <div className="flex items-center justify-between">
               <div>
@@ -317,7 +317,7 @@ export default function AdminDashboard(): JSX.Element {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="min-h-[340px]">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div>
@@ -361,7 +361,7 @@ export default function AdminDashboard(): JSX.Element {
       {/* ══════════ Section 3: Alerts side by side ══════════ */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Expiring trials */}
-        <Card>
+        <Card className="min-h-[340px]">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -411,7 +411,7 @@ export default function AdminDashboard(): JSX.Element {
         </Card>
 
         {/* Past due */}
-        <Card>
+        <Card className="min-h-[340px]">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">

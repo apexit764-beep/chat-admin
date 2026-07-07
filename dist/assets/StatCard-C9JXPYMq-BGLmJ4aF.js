@@ -1,0 +1,6 @@
+import{as as e,h as o,ar as t,Q as c}from"./index-HZv-6-mM.js";import{o as d}from"./trending-up-Cr_zWX3X-DIAw-KPA.js";/**
+ * @license lucide-react v0.378.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const x=c("TrendingDown",[["polyline",{points:"22 17 13.5 8.5 8.5 13.5 2 7",key:"1r2t7k"}],["polyline",{points:"16 17 22 17 22 11",key:"11uiuu"}]]);function u({label:i,value:n,icon:a,iconBg:r="bg-primary/15",iconColor:l="text-primary",trend:s}){return e.jsxs(o,{className:"p-3 hover:shadow-md transition-shadow",children:[e.jsxs("div",{className:"flex items-start justify-between mb-2",children:[e.jsx("div",{className:t("h-9 w-9 rounded-lg flex items-center justify-center",r,l),children:a}),s&&e.jsxs("span",{className:t("inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-md",s.positive?"bg-success/15 text-success":"bg-danger/15 text-danger"),children:[s.positive?e.jsx(d,{className:"h-3 w-3"}):e.jsx(x,{className:"h-3 w-3"}),s.value,"%"]})]}),e.jsxs("div",{className:"space-y-1",children:[e.jsx("p",{className:"text-xs text-muted-foreground",children:i}),e.jsx("p",{className:"text-xl font-bold",children:n})]})]})}export{u,x};
