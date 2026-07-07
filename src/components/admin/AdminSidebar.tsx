@@ -111,7 +111,7 @@ function SidebarInner({ collapsed, onToggleCollapse, onNavigate, mobile, onClose
   );
 
   const goToProfile = (): void => {
-    navigate('/profile');
+    navigate('/settings#profile');
     onNavigate?.();
   };
 

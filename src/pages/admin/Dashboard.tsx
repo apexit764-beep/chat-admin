@@ -9,7 +9,6 @@ import {
   Sparkles,
   ArrowUpRight,
   CheckCircle2,
-  XCircle,
   Building2,
   UserCog,
   Receipt,
@@ -214,10 +213,6 @@ export default function AdminDashboard(): JSX.Element {
     [clients]
   );
 
-  const recentTransactions = useMemo(
-    () => [...transactions].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt)).slice(0, 5),
-    [transactions]
-  );
 
   return (
     <div className="p-4 lg:p-6 space-y-5 page-fade">
@@ -294,7 +289,7 @@ export default function AdminDashboard(): JSX.Element {
 
       {/* ══════════ Section 2: MRR Chart + Top Plans side by side ══════════ */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Card className="min-h-[340px]">
+        <Card style={{minHeight: 420}}>
           <CardHeader className="pb-1">
             <div className="flex items-center justify-between">
               <div>
@@ -317,7 +312,7 @@ export default function AdminDashboard(): JSX.Element {
           </CardContent>
         </Card>
 
-        <Card className="min-h-[340px]">
+        <Card style={{minHeight: 420}}>
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div>
@@ -361,7 +356,7 @@ export default function AdminDashboard(): JSX.Element {
       {/* ══════════ Section 3: Alerts side by side ══════════ */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Expiring trials */}
-        <Card className="min-h-[340px]">
+        <Card style={{minHeight: 420}}>
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -411,7 +406,7 @@ export default function AdminDashboard(): JSX.Element {
         </Card>
 
         {/* Past due */}
-        <Card className="min-h-[340px]">
+        <Card style={{minHeight: 420}}>
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -558,57 +553,6 @@ export default function AdminDashboard(): JSX.Element {
         </Card>
       </div>
 
-      {/* ══════════ Section 5: Recent Transactions ══════════ */}
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-sm">أحدث المعاملات</CardTitle>
-              <CardDescription className="text-xs">آخر 5 دفعات</CardDescription>
-            </div>
-            <Button variant="link" size="sm" asChild>
-              <Link to="/finance" className="flex items-center gap-1 text-xs">التفاصيل <ArrowUpRight className="h-3 w-3" /></Link>
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="text-start">العميل</TableHead>
-                <TableHead className="text-start">المبلغ</TableHead>
-                <TableHead className="text-start">الحالة</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {recentTransactions.map((t) => {
-                const client = clients.find((c) => c.id === t.clientId);
-                const statusVariant = t.status === 'succeeded' ? 'success' : t.status === 'failed' ? 'destructive' : 'secondary';
-                const statusLabel = t.status === 'succeeded' ? 'نجحت' : t.status === 'failed' ? 'فشلت' : 'مرتجعة';
-                return (
-                  <TableRow key={t.id}>
-                    <TableCell className="py-2.5">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <Avatar className="h-7 w-7">
-                          <AvatarFallback className={`text-[10px] font-semibold ${avatarColor(client?.companyName ?? '?')}`}>{initials(client?.companyName ?? '?')}</AvatarFallback>
-                        </Avatar>
-                        <span className="text-sm font-medium truncate">{client?.companyName ?? '—'}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-2.5 text-sm font-bold">{formatMoney(t.amount, t.currency)}</TableCell>
-                    <TableCell className="py-2.5">
-                      <Badge variant={statusVariant} className="text-[10px] px-2 py-0.5">
-                        {t.status === 'succeeded' ? <CheckCircle2 className="h-3 w-3 me-0.5 inline" /> : t.status === 'failed' ? <XCircle className="h-3 w-3 me-0.5 inline" /> : null}
-                        {statusLabel}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
     </div>
   );
 }

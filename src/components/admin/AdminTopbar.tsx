@@ -144,7 +144,7 @@ export function AdminTopbar(): JSX.Element {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="cursor-pointer gap-2 px-3"
-                  onClick={() => navigate('/profile')}
+                  onClick={() => navigate('/settings#profile')}
                 >
                   <User className="h-4 w-4" />
                   الملف الشخصي
