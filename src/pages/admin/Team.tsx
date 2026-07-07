@@ -9,10 +9,8 @@ import {
   Shield,
   ShieldCheck,
   ShieldAlert,
-  Clock,
   MoreHorizontal,
   CheckCircle2,
-  XCircle,
   Filter,
   ArrowRight,
   Plus,
@@ -22,7 +20,7 @@ import { useConfirm } from '@components/ui';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useUIStore } from '@/store/useUIStore';
-import { timeAgo, initials, avatarColor } from '@/utils/format';
+import { initials, avatarColor } from '@/utils/format';
 import { cn } from '@/lib/utils';
 import type { AdminRole, AdminUser } from '@/types';
 
@@ -739,10 +737,9 @@ export default function AdminTeam(): JSX.Element {
                 <TableHead className="w-[280px]">العضو</TableHead>
                 <TableHead>الدور</TableHead>
                 <TableHead>الحالة</TableHead>
-                <TableHead className="hidden md:table-cell">آخر نشاط</TableHead>
                 <TableHead className="hidden lg:table-cell">النشاط</TableHead>
                 <TableHead className="hidden lg:table-cell">تاريخ الإضافة</TableHead>
-                <TableHead className="w-[60px]" />
+                <TableHead className="w-[100px]">الإجراءات</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -789,23 +786,11 @@ export default function AdminTeam(): JSX.Element {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        {u.active ? (
-                          <Badge variant="outline" className="gap-1 text-emerald-600 border-emerald-200 bg-emerald-50 dark:bg-emerald-950/30 dark:border-emerald-800">
-                            <CheckCircle2 className="h-3 w-3" />
-                            نشط
-                          </Badge>
-                        ) : (
-                          <Badge variant="outline" className="gap-1 text-gray-500 border-gray-200 bg-gray-50 dark:bg-gray-950/30 dark:border-gray-700">
-                            <XCircle className="h-3 w-3" />
-                            معطل
-                          </Badge>
-                        )}
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                          <Clock className="h-3.5 w-3.5" />
-                          {timeAgo(u.lastActive)}
-                        </div>
+                        <Switch
+                          checked={u.active}
+                          onCheckedChange={() => void handleToggleActive(u)}
+                          disabled={u.id === 'au_1'}
+                        />
                       </TableCell>
                       <TableCell className="hidden lg:table-cell">
                         <div className="flex items-center gap-1.5">
@@ -826,40 +811,20 @@ export default function AdminTeam(): JSX.Element {
                         </span>
                       </TableCell>
                       <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => openEditUser(u)}>
-                              <Edit2 className="h-4 w-4 ml-2" />
-                              تعديل
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => void handleToggleActive(u)}>
-                              {u.active ? (
-                                <>
-                                  <XCircle className="h-4 w-4 ml-2" />
-                                  تعطيل الحساب
-                                </>
-                              ) : (
-                                <>
-                                  <CheckCircle2 className="h-4 w-4 ml-2" />
-                                  تفعيل الحساب
-                                </>
-                              )}
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              onClick={() => void handleDelete(u)}
-                              className="text-destructive focus:text-destructive"
-                            >
-                              <Trash2 className="h-4 w-4 ml-2" />
-                              حذف
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        <div className="flex items-center gap-1">
+                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEditUser(u)}>
+                            <Edit2 className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-destructive hover:text-destructive"
+                            onClick={() => void handleDelete(u)}
+                            disabled={u.id === 'au_1'}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   );
