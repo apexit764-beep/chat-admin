@@ -155,3 +155,32 @@
     animation: copied-pulse 1.6s ease-in-out;
   }
 }
+
+.rdp-compact .rdp-root {
+  --rdp-day-height: 26px;
+  --rdp-day-width: 26px;
+  --rdp-day_button-height: 24px;
+  --rdp-day_button-width: 24px;
+  --rdp-day_button-border-radius: 6px;
+  --rdp-day_button-border: 1px solid transparent;
+  --rdp-selected-border: 1px solid var(--rdp-accent-color);
+  --rdp-nav_button-height: 1.25rem;
+  --rdp-nav_button-width: 1.25rem;
+  --rdp-nav-height: 1.75rem;
+  --rdp-months-gap: 0.5rem;
+  --rdp-weekday-padding: 0.15rem 0;
+  font-size: 11px;
+}
+.rdp-compact .rdp-month_caption {
+  font-size: 12px;
+}
+.rdp-compact .rdp-day_button {
+  font-size: 11px;
+}
+.rdp-compact .rdp-weekday {
+  font-size: 9px;
+}
+.rdp-compact .rdp-chevron {
+  width: 14px;
+  height: 14px;
+}

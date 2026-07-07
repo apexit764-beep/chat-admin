@@ -205,7 +205,7 @@ export default function AdminDashboard(): JSX.Element {
         <p className="text-sm text-muted-foreground">ملخّص الأداء المالي والتشغيلي للمنصة</p>
       </div>
 
-      {/* ══════════ Section 1: Financial KPIs ══════════ */}
+      {/* ══════════ Section 1: All KPIs in 2 rows ══════════ */}
       <section className="space-y-3">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <StatCard
@@ -238,34 +238,6 @@ export default function AdminDashboard(): JSX.Element {
             iconColor="text-danger"
           />
         </div>
-      </section>
-
-      {/* ══════════ Section 2: MRR Trend Chart ══════════ */}
-      <Card>
-        <CardHeader className="pb-2">
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-base">تطور الإيراد الشهري</CardTitle>
-              <CardDescription>آخر 6 أشهر · بالدولار الأمريكي</CardDescription>
-            </div>
-            <Badge variant={mrrGrowth !== null && mrrGrowth >= 0 ? 'success' : 'destructive'} className="text-xs">
-              {mrrGrowth !== null ? (mrrGrowth >= 0 ? '+' : '') + mrrGrowth + '%' : '—'}
-              <span className="text-[10px] font-normal ms-1 opacity-70">MoM</span>
-            </Badge>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <LineChart
-            labels={mrrHistory.labels}
-            series={[{ name: 'MRR', color: '#2563EB', data: mrrHistory.values }]}
-            height={220}
-            formatValue={(v) => `$${v.toLocaleString()}`}
-          />
-        </CardContent>
-      </Card>
-
-      {/* ══════════ Section 3: Customer Base ══════════ */}
-      <section className="space-y-3">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <StatCard
             label="عملاء نشطون"
@@ -298,46 +270,63 @@ export default function AdminDashboard(): JSX.Element {
         </div>
       </section>
 
-      {/* ══════════ Section 4: Alerts (past due + expiring trials) — stacked ══════════ */}
-      <div className="space-y-4">
-        {/* Past due */}
+      {/* ══════════ Section 2: MRR Chart + Top Plans side by side ══════════ */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader className="pb-1">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-sm">تطور الإيراد الشهري</CardTitle>
+                <CardDescription className="text-xs">آخر 6 أشهر · بالدولار الأمريكي</CardDescription>
+              </div>
+              <Badge variant={mrrGrowth !== null && mrrGrowth >= 0 ? 'success' : 'destructive'} className="text-[10px]">
+                {mrrGrowth !== null ? (mrrGrowth >= 0 ? '+' : '') + mrrGrowth + '%' : '—'}
+                <span className="text-[9px] font-normal ms-1 opacity-70">MoM</span>
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <LineChart
+              labels={mrrHistory.labels}
+              series={[{ name: 'MRR', color: '#2563EB', data: mrrHistory.values }]}
+              height={140}
+              formatValue={(v) => `$${v.toLocaleString()}`}
+            />
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <CardTitle className="text-base">متأخرون عن الدفع</CardTitle>
-                <Badge variant="warning" className="text-[10px]">{pastDueClients.length}</Badge>
+              <div>
+                <CardTitle className="text-sm">أكثر الباقات اشتراكاً</CardTitle>
+                <CardDescription className="text-xs">حسب عدد المشتركين النشطين</CardDescription>
               </div>
-              {pastDueClients.length > 0 && (
-                <Button variant="link" size="sm" asChild>
-                  <Link to="/clients?filter=past_due" className="text-xs flex items-center gap-1">عرض الكل <ArrowUpRight className="h-3 w-3" /></Link>
-                </Button>
-              )}
+              <Button variant="link" size="sm" asChild>
+                <Link to="/plans" className="flex items-center gap-1 text-xs">إدارة الباقات <ArrowUpRight className="h-3 w-3" /></Link>
+              </Button>
             </div>
           </CardHeader>
           <CardContent className="p-0">
-            {pastDueClients.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-8 text-center">لا يوجد متأخرين — كل الاشتراكات مسدّدة</p>
+            {topPlans.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-8 text-center">لا توجد اشتراكات نشطة</p>
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-start">العميل</TableHead>
-                    <TableHead className="text-start">المبلغ المستحق</TableHead>
+                    <TableHead className="text-start w-8">#</TableHead>
+                    <TableHead className="text-start">الباقة</TableHead>
+                    <TableHead className="text-start">المشتركين</TableHead>
+                    <TableHead className="text-start">الإيراد</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {pastDueClients.map(({ client, amount, currency }) => (
-                    <TableRow key={client.id}>
-                      <TableCell className="py-2.5">
-                        <Link to={`/clients/${client.id}`} className="flex items-center gap-2 min-w-0 hover:underline">
-                          <Avatar className="h-7 w-7">
-                            <AvatarFallback className={`text-[10px] font-semibold ${avatarColor(client.companyName)}`}>{initials(client.companyName)}</AvatarFallback>
-                          </Avatar>
-                          <span className="text-sm font-medium truncate">{client.companyName}</span>
-                        </Link>
-                      </TableCell>
-                      <TableCell className="py-2.5 text-sm font-bold text-danger">{formatMoney(amount, currency)}</TableCell>
+                  {topPlans.map(({ plan, subscribers, revenue }, i) => (
+                    <TableRow key={plan.id}>
+                      <TableCell className="py-2.5 text-xs text-muted-foreground font-mono">{i + 1}</TableCell>
+                      <TableCell className="py-2.5 text-sm font-medium">{plan.nameAr}</TableCell>
+                      <TableCell className="py-2.5 text-sm font-bold">{subscribers}</TableCell>
+                      <TableCell className="py-2.5 text-sm font-bold text-success">${revenue.toLocaleString()}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -345,13 +334,16 @@ export default function AdminDashboard(): JSX.Element {
             )}
           </CardContent>
         </Card>
+      </div>
 
+      {/* ══════════ Section 3: Alerts side by side ══════════ */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Expiring trials */}
         <Card>
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <CardTitle className="text-base">تجارب تنتهي قريباً</CardTitle>
+                <CardTitle className="text-sm">تجارب تنتهي قريباً</CardTitle>
                 <Badge variant="default" className="text-[10px]">{expiringTrials.length}</Badge>
               </div>
               {expiringTrials.length > 0 && (
@@ -395,210 +387,206 @@ export default function AdminDashboard(): JSX.Element {
             )}
           </CardContent>
         </Card>
+
+        {/* Past due */}
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <CardTitle className="text-sm">متأخرون عن الدفع</CardTitle>
+                <Badge variant="warning" className="text-[10px]">{pastDueClients.length}</Badge>
+              </div>
+              {pastDueClients.length > 0 && (
+                <Button variant="link" size="sm" asChild>
+                  <Link to="/clients?filter=past_due" className="text-xs flex items-center gap-1">عرض الكل <ArrowUpRight className="h-3 w-3" /></Link>
+                </Button>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            {pastDueClients.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-8 text-center">لا يوجد متأخرين — كل الاشتراكات مسدّدة</p>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-start">العميل</TableHead>
+                    <TableHead className="text-start">المبلغ المستحق</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {pastDueClients.map(({ client, amount, currency }) => (
+                    <TableRow key={client.id}>
+                      <TableCell className="py-2.5">
+                        <Link to={`/clients/${client.id}`} className="flex items-center gap-2 min-w-0 hover:underline">
+                          <Avatar className="h-7 w-7">
+                            <AvatarFallback className={`text-[10px] font-semibold ${avatarColor(client.companyName)}`}>{initials(client.companyName)}</AvatarFallback>
+                          </Avatar>
+                          <span className="text-sm font-medium truncate">{client.companyName}</span>
+                        </Link>
+                      </TableCell>
+                      <TableCell className="py-2.5 text-sm font-bold text-danger">{formatMoney(amount, currency)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
-      {/* ══════════ Section 5: Distribution (countries + plans) ══════════ */}
-      <section className="space-y-3">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* By country */}
-          <Card>
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-base">العملاء حسب الدولة</CardTitle>
-                  <CardDescription>مرتّبة حسب الإيراد</CardDescription>
-                </div>
-                <Button variant="link" size="sm" asChild>
-                  <Link to="/reports" className="flex items-center gap-1 text-xs">التفاصيل <ArrowUpRight className="h-3 w-3" /></Link>
-                </Button>
+      {/* ══════════ Section 4: Recent clients + By country side by side ══════════ */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Recent clients */}
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-sm">أحدث العملاء المسجّلين</CardTitle>
+                <CardDescription className="text-xs">آخر 5 اشتراكات</CardDescription>
               </div>
-            </CardHeader>
-            <CardContent className="p-0">
-              {byCountry.length === 0 ? (
-                <p className="text-sm text-muted-foreground py-8 text-center">لا توجد بيانات</p>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="text-start w-8">#</TableHead>
-                      <TableHead className="text-start">الدولة</TableHead>
-                      <TableHead className="text-start">العملاء</TableHead>
-                      <TableHead className="text-start">الإيراد</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {byCountry.map((c, i) => (
-                      <TableRow key={c.code}>
-                        <TableCell className="py-2.5 text-xs text-muted-foreground font-mono">{i + 1}</TableCell>
-                        <TableCell className="py-2.5">
-                          <div className="flex items-center gap-2">
-                            <span className="text-base">{c.flag}</span>
-                            <span className="text-sm font-medium">{c.name}</span>
+              <Button variant="link" size="sm" asChild>
+                <Link to="/clients" className="flex items-center gap-1 text-xs">عرض الكل <ArrowUpRight className="h-3 w-3" /></Link>
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-start">العميل</TableHead>
+                  <TableHead className="text-start">الباقة</TableHead>
+                  <TableHead className="text-start">الحالة</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {recentClients.map((r) => {
+                  const country = countries.find((co) => co.code === r.country);
+                  const plan = plans.find((p) => p.id === r.planId);
+                  return (
+                    <TableRow key={r.id}>
+                      <TableCell className="py-2.5">
+                        <Link to={`/clients/${r.id}`} className="flex items-center gap-2.5 min-w-0 hover:underline">
+                          <Avatar className="h-7 w-7">
+                            <AvatarFallback className={`text-[10px] font-semibold ${avatarColor(r.companyName)}`}>{initials(r.companyName)}</AvatarFallback>
+                          </Avatar>
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium truncate">{r.companyName} <span className="text-xs">{country?.flag}</span></p>
+                            <p className="text-[10px] text-muted-foreground truncate">{r.industry}</p>
                           </div>
-                        </TableCell>
-                        <TableCell className="py-2.5 text-sm">
-                          <span className="font-bold">{c.active}</span>
-                          <span className="text-xs text-muted-foreground"> / {c.total}</span>
-                        </TableCell>
-                        <TableCell className="py-2.5 text-sm font-bold text-success">${c.mrr.toLocaleString()}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* By plan */}
-          <Card>
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-base">أكثر الباقات اشتراكاً</CardTitle>
-                  <CardDescription>حسب عدد المشتركين النشطين</CardDescription>
-                </div>
-                <Button variant="link" size="sm" asChild>
-                  <Link to="/plans" className="flex items-center gap-1 text-xs">إدارة الباقات <ArrowUpRight className="h-3 w-3" /></Link>
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="p-0">
-              {topPlans.length === 0 ? (
-                <p className="text-sm text-muted-foreground py-8 text-center">لا توجد اشتراكات نشطة</p>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="text-start w-8">#</TableHead>
-                      <TableHead className="text-start">الباقة</TableHead>
-                      <TableHead className="text-start">المشتركين</TableHead>
-                      <TableHead className="text-start">الإيراد</TableHead>
+                        </Link>
+                      </TableCell>
+                      <TableCell className="py-2.5 text-sm">{plan?.nameAr ?? '—'}</TableCell>
+                      <TableCell className="py-2.5"><StatusPill status={r.status} /></TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {topPlans.map(({ plan, subscribers, revenue }, i) => (
-                      <TableRow key={plan.id}>
-                        <TableCell className="py-2.5 text-xs text-muted-foreground font-mono">{i + 1}</TableCell>
-                        <TableCell className="py-2.5 text-sm font-medium">{plan.nameAr}</TableCell>
-                        <TableCell className="py-2.5 text-sm font-bold">{subscribers}</TableCell>
-                        <TableCell className="py-2.5 text-sm font-bold text-success">${revenue.toLocaleString()}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </section>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
 
-      {/* ══════════ Section 6: Recent Activity ══════════ */}
-      <section className="space-y-3">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-          {/* Recent clients */}
-          <Card className="lg:col-span-3">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-base">أحدث العملاء المسجّلين</CardTitle>
-                  <CardDescription>آخر 5 اشتراكات</CardDescription>
-                </div>
-                <Button variant="link" size="sm" asChild>
-                  <Link to="/clients" className="flex items-center gap-1 text-xs">عرض الكل <ArrowUpRight className="h-3 w-3" /></Link>
-                </Button>
+        {/* By country */}
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-sm">العملاء حسب الدولة</CardTitle>
+                <CardDescription className="text-xs">مرتّبة حسب الإيراد</CardDescription>
               </div>
-            </CardHeader>
-            <CardContent className="p-0">
+              <Button variant="link" size="sm" asChild>
+                <Link to="/reports" className="flex items-center gap-1 text-xs">التفاصيل <ArrowUpRight className="h-3 w-3" /></Link>
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            {byCountry.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-8 text-center">لا توجد بيانات</p>
+            ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-start">العميل</TableHead>
-                    <TableHead className="text-start">الباقة</TableHead>
-                    <TableHead className="text-start">الحالة</TableHead>
-                    <TableHead className="text-start hidden md:table-cell">انضم</TableHead>
+                    <TableHead className="text-start w-8">#</TableHead>
+                    <TableHead className="text-start">الدولة</TableHead>
+                    <TableHead className="text-start">العملاء</TableHead>
+                    <TableHead className="text-start">الإيراد</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {recentClients.map((r) => {
-                    const country = countries.find((co) => co.code === r.country);
-                    const plan = plans.find((p) => p.id === r.planId);
-                    return (
-                      <TableRow key={r.id}>
-                        <TableCell className="py-2.5">
-                          <Link to={`/clients/${r.id}`} className="flex items-center gap-2.5 min-w-0 hover:underline">
-                            <Avatar className="h-7 w-7">
-                              <AvatarFallback className={`text-[10px] font-semibold ${avatarColor(r.companyName)}`}>{initials(r.companyName)}</AvatarFallback>
-                            </Avatar>
-                            <div className="min-w-0">
-                              <p className="text-sm font-medium truncate">{r.companyName} <span className="text-xs">{country?.flag}</span></p>
-                              <p className="text-[10px] text-muted-foreground truncate">{r.industry}</p>
-                            </div>
-                          </Link>
-                        </TableCell>
-                        <TableCell className="py-2.5 text-sm">{plan?.nameAr ?? '—'}</TableCell>
-                        <TableCell className="py-2.5"><StatusPill status={r.status} /></TableCell>
-                        <TableCell className="py-2.5 hidden md:table-cell text-xs text-muted-foreground">{timeAgo(r.joinedAt)}</TableCell>
-                      </TableRow>
-                    );
-                  })}
+                  {byCountry.map((c, i) => (
+                    <TableRow key={c.code}>
+                      <TableCell className="py-2.5 text-xs text-muted-foreground font-mono">{i + 1}</TableCell>
+                      <TableCell className="py-2.5">
+                        <div className="flex items-center gap-2">
+                          <span className="text-base">{c.flag}</span>
+                          <span className="text-sm font-medium">{c.name}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-2.5 text-sm">
+                        <span className="font-bold">{c.active}</span>
+                        <span className="text-xs text-muted-foreground"> / {c.total}</span>
+                      </TableCell>
+                      <TableCell className="py-2.5 text-sm font-bold text-success">${c.mrr.toLocaleString()}</TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
-            </CardContent>
-          </Card>
+            )}
+          </CardContent>
+        </Card>
+      </div>
 
-          {/* Recent transactions */}
-          <Card className="lg:col-span-2">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-base">أحدث المعاملات</CardTitle>
-                  <CardDescription>آخر 5 دفعات</CardDescription>
-                </div>
-                <Button variant="link" size="sm" asChild>
-                  <Link to="/finance" className="flex items-center gap-1 text-xs">التفاصيل <ArrowUpRight className="h-3 w-3" /></Link>
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-start">العميل</TableHead>
-                    <TableHead className="text-start">المبلغ</TableHead>
-                    <TableHead className="text-start">الحالة</TableHead>
+      {/* ══════════ Section 5: Recent Transactions ══════════ */}
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-sm">أحدث المعاملات</CardTitle>
+              <CardDescription className="text-xs">آخر 5 دفعات</CardDescription>
+            </div>
+            <Button variant="link" size="sm" asChild>
+              <Link to="/finance" className="flex items-center gap-1 text-xs">التفاصيل <ArrowUpRight className="h-3 w-3" /></Link>
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="text-start">العميل</TableHead>
+                <TableHead className="text-start">المبلغ</TableHead>
+                <TableHead className="text-start">الحالة</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {recentTransactions.map((t) => {
+                const client = clients.find((c) => c.id === t.clientId);
+                const statusVariant = t.status === 'succeeded' ? 'success' : t.status === 'failed' ? 'destructive' : 'secondary';
+                const statusLabel = t.status === 'succeeded' ? 'نجحت' : t.status === 'failed' ? 'فشلت' : 'مرتجعة';
+                return (
+                  <TableRow key={t.id}>
+                    <TableCell className="py-2.5">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <Avatar className="h-7 w-7">
+                          <AvatarFallback className={`text-[10px] font-semibold ${avatarColor(client?.companyName ?? '?')}`}>{initials(client?.companyName ?? '?')}</AvatarFallback>
+                        </Avatar>
+                        <span className="text-sm font-medium truncate">{client?.companyName ?? '—'}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-2.5 text-sm font-bold">{formatMoney(t.amount, t.currency)}</TableCell>
+                    <TableCell className="py-2.5">
+                      <Badge variant={statusVariant} className="text-[10px] px-2 py-0.5">
+                        {t.status === 'succeeded' ? <CheckCircle2 className="h-3 w-3 me-0.5 inline" /> : t.status === 'failed' ? <XCircle className="h-3 w-3 me-0.5 inline" /> : null}
+                        {statusLabel}
+                      </Badge>
+                    </TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {recentTransactions.map((t) => {
-                    const client = clients.find((c) => c.id === t.clientId);
-                    const statusVariant = t.status === 'succeeded' ? 'success' : t.status === 'failed' ? 'destructive' : 'secondary';
-                    const statusLabel = t.status === 'succeeded' ? 'نجحت' : t.status === 'failed' ? 'فشلت' : 'مرتجعة';
-                    return (
-                      <TableRow key={t.id}>
-                        <TableCell className="py-2.5">
-                          <div className="flex items-center gap-2 min-w-0">
-                            <Avatar className="h-7 w-7">
-                              <AvatarFallback className={`text-[10px] font-semibold ${avatarColor(client?.companyName ?? '?')}`}>{initials(client?.companyName ?? '?')}</AvatarFallback>
-                            </Avatar>
-                            <span className="text-sm font-medium truncate">{client?.companyName ?? '—'}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="py-2.5 text-sm font-bold">{formatMoney(t.amount, t.currency)}</TableCell>
-                        <TableCell className="py-2.5">
-                          <Badge variant={statusVariant} className="text-[10px] px-2 py-0.5">
-                            {t.status === 'succeeded' ? <CheckCircle2 className="h-3 w-3 me-0.5 inline" /> : t.status === 'failed' ? <XCircle className="h-3 w-3 me-0.5 inline" /> : null}
-                            {statusLabel}
-                          </Badge>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 }

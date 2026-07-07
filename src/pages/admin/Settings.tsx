@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   Building,
   Palette,
@@ -14,10 +14,12 @@ import {
   EyeOff,
   User as UserIcon,
   Mail,
+  Phone,
   Lock,
   Camera,
   Bell,
   Save,
+  Pencil,
 } from 'lucide-react';
 import { useConfirm } from '@components/ui';
 import { useAdminStore } from '@/store/useAdminStore';
@@ -107,6 +109,14 @@ export default function AdminSettings(): JSX.Element {
   const [newPwd, setNewPwd] = useState('');
   const [confirmPwd, setConfirmPwd] = useState('');
   const [pwdOpen, setPwdOpen] = useState(false);
+  const [emailEditOpen, setEmailEditOpen] = useState(false);
+  const [phoneEditOpen, setPhoneEditOpen] = useState(false);
+  const [newEmail, setNewEmail] = useState('');
+  const [newPhone, setNewPhone] = useState('');
+  const [otpSentEmail, setOtpSentEmail] = useState(false);
+  const [otpSentPhone, setOtpSentPhone] = useState(false);
+  const [emailOtp, setEmailOtp] = useState(['', '', '', '', '', '']);
+  const [phoneOtp, setPhoneOtp] = useState(['', '', '', '', '', '']);
   const [notifyEmail, setNotifyEmail] = useState(true);
   const [notifyPush, setNotifyPush] = useState(false);
   const [notifyInApp, setNotifyInApp] = useState(true);
@@ -219,15 +229,36 @@ export default function AdminSettings(): JSX.Element {
                       <Input value={profileName} onChange={(e) => setProfileName(e.target.value)} />
                     </div>
                     <div className="space-y-1.5">
-                      <Label>البريد الإلكتروني</Label>
-                      <div className="relative">
-                        <Mail className="h-4 w-4 absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                        <Input type="email" value={profileEmail} onChange={(e) => setProfileEmail(e.target.value)} className="pe-9" />
+                      <Label className="flex items-center justify-between">
+                        <span>البريد الإلكتروني</span>
+                        <span className="text-[11px] text-muted-foreground font-normal">لتغيير البريد يتم إرسال رمز تحقق</span>
+                      </Label>
+                      <div className="flex items-center gap-2">
+                        <div className="relative flex-1">
+                          <Mail className="h-4 w-4 absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                          <Input type="email" value={profileEmail} disabled className="pe-9 bg-muted/50" />
+                        </div>
+                        <Button variant="outline" size="sm" className="gap-1.5 flex-shrink-0" onClick={() => setEmailEditOpen(true)}>
+                          <Pencil className="h-3.5 w-3.5" />
+                          تعديل
+                        </Button>
                       </div>
                     </div>
                     <div className="space-y-1.5 md:col-span-2">
-                      <Label>رقم الهاتف</Label>
-                      <Input value={profilePhone} onChange={(e) => setProfilePhone(e.target.value)} placeholder="+96891234567" />
+                      <Label className="flex items-center justify-between">
+                        <span>رقم الهاتف</span>
+                        <span className="text-[11px] text-muted-foreground font-normal">لتغيير الرقم يتم إرسال رمز تحقق</span>
+                      </Label>
+                      <div className="flex items-center gap-2">
+                        <div className="relative flex-1">
+                          <Phone className="h-4 w-4 absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                          <Input value={profilePhone || '+96891234567'} disabled className="pe-9 bg-muted/50" />
+                        </div>
+                        <Button variant="outline" size="sm" className="gap-1.5 flex-shrink-0" onClick={() => setPhoneEditOpen(true)}>
+                          <Pencil className="h-3.5 w-3.5" />
+                          تعديل
+                        </Button>
+                      </div>
                     </div>
                   </div>
 
@@ -280,6 +311,71 @@ export default function AdminSettings(): JSX.Element {
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
+
+                {/* Email edit dialog */}
+                <OtpVerifyDialog
+                  open={emailEditOpen}
+                  onOpenChange={(o) => {
+                    setEmailEditOpen(o);
+                    if (!o) { setNewEmail(''); setOtpSentEmail(false); setEmailOtp(['', '', '', '', '', '']); }
+                  }}
+                  icon={<Mail className="h-4 w-4 text-primary" />}
+                  title="تغيير البريد الإلكتروني"
+                  label="البريد الإلكتروني الجديد"
+                  inputType="email"
+                  placeholder="example@domain.com"
+                  value={newEmail}
+                  onValueChange={setNewEmail}
+                  otpSent={otpSentEmail}
+                  otp={emailOtp}
+                  onOtpChange={setEmailOtp}
+                  onSendCode={() => {
+                    if (!newEmail) { showToast('أدخل البريد الإلكتروني الجديد', 'error'); return; }
+                    setOtpSentEmail(true);
+                    showToast('تم إرسال رمز التحقق إلى بريدك الجديد', 'success');
+                  }}
+                  onVerify={() => {
+                    const code = emailOtp.join('');
+                    if (code.length < 6) { showToast('أدخل رمز التحقق كاملاً', 'error'); return; }
+                    setProfileEmail(newEmail);
+                    setEmailEditOpen(false);
+                    setNewEmail(''); setOtpSentEmail(false); setEmailOtp(['', '', '', '', '', '']);
+                    showToast('تم تحديث البريد الإلكتروني بنجاح', 'success');
+                  }}
+                />
+
+                {/* Phone edit dialog */}
+                <OtpVerifyDialog
+                  open={phoneEditOpen}
+                  onOpenChange={(o) => {
+                    setPhoneEditOpen(o);
+                    if (!o) { setNewPhone(''); setOtpSentPhone(false); setPhoneOtp(['', '', '', '', '', '']); }
+                  }}
+                  icon={<Phone className="h-4 w-4 text-primary" />}
+                  title="تغيير رقم الهاتف"
+                  label="رقم الهاتف الجديد"
+                  inputType="tel"
+                  placeholder="+96891234567"
+                  value={newPhone}
+                  onValueChange={setNewPhone}
+                  otpSent={otpSentPhone}
+                  otp={phoneOtp}
+                  onOtpChange={setPhoneOtp}
+                  dir="ltr"
+                  onSendCode={() => {
+                    if (!newPhone) { showToast('أدخل رقم الهاتف الجديد', 'error'); return; }
+                    setOtpSentPhone(true);
+                    showToast('تم إرسال رمز التحقق إلى رقمك الجديد', 'success');
+                  }}
+                  onVerify={() => {
+                    const code = phoneOtp.join('');
+                    if (code.length < 6) { showToast('أدخل رمز التحقق كاملاً', 'error'); return; }
+                    setProfilePhone(newPhone);
+                    setPhoneEditOpen(false);
+                    setNewPhone(''); setOtpSentPhone(false); setPhoneOtp(['', '', '', '', '', '']);
+                    showToast('تم تحديث رقم الهاتف بنجاح', 'success');
+                  }}
+                />
 
                 {/* Notification preferences */}
                 <div className="space-y-4">
@@ -1154,6 +1250,74 @@ function Header({ icon, title, subtitle, action }: { icon: React.ReactNode; titl
       </div>
       <Separator className="mt-5" />
     </div>
+  );
+}
+
+function OtpVerifyDialog({ open, onOpenChange, icon, title, label, inputType, placeholder, value, onValueChange, otpSent, otp, onOtpChange, onSendCode, onVerify, dir }: {
+  open: boolean; onOpenChange: (o: boolean) => void; icon: React.ReactNode; title: string; label: string;
+  inputType: string; placeholder: string; value: string; onValueChange: (v: string) => void;
+  otpSent: boolean; otp: string[]; onOtpChange: (o: string[]) => void;
+  onSendCode: () => void; onVerify: () => void; dir?: string;
+}): JSX.Element {
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const handleOtpKey = (idx: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && !otp[idx] && idx > 0) inputRefs.current[idx - 1]?.focus();
+  };
+  const handleOtpInput = (idx: number, val: string) => {
+    if (!/^\d?$/.test(val)) return;
+    const next = [...otp]; next[idx] = val; onOtpChange(next);
+    if (val && idx < 5) inputRefs.current[idx + 1]?.focus();
+  };
+  const handlePaste = (e: React.ClipboardEvent) => {
+    const txt = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+    if (txt.length === 6) { onOtpChange(txt.split('')); inputRefs.current[5]?.focus(); e.preventDefault(); }
+  };
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md" dir="rtl">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">{icon}{title}</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4 py-2">
+          <div className="space-y-1.5">
+            <Label>{label}</Label>
+            <Input type={inputType} value={value} onChange={(e) => onValueChange(e.target.value)} placeholder={placeholder} dir={dir} disabled={otpSent} autoFocus />
+          </div>
+          {!otpSent ? (
+            <Button className="w-full" onClick={onSendCode}>إرسال رمز التحقق</Button>
+          ) : (
+            <>
+              <div className="space-y-2">
+                <Label>رمز التحقق (6 أرقام)</Label>
+                <p className="text-xs text-muted-foreground">تم إرسال رمز التحقق، أدخله أدناه</p>
+                <div className="flex items-center justify-center gap-2" dir="ltr" onPaste={handlePaste}>
+                  {otp.map((d, i) => (
+                    <input
+                      key={i}
+                      ref={(el) => { inputRefs.current[i] = el; }}
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={1}
+                      value={d}
+                      onChange={(e) => handleOtpInput(i, e.target.value)}
+                      onKeyDown={(e) => handleOtpKey(i, e)}
+                      className="w-11 h-12 text-center text-lg font-semibold border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors"
+                    />
+                  ))}
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <button type="button" className="text-xs text-primary hover:underline" onClick={onSendCode}>إعادة إرسال الرمز</button>
+              </div>
+            </>
+          )}
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>إلغاء</Button>
+          {otpSent && <Button onClick={onVerify}>تحقق وحفظ</Button>}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
