@@ -289,7 +289,7 @@ export default function AdminDashboard(): JSX.Element {
 
       {/* ══════════ Section 2: MRR Chart + Top Plans side by side ══════════ */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Card style={{minHeight: 420}}>
+        <Card style={{minHeight: 320}} className="flex flex-col">
           <CardHeader className="pb-1">
             <div className="flex items-center justify-between">
               <div>
@@ -302,17 +302,17 @@ export default function AdminDashboard(): JSX.Element {
               </Badge>
             </div>
           </CardHeader>
-          <CardContent className="pt-0">
+          <CardContent className="pt-0 flex-1">
             <LineChart
               labels={mrrHistory.labels}
               series={[{ name: 'MRR', color: '#2563EB', data: mrrHistory.values }]}
-              height={140}
+              height={220}
               formatValue={(v) => `$${v.toLocaleString()}`}
             />
           </CardContent>
         </Card>
 
-        <Card style={{minHeight: 420}}>
+        <Card style={{minHeight: 320}}>
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div>
@@ -356,7 +356,7 @@ export default function AdminDashboard(): JSX.Element {
       {/* ══════════ Section 3: Alerts side by side ══════════ */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Expiring trials */}
-        <Card style={{minHeight: 420}}>
+        <Card style={{minHeight: 320}}>
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -406,7 +406,7 @@ export default function AdminDashboard(): JSX.Element {
         </Card>
 
         {/* Past due */}
-        <Card style={{minHeight: 420}}>
+        <Card style={{minHeight: 320}}>
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
