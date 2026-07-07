@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useUIStore } from '@/store/useUIStore';
+import { useConfirm } from '@components/ui';
 import { cn } from '@/lib/utils';
 import { initials } from '@/utils/format';
 import {
@@ -91,8 +92,14 @@ interface SidebarInnerProps {
 function SidebarInner({ collapsed, onToggleCollapse, onNavigate, mobile, onCloseMobile }: SidebarInnerProps): JSX.Element {
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
+  const { confirm } = useConfirm();
   const location = useLocation();
   const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    const ok = await confirm({ title: 'تسجيل الخروج', message: 'هل أنت متأكد من تسجيل الخروج؟', variant: 'danger', confirmText: 'خروج' });
+    if (ok) logout();
+  };
 
   const toggleBtn = (
     <button
@@ -226,7 +233,7 @@ function SidebarInner({ collapsed, onToggleCollapse, onNavigate, mobile, onClose
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
-                  onClick={logout}
+                  onClick={handleLogout}
                   className="h-9 w-9 rounded-xl bg-white/8 hover:bg-red-500/25 flex items-center justify-center text-white/70 hover:text-white transition-colors flex-shrink-0"
                   aria-label="تسجيل الخروج"
                 >
@@ -255,7 +262,7 @@ function SidebarInner({ collapsed, onToggleCollapse, onNavigate, mobile, onClose
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
-                  onClick={logout}
+                  onClick={handleLogout}
                   className="h-9 w-9 rounded-xl bg-white/8 hover:bg-red-500/25 flex items-center justify-center text-white/70 hover:text-white transition-colors"
                   aria-label="تسجيل الخروج"
                 >

@@ -9,6 +9,7 @@ import {
   ShoppingBag,
   Plug,
   X,
+  Tag,
 } from 'lucide-react';
 import { useConfirm } from '@components/ui';
 import { useAdminStore } from '@/store/useAdminStore';
@@ -205,13 +206,12 @@ export default function Integrations() {
     return list;
   }, [platforms, search, filterCategory]);
 
-  const stats = useMemo(() => ({
-    total: platforms.length,
-    enabled: platforms.filter((p) => p.enabled).length,
-    communication: platforms.filter((p) => p.category === 'communication').length,
-    email: platforms.filter((p) => p.category === 'email').length,
-    ecommerce: platforms.filter((p) => p.category === 'ecommerce').length,
-  }), [platforms]);
+  const [categories, setCategories] = useState<{ key: string; label: string }[]>(
+    Object.entries(categoryLabels).map(([key, label]) => ({ key, label }))
+  );
+  const [catModalOpen, setCatModalOpen] = useState(false);
+  const [catEditIdx, setCatEditIdx] = useState<number | null>(null);
+  const [catForm, setCatForm] = useState({ key: '', label: '' });
 
   function openAdd() {
     setEditingId(null);
@@ -272,28 +272,16 @@ export default function Integrations() {
           </h1>
           <p className="text-muted-foreground mt-1">إدارة وتفعيل منصات التكامل المتاحة</p>
         </div>
-        <Button onClick={openAdd}>
-          <Plus className="h-4 w-4 me-2" />
-          إضافة منصة
-        </Button>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        {[
-          { label: 'إجمالي المنصات', value: stats.total, color: 'text-foreground' },
-          { label: 'مفعّلة', value: stats.enabled, color: 'text-emerald-600' },
-          { label: 'قنوات التواصل', value: stats.communication, color: 'text-blue-600' },
-          { label: 'البريد الإلكتروني', value: stats.email, color: 'text-amber-600' },
-          { label: 'التجارة الإلكترونية', value: stats.ecommerce, color: 'text-purple-600' },
-        ].map((s) => (
-          <Card key={s.label}>
-            <CardContent className="p-4 text-center">
-              <p className={cn('text-2xl font-bold', s.color)}>{s.value}</p>
-              <p className="text-xs text-muted-foreground mt-1">{s.label}</p>
-            </CardContent>
-          </Card>
-        ))}
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={() => { setCatEditIdx(null); setCatForm({ key: '', label: '' }); setCatModalOpen(true); }}>
+            <Tag className="h-4 w-4 me-2" />
+            إدارة الأنواع
+          </Button>
+          <Button onClick={openAdd}>
+            <Plus className="h-4 w-4 me-2" />
+            إضافة منصة
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -315,9 +303,9 @@ export default function Integrations() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">جميع الفئات</SelectItem>
-                <SelectItem value="communication">قنوات التواصل</SelectItem>
-                <SelectItem value="email">البريد الإلكتروني</SelectItem>
-                <SelectItem value="ecommerce">التجارة الإلكترونية</SelectItem>
+                {categories.map((cat) => (
+                  <SelectItem key={cat.key} value={cat.key}>{cat.label}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -365,8 +353,8 @@ export default function Integrations() {
                           <code className="text-xs bg-muted px-2 py-1 rounded">{p.slug}</code>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="secondary" className={cn('text-xs', categoryBadgeColors[p.category])}>
-                            {categoryLabels[p.category]}
+                          <Badge variant="secondary" className={cn('text-xs', categoryBadgeColors[p.category] ?? 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400')}>
+                            {categories.find((c) => c.key === p.category)?.label ?? categoryLabels[p.category] ?? p.category}
                           </Badge>
                         </TableCell>
                         <TableCell>
@@ -406,6 +394,80 @@ export default function Integrations() {
         </CardContent>
       </Card>
 
+      {/* Categories Management Dialog */}
+      <Dialog open={catModalOpen} onOpenChange={setCatModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>إدارة أنواع المنصات</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            {categories.map((cat, idx) => (
+              <div key={cat.key} className="flex items-center gap-2">
+                {catEditIdx === idx ? (
+                  <>
+                    <Input
+                      value={catForm.label}
+                      onChange={(e) => setCatForm({ ...catForm, label: e.target.value })}
+                      className="flex-1 h-9"
+                      autoFocus
+                    />
+                    <Button size="sm" variant="default" onClick={() => {
+                      if (!catForm.label.trim()) return;
+                      setCategories((prev) => prev.map((c, i) => i === idx ? { ...c, label: catForm.label } : c));
+                      setCatEditIdx(null);
+                    }}>حفظ</Button>
+                    <Button size="sm" variant="ghost" onClick={() => setCatEditIdx(null)}>إلغاء</Button>
+                  </>
+                ) : (
+                  <>
+                    <span className="flex-1 text-sm font-medium">{cat.label}</span>
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setCatEditIdx(idx); setCatForm({ key: cat.key, label: cat.label }); }}>
+                      <Edit2 className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={async () => {
+                      const inUse = platforms.some((p) => p.category === cat.key);
+                      if (inUse) { return; }
+                      const ok = await confirm({ title: 'حذف النوع', message: `هل أنت متأكد من حذف "${cat.label}"؟` });
+                      if (ok) setCategories((prev) => prev.filter((_, i) => i !== idx));
+                    }}>
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+          <div className="flex items-center gap-2 border-t pt-3">
+            <Input
+              placeholder="اسم النوع الجديد..."
+              value={catEditIdx === -1 ? catForm.label : ''}
+              onChange={(e) => { setCatEditIdx(-1); setCatForm({ key: '', label: e.target.value }); }}
+              className="flex-1 h-9"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && catForm.label.trim() && catEditIdx === -1) {
+                  const key = catForm.label.trim().toLowerCase().replace(/\s+/g, '-');
+                  setCategories((prev) => [...prev, { key, label: catForm.label.trim() }]);
+                  setCatForm({ key: '', label: '' });
+                  setCatEditIdx(null);
+                }
+              }}
+            />
+            <Button size="sm" variant="default" disabled={catEditIdx !== -1 || !catForm.label.trim()}
+              onClick={() => {
+                if (!catForm.label.trim()) return;
+                const key = catForm.label.trim().toLowerCase().replace(/\s+/g, '-');
+                setCategories((prev) => [...prev, { key, label: catForm.label.trim() }]);
+                setCatForm({ key: '', label: '' });
+                setCatEditIdx(null);
+              }}
+            >
+              <Plus className="h-4 w-4 me-1" />
+              إضافة
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Add/Edit Dialog */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent className="max-w-lg">
@@ -433,12 +495,11 @@ export default function Integrations() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="communication">قنوات التواصل</SelectItem>
-                  <SelectItem value="email">البريد الإلكتروني</SelectItem>
-                  <SelectItem value="ecommerce">تخزين</SelectItem>
+                  {categories.map((cat) => (
+                    <SelectItem key={cat.key} value={cat.key}>{cat.label}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
-              <p className="text-xs text-muted-foreground">تكاملات منصات التجارة الإلكترونية وشركات الشحن</p>
             </div>
 
             <div className="flex items-center gap-3">

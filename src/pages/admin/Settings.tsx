@@ -17,7 +17,6 @@ import {
   Phone,
   Lock,
   Camera,
-  Bell,
   Save,
   Pencil,
 } from 'lucide-react';
@@ -117,9 +116,6 @@ export default function AdminSettings(): JSX.Element {
   const [otpSentPhone, setOtpSentPhone] = useState(false);
   const [emailOtp, setEmailOtp] = useState(['', '', '', '', '', '']);
   const [phoneOtp, setPhoneOtp] = useState(['', '', '', '', '', '']);
-  const [notifyEmail, setNotifyEmail] = useState(true);
-  const [notifyPush, setNotifyPush] = useState(false);
-  const [notifyInApp, setNotifyInApp] = useState(true);
   // Email templates CRUD
   type EmailTemplate = { id: string; name: string; subject: string; body: string; trigger: string };
   const [emailTemplates, setEmailTemplates] = useState<EmailTemplate[]>([
@@ -228,36 +224,32 @@ export default function AdminSettings(): JSX.Element {
                       <Label>الاسم الكامل</Label>
                       <Input value={profileName} onChange={(e) => setProfileName(e.target.value)} />
                     </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
                       <Label className="flex items-center justify-between">
                         <span>البريد الإلكتروني</span>
-                        <span className="text-[11px] text-muted-foreground font-normal">لتغيير البريد يتم إرسال رمز تحقق</span>
-                      </Label>
-                      <div className="flex items-center gap-2">
-                        <div className="relative flex-1">
-                          <Mail className="h-4 w-4 absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                          <Input type="email" value={profileEmail} disabled className="pe-9 bg-muted/50" />
-                        </div>
-                        <Button variant="outline" size="sm" className="gap-1.5 flex-shrink-0" onClick={() => setEmailEditOpen(true)}>
-                          <Pencil className="h-3.5 w-3.5" />
+                        <Button variant="link" size="sm" className="h-auto p-0 gap-1 text-xs" onClick={() => setEmailEditOpen(true)}>
+                          <Pencil className="h-3 w-3" />
                           تعديل
                         </Button>
+                      </Label>
+                      <div className="relative">
+                        <Mail className="h-4 w-4 absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                        <Input type="email" value={profileEmail} disabled className="pe-9 bg-muted/50" />
                       </div>
                     </div>
-                    <div className="space-y-1.5 md:col-span-2">
+                    <div className="space-y-1.5">
                       <Label className="flex items-center justify-between">
                         <span>رقم الهاتف</span>
-                        <span className="text-[11px] text-muted-foreground font-normal">لتغيير الرقم يتم إرسال رمز تحقق</span>
-                      </Label>
-                      <div className="flex items-center gap-2">
-                        <div className="relative flex-1">
-                          <Phone className="h-4 w-4 absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                          <Input value={profilePhone || '+96891234567'} disabled className="pe-9 bg-muted/50" />
-                        </div>
-                        <Button variant="outline" size="sm" className="gap-1.5 flex-shrink-0" onClick={() => setPhoneEditOpen(true)}>
-                          <Pencil className="h-3.5 w-3.5" />
+                        <Button variant="link" size="sm" className="h-auto p-0 gap-1 text-xs" onClick={() => setPhoneEditOpen(true)}>
+                          <Pencil className="h-3 w-3" />
                           تعديل
                         </Button>
+                      </Label>
+                      <div className="relative">
+                        <Phone className="h-4 w-4 absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                        <Input value={profilePhone || '+96891234567'} disabled className="pe-9 bg-muted/50" />
                       </div>
                     </div>
                   </div>
@@ -377,39 +369,6 @@ export default function AdminSettings(): JSX.Element {
                   }}
                 />
 
-                {/* Notification preferences */}
-                <div className="space-y-4">
-                  <h3 className="text-base font-semibold flex items-center gap-2">
-                    <Bell className="h-4 w-4 text-primary" />
-                    تفضيلات الإشعارات
-                  </h3>
-                  <div className="flex items-center justify-between py-2">
-                    <div>
-                      <p className="text-sm font-medium">إشعارات البريد الإلكتروني</p>
-                      <p className="text-xs text-muted-foreground">تلقّي إشعارات على بريدك</p>
-                    </div>
-                    <Switch checked={notifyEmail} onCheckedChange={setNotifyEmail} />
-                  </div>
-                  <Separator />
-                  <div className="flex items-center justify-between py-2">
-                    <div>
-                      <p className="text-sm font-medium">إشعارات المتصفح (Push)</p>
-                      <p className="text-xs text-muted-foreground">إشعارات فورية في المتصفح</p>
-                    </div>
-                    <Switch checked={notifyPush} onCheckedChange={setNotifyPush} />
-                  </div>
-                  <Separator />
-                  <div className="flex items-center justify-between py-2">
-                    <div>
-                      <p className="text-sm font-medium">إشعارات داخل التطبيق</p>
-                      <p className="text-xs text-muted-foreground">إشعارات في جرس اللوحة</p>
-                    </div>
-                    <Switch checked={notifyInApp} onCheckedChange={setNotifyInApp} />
-                  </div>
-                  <div className="flex justify-end">
-                    <Button onClick={() => showToast('تم حفظ تفضيلات الإشعارات', 'success')}>حفظ التفضيلات</Button>
-                  </div>
-                </div>
               </div>
             )}
 
@@ -529,6 +488,7 @@ export default function AdminSettings(): JSX.Element {
                       <TableHead>الرمز</TableHead>
                       <TableHead>العملة</TableHead>
                       <TableHead>سعر الصرف (USD)</TableHead>
+                      <TableHead>الحالة</TableHead>
                       <TableHead className="text-end">إجراءات</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -544,6 +504,12 @@ export default function AdminSettings(): JSX.Element {
                         <TableCell className="font-mono text-xs">{c.code}</TableCell>
                         <TableCell>{c.currency} <span className="text-muted-foreground text-xs">({c.symbol})</span></TableCell>
                         <TableCell className="font-mono text-xs">{c.usdRate}</TableCell>
+                        <TableCell>
+                          <Switch
+                            checked={c.active !== false}
+                            onCheckedChange={(checked) => updateCountry(c.code, { active: checked })}
+                          />
+                        </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-0.5 justify-end">
                             <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => setCountryModal({ ...c, isNew: false })}>
@@ -902,7 +868,7 @@ export default function AdminSettings(): JSX.Element {
                 if (!countryModal.code || !countryModal.nameAr) { showToast('الرمز والاسم مطلوبان', 'error'); return; }
                 if (countryModal.isNew) {
                   if (countries.some((c) => c.code === countryModal.code)) { showToast('الرمز موجود مسبقاً', 'error'); return; }
-                  addCountry({ code: countryModal.code, name: countryModal.name, nameAr: countryModal.nameAr, flag: countryModal.flag, currency: countryModal.currency, symbol: countryModal.symbol, usdRate: countryModal.usdRate });
+                  addCountry({ code: countryModal.code, name: countryModal.name, nameAr: countryModal.nameAr, flag: countryModal.flag, currency: countryModal.currency, symbol: countryModal.symbol, usdRate: countryModal.usdRate, active: true });
                   showToast('تمت الإضافة', 'success');
                 } else {
                   updateCountry(countryModal.code, { name: countryModal.name, nameAr: countryModal.nameAr, flag: countryModal.flag, currency: countryModal.currency, symbol: countryModal.symbol, usdRate: countryModal.usdRate });

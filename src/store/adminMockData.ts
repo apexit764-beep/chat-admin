@@ -24,14 +24,14 @@ const nowPlusDays = (days: number): string =>
 // Countries
 // =====================================================================
 export const countries: Country[] = [
-  { code: 'OM', name: 'Oman', nameAr: 'عُمان', flag: '🇴🇲', currency: 'OMR', symbol: 'ر.ع', usdRate: 0.385 },
-  { code: 'AE', name: 'UAE', nameAr: 'الإمارات', flag: '🇦🇪', currency: 'AED', symbol: 'د.إ', usdRate: 3.67 },
-  { code: 'SA', name: 'Saudi Arabia', nameAr: 'السعودية', flag: '🇸🇦', currency: 'SAR', symbol: 'ر.س', usdRate: 3.75 },
-  { code: 'KW', name: 'Kuwait', nameAr: 'الكويت', flag: '🇰🇼', currency: 'KWD', symbol: 'د.ك', usdRate: 0.31 },
-  { code: 'QA', name: 'Qatar', nameAr: 'قطر', flag: '🇶🇦', currency: 'QAR', symbol: 'ر.ق', usdRate: 3.64 },
-  { code: 'BH', name: 'Bahrain', nameAr: 'البحرين', flag: '🇧🇭', currency: 'BHD', symbol: 'د.ب', usdRate: 0.377 },
-  { code: 'EG', name: 'Egypt', nameAr: 'مصر', flag: '🇪🇬', currency: 'EGP', symbol: 'ج.م', usdRate: 49 },
-  { code: 'JO', name: 'Jordan', nameAr: 'الأردن', flag: '🇯🇴', currency: 'JOD', symbol: 'د.أ', usdRate: 0.71 },
+  { code: 'OM', name: 'Oman', nameAr: 'عُمان', flag: '🇴🇲', currency: 'OMR', symbol: 'ر.ع', usdRate: 0.385, active: true },
+  { code: 'AE', name: 'UAE', nameAr: 'الإمارات', flag: '🇦🇪', currency: 'AED', symbol: 'د.إ', usdRate: 3.67, active: true },
+  { code: 'SA', name: 'Saudi Arabia', nameAr: 'السعودية', flag: '🇸🇦', currency: 'SAR', symbol: 'ر.س', usdRate: 3.75, active: true },
+  { code: 'KW', name: 'Kuwait', nameAr: 'الكويت', flag: '🇰🇼', currency: 'KWD', symbol: 'د.ك', usdRate: 0.31, active: true },
+  { code: 'QA', name: 'Qatar', nameAr: 'قطر', flag: '🇶🇦', currency: 'QAR', symbol: 'ر.ق', usdRate: 3.64, active: true },
+  { code: 'BH', name: 'Bahrain', nameAr: 'البحرين', flag: '🇧🇭', currency: 'BHD', symbol: 'د.ب', usdRate: 0.377, active: true },
+  { code: 'EG', name: 'Egypt', nameAr: 'مصر', flag: '🇪🇬', currency: 'EGP', symbol: 'ج.م', usdRate: 49, active: true },
+  { code: 'JO', name: 'Jordan', nameAr: 'الأردن', flag: '🇯🇴', currency: 'JOD', symbol: 'د.أ', usdRate: 0.71, active: true },
 ];
 
 // =====================================================================
@@ -1252,7 +1252,7 @@ export const planRequests: PlanRequest[] = [
     companyName: 'شحن الكويت',
     orderVolume: '20000-50000',
     businessType: 'seasonal',
-    status: 'converted',
+    status: 'contacted',
     createdAt: nowMinus(60 * 60 * 24 * 5),
   },
   {

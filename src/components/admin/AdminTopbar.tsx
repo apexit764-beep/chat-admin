@@ -5,6 +5,7 @@ import { HeaderSearch } from '@/components/admin/HeaderSearch';
 import { useThemeStore } from '@/store/useThemeStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useUIStore } from '@/store/useUIStore';
+import { useConfirm } from '@components/ui';
 import { initials, avatarColor } from '@/utils/format';
 import { Button } from '@/components/ui/button';
 import {
@@ -50,7 +51,13 @@ export function AdminTopbar(): JSX.Element {
   const toggleTheme = useThemeStore((s) => s.toggle);
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
+  const { confirm } = useConfirm();
   const openMobileSidebar = useUIStore((s) => s.toggleMobileSidebar);
+
+  const handleLogout = async () => {
+    const ok = await confirm({ title: 'تسجيل الخروج', message: 'هل أنت متأكد من تسجيل الخروج؟', variant: 'danger', confirmText: 'خروج' });
+    if (ok) logout();
+  };
 
   const segments = location.pathname.split('/').filter(Boolean);
   const currentLabel = breadcrumbMap[location.pathname] ?? breadcrumbMap['/' + segments[0]] ?? 'لوحة التحكم';
@@ -152,7 +159,7 @@ export function AdminTopbar(): JSX.Element {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="text-destructive focus:text-destructive cursor-pointer gap-2 px-3"
-                  onClick={logout}
+                  onClick={handleLogout}
                 >
                   <LogOut className="h-4 w-4" />
                   تسجيل الخروج

@@ -4,10 +4,10 @@ import {
   MoreHorizontal,
   Eye,
   CheckCircle2,
-  XCircle,
   Phone,
   Trash2,
   ClipboardList,
+  ChevronDown,
 } from 'lucide-react';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
@@ -43,23 +43,13 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
-import type { PlanRequest, PlanRequestStatus, OrderVolume } from '@/types';
+import type { PlanRequest, PlanRequestStatus } from '@/types';
 
 const STATUS_MAP: Record<PlanRequestStatus, { label: string; color: string }> = {
   new: { label: 'جديد', color: 'bg-blue-500/15 text-blue-700 dark:text-blue-400' },
-  contacted: { label: 'تم التواصل', color: 'bg-amber-500/15 text-amber-700 dark:text-amber-400' },
-  converted: { label: 'تم التحويل', color: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400' },
-  rejected: { label: 'مرفوض', color: 'bg-red-500/15 text-red-700 dark:text-red-400' },
+  contacted: { label: 'تم التواصل', color: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400' },
 };
 
-const VOLUME_LABELS: Record<OrderVolume, string> = {
-  '1-5000': '1 – 5,000',
-  '5000-20000': '5,000 – 20,000',
-  '20000-50000': '20,000 – 50,000',
-  '50000-100000': '50,000 – 100,000',
-  '100000-200000': '100,000 – 200,000',
-  '200000+': 'أكثر من 200,000',
-};
 
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -101,7 +91,6 @@ export default function AdminPlanRequests({ embedded }: { embedded?: boolean }):
 
   const newCount = planRequests.filter((r) => r.status === 'new').length;
   const contactedCount = planRequests.filter((r) => r.status === 'contacted').length;
-  const convertedCount = planRequests.filter((r) => r.status === 'converted').length;
 
   const getPlan = (id: string) => plans.find((p) => p.id === id);
   const getCountry = (code: string) => countries.find((c) => c.code === code);
@@ -124,7 +113,7 @@ export default function AdminPlanRequests({ embedded }: { embedded?: boolean }):
   const content = (
     <>
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-3 gap-4">
         <StatCard
           label="إجمالي الطلبات"
           value={planRequests.length}
@@ -142,13 +131,6 @@ export default function AdminPlanRequests({ embedded }: { embedded?: boolean }):
         <StatCard
           label="تم التواصل"
           value={contactedCount}
-          icon={<Phone className="h-5 w-5" />}
-          iconBg="bg-warning/15"
-          iconColor="text-warning"
-        />
-        <StatCard
-          label="تم التحويل"
-          value={convertedCount}
           icon={<CheckCircle2 className="h-5 w-5" />}
           iconBg="bg-success/15"
           iconColor="text-success"
@@ -169,7 +151,7 @@ export default function AdminPlanRequests({ embedded }: { embedded?: boolean }):
             />
           </div>
           <div className="flex items-center gap-1.5">
-            {(['all', 'new', 'contacted', 'converted', 'rejected'] as const).map((s) => (
+            {(['all', 'new', 'contacted'] as const).map((s) => (
               <button
                 key={s}
                 onClick={() => setStatusFilter(s)}
@@ -202,8 +184,8 @@ export default function AdminPlanRequests({ embedded }: { embedded?: boolean }):
                 <TableHead className="text-start">البريد الإلكتروني</TableHead>
                 <TableHead className="text-start">رقم الهاتف</TableHead>
                 <TableHead className="text-start">الباقة</TableHead>
-                <TableHead className="text-start">عدد الطلبات</TableHead>
-                <TableHead className="text-start">النوع</TableHead>
+                <TableHead className="text-start">الموظفين</TableHead>
+                <TableHead className="text-start">القنوات</TableHead>
                 <TableHead className="text-start">الحالة</TableHead>
                 <TableHead className="text-start w-12" />
               </TableRow>
@@ -243,15 +225,27 @@ export default function AdminPlanRequests({ embedded }: { embedded?: boolean }):
                       </Badge>
                     </TableCell>
                     <TableCell className="text-sm font-medium">
-                      {VOLUME_LABELS[r.orderVolume]}
+                      {plan?.limits.agents === -1 ? '∞' : plan?.limits.agents ?? '—'}
                     </TableCell>
-                    <TableCell className="text-sm">
-                      {r.businessType === 'fixed' ? 'ثابت شهريًا' : 'موسمي (يزيد في مواسم معينة)'}
+                    <TableCell className="text-sm font-medium">
+                      {plan?.limits.channels === -1 ? '∞' : plan?.limits.channels ?? '—'}
                     </TableCell>
                     <TableCell>
-                      <span className={cn('inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium', STATUS_MAP[r.status].color)}>
-                        {STATUS_MAP[r.status].label}
-                      </span>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button className={cn('inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium cursor-pointer transition-colors', STATUS_MAP[r.status].color)}>
+                            {STATUS_MAP[r.status].label}
+                            <ChevronDown className="h-3 w-3" />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start">
+                          {(Object.keys(STATUS_MAP) as PlanRequestStatus[]).map((s) => (
+                            <DropdownMenuItem key={s} onClick={() => handleStatusChange(r.id, s)} disabled={r.status === s}>
+                              {STATUS_MAP[s].label}
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                     <TableCell>
                       <DropdownMenu>
@@ -264,22 +258,6 @@ export default function AdminPlanRequests({ embedded }: { embedded?: boolean }):
                           <DropdownMenuItem onClick={() => setViewing(r)}>
                             <Eye className="h-4 w-4 me-2" /> عرض التفاصيل
                           </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          {r.status !== 'contacted' && (
-                            <DropdownMenuItem onClick={() => handleStatusChange(r.id, 'contacted')}>
-                              <Phone className="h-4 w-4 me-2" /> تم التواصل
-                            </DropdownMenuItem>
-                          )}
-                          {r.status !== 'converted' && (
-                            <DropdownMenuItem onClick={() => handleStatusChange(r.id, 'converted')}>
-                              <CheckCircle2 className="h-4 w-4 me-2" /> تم التحويل
-                            </DropdownMenuItem>
-                          )}
-                          {r.status !== 'rejected' && (
-                            <DropdownMenuItem onClick={() => handleStatusChange(r.id, 'rejected')}>
-                              <XCircle className="h-4 w-4 me-2" /> رفض
-                            </DropdownMenuItem>
-                          )}
                           <DropdownMenuSeparator />
                           <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(r)}>
                             <Trash2 className="h-4 w-4 me-2" /> حذف
@@ -354,8 +332,8 @@ function RequestDetail({
         {r.whatsapp && <Field label="رقم واتساب" value={r.whatsapp} dir="ltr" />}
         <Field label="الدولة" value={country ? `${country.flag} ${country.nameAr}` : r.country} />
         <Field label="الباقة المطلوبة" value={plan?.nameAr ?? r.planId} />
-        <Field label="الطلبات الشهرية المتوقعة" value={VOLUME_LABELS[r.orderVolume]} />
-        <Field label="نوع الحجم" value={r.businessType === 'fixed' ? 'ثابت شهريًا' : 'موسمي (يزيد في مواسم معينة)'} />
+        <Field label="حد الموظفين" value={plan?.limits.agents === -1 ? 'غير محدود' : String(plan?.limits.agents ?? '—')} />
+        <Field label="حد القنوات" value={plan?.limits.channels === -1 ? 'غير محدود' : String(plan?.limits.channels ?? '—')} />
       </div>
 
       {r.notes && (

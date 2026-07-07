@@ -158,6 +158,7 @@ export interface Country {
   symbol: string;
   /** USD → local rate, for fast display only */
   usdRate: number;
+  active: boolean;
 }
 
 export type PlanTier = 'starter' | 'pro' | 'business' | 'enterprise';
@@ -286,7 +287,7 @@ export interface PaymobConfig {
   integrationsByCountry: Record<string, string>;
 }
 
-export type PlanRequestStatus = 'new' | 'contacted' | 'converted' | 'rejected';
+export type PlanRequestStatus = 'new' | 'contacted';
 export type OrderVolume = '1-5000' | '5000-20000' | '20000-50000' | '50000-100000' | '100000-200000' | '200000+';
 export type BusinessType = 'fixed' | 'seasonal';
 
