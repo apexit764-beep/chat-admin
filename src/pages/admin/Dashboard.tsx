@@ -10,6 +10,10 @@ import {
   ArrowUpRight,
   CheckCircle2,
   XCircle,
+  Building2,
+  UserCog,
+  Receipt,
+  CreditCard,
 } from 'lucide-react';
 import { StatCard } from '@components/ui';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
@@ -39,6 +43,7 @@ export default function AdminDashboard(): JSX.Element {
   const invoices = useAdminStore((s) => s.invoices);
   const plans = useAdminStore((s) => s.plans);
   const countries = useAdminStore((s) => s.countries);
+  const adminUsers = useAdminStore((s) => s.adminUsers);
 
   /* ══════════════════════ Financial metrics ══════════════════════ */
 
@@ -104,6 +109,23 @@ export default function AdminDashboard(): JSX.Element {
     const cutoff = Date.now() - 30 * 86400000;
     return clients.filter((c) => Date.parse(c.joinedAt) >= cutoff).length;
   }, [clients]);
+
+  // Total revenue from all successful transactions
+  const totalRevenue = useMemo(() =>
+    Math.round(transactions
+      .filter((t) => t.status === 'succeeded')
+      .reduce((acc, t) => acc + approxUSD(t.amount, t.currency), 0)),
+    [transactions]
+  );
+
+  // Total active subscriptions
+  const activeSubscriptions = useMemo(() =>
+    subscriptions.filter((s) => s.status === 'active').length,
+    [subscriptions]
+  );
+
+  // Total invoices count
+  const totalInvoices = invoices.length;
 
   // Trial → paid conversion (last 90 days)
   const conversionRate = useMemo(() => {
@@ -209,36 +231,12 @@ export default function AdminDashboard(): JSX.Element {
       <section className="space-y-3">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <StatCard
-            label="الإيراد الشهري (MRR)"
-            value={`$${currentMrr.toLocaleString()}`}
-            icon={<DollarSign className="h-4 w-4" />}
-            iconBg="bg-success/15"
-            iconColor="text-success"
-            trend={mrrGrowth !== null ? { value: Math.abs(mrrGrowth), positive: mrrGrowth >= 0 } : undefined}
-          />
-          <StatCard
-            label="الإيراد السنوي (ARR)"
-            value={`$${arrTotal.toLocaleString()}`}
-            icon={<TrendingUp className="h-4 w-4" />}
+            label="إجمالي العملاء"
+            value={clients.length}
+            icon={<Building2 className="h-4 w-4" />}
             iconBg="bg-primary/15"
             iconColor="text-primary"
           />
-          <StatCard
-            label="متوسط الإيراد للعميل"
-            value={`$${arpu}`}
-            icon={<Users className="h-4 w-4" />}
-            iconBg="bg-info/15"
-            iconColor="text-info"
-          />
-          <StatCard
-            label="معدل الإلغاء"
-            value={`${churnRate}%`}
-            icon={<TrendingDown className="h-4 w-4" />}
-            iconBg="bg-danger/15"
-            iconColor="text-danger"
-          />
-        </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <StatCard
             label="عملاء نشطون"
             value={activeClients.length}
@@ -247,9 +245,40 @@ export default function AdminDashboard(): JSX.Element {
             iconColor="text-success"
           />
           <StatCard
-            label="حسابات تجريبية"
-            value={trialCount}
-            icon={<Sparkles className="h-4 w-4" />}
+            label="إجمالي الموظفين"
+            value={adminUsers.length}
+            icon={<UserCog className="h-4 w-4" />}
+            iconBg="bg-info/15"
+            iconColor="text-info"
+          />
+          <StatCard
+            label="إجمالي الإيرادات"
+            value={`$${totalRevenue.toLocaleString()}`}
+            icon={<DollarSign className="h-4 w-4" />}
+            iconBg="bg-success/15"
+            iconColor="text-success"
+          />
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <StatCard
+            label="الإيراد الشهري (MRR)"
+            value={`$${currentMrr.toLocaleString()}`}
+            icon={<TrendingUp className="h-4 w-4" />}
+            iconBg="bg-primary/15"
+            iconColor="text-primary"
+            trend={mrrGrowth !== null ? { value: Math.abs(mrrGrowth), positive: mrrGrowth >= 0 } : undefined}
+          />
+          <StatCard
+            label="الاشتراكات النشطة"
+            value={activeSubscriptions}
+            icon={<CreditCard className="h-4 w-4" />}
+            iconBg="bg-warning/15"
+            iconColor="text-warning"
+          />
+          <StatCard
+            label="إجمالي الفواتير"
+            value={totalInvoices}
+            icon={<Receipt className="h-4 w-4" />}
             iconBg="bg-info/15"
             iconColor="text-info"
           />
@@ -259,13 +288,6 @@ export default function AdminDashboard(): JSX.Element {
             icon={<UserPlus className="h-4 w-4" />}
             iconBg="bg-primary/15"
             iconColor="text-primary"
-          />
-          <StatCard
-            label="معدل الاحتفاظ"
-            value={`${retentionRate}%`}
-            icon={<TrendingUp className="h-4 w-4" />}
-            iconBg="bg-warning/15"
-            iconColor="text-warning"
           />
         </div>
       </section>
