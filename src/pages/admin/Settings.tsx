@@ -981,7 +981,24 @@ export default function AdminSettings(): JSX.Element {
               </div>
               <div className="space-y-1.5">
                 <Label>محتوى الرسالة</Label>
-                <Textarea value={emailModal.body} onChange={(e) => setEmailModal({ ...emailModal, body: e.target.value })} rows={6} className="font-mono text-sm" dir="rtl" />
+                <div className="flex items-center gap-1 border rounded-t-md px-2 py-1.5 bg-muted/50">
+                  <button type="button" className="p-1.5 rounded hover:bg-muted text-xs font-bold" onClick={() => document.execCommand('bold')}>B</button>
+                  <button type="button" className="p-1.5 rounded hover:bg-muted text-xs italic" onClick={() => document.execCommand('italic')}>I</button>
+                  <button type="button" className="p-1.5 rounded hover:bg-muted text-xs underline" onClick={() => document.execCommand('underline')}>U</button>
+                  <span className="w-px h-4 bg-border mx-1" />
+                  <button type="button" className="p-1.5 rounded hover:bg-muted text-xs" onClick={() => document.execCommand('insertUnorderedList')}>• قائمة</button>
+                  <button type="button" className="p-1.5 rounded hover:bg-muted text-xs" onClick={() => document.execCommand('insertOrderedList')}>1. قائمة</button>
+                  <span className="w-px h-4 bg-border mx-1" />
+                  <button type="button" className="p-1.5 rounded hover:bg-muted text-xs" onClick={() => { const url = prompt('أدخل الرابط:'); if (url) document.execCommand('createLink', false, url); }}>رابط</button>
+                  <button type="button" className="p-1.5 rounded hover:bg-muted text-xs font-bold" onClick={() => document.execCommand('formatBlock', false, 'h2')}>عنوان</button>
+                </div>
+                <div
+                  contentEditable
+                  dir="rtl"
+                  className="min-h-[180px] max-h-[350px] overflow-y-auto border border-t-0 rounded-b-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 prose prose-sm max-w-none"
+                  dangerouslySetInnerHTML={{ __html: emailModal.body }}
+                  onBlur={(e) => setEmailModal({ ...emailModal, body: e.currentTarget.innerHTML })}
+                />
                 <p className="text-[11px] text-muted-foreground">
                   المتغيرات: {'{{client_name}}'}, {'{{product_name}}'}, {'{{amount}}'}, {'{{currency}}'}, {'{{invoice_number}}'}, {'{{plan_name}}'}
                 </p>
