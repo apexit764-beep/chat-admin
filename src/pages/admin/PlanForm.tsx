@@ -281,61 +281,69 @@ export default function PlanForm(): JSX.Element {
             </CardContent>
           </Card>
 
-          {/* Prices per country - full name, each field on its own line */}
+          {/* Trial toggle - before prices */}
           <Card>
-            <CardHeader>
-              <h3 className="text-lg font-semibold">الأسعار حسب الدولة</h3>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {countries.map((co) => {
-                  const price = form.pricesPerCountry[co.code] ?? { monthly: 0, yearly: 0 };
-                  return (
-                    <div key={co.code} className="grid grid-cols-[1fr_1fr_1fr] items-center gap-2 p-2.5 rounded-lg bg-muted">
-                      <div className="flex items-center gap-2 font-medium">
-                        <span className="text-lg">{co.flag}</span>
-                        <span className="text-sm">{co.nameAr}</span>
-                      </div>
-                      <div className="relative">
-                        <Input
-                          type="number"
-                          min={0}
-                          value={price.monthly}
-                          onChange={(e) => setMonthlyPrice(co.code, Number(e.target.value) || 0)}
-                          placeholder="0"
-                          className="font-mono"
-                        />
-                        <span className="absolute end-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground pointer-events-none">{co.symbol}/شهر</span>
-                      </div>
-                      <div className="relative">
-                        <Input
-                          type="number"
-                          min={0}
-                          value={price.yearly}
-                          onChange={(e) => setForm({ ...form, pricesPerCountry: { ...form.pricesPerCountry, [co.code]: { ...price, yearly: Number(e.target.value) || 0 } } })}
-                          placeholder="0"
-                          className="font-mono"
-                        />
-                        <span className="absolute end-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground pointer-events-none">{co.symbol}/سنة</span>
-                      </div>
-                    </div>
-                  );
-                })}
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
+                <div>
+                  <p className="text-sm font-medium">باقة تجريبية</p>
+                  <p className="text-xs text-muted-foreground">مجانية للتجربة — لن تحتاج لإدخال أسعار</p>
+                </div>
+                <Switch checked={form.isTrial} onCheckedChange={(checked) => setForm({ ...form, isTrial: checked })} />
               </div>
             </CardContent>
           </Card>
 
+          {/* Prices per country - hidden when trial */}
+          {!form.isTrial && (
+            <Card>
+              <CardHeader>
+                <h3 className="text-lg font-semibold">الأسعار حسب الدولة</h3>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {countries.map((co) => {
+                    const price = form.pricesPerCountry[co.code] ?? { monthly: 0, yearly: 0 };
+                    return (
+                      <div key={co.code} className="grid grid-cols-[1fr_1fr_1fr] items-center gap-2 p-2.5 rounded-lg bg-muted">
+                        <div className="flex items-center gap-2 font-medium">
+                          <span className="text-lg">{co.flag}</span>
+                          <span className="text-sm">{co.nameAr}</span>
+                        </div>
+                        <div className="relative">
+                          <Input
+                            type="number"
+                            min={0}
+                            value={price.monthly}
+                            onChange={(e) => setMonthlyPrice(co.code, Number(e.target.value) || 0)}
+                            placeholder="0"
+                            className="font-mono"
+                          />
+                          <span className="absolute end-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground pointer-events-none">{co.symbol}/شهر</span>
+                        </div>
+                        <div className="relative">
+                          <Input
+                            type="number"
+                            min={0}
+                            value={price.yearly}
+                            onChange={(e) => setForm({ ...form, pricesPerCountry: { ...form.pricesPerCountry, [co.code]: { ...price, yearly: Number(e.target.value) || 0 } } })}
+                            placeholder="0"
+                            className="font-mono"
+                          />
+                          <span className="absolute end-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground pointer-events-none">{co.symbol}/سنة</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Toggles */}
           <Card>
             <CardContent className="pt-6">
-              <div className="grid grid-cols-3 gap-3">
-                <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
-                  <div>
-                    <p className="text-sm font-medium">باقة تجريبية</p>
-                    <p className="text-xs text-muted-foreground">مجانية للتجربة</p>
-                  </div>
-                  <Switch checked={form.isTrial} onCheckedChange={(checked) => setForm({ ...form, isTrial: checked })} />
-                </div>
+              <div className="grid grid-cols-2 gap-3">
                 <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
                   <div>
                     <p className="text-sm font-medium">الأكثر شعبية</p>
