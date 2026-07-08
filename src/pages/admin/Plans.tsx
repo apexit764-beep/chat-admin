@@ -9,6 +9,7 @@ import {
   Users,
   MessageSquare,
   Database,
+  ContactRound,
   Infinity as InfinityIcon,
   Globe2,
   Copy,
@@ -281,9 +282,10 @@ export default function AdminPlans(): JSX.Element {
                         </TableCell>
                         <TableCell className="text-center">
                           <div className="inline-flex flex-wrap items-center gap-1.5 text-xs justify-center">
-                            <LimitPill icon={<Users className="h-3 w-3" />} value={p.limits.agents === -1 ? '∞' : p.limits.agents} />
-                            <LimitPill icon={<MessageSquare className="h-3 w-3" />} value={p.limits.channels === -1 ? '∞' : p.limits.channels} />
-                            <LimitPill icon={<Database className="h-3 w-3" />} value={p.limits.conversations === -1 ? '∞' : (p.limits.conversations / 1000) + 'K'} />
+                            <LimitPill icon={<Users className="h-3 w-3" />} value={p.limits.agents === -1 ? '∞' : p.limits.agents} label="الموظفين" />
+                            <LimitPill icon={<MessageSquare className="h-3 w-3" />} value={p.limits.channels === -1 ? '∞' : p.limits.channels} label="القنوات" />
+                            <LimitPill icon={<Database className="h-3 w-3" />} value={p.limits.conversations === -1 ? '∞' : (p.limits.conversations / 1000) + 'K'} label="المحادثات" />
+                            <LimitPill icon={<ContactRound className="h-3 w-3" />} value={p.limits.contacts === -1 ? '∞' : (p.limits.contacts / 1000) + 'K'} label="جهات الاتصال" />
                           </div>
                         </TableCell>
                         <TableCell className="text-center">
@@ -484,13 +486,20 @@ export default function AdminPlans(): JSX.Element {
   );
 }
 
-function LimitPill({ icon, value }: { icon: React.ReactNode; value: string | number }): JSX.Element {
+function LimitPill({ icon, value, label }: { icon: React.ReactNode; value: string | number; label?: string }): JSX.Element {
   const isInfinite = value === '∞';
-  return (
+  const pill = (
     <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-muted text-xs">
       <span className="text-muted-foreground">{icon}</span>
       <span className="font-semibold">{isInfinite ? <InfinityIcon className="h-3 w-3 inline" /> : value}</span>
     </span>
+  );
+  if (!label) return pill;
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{pill}</TooltipTrigger>
+      <TooltipContent>{label}</TooltipContent>
+    </Tooltip>
   );
 }
 
