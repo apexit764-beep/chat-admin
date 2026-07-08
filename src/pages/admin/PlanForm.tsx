@@ -293,7 +293,7 @@ export default function PlanForm(): JSX.Element {
                         <span>{co.nameAr}</span>
                         <span className="text-xs text-muted-foreground">({co.code})</span>
                       </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <div className="grid grid-cols-2 gap-2">
                         <div className="relative">
                           <Label className="text-xs text-muted-foreground mb-1 block">السعر الشهري</Label>
                           <Input
