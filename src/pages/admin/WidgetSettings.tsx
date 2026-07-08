@@ -438,7 +438,7 @@ function WidgetAppearanceTab({
       </div>
 
       {/* Preview Column */}
-      <div className="xl:sticky xl:top-20 h-fit space-y-3">
+      <div className="xl:sticky xl:top-4 self-start space-y-3">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold text-muted-foreground">معاينة مباشرة</h3>
           <Button
