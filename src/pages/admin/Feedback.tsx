@@ -166,8 +166,8 @@ export default function AdminFeedback(): JSX.Element {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-12">#</TableHead>
-                  <TableHead>النوع</TableHead>
                   <TableHead>العميل</TableHead>
+                  <TableHead>النوع</TableHead>
                   <TableHead>الموضوع</TableHead>
                   <TableHead>الأولوية</TableHead>
                   <TableHead>الحالة</TableHead>
@@ -185,12 +185,12 @@ export default function AdminFeedback(): JSX.Element {
                   return (
                     <TableRow key={entry.id}>
                       <TableCell className="text-xs text-muted-foreground font-mono">{idx + 1}</TableCell>
+                      <TableCell className="font-medium text-sm">{entry.clientName}</TableCell>
                       <TableCell>
                         <Badge variant={tConfig.badgeVariant} className="text-[10px]">
                           {tConfig.label}
                         </Badge>
                       </TableCell>
-                      <TableCell className="font-medium text-sm">{entry.clientName}</TableCell>
                       <TableCell>
                         <p className="text-sm font-medium max-w-[200px] truncate">{entry.subject}</p>
                       </TableCell>
