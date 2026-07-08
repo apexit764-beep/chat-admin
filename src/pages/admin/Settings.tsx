@@ -702,9 +702,13 @@ export default function AdminSettings(): JSX.Element {
                         <TableCell className="font-medium">{p.title}</TableCell>
                         <TableCell className="font-mono text-xs text-muted-foreground">/{p.slug}</TableCell>
                         <TableCell>
-                          <Badge variant={p.status === 'published' ? 'default' : 'secondary'} className="text-[10px]">
-                            {p.status === 'published' ? 'منشورة' : 'مسودة'}
-                          </Badge>
+                          <div className="flex items-center gap-2">
+                            <Switch
+                              checked={p.status === 'published'}
+                              onCheckedChange={(checked) => setPages((prev) => prev.map((x) => x.id === p.id ? { ...x, status: checked ? 'published' : 'draft' } : x))}
+                            />
+                            <span className="text-xs text-muted-foreground">{p.status === 'published' ? 'منشورة' : 'مسودة'}</span>
+                          </div>
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-0.5 justify-end">
@@ -1004,7 +1008,7 @@ export default function AdminSettings(): JSX.Element {
 
       {/* Page Modal */}
       <Dialog open={!!pageModal} onOpenChange={(o) => { if (!o) setPageModal(null); }}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>{pageModal?.isNew ? 'إضافة صفحة' : 'تعديل صفحة'}</DialogTitle>
           </DialogHeader>
@@ -1020,19 +1024,33 @@ export default function AdminSettings(): JSX.Element {
                   <Input value={pageModal.slug} onChange={(e) => setPageModal({ ...pageModal, slug: e.target.value })} placeholder="terms" dir="ltr" />
                 </div>
               </div>
-              <div className="space-y-1.5">
-                <Label>الحالة</Label>
-                <Select value={pageModal.status} onValueChange={(v) => setPageModal({ ...pageModal, status: v as 'published' | 'draft' })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="published">منشورة</SelectItem>
-                    <SelectItem value="draft">مسودة</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="flex items-center justify-between">
+                <Label>منشورة</Label>
+                <Switch
+                  checked={pageModal.status === 'published'}
+                  onCheckedChange={(checked) => setPageModal({ ...pageModal, status: checked ? 'published' : 'draft' })}
+                />
               </div>
               <div className="space-y-1.5">
                 <Label>المحتوى</Label>
-                <Textarea value={pageModal.content} onChange={(e) => setPageModal({ ...pageModal, content: e.target.value })} rows={8} className="font-mono text-sm" dir="rtl" />
+                <div className="flex items-center gap-1 border rounded-t-md px-2 py-1.5 bg-muted/50">
+                  <button type="button" className="p-1.5 rounded hover:bg-muted text-xs font-bold" onClick={() => document.execCommand('bold')}>B</button>
+                  <button type="button" className="p-1.5 rounded hover:bg-muted text-xs italic" onClick={() => document.execCommand('italic')}>I</button>
+                  <button type="button" className="p-1.5 rounded hover:bg-muted text-xs underline" onClick={() => document.execCommand('underline')}>U</button>
+                  <span className="w-px h-4 bg-border mx-1" />
+                  <button type="button" className="p-1.5 rounded hover:bg-muted text-xs" onClick={() => document.execCommand('insertUnorderedList')}>• قائمة</button>
+                  <button type="button" className="p-1.5 rounded hover:bg-muted text-xs" onClick={() => document.execCommand('insertOrderedList')}>1. قائمة</button>
+                  <span className="w-px h-4 bg-border mx-1" />
+                  <button type="button" className="p-1.5 rounded hover:bg-muted text-xs" onClick={() => { const url = prompt('أدخل الرابط:'); if (url) document.execCommand('createLink', false, url); }}>رابط</button>
+                  <button type="button" className="p-1.5 rounded hover:bg-muted text-xs font-bold" onClick={() => document.execCommand('formatBlock', false, 'h2')}>عنوان</button>
+                </div>
+                <div
+                  contentEditable
+                  dir="rtl"
+                  className="min-h-[200px] max-h-[400px] overflow-y-auto border border-t-0 rounded-b-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 prose prose-sm max-w-none"
+                  dangerouslySetInnerHTML={{ __html: pageModal.content }}
+                  onBlur={(e) => setPageModal({ ...pageModal, content: e.currentTarget.innerHTML })}
+                />
               </div>
             </div>
           )}
