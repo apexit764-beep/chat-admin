@@ -96,7 +96,6 @@ export default function AdminPlans(): JSX.Element {
   const showToast = useUIStore((s) => s.showToast);
   const { confirm } = useConfirm();
 
-  const [previewCountry, setPreviewCountry] = useState('OM');
   const [activeFilter, setActiveFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
@@ -174,8 +173,6 @@ export default function AdminPlans(): JSX.Element {
   };
 
 
-  const previewC = countries.find((c) => c.code === previewCountry);
-
   return (
     <TooltipProvider>
       <div className="p-4 lg:p-6 space-y-5">
@@ -198,16 +195,6 @@ export default function AdminPlans(): JSX.Element {
                 <SelectItem value="all">كل الحالات</SelectItem>
                 <SelectItem value="active">نشطة</SelectItem>
                 <SelectItem value="inactive">معطّلة</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={previewCountry} onValueChange={setPreviewCountry}>
-              <SelectTrigger className="w-[160px] h-9 rounded-lg text-sm">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {countries.map((c) => (
-                  <SelectItem key={c.code} value={c.code}>{c.flag} {c.nameAr}</SelectItem>
-                ))}
               </SelectContent>
             </Select>
             {activeFilterCount > 0 && (
@@ -259,26 +246,16 @@ export default function AdminPlans(): JSX.Element {
                     <TableHead className="text-center w-12">#</TableHead>
                     <TableHead className="text-start">الباقة</TableHead>
                     <TableHead className="text-center">الحالة</TableHead>
-                    <TableHead className="text-start">السعر ({previewC?.currency ?? '—'})</TableHead>
                     <TableHead className="text-center">الحدود</TableHead>
                     <TableHead className="text-center">الميزات</TableHead>
                     <TableHead className="text-center">العملاء</TableHead>
-                    <TableHead className="text-center">MRR</TableHead>
                     <TableHead className="text-center">الإجراءات</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredPlans.map((p, idx) => {
                     const style = tierStyle[p.tier];
-                    const price = p.pricesPerCountry[previewCountry] ?? { monthly: 0, yearly: 0 };
                     const clientCount = clients.filter((c) => c.planId === p.id).length;
-                    const totalMrr = clients
-                      .filter((c) => c.planId === p.id && c.status === 'active')
-                      .reduce((acc, c) => acc + c.mrr, 0);
-                    const yearlyDiscountPct = price.monthly > 0 && price.yearly > 0 && price.yearly < price.monthly * 12
-                      ? Math.round(((price.monthly * 12 - price.yearly) / (price.monthly * 12)) * 100)
-                      : 0;
-                    const mrrCurrency = clients.find((c) => c.planId === p.id)?.currency ?? previewC?.currency ?? 'USD';
                     return (
                       <TableRow
                         key={p.id}
@@ -293,14 +270,14 @@ export default function AdminPlans(): JSX.Element {
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2 min-w-0">
-                            {p.popular && (
-                              <Star className="h-4 w-4 text-primary fill-current shrink-0" />
-                            )}
                             <div className="min-w-0">
                               <p className={cn('font-bold', style.text)}>{p.nameAr}</p>
                               <p className="text-xs text-muted-foreground line-clamp-1">{p.tagline}</p>
                             </div>
-                                          </div>
+                            {p.popular && (
+                              <Star className="h-4 w-4 text-primary fill-current shrink-0" />
+                            )}
+                          </div>
                         </TableCell>
                         <TableCell className="text-center">
                           <button
@@ -316,20 +293,6 @@ export default function AdminPlans(): JSX.Element {
                             <span className={cn('h-1.5 w-1.5 rounded-full', p.active ? 'bg-success' : 'bg-muted-foreground')} />
                             {p.active ? 'نشطة' : 'معطّلة'}
                           </button>
-                        </TableCell>
-                        <TableCell>
-                          <div>
-                            <p className="font-bold whitespace-nowrap">
-                              {formatMoney(price.monthly, previewC?.currency ?? 'USD')}
-                              <span className="text-xs text-muted-foreground font-normal"> /شهر</span>
-                            </p>
-                            <p className="text-xs text-muted-foreground whitespace-nowrap">
-                              {formatMoney(price.yearly, previewC?.currency ?? 'USD')} /سنة
-                              {yearlyDiscountPct > 0 && (
-                                <span className="text-emerald-600 font-semibold ms-1">-{yearlyDiscountPct}%</span>
-                              )}
-                            </p>
-                          </div>
                         </TableCell>
                         <TableCell className="text-center">
                           <div className="inline-flex flex-wrap items-center gap-1.5 text-xs justify-center">
@@ -365,11 +328,6 @@ export default function AdminPlans(): JSX.Element {
                         <TableCell className="text-center">
                           <span className="font-semibold">{clientCount}</span>
                           <span className="text-xs text-muted-foreground"> عميل</span>
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <span className={cn('font-semibold', totalMrr > 0 ? 'text-emerald-600' : 'text-muted-foreground')}>
-                            {totalMrr > 0 ? formatMoney(totalMrr, mrrCurrency) : '—'}
-                          </span>
                         </TableCell>
                         <TableCell className="text-center">
                           <div className="flex items-center gap-0.5 justify-center">
