@@ -8,7 +8,7 @@ import {
   CheckCircle2,
   Building2,
   CreditCard,
-  BarChart3,
+  Clock,
   Percent,
 } from 'lucide-react';
 import { StatCard } from '@components/ui';
@@ -49,9 +49,7 @@ export default function AdminDashboard(): JSX.Element {
     [subscriptions]
   );
 
-  // ARPU (average revenue per user) = MRR / active clients
   const activeClients = useMemo(() => clients.filter((c) => c.status === 'active'), [clients]);
-  const arpu = activeClients.length ? Math.round(mrrTotal / activeClients.length) : 0;
 
   // MRR history: active-at-that-time subscriptions
   const mrrHistory = useMemo(() => {
@@ -83,6 +81,8 @@ export default function AdminDashboard(): JSX.Element {
     : null;
 
   /* ══════════════════════ Client metrics ══════════════════════ */
+
+  const trialCount = clients.filter((c) => c.status === 'trial').length;
 
   // New clients within last 30 days
   const newClients30d = useMemo(() => {
@@ -212,9 +212,9 @@ export default function AdminDashboard(): JSX.Element {
             iconColor="text-success"
           />
           <StatCard
-            label="ARPU"
-            value={`$${arpu.toLocaleString()}`}
-            icon={<BarChart3 className="h-4 w-4" />}
+            label="فترة تجريبية"
+            value={trialCount}
+            icon={<Clock className="h-4 w-4" />}
             iconBg="bg-info/15"
             iconColor="text-info"
           />
