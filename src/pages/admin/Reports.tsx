@@ -144,9 +144,9 @@ export default function AdminReports(): JSX.Element {
   const exportPdf = (): void => {
     const html = `
       <h1>تقرير أداء المنصة</h1>
-      <p class="muted">${new Date().toLocaleDateString('ar-EG')}</p>
+      <p class="muted">${new Date().toLocaleDateString('ar-u-nu-latn')}</p>
       <table>
-        <tr><td>MRR</td><td class="right"><strong>$${Math.round(mrrTotal).toLocaleString()}</strong></td></tr>
+        <tr><td>MRR</td><td class="right"><strong>$${Math.round(mrrTotal).toLocaleString('en-US')}</strong></td></tr>
         <tr><td>ARPU</td><td class="right">$${arpu}</td></tr>
         <tr><td>معدل الإلغاء</td><td class="right">${churnRate}%</td></tr>
         <tr><td>إجمالي العملاء</td><td class="right">${clients.length}</td></tr>
@@ -156,7 +156,7 @@ export default function AdminReports(): JSX.Element {
       <table>
         <thead><tr><th>الدولة</th><th class="right">العملاء</th><th class="right">الإيراد الشهري</th><th class="right">متوسط الإيراد</th></tr></thead>
         <tbody>
-          ${byCountry.map((x) => `<tr><td>${x.country.flag} ${x.country.nameAr}</td><td class="right">${x.count}</td><td class="right">$${Math.round(x.revenue).toLocaleString()}</td><td class="right">$${x.avgRevenue}</td></tr>`).join('')}
+          ${byCountry.map((x) => `<tr><td>${x.country.flag} ${x.country.nameAr}</td><td class="right">${x.count}</td><td class="right">$${Math.round(x.revenue).toLocaleString('en-US')}</td><td class="right">$${x.avgRevenue}</td></tr>`).join('')}
         </tbody>
       </table>
     `;
@@ -190,7 +190,7 @@ export default function AdminReports(): JSX.Element {
       <div className="grid grid-cols-2 gap-3">
         <StatCard
           label="الإيراد الشهري"
-          value={`$${Math.round(mrrTotal).toLocaleString()}`}
+          value={`$${Math.round(mrrTotal).toLocaleString('en-US')}`}
           icon={<TrendingUp className="h-4 w-4" />}
           iconBg="bg-success/15"
           iconColor="text-success"
@@ -322,7 +322,7 @@ export default function AdminReports(): JSX.Element {
                       </div>
                     </TableCell>
                     <TableCell className="font-semibold">{x.count}</TableCell>
-                    <TableCell className="font-semibold text-success">${Math.round(x.revenue).toLocaleString()}</TableCell>
+                    <TableCell className="font-semibold text-success">${Math.round(x.revenue).toLocaleString('en-US')}</TableCell>
                     <TableCell>${x.avgRevenue}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
@@ -353,7 +353,7 @@ function FunnelStep({ label, value, color, colorHex, share }: { label: string; v
         />
         <div className="absolute inset-0 flex items-center justify-end px-2">
           <span className="text-xs font-bold text-foreground">
-            {value.toLocaleString()}
+            {value.toLocaleString('en-US')}
           </span>
         </div>
       </div>

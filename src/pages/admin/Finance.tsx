@@ -139,9 +139,9 @@ export default function AdminFinance(): JSX.Element {
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="إجمالي الفواتير" value={`$${Math.round(totalInvoices).toLocaleString()}`} icon={<Receipt className="h-5 w-5" />} iconBg="bg-primary/15" iconColor="text-primary" />
-        <StatCard label="المحصّل" value={`$${Math.round(paidTotal).toLocaleString()}`} icon={<CheckCircle2 className="h-5 w-5" />} iconBg="bg-success/15" iconColor="text-success" />
-        <StatCard label="مستحق التحصيل" value={`$${Math.round(pendingTotal).toLocaleString()}`} icon={<Clock className="h-5 w-5" />} iconBg="bg-warning/15" iconColor="text-warning" />
+        <StatCard label="إجمالي الفواتير" value={`$${Math.round(totalInvoices).toLocaleString('en-US')}`} icon={<Receipt className="h-5 w-5" />} iconBg="bg-primary/15" iconColor="text-primary" />
+        <StatCard label="المحصّل" value={`$${Math.round(paidTotal).toLocaleString('en-US')}`} icon={<CheckCircle2 className="h-5 w-5" />} iconBg="bg-success/15" iconColor="text-success" />
+        <StatCard label="مستحق التحصيل" value={`$${Math.round(pendingTotal).toLocaleString('en-US')}`} icon={<Clock className="h-5 w-5" />} iconBg="bg-warning/15" iconColor="text-warning" />
         <StatCard label="فواتير متأخرة" value={overdueInvoices.length} icon={<AlertTriangle className="h-5 w-5" />} iconBg="bg-danger/15" iconColor="text-danger" />
       </div>
 
@@ -195,7 +195,7 @@ export default function AdminFinance(): JSX.Element {
           <Button variant="outline" size="sm" onClick={() => {
             const html = `
               <h1>تقرير الفواتير</h1>
-              <p class="muted">${new Date().toLocaleDateString('ar-EG')}</p>
+              <p class="muted">${new Date().toLocaleDateString('ar-u-nu-latn')}</p>
               <table>
                 <thead><tr><th>رقم الفاتورة</th><th>العميل</th><th class="right">الإجمالي</th><th>الحالة</th><th>تاريخ الاستحقاق</th></tr></thead>
                 <tbody>

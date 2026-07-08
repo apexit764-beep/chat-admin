@@ -195,7 +195,7 @@ export function CountryMap({ data, height = 320 }: CountryMapProps): JSX.Element
           {typeof hovered.mrr === 'number' && hovered.mrr > 0 && (
             <div className="flex items-center justify-between gap-4 mt-0.5">
               <span className="text-muted-foreground">MRR</span>
-              <span className="font-bold text-emerald-600 dark:text-emerald-400">${hovered.mrr.toLocaleString()}</span>
+              <span className="font-bold text-emerald-600 dark:text-emerald-400">${hovered.mrr.toLocaleString('en-US')}</span>
             </div>
           )}
           <div className="flex items-center justify-between gap-4 mt-0.5">

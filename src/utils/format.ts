@@ -10,18 +10,18 @@ export function timeAgo(iso: string): string {
   if (diff < 3600) return `قبل ${Math.floor(diff / 60)} د`;
   if (diff < 86400) return `قبل ${Math.floor(diff / 3600)} س`;
   if (diff < 604800) return `قبل ${Math.floor(diff / 86400)} يوم`;
-  return then.toLocaleDateString('ar-OM', { day: 'numeric', month: 'short' });
+  return then.toLocaleDateString('ar-u-nu-latn', { day: 'numeric', month: 'short' });
 }
 
 export function formatTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString('ar-OM', {
+  return new Date(iso).toLocaleTimeString('ar-u-nu-latn', {
     hour: '2-digit',
     minute: '2-digit',
   });
 }
 
 export function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('ar-OM', {
+  return new Date(iso).toLocaleDateString('ar-u-nu-latn', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',

@@ -60,7 +60,7 @@ export function LineChart({ labels, series, height = 240, areaFill = true, rtl =
     return d;
   };
 
-  const fmt = formatValue ?? ((v: number) => v.toLocaleString());
+  const fmt = formatValue ?? ((v: number) => v.toLocaleString('en-US'));
 
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -117,7 +117,7 @@ export function LineChart({ labels, series, height = 240, areaFill = true, rtl =
             fill="currentColor"
             opacity="0.45"
           >
-            {Math.round(maxY * g).toLocaleString()}
+            {Math.round(maxY * g).toLocaleString('en-US')}
           </text>
         ))}
         {displayLabels.map((lbl, i) => (

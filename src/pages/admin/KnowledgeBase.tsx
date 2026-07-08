@@ -236,7 +236,7 @@ export default function KnowledgeBase(): JSX.Element {
               <Eye className="h-5 w-5 text-violet-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{stats.totalViews.toLocaleString()}</p>
+              <p className="text-2xl font-bold">{stats.totalViews.toLocaleString('en-US')}</p>
               <p className="text-xs text-muted-foreground">إجمالي المشاهدات</p>
             </div>
           </div>
@@ -367,7 +367,7 @@ export default function KnowledgeBase(): JSX.Element {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-center text-muted-foreground">
-                          {article.views.toLocaleString()}
+                          {article.views.toLocaleString('en-US')}
                         </TableCell>
                         <TableCell className="text-center">
                           <span className="inline-flex items-center gap-2 text-xs text-muted-foreground">

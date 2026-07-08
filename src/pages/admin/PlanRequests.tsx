@@ -344,7 +344,7 @@ function RequestDetail({
       )}
 
       <p className="text-xs text-muted-foreground">
-        تاريخ الإرسال: {new Date(r.createdAt).toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+        تاريخ الإرسال: {new Date(r.createdAt).toLocaleDateString('ar-u-nu-latn', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
       </p>
     </div>
   );

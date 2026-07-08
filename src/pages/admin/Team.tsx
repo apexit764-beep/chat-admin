@@ -822,7 +822,7 @@ export default function AdminTeam(): JSX.Element {
                       </TableCell>
                       <TableCell className="hidden lg:table-cell">
                         <span className="text-xs text-muted-foreground">
-                          {new Date(u.createdAt).toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric' })}
+                          {new Date(u.createdAt).toLocaleDateString('ar-u-nu-latn', { year: 'numeric', month: 'short', day: 'numeric' })}
                         </span>
                       </TableCell>
                       <TableCell>

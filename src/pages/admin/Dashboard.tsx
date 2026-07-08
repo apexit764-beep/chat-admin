@@ -220,7 +220,7 @@ export default function AdminDashboard(): JSX.Element {
           />
           <StatCard
             label="إجمالي الإيرادات"
-            value={`$${totalRevenue.toLocaleString()}`}
+            value={`$${totalRevenue.toLocaleString('en-US')}`}
             icon={<DollarSign className="h-4 w-4" />}
             iconBg="bg-success/15"
             iconColor="text-success"
@@ -229,7 +229,7 @@ export default function AdminDashboard(): JSX.Element {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <StatCard
             label="الإيراد الشهري (MRR)"
-            value={`$${currentMrr.toLocaleString()}`}
+            value={`$${currentMrr.toLocaleString('en-US')}`}
             icon={<TrendingUp className="h-4 w-4" />}
             iconBg="bg-primary/15"
             iconColor="text-primary"
@@ -279,7 +279,7 @@ export default function AdminDashboard(): JSX.Element {
               labels={mrrHistory.labels}
               series={[{ name: 'MRR', color: '#2563EB', data: mrrHistory.values }]}
               height={220}
-              formatValue={(v) => `$${v.toLocaleString()}`}
+              formatValue={(v) => `$${v.toLocaleString('en-US')}`}
             />
           </CardContent>
         </Card>
@@ -315,7 +315,7 @@ export default function AdminDashboard(): JSX.Element {
                       <TableCell className="py-2.5 text-xs text-muted-foreground font-mono">{i + 1}</TableCell>
                       <TableCell className="py-2.5 text-sm font-medium">{plan.nameAr}</TableCell>
                       <TableCell className="py-2.5 text-sm font-bold">{subscribers}</TableCell>
-                      <TableCell className="py-2.5 text-sm font-bold text-success">${revenue.toLocaleString()}</TableCell>
+                      <TableCell className="py-2.5 text-sm font-bold text-success">${revenue.toLocaleString('en-US')}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -515,7 +515,7 @@ export default function AdminDashboard(): JSX.Element {
                         <span className="font-bold">{c.active}</span>
                         <span className="text-xs text-muted-foreground"> / {c.total}</span>
                       </TableCell>
-                      <TableCell className="py-2.5 text-sm font-bold text-success">${c.mrr.toLocaleString()}</TableCell>
+                      <TableCell className="py-2.5 text-sm font-bold text-success">${c.mrr.toLocaleString('en-US')}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

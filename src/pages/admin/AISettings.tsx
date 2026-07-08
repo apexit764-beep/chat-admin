@@ -884,7 +884,7 @@ function DocumentsCard({
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{doc.name}</p>
                   <p className="text-xs text-muted-foreground">
-                    {formatSize(doc.size)} · {new Date(doc.uploadedAt).toLocaleDateString('ar-EG', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    {formatSize(doc.size)} · {new Date(doc.uploadedAt).toLocaleDateString('ar-u-nu-latn', { day: 'numeric', month: 'short', year: 'numeric' })}
                   </p>
                 </div>
                 <Button

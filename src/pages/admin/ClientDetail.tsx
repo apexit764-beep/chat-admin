@@ -274,7 +274,7 @@ export default function ClientDetail(): JSX.Element {
           <TabsContent value="overview" className="mt-5 space-y-5">
             {/* Quick stats */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <QuickStat icon={MessageSquare} label="المحادثات" value={client.conversationCount.toLocaleString()} color="primary" />
+              <QuickStat icon={MessageSquare} label="المحادثات" value={client.conversationCount.toLocaleString('en-US')} color="primary" />
               <QuickStat icon={Users} label="الموظفون" value={String(client.agentCount)} color="info" />
               <QuickStat icon={Radio} label="القنوات" value={String(client.channelCount)} color="success" />
               <QuickStat icon={TrendingUp} label="MRR" value={client.mrr > 0 ? formatMoney(client.mrr, client.currency) : '—'} color="warning" />
@@ -735,7 +735,7 @@ export default function ClientDetail(): JSX.Element {
                         <span>{bar.label}</span>
                       </div>
                       <span className="text-xs text-muted-foreground">
-                        {bar.used.toLocaleString()} / {isUnlimited ? '∞' : bar.max.toLocaleString()}
+                        {bar.used.toLocaleString('en-US')} / {isUnlimited ? '∞' : bar.max.toLocaleString('en-US')}
                       </span>
                     </div>
                     <Progress

@@ -150,10 +150,10 @@ export default function LiveChat() {
   };
 
   const formatMsgTime = (iso: string) =>
-    new Date(iso).toLocaleTimeString('ar-OM', { hour: '2-digit', minute: '2-digit' });
+    new Date(iso).toLocaleTimeString('ar-u-nu-latn', { hour: '2-digit', minute: '2-digit' });
 
   const formatDate = (iso: string) =>
-    new Date(iso).toLocaleDateString('ar-OM', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    new Date(iso).toLocaleDateString('ar-u-nu-latn', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
   return (
     <div className="flex gap-3 h-[calc(100vh-73px)] p-3">
