@@ -76,12 +76,22 @@ const PAYMENT_METHODS = [
 const TRIGGER_EVENTS = [
   { key: 'on_client_registered', label: 'عند التسجيل', description: 'يُرسل عند تسجيل عميل جديد في النظام' },
   { key: 'on_invoice_created', label: 'عند إصدار فاتورة', description: 'يُرسل عند إنشاء فاتورة جديدة للعميل' },
-  { key: 'before_renewal_3d', label: 'قبل التجديد بـ3 أيام', description: 'تذكير تلقائي قبل تجديد الاشتراك' },
+  { key: 'before_renewal', label: 'قبل التجديد', description: 'تذكير تلقائي قبل تجديد الاشتراك بمدة محددة', hasDuration: true },
+  { key: 'on_renewal', label: 'عند التجديد', description: 'يُرسل عند تجديد الاشتراك بنجاح' },
   { key: 'on_subscription_expired', label: 'عند انتهاء الاشتراك', description: 'يُرسل عند انتهاء صلاحية اشتراك العميل' },
   { key: 'on_plan_upgraded', label: 'عند ترقية الباقة', description: 'يُرسل عند ترقية العميل لباقة أعلى' },
   { key: 'on_plan_downgraded', label: 'عند تخفيض الباقة', description: 'يُرسل عند تخفيض العميل لباقة أقل' },
   { key: 'on_payment_failed', label: 'عند فشل الدفع', description: 'يُرسل عند فشل عملية الدفع' },
   { key: 'on_payment_success', label: 'عند نجاح الدفع', description: 'يُرسل بعد تأكيد الدفع بنجاح' },
+] as const;
+
+const DURATION_OPTIONS = [
+  { value: '1', label: 'يوم واحد' },
+  { value: '3', label: '3 أيام' },
+  { value: '5', label: '5 أيام' },
+  { value: '7', label: 'أسبوع' },
+  { value: '14', label: 'أسبوعين' },
+  { value: '30', label: 'شهر' },
 ] as const;
 
 export default function AdminSettings(): JSX.Element {
@@ -128,11 +138,11 @@ export default function AdminSettings(): JSX.Element {
   const [emailOtp, setEmailOtp] = useState(['', '', '', '', '', '']);
   const [phoneOtp, setPhoneOtp] = useState(['', '', '', '', '', '']);
   // Email templates CRUD
-  type EmailTemplate = { id: string; name: string; subject: string; body: string; trigger: string };
+  type EmailTemplate = { id: string; name: string; subject: string; body: string; trigger: string; triggerDays?: string };
   const [emailTemplates, setEmailTemplates] = useState<EmailTemplate[]>([
     { id: '1', name: 'رسالة الترحيب', subject: 'مرحباً بك في {{product_name}}', body: 'مرحباً {{client_name}}!\n\nشكراً لتسجيلك في {{product_name}}. حسابك جاهز للاستخدام.\n\nفريق الدعم', trigger: 'on_client_registered' },
     { id: '2', name: 'إشعار فاتورة', subject: 'فاتورة جديدة #{{invoice_number}}', body: 'مرحباً {{client_name}},\n\nتم إصدار فاتورة جديدة بمبلغ {{amount}} {{currency}}.\nرقم الفاتورة: {{invoice_number}}\n\nشكراً لثقتكم.', trigger: 'on_invoice_created' },
-    { id: '3', name: 'تذكير تجديد', subject: 'تجديد اشتراكك في {{plan_name}}', body: 'مرحباً {{client_name}},\n\nاشتراكك في باقة {{plan_name}} سيتجدد خلال 3 أيام.\nالمبلغ: {{amount}} {{currency}}\n\nللتعديل أو الإلغاء تواصل معنا.', trigger: 'before_renewal_3d' },
+    { id: '3', name: 'تذكير تجديد', subject: 'تجديد اشتراكك في {{plan_name}}', body: 'مرحباً {{client_name}},\n\nاشتراكك في باقة {{plan_name}} سيتجدد خلال 3 أيام.\nالمبلغ: {{amount}} {{currency}}\n\nللتعديل أو الإلغاء تواصل معنا.', trigger: 'before_renewal', triggerDays: '3' },
   ]);
   const [emailModal, setEmailModal] = useState<(EmailTemplate & { isNew: boolean }) | null>(null);
 
@@ -609,7 +619,7 @@ export default function AdminSettings(): JSX.Element {
                   title="قوالب البريد الإلكتروني"
                   subtitle="إدارة قوالب رسائل البريد المرسلة للعملاء"
                   action={
-                    <Button size="sm" onClick={() => setEmailModal({ id: String(Date.now()), name: '', subject: '', body: '', trigger: '', isNew: true })}>
+                    <Button size="sm" onClick={() => setEmailModal({ id: String(Date.now()), name: '', subject: '', body: '', trigger: '', triggerDays: undefined, isNew: true })}>
                       <Plus className="h-4 w-4 me-2" /> إضافة قالب
                     </Button>
                   }
@@ -630,7 +640,12 @@ export default function AdminSettings(): JSX.Element {
                         <TableCell className="text-xs text-muted-foreground font-mono">{idx + 1}</TableCell>
                         <TableCell className="font-medium">{t.name}</TableCell>
                         <TableCell className="text-sm text-muted-foreground max-w-[200px] truncate">{t.subject}</TableCell>
-                        <TableCell><Badge variant="secondary" className="text-[10px]">{TRIGGER_EVENTS.find((e) => e.key === t.trigger)?.label ?? t.trigger}</Badge></TableCell>
+                        <TableCell>
+                          <Badge variant="secondary" className="text-[10px]">
+                            {TRIGGER_EVENTS.find((e) => e.key === t.trigger)?.label ?? t.trigger}
+                            {t.trigger === 'before_renewal' && t.triggerDays && ` بـ${DURATION_OPTIONS.find((d) => d.value === t.triggerDays)?.label ?? t.triggerDays + ' أيام'}`}
+                          </Badge>
+                        </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-0.5 justify-end">
                             <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => setEmailModal({ ...t, isNew: false })}>
@@ -988,18 +1003,36 @@ export default function AdminSettings(): JSX.Element {
               </div>
               <div className="space-y-1.5">
                 <Label>المشغّل (Trigger)</Label>
-                <Select value={emailModal.trigger} onValueChange={(v) => setEmailModal({ ...emailModal, trigger: v })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="اختر الحدث المشغّل" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {TRIGGER_EVENTS.map((ev) => (
-                      <SelectItem key={ev.key} value={ev.key}>
-                        {ev.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className={cn('flex gap-2', emailModal.trigger === 'before_renewal' ? 'items-start' : 'items-center')}>
+                  <div className="flex-1">
+                    <Select value={emailModal.trigger} onValueChange={(v) => setEmailModal({ ...emailModal, trigger: v, triggerDays: v === 'before_renewal' ? (emailModal.triggerDays ?? '3') : undefined })}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر الحدث المشغّل" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {TRIGGER_EVENTS.map((ev) => (
+                          <SelectItem key={ev.key} value={ev.key}>
+                            {ev.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {emailModal.trigger === 'before_renewal' && (
+                    <div className="w-36">
+                      <Select value={emailModal.triggerDays ?? '3'} onValueChange={(v) => setEmailModal({ ...emailModal, triggerDays: v })}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {DURATION_OPTIONS.map((d) => (
+                            <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+                </div>
                 {emailModal.trigger && (
                   <p className="text-[11px] text-muted-foreground">
                     {TRIGGER_EVENTS.find((e) => e.key === emailModal.trigger)?.description}
@@ -1037,11 +1070,12 @@ export default function AdminSettings(): JSX.Element {
             <Button onClick={() => {
               if (!emailModal) return;
               if (!emailModal.name) { showToast('اسم القالب مطلوب', 'error'); return; }
+              const tpl: EmailTemplate = { id: emailModal.id, name: emailModal.name, subject: emailModal.subject, body: emailModal.body, trigger: emailModal.trigger, triggerDays: emailModal.triggerDays };
               if (emailModal.isNew) {
-                setEmailTemplates((prev) => [...prev, { id: emailModal.id, name: emailModal.name, subject: emailModal.subject, body: emailModal.body, trigger: emailModal.trigger }]);
+                setEmailTemplates((prev) => [...prev, tpl]);
                 showToast('تمت الإضافة', 'success');
               } else {
-                setEmailTemplates((prev) => prev.map((t) => t.id === emailModal.id ? { id: t.id, name: emailModal.name, subject: emailModal.subject, body: emailModal.body, trigger: emailModal.trigger } : t));
+                setEmailTemplates((prev) => prev.map((t) => t.id === tpl.id ? tpl : t));
                 showToast('تم الحفظ', 'success');
               }
               setEmailModal(null);
