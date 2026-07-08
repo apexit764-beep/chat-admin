@@ -85,14 +85,6 @@ const TRIGGER_EVENTS = [
   { key: 'on_payment_success', label: 'عند نجاح الدفع', description: 'يُرسل بعد تأكيد الدفع بنجاح' },
 ] as const;
 
-const DURATION_OPTIONS = [
-  { value: '1', label: 'يوم واحد' },
-  { value: '3', label: '3 أيام' },
-  { value: '5', label: '5 أيام' },
-  { value: '7', label: 'أسبوع' },
-  { value: '14', label: 'أسبوعين' },
-  { value: '30', label: 'شهر' },
-] as const;
 
 export default function AdminSettings(): JSX.Element {
   const initialTab = ((): Tab => {
@@ -643,7 +635,7 @@ export default function AdminSettings(): JSX.Element {
                         <TableCell>
                           <Badge variant="secondary" className="text-[10px]">
                             {TRIGGER_EVENTS.find((e) => e.key === t.trigger)?.label ?? t.trigger}
-                            {t.trigger === 'before_renewal' && t.triggerDays && ` بـ${DURATION_OPTIONS.find((d) => d.value === t.triggerDays)?.label ?? t.triggerDays + ' أيام'}`}
+                            {t.trigger === 'before_renewal' && t.triggerDays && ` بـ${t.triggerDays} يوم`}
                           </Badge>
                         </TableCell>
                         <TableCell>
@@ -1019,17 +1011,16 @@ export default function AdminSettings(): JSX.Element {
                     </Select>
                   </div>
                   {emailModal.trigger === 'before_renewal' && (
-                    <div className="w-36">
-                      <Select value={emailModal.triggerDays ?? '3'} onValueChange={(v) => setEmailModal({ ...emailModal, triggerDays: v })}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {DURATION_OPTIONS.map((d) => (
-                            <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                    <div className="flex items-center gap-1.5 w-36">
+                      <Input
+                        type="number"
+                        min={1}
+                        max={365}
+                        value={emailModal.triggerDays ?? '3'}
+                        onChange={(e) => setEmailModal({ ...emailModal, triggerDays: e.target.value })}
+                        className="w-16 text-center"
+                      />
+                      <span className="text-sm text-muted-foreground whitespace-nowrap">يوم</span>
                     </div>
                   )}
                 </div>
