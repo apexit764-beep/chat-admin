@@ -24,6 +24,7 @@ import { cn } from '@/lib/utils';
 import type { Plan, PlanTier } from '@/types';
 
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -245,10 +246,10 @@ export default function AdminPlans(): JSX.Element {
                   <TableRow>
                     <TableHead className="text-center w-12">#</TableHead>
                     <TableHead className="text-start">الباقة</TableHead>
-                    <TableHead className="text-center">الحالة</TableHead>
                     <TableHead className="text-center">الحدود</TableHead>
                     <TableHead className="text-center">الميزات</TableHead>
                     <TableHead className="text-center">العملاء</TableHead>
+                    <TableHead className="text-center">الحالة</TableHead>
                     <TableHead className="text-center">الإجراءات</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -261,7 +262,6 @@ export default function AdminPlans(): JSX.Element {
                         key={p.id}
                         ref={(el) => { cardRefs.current[p.id] = el as unknown as HTMLDivElement; }}
                         className={cn(
-                          !p.active && 'opacity-70',
                           copiedId === p.id && 'animate-copied-pulse'
                         )}
                       >
@@ -278,21 +278,6 @@ export default function AdminPlans(): JSX.Element {
                               <Star className="h-4 w-4 text-primary fill-current shrink-0" />
                             )}
                           </div>
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <button
-                            type="button"
-                            onClick={() => { updatePlan(p.id, { active: !p.active }); showToast(p.active ? 'تم تعطيل الباقة' : 'تم تفعيل الباقة', 'success'); }}
-                            className={cn(
-                              'inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium transition-colors',
-                              p.active
-                                ? 'bg-success/10 text-success hover:bg-success/20'
-                                : 'bg-muted text-muted-foreground hover:bg-muted/70'
-                            )}
-                          >
-                            <span className={cn('h-1.5 w-1.5 rounded-full', p.active ? 'bg-success' : 'bg-muted-foreground')} />
-                            {p.active ? 'نشطة' : 'معطّلة'}
-                          </button>
                         </TableCell>
                         <TableCell className="text-center">
                           <div className="inline-flex flex-wrap items-center gap-1.5 text-xs justify-center">
@@ -328,6 +313,12 @@ export default function AdminPlans(): JSX.Element {
                         <TableCell className="text-center">
                           <span className="font-semibold">{clientCount}</span>
                           <span className="text-xs text-muted-foreground"> عميل</span>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Switch
+                            checked={p.active}
+                            onCheckedChange={(checked) => { updatePlan(p.id, { active: checked }); showToast(checked ? 'تم تفعيل الباقة' : 'تم تعطيل الباقة', 'success'); }}
+                          />
                         </TableCell>
                         <TableCell className="text-center">
                           <div className="flex items-center gap-0.5 justify-center">
