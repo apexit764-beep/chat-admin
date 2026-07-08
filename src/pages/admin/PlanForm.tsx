@@ -246,13 +246,13 @@ export default function PlanForm(): JSX.Element {
             </CardContent>
           </Card>
 
-          {/* Limits */}
+          {/* Limits - 2 per row */}
           <Card>
             <CardHeader>
               <h3 className="text-lg font-semibold">الحدود</h3>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-2">
                   <Label className="flex items-center gap-1.5"><Users className="h-3.5 w-3.5 text-muted-foreground" /> حد الموظفين</Label>
                   <Input type="number" min={-1} value={form.limitAgents} onChange={(e) => setForm({ ...form, limitAgents: Number(e.target.value) || 0 })} />
@@ -277,39 +277,47 @@ export default function PlanForm(): JSX.Element {
             </CardContent>
           </Card>
 
-          {/* Prices per country */}
+          {/* Prices per country - full name, each field on its own line */}
           <Card>
             <CardHeader>
               <h3 className="text-lg font-semibold">الأسعار حسب الدولة</h3>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div className="space-y-3">
                 {countries.map((co) => {
                   const price = form.pricesPerCountry[co.code] ?? { monthly: 0, yearly: 0 };
                   return (
-                    <div key={co.code} className="grid grid-cols-[auto_1fr_1fr] items-center gap-2 p-2.5 rounded-lg bg-muted">
-                      <span className="font-medium whitespace-nowrap"><span className="text-lg me-1">{co.flag}</span>{co.code}</span>
-                      <div className="relative">
-                        <Input
-                          type="number"
-                          min={0}
-                          value={price.monthly}
-                          onChange={(e) => setMonthlyPrice(co.code, Number(e.target.value) || 0)}
-                          placeholder="شهري"
-                          className="font-mono"
-                        />
-                        <span className="absolute end-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground pointer-events-none">/شهر {co.symbol}</span>
+                    <div key={co.code} className="p-3 rounded-lg bg-muted space-y-2.5">
+                      <div className="flex items-center gap-2 font-medium">
+                        <span className="text-lg">{co.flag}</span>
+                        <span>{co.nameAr}</span>
+                        <span className="text-xs text-muted-foreground">({co.code})</span>
                       </div>
-                      <div className="relative">
-                        <Input
-                          type="number"
-                          min={0}
-                          value={price.yearly}
-                          onChange={(e) => setForm({ ...form, pricesPerCountry: { ...form.pricesPerCountry, [co.code]: { ...price, yearly: Number(e.target.value) || 0 } } })}
-                          placeholder="سنوي"
-                          className="font-mono"
-                        />
-                        <span className="absolute end-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground pointer-events-none">/سنة</span>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div className="relative">
+                          <Label className="text-xs text-muted-foreground mb-1 block">السعر الشهري</Label>
+                          <Input
+                            type="number"
+                            min={0}
+                            value={price.monthly}
+                            onChange={(e) => setMonthlyPrice(co.code, Number(e.target.value) || 0)}
+                            placeholder="0"
+                            className="font-mono"
+                          />
+                          <span className="absolute end-2 bottom-2.5 text-[10px] text-muted-foreground pointer-events-none">{co.symbol}/شهر</span>
+                        </div>
+                        <div className="relative">
+                          <Label className="text-xs text-muted-foreground mb-1 block">السعر السنوي</Label>
+                          <Input
+                            type="number"
+                            min={0}
+                            value={price.yearly}
+                            onChange={(e) => setForm({ ...form, pricesPerCountry: { ...form.pricesPerCountry, [co.code]: { ...price, yearly: Number(e.target.value) || 0 } } })}
+                            placeholder="0"
+                            className="font-mono"
+                          />
+                          <span className="absolute end-2 bottom-2.5 text-[10px] text-muted-foreground pointer-events-none">{co.symbol}/سنة</span>
+                        </div>
                       </div>
                     </div>
                   );
@@ -339,25 +347,19 @@ export default function PlanForm(): JSX.Element {
               </div>
             </CardContent>
           </Card>
-
-          {/* Actions */}
-          <div className="flex items-center gap-3 justify-end pb-6">
-            <Button variant="outline" onClick={() => navigate('/plans')}>إلغاء</Button>
-            <Button onClick={submit}>{editing ? 'حفظ التعديلات' : 'إنشاء الباقة'}</Button>
-          </div>
         </div>
 
-        {/* Left side: Features (sticky) - 1/3 width */}
+        {/* Left side: Features (fixed with internal scroll) - 1/3 width */}
         <div className="w-full lg:w-[33%] lg:flex-shrink-0 order-2 lg:order-2">
-          <div className="lg:sticky lg:top-4">
-            <Card>
-              <CardHeader>
+          <div className="lg:sticky lg:top-4 lg:max-h-[calc(100vh-6rem)] lg:flex lg:flex-col">
+            <Card className="lg:flex lg:flex-col lg:overflow-hidden lg:max-h-full">
+              <CardHeader className="flex-shrink-0">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-semibold">الميزات</h3>
                   <span className="text-xs text-muted-foreground">{form.features.length} ميزة مفعّلة</span>
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="lg:overflow-y-auto lg:flex-1">
                 <div className="space-y-2">
                   {FEATURE_CATALOG.map((group) => {
                     const isCollapsed = collapsed[group.label] ?? false;
@@ -405,6 +407,12 @@ export default function PlanForm(): JSX.Element {
             </Card>
           </div>
         </div>
+      </div>
+
+      {/* Actions - full width at page level */}
+      <div className="flex items-center gap-3 justify-end py-5 border-t mt-5">
+        <Button variant="outline" onClick={() => navigate('/plans')}>إلغاء</Button>
+        <Button onClick={submit}>{editing ? 'حفظ التعديلات' : 'إنشاء الباقة'}</Button>
       </div>
     </div>
   );
