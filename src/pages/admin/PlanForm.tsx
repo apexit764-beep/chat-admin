@@ -89,6 +89,7 @@ interface FormState {
   limitContacts: number;
   pricesPerCountry: Record<string, { monthly: number; yearly: number }>;
   popular: boolean;
+  isTrial: boolean;
   active: boolean;
 }
 
@@ -124,6 +125,7 @@ export default function PlanForm(): JSX.Element {
         limitContacts: editing.limits.contacts,
         pricesPerCountry: { ...editing.pricesPerCountry },
         popular: editing.popular ?? false,
+        isTrial: editing.isTrial ?? false,
         active: editing.active,
       };
     }
@@ -139,6 +141,7 @@ export default function PlanForm(): JSX.Element {
       limitContacts: 1000,
       pricesPerCountry: defaultPrices,
       popular: false,
+      isTrial: false,
       active: true,
     };
   });
@@ -191,6 +194,7 @@ export default function PlanForm(): JSX.Element {
       },
       pricesPerCountry: form.pricesPerCountry,
       popular: form.popular,
+      isTrial: form.isTrial,
       active: form.active,
     };
     if (editing) {
@@ -324,7 +328,14 @@ export default function PlanForm(): JSX.Element {
           {/* Toggles */}
           <Card>
             <CardContent className="pt-6">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
+                <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
+                  <div>
+                    <p className="text-sm font-medium">باقة تجريبية</p>
+                    <p className="text-xs text-muted-foreground">مجانية للتجربة</p>
+                  </div>
+                  <Switch checked={form.isTrial} onCheckedChange={(checked) => setForm({ ...form, isTrial: checked })} />
+                </div>
                 <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
                   <div>
                     <p className="text-sm font-medium">الأكثر شعبية</p>

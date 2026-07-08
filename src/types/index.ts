@@ -180,6 +180,7 @@ export interface Plan {
   /** keyed by country code; price in local currency (monthly) */
   pricesPerCountry: Record<string, { monthly: number; yearly: number }>;
   popular?: boolean;
+  isTrial?: boolean;
   active: boolean;
   createdAt: string;
 }
