@@ -1,18 +1,15 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Users,
   DollarSign,
   TrendingUp,
-  TrendingDown,
   UserPlus,
-  Sparkles,
   ArrowUpRight,
   CheckCircle2,
   Building2,
-  UserCog,
-  Receipt,
   CreditCard,
+  BarChart3,
+  Percent,
 } from 'lucide-react';
 import { StatCard } from '@components/ui';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
@@ -39,10 +36,8 @@ export default function AdminDashboard(): JSX.Element {
   const clients = useAdminStore((s) => s.clients);
   const subscriptions = useAdminStore((s) => s.subscriptions);
   const transactions = useAdminStore((s) => s.transactions);
-  const invoices = useAdminStore((s) => s.invoices);
   const plans = useAdminStore((s) => s.plans);
   const countries = useAdminStore((s) => s.countries);
-  const adminUsers = useAdminStore((s) => s.adminUsers);
 
   /* ══════════════════════ Financial metrics ══════════════════════ */
 
@@ -53,9 +48,6 @@ export default function AdminDashboard(): JSX.Element {
       .reduce((acc, s) => acc + approxUSD(s.amount, s.currency), 0),
     [subscriptions]
   );
-
-  // ARR = MRR × 12
-  const arrTotal = Math.round(mrrTotal * 12);
 
   // ARPU (average revenue per user) = MRR / active clients
   const activeClients = useMemo(() => clients.filter((c) => c.status === 'active'), [clients]);
@@ -92,17 +84,6 @@ export default function AdminDashboard(): JSX.Element {
 
   /* ══════════════════════ Client metrics ══════════════════════ */
 
-  const trialCount = clients.filter((c) => c.status === 'trial').length;
-  const pastDueCount = clients.filter((c) => c.status === 'past_due').length;
-  const cancelledCount = clients.filter((c) => c.status === 'cancelled').length;
-
-  // Proper churn: cancelled / (active + past_due + cancelled)   — excludes trials
-  const paidBase = activeClients.length + pastDueCount + cancelledCount;
-  const churnRate = paidBase > 0 ? Math.round((cancelledCount / paidBase) * 100) : 0;
-
-  // Retention rate = 100 - churn (out of paid customers)
-  const retentionRate = 100 - churnRate;
-
   // New clients within last 30 days
   const newClients30d = useMemo(() => {
     const cutoff = Date.now() - 30 * 86400000;
@@ -122,9 +103,6 @@ export default function AdminDashboard(): JSX.Element {
     subscriptions.filter((s) => s.status === 'active').length,
     [subscriptions]
   );
-
-  // Total invoices count
-  const totalInvoices = invoices.length;
 
   // Trial → paid conversion (last 90 days)
   const conversionRate = useMemo(() => {
@@ -160,12 +138,6 @@ export default function AdminDashboard(): JSX.Element {
       .slice(0, 5);
   }, [clients, subscriptions]);
 
-  const overdueInvoiceAmount = useMemo(() =>
-    invoices
-      .filter((inv) => inv.status === 'pending' && new Date(inv.dueDate) < new Date())
-      .reduce((acc, inv) => acc + approxUSD(inv.total, inv.currency), 0),
-    [invoices]
-  );
 
   /* ══════════════════════ Distribution ══════════════════════ */
 
@@ -240,9 +212,9 @@ export default function AdminDashboard(): JSX.Element {
             iconColor="text-success"
           />
           <StatCard
-            label="إجمالي الموظفين"
-            value={adminUsers.length}
-            icon={<UserCog className="h-4 w-4" />}
+            label="ARPU"
+            value={`$${arpu.toLocaleString()}`}
+            icon={<BarChart3 className="h-4 w-4" />}
             iconBg="bg-info/15"
             iconColor="text-info"
           />
@@ -271,9 +243,9 @@ export default function AdminDashboard(): JSX.Element {
             iconColor="text-warning"
           />
           <StatCard
-            label="إجمالي الفواتير"
-            value={totalInvoices}
-            icon={<Receipt className="h-4 w-4" />}
+            label="معدل التحويل"
+            value={`${conversionRate}%`}
+            icon={<Percent className="h-4 w-4" />}
             iconBg="bg-info/15"
             iconColor="text-info"
           />
@@ -289,7 +261,7 @@ export default function AdminDashboard(): JSX.Element {
 
       {/* ══════════ Section 2: MRR Chart + Top Plans side by side ══════════ */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Card style={{minHeight: 320}} className="flex flex-col">
+        <Card className="min-h-80 flex flex-col">
           <CardHeader className="pb-1">
             <div className="flex items-center justify-between">
               <div>
@@ -312,7 +284,7 @@ export default function AdminDashboard(): JSX.Element {
           </CardContent>
         </Card>
 
-        <Card style={{minHeight: 320}}>
+        <Card className="min-h-80">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div>
@@ -356,7 +328,7 @@ export default function AdminDashboard(): JSX.Element {
       {/* ══════════ Section 3: Alerts side by side ══════════ */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Expiring trials */}
-        <Card style={{minHeight: 320}}>
+        <Card className="min-h-80">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -406,7 +378,7 @@ export default function AdminDashboard(): JSX.Element {
         </Card>
 
         {/* Past due */}
-        <Card style={{minHeight: 320}}>
+        <Card className="min-h-80">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
