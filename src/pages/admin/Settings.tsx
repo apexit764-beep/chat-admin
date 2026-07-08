@@ -73,6 +73,17 @@ const PAYMENT_METHODS = [
   { key: 'bank_transfer', label: 'تحويل بنكي' },
 ] as const;
 
+const TRIGGER_EVENTS = [
+  { key: 'on_client_registered', label: 'عند التسجيل', description: 'يُرسل عند تسجيل عميل جديد في النظام' },
+  { key: 'on_invoice_created', label: 'عند إصدار فاتورة', description: 'يُرسل عند إنشاء فاتورة جديدة للعميل' },
+  { key: 'before_renewal_3d', label: 'قبل التجديد بـ3 أيام', description: 'تذكير تلقائي قبل تجديد الاشتراك' },
+  { key: 'on_subscription_expired', label: 'عند انتهاء الاشتراك', description: 'يُرسل عند انتهاء صلاحية اشتراك العميل' },
+  { key: 'on_plan_upgraded', label: 'عند ترقية الباقة', description: 'يُرسل عند ترقية العميل لباقة أعلى' },
+  { key: 'on_plan_downgraded', label: 'عند تخفيض الباقة', description: 'يُرسل عند تخفيض العميل لباقة أقل' },
+  { key: 'on_payment_failed', label: 'عند فشل الدفع', description: 'يُرسل عند فشل عملية الدفع' },
+  { key: 'on_payment_success', label: 'عند نجاح الدفع', description: 'يُرسل بعد تأكيد الدفع بنجاح' },
+] as const;
+
 export default function AdminSettings(): JSX.Element {
   const initialTab = ((): Tab => {
     const h = typeof window !== 'undefined' ? window.location.hash.replace('#', '') : '';
@@ -119,9 +130,9 @@ export default function AdminSettings(): JSX.Element {
   // Email templates CRUD
   type EmailTemplate = { id: string; name: string; subject: string; body: string; trigger: string };
   const [emailTemplates, setEmailTemplates] = useState<EmailTemplate[]>([
-    { id: '1', name: 'رسالة الترحيب', subject: 'مرحباً بك في {{product_name}}', body: 'مرحباً {{client_name}}!\n\nشكراً لتسجيلك في {{product_name}}. حسابك جاهز للاستخدام.\n\nفريق الدعم', trigger: 'عند التسجيل' },
-    { id: '2', name: 'إشعار فاتورة', subject: 'فاتورة جديدة #{{invoice_number}}', body: 'مرحباً {{client_name}},\n\nتم إصدار فاتورة جديدة بمبلغ {{amount}} {{currency}}.\nرقم الفاتورة: {{invoice_number}}\n\nشكراً لثقتكم.', trigger: 'عند إصدار فاتورة' },
-    { id: '3', name: 'تذكير تجديد', subject: 'تجديد اشتراكك في {{plan_name}}', body: 'مرحباً {{client_name}},\n\nاشتراكك في باقة {{plan_name}} سيتجدد خلال 3 أيام.\nالمبلغ: {{amount}} {{currency}}\n\nللتعديل أو الإلغاء تواصل معنا.', trigger: 'قبل التجديد بـ3 أيام' },
+    { id: '1', name: 'رسالة الترحيب', subject: 'مرحباً بك في {{product_name}}', body: 'مرحباً {{client_name}}!\n\nشكراً لتسجيلك في {{product_name}}. حسابك جاهز للاستخدام.\n\nفريق الدعم', trigger: 'on_client_registered' },
+    { id: '2', name: 'إشعار فاتورة', subject: 'فاتورة جديدة #{{invoice_number}}', body: 'مرحباً {{client_name}},\n\nتم إصدار فاتورة جديدة بمبلغ {{amount}} {{currency}}.\nرقم الفاتورة: {{invoice_number}}\n\nشكراً لثقتكم.', trigger: 'on_invoice_created' },
+    { id: '3', name: 'تذكير تجديد', subject: 'تجديد اشتراكك في {{plan_name}}', body: 'مرحباً {{client_name}},\n\nاشتراكك في باقة {{plan_name}} سيتجدد خلال 3 أيام.\nالمبلغ: {{amount}} {{currency}}\n\nللتعديل أو الإلغاء تواصل معنا.', trigger: 'before_renewal_3d' },
   ]);
   const [emailModal, setEmailModal] = useState<(EmailTemplate & { isNew: boolean }) | null>(null);
 
@@ -619,7 +630,7 @@ export default function AdminSettings(): JSX.Element {
                         <TableCell className="text-xs text-muted-foreground font-mono">{idx + 1}</TableCell>
                         <TableCell className="font-medium">{t.name}</TableCell>
                         <TableCell className="text-sm text-muted-foreground max-w-[200px] truncate">{t.subject}</TableCell>
-                        <TableCell><Badge variant="secondary" className="text-[10px]">{t.trigger}</Badge></TableCell>
+                        <TableCell><Badge variant="secondary" className="text-[10px]">{TRIGGER_EVENTS.find((e) => e.key === t.trigger)?.label ?? t.trigger}</Badge></TableCell>
                         <TableCell>
                           <div className="flex items-center gap-0.5 justify-end">
                             <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => setEmailModal({ ...t, isNew: false })}>
@@ -977,7 +988,23 @@ export default function AdminSettings(): JSX.Element {
               </div>
               <div className="space-y-1.5">
                 <Label>المشغّل (Trigger)</Label>
-                <Input value={emailModal.trigger} onChange={(e) => setEmailModal({ ...emailModal, trigger: e.target.value })} placeholder="عند التسجيل" />
+                <Select value={emailModal.trigger} onValueChange={(v) => setEmailModal({ ...emailModal, trigger: v })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="اختر الحدث المشغّل" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TRIGGER_EVENTS.map((ev) => (
+                      <SelectItem key={ev.key} value={ev.key}>
+                        {ev.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {emailModal.trigger && (
+                  <p className="text-[11px] text-muted-foreground">
+                    {TRIGGER_EVENTS.find((e) => e.key === emailModal.trigger)?.description}
+                  </p>
+                )}
               </div>
               <div className="space-y-1.5">
                 <Label>محتوى الرسالة</Label>
