@@ -12,9 +12,9 @@ import {
   Phone,
   Globe,
   X,
-  HeartPulse,
+  Clock,
+  AlertCircle,
   Briefcase,
-  ArrowRight,
 } from 'lucide-react';
 
 const AdminIndustries = lazy(() => import('./Industries'));
@@ -44,19 +44,12 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet';
-import {
   Select,
   SelectTrigger,
   SelectValue,
   SelectContent,
   SelectItem,
 } from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
 import type { Client, ClientStatus } from '@/types';
 
 const statusLabel: Record<ClientStatus, string> = {
@@ -100,7 +93,6 @@ export default function AdminClients(): JSX.Element {
   const [planFilter, setPlanFilter] = useState<'all' | string>('all');
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Client | null>(null);
-  const [drawer, setDrawer] = useState<Client | null>(null);
   const [form, setForm] = useState<{
     companyName: string;
     contactName: string;
@@ -115,7 +107,7 @@ export default function AdminClients(): JSX.Element {
     contactName: '',
     email: '',
     phone: '',
-    country: 'OM',
+    country: '',
     industry: '',
     status: 'trial',
     planId: '',
@@ -151,7 +143,7 @@ export default function AdminClients(): JSX.Element {
 
   const openCreate = (): void => {
     setEditing(null);
-    setForm({ companyName: '', contactName: '', email: '', phone: '', country: 'OM', industry: '', status: 'trial', planId: '' });
+    setForm({ companyName: '', contactName: '', email: '', phone: '', country: '', industry: '', status: 'trial', planId: '' });
     setErrors({});
     setModalOpen(true);
   };
@@ -194,7 +186,7 @@ export default function AdminClients(): JSX.Element {
         phone: form.phone, country: form.country, industry: form.industry, status: form.status,
         planId: form.planId || null, currency: country.currency,
         trialEndsAt: form.status === 'trial' ? new Date(Date.now() + 14 * 86400000).toISOString() : undefined,
-        dashboardUrl: `https://${form.companyName.toLowerCase().replace(/\s+/g, '-')}.dashboard.example.com`,
+        dashboardUrl: '',
       });
       if (form.planId) createSubscription(newClient.id, form.planId, 'monthly');
       showToast(`تمت إضافة: ${newClient.companyName}`, 'success');
@@ -216,7 +208,6 @@ export default function AdminClients(): JSX.Element {
     if (ok) {
       deleteClient(c.id);
       showToast('تم حذف العميل', 'success');
-      setDrawer(null);
     }
   };
 
@@ -248,8 +239,6 @@ export default function AdminClients(): JSX.Element {
           'مجال العمل': c.industry,
           'الحالة': statusLabel[c.status],
           'الباقة': plan?.nameAr ?? '—',
-          'MRR': c.mrr,
-          'العملة': c.currency,
           'الموظفون': c.agentCount,
           'المحادثات': c.conversationCount,
         };
@@ -293,10 +282,7 @@ export default function AdminClients(): JSX.Element {
         return plan ? <span className="text-xs font-medium">{plan.nameAr}</span> : <span className="text-xs text-muted-foreground italic">بدون باقة</span>;
       },
     },
-    {
-      key: 'mrr', header: 'MRR', accessor: (r) => r.mrr,
-      cell: (r) => r.mrr > 0 ? <span className="font-semibold">{formatMoney(r.mrr, r.currency)}</span> : <span className="text-muted-foreground">—</span>,
-    },
+    { key: 'joined', header: 'تاريخ الانضمام', accessor: (r) => r.joinedAt, hideOn: 'lg', cell: (r) => <span className="text-muted-foreground text-xs">{formatDate(r.joinedAt)}</span> },
     { key: 'last', header: 'آخر نشاط', accessor: (r) => r.lastActiveAt, hideOn: 'lg', cell: (r) => <span className="text-muted-foreground text-xs">{timeAgo(r.lastActiveAt)}</span> },
     {
       key: 'status', header: 'الحالة', accessor: (r) => r.status,
@@ -392,8 +378,8 @@ export default function AdminClients(): JSX.Element {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="إجمالي العملاء" value={stats.total} icon={<Globe className="h-5 w-5" />} iconBg="bg-primary/15" iconColor="text-primary" />
         <StatCard label="نشطون" value={stats.active} icon={<PlayCircle className="h-5 w-5" />} iconBg="bg-success/15" iconColor="text-success" />
-        <StatCard label="فترة تجريبية" value={stats.trial} icon={<Globe className="h-5 w-5" />} iconBg="bg-info/15" iconColor="text-info" />
-        <StatCard label="متأخر دفع" value={stats.pastDue} icon={<PauseCircle className="h-5 w-5" />} iconBg="bg-warning/15" iconColor="text-warning" />
+        <StatCard label="فترة تجريبية" value={stats.trial} icon={<Clock className="h-5 w-5" />} iconBg="bg-info/15" iconColor="text-info" />
+        <StatCard label="متأخر دفع" value={stats.pastDue} icon={<AlertCircle className="h-5 w-5" />} iconBg="bg-warning/15" iconColor="text-warning" />
       </div>
 
       <DataTable
@@ -569,7 +555,7 @@ export default function AdminClients(): JSX.Element {
               <Label>الدولة</Label>
               <Select value={form.country} onValueChange={(v) => setForm({ ...form, country: v })}>
                 <SelectTrigger>
-                  <SelectValue />
+                  <SelectValue placeholder="اختر الدولة" />
                 </SelectTrigger>
                 <SelectContent>
                   {countries.map((c) => (
@@ -630,114 +616,7 @@ export default function AdminClients(): JSX.Element {
         </DialogContent>
       </Dialog>
 
-      <Sheet open={!!drawer} onOpenChange={(open) => !open && setDrawer(null)}>
-        <SheetContent side="left" className="w-[460px] sm:max-w-[460px] overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle>تفاصيل العميل</SheetTitle>
-          </SheetHeader>
-          {drawer && <ClientDrawerBody client={drawer} onEdit={() => { openEdit(drawer); setDrawer(null); }} onDelete={() => remove(drawer)} />}
-        </SheetContent>
-      </Sheet>
     </div>
   );
 }
 
-function ClientDrawerBody({ client, onEdit, onDelete }: { client: Client; onEdit: () => void; onDelete: () => void }): JSX.Element {
-  const plans = useAdminStore((s) => s.plans);
-  const subscriptions = useAdminStore((s) => s.subscriptions);
-  const invoices = useAdminStore((s) => s.invoices);
-  const countries = useAdminStore((s) => s.countries);
-  const plan = plans.find((p) => p.id === client.planId);
-  const sub = subscriptions.find((s) => s.clientId === client.id);
-  const clientInvoices = invoices.filter((i) => i.clientId === client.id);
-  const country = countries.find((c) => c.code === client.country);
-
-  return (
-    <div className="space-y-5 pt-4">
-      <div className="text-center">
-        <Avatar className="h-16 w-16 mx-auto">
-          <AvatarFallback className={`text-lg font-bold ${avatarColor(client.companyName)}`}>{initials(client.companyName)}</AvatarFallback>
-        </Avatar>
-        <p className="text-xl font-bold mt-3">{client.companyName} <span className="text-xl">{country?.flag}</span></p>
-        <p className="text-xs text-muted-foreground">{client.contactName}</p>
-        <Badge className={cn('mt-2 text-[10px] font-semibold', statusBadgeClass[client.status])}>
-          {statusLabel[client.status]}
-        </Badge>
-      </div>
-
-      <div className="grid grid-cols-3 gap-3 text-center">
-        <div className="p-3 rounded-lg bg-muted">
-          <p className="text-lg font-bold">{client.agentCount}</p>
-          <p className="text-xs text-muted-foreground">موظفون</p>
-        </div>
-        <div className="p-3 rounded-lg bg-muted">
-          <p className="text-lg font-bold">{client.channelCount}</p>
-          <p className="text-xs text-muted-foreground">قنوات</p>
-        </div>
-        <div className="p-3 rounded-lg bg-muted">
-          <p className="text-lg font-bold">{client.conversationCount}</p>
-          <p className="text-xs text-muted-foreground">محادثات</p>
-        </div>
-      </div>
-
-      <div>
-        <p className="text-xs font-semibold mb-2">معلومات الاتصال</p>
-        <div className="space-y-1.5 text-xs">
-          <div className="flex items-center gap-2"><Mail className="h-3.5 w-3.5 text-muted-foreground" /> {client.email}</div>
-          <div className="flex items-center gap-2"><Phone className="h-3.5 w-3.5 text-muted-foreground" /> {client.phone}</div>
-          <div className="flex items-center gap-2"><Globe className="h-3.5 w-3.5 text-muted-foreground" /> <span className="text-muted-foreground">{client.dashboardUrl || '—'}</span></div>
-        </div>
-      </div>
-
-      {plan && sub && (
-        <div>
-          <p className="text-xs font-semibold mb-2">الاشتراك</p>
-          <div className="p-3 rounded-lg bg-primary/5 border border-primary/20 space-y-1.5 text-xs">
-            <div className="flex justify-between"><span className="text-muted-foreground">الباقة</span><span className="font-semibold">{plan.nameAr}</span></div>
-            <div className="flex justify-between"><span className="text-muted-foreground">قيمة الاشتراك</span><span className="font-semibold">{formatMoney(sub.amount, sub.currency)} / شهر</span></div>
-            <div className="flex justify-between"><span className="text-muted-foreground">يتجدد في</span><span>{formatDate(sub.currentPeriodEnd)}</span></div>
-            {sub.paymentMethod && (
-              <div className="flex justify-between"><span className="text-muted-foreground">طريقة الدفع</span><span className="font-mono">VISA {sub.paymentMethod.last4}</span></div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {clientInvoices.length > 0 && (
-        <div>
-          <p className="text-xs font-semibold mb-2">آخر الفواتير</p>
-          <div className="space-y-1.5">
-            {clientInvoices.slice(0, 4).map((inv) => (
-              <div key={inv.id} className="p-2.5 rounded-lg bg-muted flex items-center justify-between text-xs">
-                <div className="min-w-0">
-                  <p className="font-medium font-mono">{inv.number}</p>
-                  <p className="text-[10px] text-muted-foreground">{formatDate(inv.dueDate)}</p>
-                </div>
-                <div className="text-end">
-                  <p className="font-semibold">{formatMoney(inv.total, inv.currency)}</p>
-                  <span className={cn('text-[10px] font-semibold',
-                    inv.status === 'paid' && 'text-success',
-                    inv.status === 'failed' && 'text-danger',
-                    inv.status === 'pending' && 'text-warning',
-                    inv.status === 'refunded' && 'text-muted-foreground'
-                  )}>{inv.status === 'paid' ? 'مدفوعة' : inv.status === 'failed' ? 'فشلت' : inv.status === 'pending' ? 'معلّقة' : 'مرتجعة'}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <Separator />
-
-      <div className="grid grid-cols-2 gap-2">
-        <Button variant="outline" onClick={onEdit}>
-          <Edit2 className="h-4 w-4 me-2" /> تعديل
-        </Button>
-        <Button variant="destructive" onClick={onDelete}>
-          <Trash2 className="h-4 w-4 me-2" /> حذف
-        </Button>
-      </div>
-    </div>
-  );
-}
