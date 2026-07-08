@@ -1,16 +1,14 @@
 import { useMemo, useState } from 'react';
 import {
-  DollarSign,
   AlertTriangle,
   CheckCircle2,
   Search,
   Download,
   FileText,
-  RefreshCcw,
   Clock,
   Receipt,
 } from 'lucide-react';
-import { StatCard, useConfirm } from '@components/ui';
+import { StatCard } from '@components/ui';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
 import { formatMoney, approxUSD } from '@/utils/money';
@@ -39,28 +37,22 @@ import {
 } from '@/components/ui/select';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
-const invStatusLabel: Record<InvoiceStatus, string> = {
-  draft: 'مسودة',
+const invStatusLabel: Record<string, string> = {
   pending: 'معلّقة',
   paid: 'مدفوعة',
   failed: 'فشلت',
-  refunded: 'مرتجعة',
 };
 
-const invStatusVariant: Record<InvoiceStatus, 'secondary' | 'warning' | 'success' | 'destructive' | 'outline'> = {
-  draft: 'secondary',
+const invStatusVariant: Record<string, 'warning' | 'success' | 'destructive'> = {
   pending: 'warning',
   paid: 'success',
   failed: 'destructive',
-  refunded: 'outline',
 };
 
 export default function AdminFinance(): JSX.Element {
   const clients = useAdminStore((s) => s.clients);
   const invoices = useAdminStore((s) => s.invoices);
-  const refundInvoice = useAdminStore((s) => s.refundInvoice);
   const showToast = useUIStore((s) => s.showToast);
-  const { confirm } = useConfirm();
 
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | InvoiceStatus>('all');
@@ -195,7 +187,6 @@ export default function AdminFinance(): JSX.Element {
               <SelectItem value="paid">مدفوعة</SelectItem>
               <SelectItem value="pending">معلّقة</SelectItem>
               <SelectItem value="failed">فشلت</SelectItem>
-              <SelectItem value="refunded">مرتجعة</SelectItem>
             </SelectContent>
           </Select>
           <Button variant="outline" size="sm" onClick={handleExportInvoices} className="h-9 ms-auto">
@@ -229,7 +220,7 @@ export default function AdminFinance(): JSX.Element {
                   <TableHead className="text-start w-12">#</TableHead>
                   <TableHead className="text-start">رقم الفاتورة</TableHead>
                   <TableHead className="text-start">العميل</TableHead>
-                  <TableHead className="text-start hidden md:table-cell">الإجمالي</TableHead>
+                  <TableHead className="text-start">الإجمالي</TableHead>
                   <TableHead className="text-start hidden lg:table-cell">تاريخ الاستحقاق</TableHead>
                   <TableHead className="text-start">الحالة</TableHead>
                   <TableHead className="text-start w-1">إجراءات</TableHead>
@@ -250,7 +241,7 @@ export default function AdminFinance(): JSX.Element {
                           <span className="font-medium">{client?.companyName ?? '—'}</span>
                         </div>
                       </TableCell>
-                      <TableCell className="hidden md:table-cell font-semibold">{formatMoney(inv.total, inv.currency)}</TableCell>
+                      <TableCell className="font-semibold">{formatMoney(inv.total, inv.currency)}</TableCell>
                       <TableCell className="hidden lg:table-cell text-sm text-muted-foreground">{formatDate(inv.dueDate)}</TableCell>
                       <TableCell>
                         <Badge variant={invStatusVariant[inv.status]}>
@@ -258,31 +249,9 @@ export default function AdminFinance(): JSX.Element {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-1">
-                          <Button variant="ghost" size="icon" title="طباعة PDF" onClick={() => handleDownloadInvoice(inv)}>
-                            <FileText className="h-4 w-4" />
-                          </Button>
-                          {inv.status === 'paid' && (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              title="استرجاع"
-                              onClick={() => {
-                                void (async () => {
-                                  const reason = window.prompt('سبب الاسترجاع:');
-                                  if (!reason) return;
-                                  const ok = await confirm({ title: `استرجاع فاتورة ${inv.number}؟`, message: `سيتم إرجاع ${formatMoney(inv.total, inv.currency)} للعميل\nالسبب: ${reason}`, variant: 'warning', confirmText: 'استرجاع' });
-                                  if (ok) {
-                                    refundInvoice(inv.id);
-                                    showToast(`تم استرجاع الفاتورة — السبب: ${reason}`, 'success');
-                                  }
-                                })();
-                              }}
-                            >
-                              <RefreshCcw className="h-4 w-4" />
-                            </Button>
-                          )}
-                        </div>
+                        <Button variant="ghost" size="icon" title="طباعة PDF" onClick={() => handleDownloadInvoice(inv)}>
+                          <FileText className="h-4 w-4" />
+                        </Button>
                       </TableCell>
                     </TableRow>
                   );
