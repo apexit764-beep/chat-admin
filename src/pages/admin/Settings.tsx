@@ -1245,17 +1245,19 @@ function OtpVerifyDialog({ open, onOpenChange, icon, title, label, inputType, pl
           <DialogTitle className="flex items-center gap-2">{icon}{title}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-2">
-          <div className="space-y-1.5">
-            <Label>{label}</Label>
-            <Input type={inputType} value={value} onChange={(e) => onValueChange(e.target.value)} placeholder={placeholder} dir={dir} disabled={otpSent} autoFocus />
-          </div>
+          {!otpSent && (
+            <div className="space-y-1.5">
+              <Label>{label}</Label>
+              <Input type={inputType} value={value} onChange={(e) => onValueChange(e.target.value)} placeholder={placeholder} dir={dir} autoFocus />
+            </div>
+          )}
           {!otpSent ? (
             <Button className="w-full" onClick={onSendCode}>إرسال رمز التحقق</Button>
           ) : (
             <>
               <div className="space-y-2">
                 <Label>رمز التحقق (6 أرقام)</Label>
-                <p className="text-xs text-muted-foreground">تم إرسال رمز التحقق، أدخله أدناه</p>
+                <p className="text-xs text-muted-foreground">تم إرسال رمز التحقق إلى <span className="font-semibold text-foreground" dir="ltr">{value}</span>، أدخله أدناه</p>
                 <div className="flex items-center justify-center gap-2" dir="ltr" onPaste={handlePaste}>
                   {otp.map((d, i) => (
                     <input
