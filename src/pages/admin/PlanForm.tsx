@@ -283,41 +283,36 @@ export default function PlanForm(): JSX.Element {
               <h3 className="text-lg font-semibold">الأسعار حسب الدولة</h3>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {countries.map((co) => {
                   const price = form.pricesPerCountry[co.code] ?? { monthly: 0, yearly: 0 };
                   return (
-                    <div key={co.code} className="p-3 rounded-lg bg-muted space-y-2.5">
+                    <div key={co.code} className="grid grid-cols-[1fr_1fr_1fr] items-center gap-2 p-2.5 rounded-lg bg-muted">
                       <div className="flex items-center gap-2 font-medium">
                         <span className="text-lg">{co.flag}</span>
-                        <span>{co.nameAr}</span>
-                        <span className="text-xs text-muted-foreground">({co.code})</span>
+                        <span className="text-sm">{co.nameAr}</span>
                       </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="relative">
-                          <Label className="text-xs text-muted-foreground mb-1 block">السعر الشهري</Label>
-                          <Input
-                            type="number"
-                            min={0}
-                            value={price.monthly}
-                            onChange={(e) => setMonthlyPrice(co.code, Number(e.target.value) || 0)}
-                            placeholder="0"
-                            className="font-mono"
-                          />
-                          <span className="absolute end-2 bottom-2.5 text-[10px] text-muted-foreground pointer-events-none">{co.symbol}/شهر</span>
-                        </div>
-                        <div className="relative">
-                          <Label className="text-xs text-muted-foreground mb-1 block">السعر السنوي</Label>
-                          <Input
-                            type="number"
-                            min={0}
-                            value={price.yearly}
-                            onChange={(e) => setForm({ ...form, pricesPerCountry: { ...form.pricesPerCountry, [co.code]: { ...price, yearly: Number(e.target.value) || 0 } } })}
-                            placeholder="0"
-                            className="font-mono"
-                          />
-                          <span className="absolute end-2 bottom-2.5 text-[10px] text-muted-foreground pointer-events-none">{co.symbol}/سنة</span>
-                        </div>
+                      <div className="relative">
+                        <Input
+                          type="number"
+                          min={0}
+                          value={price.monthly}
+                          onChange={(e) => setMonthlyPrice(co.code, Number(e.target.value) || 0)}
+                          placeholder="0"
+                          className="font-mono"
+                        />
+                        <span className="absolute end-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground pointer-events-none">{co.symbol}/شهر</span>
+                      </div>
+                      <div className="relative">
+                        <Input
+                          type="number"
+                          min={0}
+                          value={price.yearly}
+                          onChange={(e) => setForm({ ...form, pricesPerCountry: { ...form.pricesPerCountry, [co.code]: { ...price, yearly: Number(e.target.value) || 0 } } })}
+                          placeholder="0"
+                          className="font-mono"
+                        />
+                        <span className="absolute end-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground pointer-events-none">{co.symbol}/سنة</span>
                       </div>
                     </div>
                   );
