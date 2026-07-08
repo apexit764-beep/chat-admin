@@ -1,9 +1,7 @@
 import { useMemo, useState, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Repeat,
   Search,
-  Filter,
   MoreHorizontal,
   ExternalLink,
   XCircle,
@@ -12,10 +10,7 @@ import {
   AlertTriangle,
   DollarSign,
   CalendarClock,
-  CreditCard,
-  RefreshCcw,
   ArrowRightLeft,
-  ShieldAlert,
   ClipboardList,
   ArrowRight,
 } from 'lucide-react';
@@ -95,7 +90,6 @@ export default function AdminSubscriptions(): JSX.Element {
   const clients = useAdminStore((s) => s.clients);
   const plans = useAdminStore((s) => s.plans);
   const cancelSubscription = useAdminStore((s) => s.cancelSubscription);
-  const createSubscription = useAdminStore((s) => s.createSubscription);
   const showToast = useUIStore((s) => s.showToast);
   const { confirm } = useConfirm();
 
@@ -159,17 +153,6 @@ export default function AdminSubscriptions(): JSX.Element {
     if (ok) {
       cancelSubscription(subId);
       showToast('تم إلغاء الاشتراك', 'success');
-    }
-  };
-
-  const handleRenew = async (subId: string, companyName: string): Promise<void> => {
-    const ok = await confirm({
-      title: `تجديد اشتراك ${companyName}؟`,
-      message: 'سيتم تجديد الاشتراك لفترة جديدة بنفس الشروط الحالية.',
-      confirmText: 'تجديد',
-    });
-    if (ok) {
-      showToast('تم تجديد الاشتراك بنجاح', 'success');
     }
   };
 
@@ -262,7 +245,6 @@ export default function AdminSubscriptions(): JSX.Element {
             </div>
             <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as SubscriptionStatus | 'all')}>
               <SelectTrigger className="w-full sm:w-[160px]">
-                <Filter className="h-4 w-4 me-2 text-muted-foreground" />
                 <SelectValue placeholder="كل الحالات" />
               </SelectTrigger>
               <SelectContent>
@@ -382,7 +364,7 @@ export default function AdminSubscriptions(): JSX.Element {
                       <TableCell>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button variant="ghost" size="icon" className="h-8 w-8">
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
@@ -391,12 +373,6 @@ export default function AdminSubscriptions(): JSX.Element {
                               <ExternalLink className="h-4 w-4 ml-2" />
                               عرض العميل
                             </DropdownMenuItem>
-                            {sub.status !== 'cancelled' && (
-                              <DropdownMenuItem onClick={() => void handleRenew(sub.id, client?.companyName ?? 'العميل')}>
-                                <RefreshCcw className="h-4 w-4 ml-2" />
-                                تجديد يدوي
-                              </DropdownMenuItem>
-                            )}
                             {sub.status !== 'cancelled' && (
                               <DropdownMenuItem onClick={() => setSwitchModal({ subId: sub.id, clientId: sub.clientId, currentPlanId: sub.planId, companyName: client?.companyName ?? 'العميل' })}>
                                 <ArrowRightLeft className="h-4 w-4 ml-2" />
@@ -426,12 +402,8 @@ export default function AdminSubscriptions(): JSX.Element {
           </Table>
 
           {/* Footer summary */}
-          <div className="flex items-center justify-between p-4 border-t text-xs text-muted-foreground">
+          <div className="p-4 border-t text-xs text-muted-foreground">
             <span>{filtered.length} من {subscriptions.length} اشتراك</span>
-            <span className="flex items-center gap-1.5">
-              <CreditCard className="h-3.5 w-3.5" />
-              التجديد التلقائي عبر Paymob
-            </span>
           </div>
         </CardContent>
       </Card>
