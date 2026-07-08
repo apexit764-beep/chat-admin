@@ -349,17 +349,17 @@ export default function PlanForm(): JSX.Element {
           </Card>
         </div>
 
-        {/* Left side: Features (fixed with internal scroll) - 1/3 width */}
+        {/* Left side: Features (sticky) - 1/3 width */}
         <div className="w-full lg:w-[33%] lg:flex-shrink-0 order-2 lg:order-2">
-          <div className="lg:sticky lg:top-4 lg:max-h-[calc(100vh-6rem)] lg:flex lg:flex-col">
-            <Card className="lg:flex lg:flex-col lg:overflow-hidden lg:max-h-full">
-              <CardHeader className="flex-shrink-0">
+          <div className="lg:sticky lg:top-4">
+            <Card>
+              <CardHeader>
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-semibold">الميزات</h3>
                   <span className="text-xs text-muted-foreground">{form.features.length} ميزة مفعّلة</span>
                 </div>
               </CardHeader>
-              <CardContent className="lg:overflow-y-auto lg:flex-1">
+              <CardContent>
                 <div className="space-y-2">
                   {FEATURE_CATALOG.map((group) => {
                     const isCollapsed = collapsed[group.label] ?? false;
