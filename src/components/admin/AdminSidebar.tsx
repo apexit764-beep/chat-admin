@@ -122,7 +122,7 @@ function SidebarInner({ collapsed, onToggleCollapse, onNavigate, mobile, onClose
         {collapsed ? (
           <div className="group relative h-10 w-10 flex-shrink-0">
             <NavLink to="/dashboard" className="block h-10 w-10">
-              <img src="/qhub-icon.png" alt="Qhub" className="h-10 w-10" />
+              <img src="/qhub-icon.png?v=2" alt="Qhub" className="h-10 w-10" />
             </NavLink>
             <button
               onClick={onToggleCollapse}
@@ -134,7 +134,7 @@ function SidebarInner({ collapsed, onToggleCollapse, onNavigate, mobile, onClose
         ) : (
           <>
             <NavLink to="/dashboard" className="h-10 w-10 flex-shrink-0" onClick={onNavigate}>
-              <img src="/qhub-icon.png" alt="Qhub" className="h-10 w-10" />
+              <img src="/qhub-icon.png?v=2" alt="Qhub" className="h-10 w-10" />
             </NavLink>
             <div className="flex flex-col min-w-0 flex-1">
               <span className="text-sm font-bold text-white tracking-wide">Qhub</span>
