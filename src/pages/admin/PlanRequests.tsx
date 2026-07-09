@@ -4,7 +4,6 @@ import {
   MoreHorizontal,
   Eye,
   CheckCircle2,
-  Phone,
   Trash2,
   ClipboardList,
   ChevronDown,
@@ -42,6 +41,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import type { PlanRequest, PlanRequestStatus } from '@/types';
 
@@ -113,7 +113,7 @@ export default function AdminPlanRequests({ embedded }: { embedded?: boolean }):
   const content = (
     <>
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard
           label="إجمالي الطلبات"
           value={planRequests.length}
@@ -141,13 +141,12 @@ export default function AdminPlanRequests({ embedded }: { embedded?: boolean }):
       <Card>
         <CardContent className="p-3 flex flex-wrap items-center gap-3">
           <div className="relative flex-1 min-w-[200px]">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <input
-              type="text"
+            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
               placeholder="البحث في طلبات الاشتراك..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full h-9 rounded-lg border border-input bg-background pe-9 ps-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              className="pe-9"
             />
           </div>
           <div className="flex items-center gap-1.5">
