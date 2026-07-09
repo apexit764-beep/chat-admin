@@ -1,8 +1,7 @@
 import { FormEvent, useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Lock, Mail, ArrowLeft, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, ArrowLeft, AlertCircle } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
-import { Modal, useConfirm } from '@components/ui';
 import { cn } from '@/utils/cn';
 
 export default function Login(): JSX.Element {
@@ -20,10 +19,6 @@ export default function Login(): JSX.Element {
   const [pwdError, setPwdError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [remember, setRemember] = useState(true);
-  const [forgotOpen, setForgotOpen] = useState(false);
-  const [resetEmail, setResetEmail] = useState('');
-  const [resetSent, setResetSent] = useState(false);
-  const { alert } = useConfirm();
 
   if (isAuthenticated) return <Navigate to={from} replace />;
 
@@ -56,13 +51,6 @@ export default function Login(): JSX.Element {
     }, 400);
   };
 
-  const submitReset = (): void => {
-    if (!emailRe.test(resetEmail.trim())) {
-      alert({ title: 'بريد غير صالح', message: 'أدخل بريداً إلكترونياً صحيحاً', variant: 'warning' });
-      return;
-    }
-    setTimeout(() => setResetSent(true), 500);
-  };
 
   return (
     <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden bg-gradient-to-br from-slate-50 via-white to-sky-50/50 dark:from-bg-dark dark:via-bg-dark dark:to-bg-dark">
@@ -103,16 +91,7 @@ export default function Login(): JSX.Element {
             </div>
 
             <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium">كلمة المرور</label>
-                <button
-                  type="button"
-                  onClick={() => { setResetEmail(email); setResetSent(false); setForgotOpen(true); }}
-                  className="text-xs text-primary hover:underline"
-                >
-                  نسيت كلمة المرور؟
-                </button>
-              </div>
+              <label className="text-sm font-medium">كلمة المرور</label>
               <div className="relative">
                 <Lock className="h-4 w-4 absolute end-3 top-1/2 -translate-y-1/2 text-muted-light dark:text-muted-dark" />
                 <input
@@ -181,51 +160,6 @@ export default function Login(): JSX.Element {
         </p>
       </div>
 
-      {/* Forgot password modal */}
-      <Modal
-        open={forgotOpen}
-        onClose={() => setForgotOpen(false)}
-        title={resetSent ? 'تم الإرسال' : 'استعادة كلمة المرور'}
-        size="sm"
-        footer={
-          resetSent ? (
-            <button onClick={() => setForgotOpen(false)} className="h-10 px-5 rounded-full bg-primary hover:bg-primary-dark text-white text-sm font-medium">حسناً</button>
-          ) : (
-            <>
-              <button onClick={() => setForgotOpen(false)} className="h-10 px-5 rounded-full border border-border-light dark:border-border-dark text-sm font-medium hover:bg-bg-light dark:hover:bg-bg-dark">إلغاء</button>
-              <button onClick={submitReset} className="h-10 px-5 rounded-full bg-primary hover:bg-primary-dark text-white text-sm font-medium">إرسال</button>
-            </>
-          )
-        }
-      >
-        {resetSent ? (
-          <div className="text-center">
-            <div className="h-14 w-14 rounded-full bg-success/15 text-success flex items-center justify-center mx-auto mb-3">
-              <CheckCircle2 className="h-7 w-7" />
-            </div>
-            <p className="text-sm text-muted-light dark:text-muted-dark">
-              إذا كان البريد <strong className="text-current">{resetEmail}</strong> مسجّل لدينا، ستصلك رسالة فيها رابط لإعادة التعيين
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            <p className="text-sm text-muted-light dark:text-muted-dark">
-              أدخل بريدك وسنرسل لك رابط إعادة تعيين كلمة المرور
-            </p>
-            <div className="relative">
-              <Mail className="h-4 w-4 absolute end-3 top-1/2 -translate-y-1/2 text-muted-light dark:text-muted-dark" />
-              <input
-                type="email"
-                autoFocus
-                value={resetEmail}
-                onChange={(e) => setResetEmail(e.target.value)}
-                className="w-full h-11 ps-3 pe-10 rounded-xl bg-bg-light dark:bg-bg-dark border border-border-light dark:border-border-dark text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
-                placeholder="you@company.com"
-              />
-            </div>
-          </div>
-        )}
-      </Modal>
     </div>
   );
 }
