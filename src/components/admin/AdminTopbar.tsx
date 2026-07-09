@@ -134,23 +134,23 @@ export function AdminTopbar(): JSX.Element {
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-52">
+              <DropdownMenuContent align="end" className="w-52 [direction:rtl]">
                 <DropdownMenuLabel className="font-normal px-3 py-2">
-                  <div className="flex flex-col gap-1">
+                  <div className="flex flex-col gap-1 text-start">
                     <p className="text-sm font-medium">{user.name}</p>
                     <p className="text-xs text-muted-foreground">{user.email}</p>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
-                  className="cursor-pointer gap-2 px-3"
+                  className="cursor-pointer gap-2 px-3 flex-row-reverse justify-end"
                   onClick={() => navigate('/settings#profile')}
                 >
                   <User className="h-4 w-4" />
                   الملف الشخصي
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  className="cursor-pointer gap-2 px-3"
+                  className="cursor-pointer gap-2 px-3 flex-row-reverse justify-end"
                   onClick={() => navigate('/settings')}
                 >
                   <Settings className="h-4 w-4" />
@@ -158,7 +158,7 @@ export function AdminTopbar(): JSX.Element {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
-                  className="text-destructive focus:text-destructive cursor-pointer gap-2 px-3"
+                  className="text-destructive focus:text-destructive cursor-pointer gap-2 px-3 flex-row-reverse justify-end"
                   onClick={handleLogout}
                 >
                   <LogOut className="h-4 w-4" />
