@@ -1,5 +1,6 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { subDays } from 'date-fns';
 import {
   DollarSign,
   TrendingUp,
@@ -25,6 +26,7 @@ import {
   TableCell,
 } from '@/components/ui/table';
 import { LineChart } from '@components/charts/LineChart';
+import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { useAdminStore } from '@/store/useAdminStore';
 import { formatMoney, approxUSD } from '@/utils/money';
 import { timeAgo, initials, avatarColor } from '@/utils/format';
@@ -33,20 +35,55 @@ import type { Client } from '@/types';
 const MONTH_NAMES_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
 
 export default function AdminDashboard(): JSX.Element {
-  const clients = useAdminStore((s) => s.clients);
-  const subscriptions = useAdminStore((s) => s.subscriptions);
-  const transactions = useAdminStore((s) => s.transactions);
+  const allClients = useAdminStore((s) => s.clients);
+  const allSubscriptions = useAdminStore((s) => s.subscriptions);
+  const allTransactions = useAdminStore((s) => s.transactions);
   const plans = useAdminStore((s) => s.plans);
   const countries = useAdminStore((s) => s.countries);
+
+  const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
+    from: subDays(new Date(), 29),
+    to: new Date(),
+  });
+
+  const clients = useMemo(() => {
+    if (!dateRange) return allClients;
+    const from = dateRange.from.getTime();
+    const to = dateRange.to.getTime() + 86400000 - 1;
+    return allClients.filter((c) => {
+      const t = Date.parse(c.joinedAt);
+      return t >= from && t <= to;
+    });
+  }, [allClients, dateRange]);
+
+  const subscriptions = useMemo(() => {
+    if (!dateRange) return allSubscriptions;
+    const from = dateRange.from.getTime();
+    const to = dateRange.to.getTime() + 86400000 - 1;
+    return allSubscriptions.filter((s) => {
+      const t = Date.parse(s.startedAt);
+      return t >= from && t <= to;
+    });
+  }, [allSubscriptions, dateRange]);
+
+  const transactions = useMemo(() => {
+    if (!dateRange) return allTransactions;
+    const from = dateRange.from.getTime();
+    const to = dateRange.to.getTime() + 86400000 - 1;
+    return allTransactions.filter((t) => {
+      const ts = Date.parse(t.createdAt);
+      return ts >= from && ts <= to;
+    });
+  }, [allTransactions, dateRange]);
 
   /* ══════════════════════ Financial metrics ══════════════════════ */
 
   // MRR = sum of active monthly subscriptions in USD
   const mrrTotal = useMemo(() =>
-    subscriptions
+    allSubscriptions
       .filter((s) => s.status === 'active' && s.billingCycle === 'monthly')
       .reduce((acc, s) => acc + approxUSD(s.amount, s.currency), 0),
-    [subscriptions]
+    [allSubscriptions]
   );
 
   const activeClients = useMemo(() => clients.filter((c) => c.status === 'active'), [clients]);
@@ -58,12 +95,11 @@ export default function AdminDashboard(): JSX.Element {
     const values: number[] = [];
     for (let i = 5; i >= 0; i--) {
       const monthEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 0, 23, 59, 59);
-      const total = subscriptions
+      const total = allSubscriptions
         .filter((s) => s.billingCycle === 'monthly')
         .filter((s) => {
           const start = new Date(s.startedAt);
           if (start > monthEnd) return false;
-          // Was still active at monthEnd
           if (s.status === 'cancelled' && s.cancelAt && new Date(s.cancelAt) <= monthEnd) return false;
           return true;
         })
@@ -72,7 +108,7 @@ export default function AdminDashboard(): JSX.Element {
       values.push(Math.round(total));
     }
     return { labels, values };
-  }, [subscriptions]);
+  }, [allSubscriptions]);
 
   const currentMrr = Math.round(mrrTotal);
   const prevMrr = mrrHistory.values[mrrHistory.values.length - 2] ?? 0;
@@ -84,11 +120,7 @@ export default function AdminDashboard(): JSX.Element {
 
   const trialCount = clients.filter((c) => c.status === 'trial').length;
 
-  // New clients within last 30 days
-  const newClients30d = useMemo(() => {
-    const cutoff = Date.now() - 30 * 86400000;
-    return clients.filter((c) => Date.parse(c.joinedAt) >= cutoff).length;
-  }, [clients]);
+  const newClientsInRange = clients.length;
 
   // Total revenue from all successful transactions
   const totalRevenue = useMemo(() =>
@@ -104,20 +136,17 @@ export default function AdminDashboard(): JSX.Element {
     [subscriptions]
   );
 
-  // Trial → paid conversion (last 90 days)
   const conversionRate = useMemo(() => {
-    const cutoff = Date.now() - 90 * 86400000;
-    const recentClients = clients.filter((c) => Date.parse(c.joinedAt) >= cutoff);
-    if (recentClients.length === 0) return 0;
-    const converted = recentClients.filter((c) => c.status === 'active').length;
-    return Math.round((converted / recentClients.length) * 100);
+    if (clients.length === 0) return 0;
+    const converted = clients.filter((c) => c.status === 'active').length;
+    return Math.round((converted / clients.length) * 100);
   }, [clients]);
 
   /* ══════════════════════ Alerts ══════════════════════ */
 
   const expiringTrials = useMemo(() => {
     const now = Date.now();
-    return clients
+    return allClients
       .filter((c) => c.status === 'trial' && c.trialEndsAt)
       .map((c) => ({
         client: c,
@@ -126,17 +155,17 @@ export default function AdminDashboard(): JSX.Element {
       .filter((x) => x.daysLeft >= 0 && x.daysLeft <= 7)
       .sort((a, b) => a.daysLeft - b.daysLeft)
       .slice(0, 5);
-  }, [clients]);
+  }, [allClients]);
 
   const pastDueClients = useMemo(() => {
-    return clients
+    return allClients
       .filter((c) => c.status === 'past_due')
       .map((c) => {
         const sub = subscriptions.find((s) => s.id === c.subscriptionId);
         return { client: c, amount: sub?.amount ?? c.mrr, currency: sub?.currency ?? c.currency };
       })
       .slice(0, 5);
-  }, [clients, subscriptions]);
+  }, [allClients, allSubscriptions]);
 
 
   /* ══════════════════════ Distribution ══════════════════════ */
@@ -189,9 +218,12 @@ export default function AdminDashboard(): JSX.Element {
   return (
     <div className="p-4 lg:p-6 space-y-5 page-fade">
       {/* Header */}
-      <div>
-        <h2 className="text-2xl font-bold">نظرة عامة</h2>
-        <p className="text-sm text-muted-foreground">ملخّص الأداء المالي والتشغيلي للمنصة</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h2 className="text-2xl font-bold">نظرة عامة</h2>
+          <p className="text-sm text-muted-foreground">ملخّص الأداء المالي والتشغيلي للمنصة</p>
+        </div>
+        <DateRangePicker value={dateRange} onChange={(r) => r && setDateRange(r)} />
       </div>
 
       {/* ══════════ Section 1: All KPIs in 2 rows ══════════ */}
@@ -250,8 +282,8 @@ export default function AdminDashboard(): JSX.Element {
             iconColor="text-info"
           />
           <StatCard
-            label="عملاء جدد (30 يوم)"
-            value={newClients30d}
+            label="عملاء جدد"
+            value={newClientsInRange}
             icon={<UserPlus className="h-4 w-4" />}
             iconBg="bg-primary/15"
             iconColor="text-primary"
