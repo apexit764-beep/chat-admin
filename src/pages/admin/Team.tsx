@@ -163,6 +163,94 @@ const permissionGroups: PermissionGroup[] = [
     ],
   },
   {
+    id: 'live_chat',
+    label: 'الدردشات المباشرة',
+    permissions: [
+      { id: 'live_chat.view', label: 'عرض المحادثات' },
+      { id: 'live_chat.reply', label: 'الرد على المحادثات' },
+      { id: 'live_chat.assign', label: 'تعيين محادثة لموظف' },
+      { id: 'live_chat.close', label: 'إغلاق المحادثات' },
+    ],
+  },
+  {
+    id: 'ai',
+    label: 'إعدادات الذكاء الاصطناعي',
+    permissions: [
+      { id: 'ai.view', label: 'عرض إعدادات الذكاء الاصطناعي' },
+      { id: 'ai.edit', label: 'تعديل إعدادات الذكاء الاصطناعي' },
+      { id: 'ai.templates', label: 'إدارة قوالب الردود' },
+    ],
+  },
+  {
+    id: 'knowledge',
+    label: 'قاعدة المعرفة',
+    permissions: [
+      { id: 'knowledge.view', label: 'عرض قاعدة المعرفة' },
+      { id: 'knowledge.create', label: 'إضافة مقالة' },
+      { id: 'knowledge.edit', label: 'تعديل مقالة' },
+      { id: 'knowledge.delete', label: 'حذف مقالة' },
+    ],
+  },
+  {
+    id: 'subscriptions',
+    label: 'الاشتراكات',
+    permissions: [
+      { id: 'subscriptions.view', label: 'عرض الاشتراكات' },
+      { id: 'subscriptions.edit', label: 'تعديل اشتراك' },
+      { id: 'subscriptions.cancel', label: 'إلغاء اشتراك' },
+    ],
+  },
+  {
+    id: 'plan_requests',
+    label: 'طلبات الباقات',
+    permissions: [
+      { id: 'plan_requests.view', label: 'عرض الطلبات' },
+      { id: 'plan_requests.approve', label: 'موافقة / رفض الطلبات' },
+    ],
+  },
+  {
+    id: 'industries',
+    label: 'القطاعات',
+    permissions: [
+      { id: 'industries.view', label: 'عرض القطاعات' },
+      { id: 'industries.create', label: 'إضافة قطاع' },
+      { id: 'industries.edit', label: 'تعديل قطاع' },
+      { id: 'industries.delete', label: 'حذف قطاع' },
+    ],
+  },
+  {
+    id: 'integrations',
+    label: 'التكاملات',
+    permissions: [
+      { id: 'integrations.view', label: 'عرض التكاملات' },
+      { id: 'integrations.manage', label: 'إدارة التكاملات' },
+    ],
+  },
+  {
+    id: 'widget',
+    label: 'الويدجت',
+    permissions: [
+      { id: 'widget.view', label: 'عرض إعدادات الويدجت' },
+      { id: 'widget.edit', label: 'تعديل إعدادات الويدجت' },
+    ],
+  },
+  {
+    id: 'notifications',
+    label: 'الإشعارات',
+    permissions: [
+      { id: 'notifications.view', label: 'عرض الإشعارات' },
+      { id: 'notifications.manage', label: 'إدارة الإشعارات' },
+    ],
+  },
+  {
+    id: 'activity',
+    label: 'سجل النشاط',
+    permissions: [
+      { id: 'activity.view', label: 'عرض سجل النشاط' },
+      { id: 'activity.export', label: 'تصدير سجل النشاط' },
+    ],
+  },
+  {
     id: 'settings',
     label: 'الإعدادات',
     permissions: [
@@ -203,6 +291,16 @@ const initialRoles: RoleConfig[] = [
       'plans.view', 'plans.create', 'plans.edit', 'plans.delete',
       'finance.view', 'finance.invoices',
       'support.view', 'support.reply', 'support.status',
+      'live_chat.view', 'live_chat.reply', 'live_chat.assign', 'live_chat.close',
+      'ai.view', 'ai.edit', 'ai.templates',
+      'knowledge.view', 'knowledge.create', 'knowledge.edit', 'knowledge.delete',
+      'subscriptions.view', 'subscriptions.edit', 'subscriptions.cancel',
+      'plan_requests.view', 'plan_requests.approve',
+      'industries.view', 'industries.create', 'industries.edit', 'industries.delete',
+      'integrations.view', 'integrations.manage',
+      'widget.view', 'widget.edit',
+      'notifications.view', 'notifications.manage',
+      'activity.view', 'activity.export',
       'reports.view', 'reports.export',
       'settings.general',
     ]),
@@ -220,6 +318,8 @@ const initialRoles: RoleConfig[] = [
       'dashboard.view',
       'clients.view',
       'support.view', 'support.reply', 'support.status',
+      'live_chat.view', 'live_chat.reply', 'live_chat.assign', 'live_chat.close',
+      'knowledge.view',
     ]),
   },
   {
@@ -235,6 +335,8 @@ const initialRoles: RoleConfig[] = [
       'dashboard.view',
       'clients.view',
       'finance.view', 'finance.invoices', 'finance.refund', 'finance.payments',
+      'subscriptions.view', 'subscriptions.edit', 'subscriptions.cancel',
+      'plan_requests.view', 'plan_requests.approve',
       'reports.view', 'reports.export',
     ]),
   },
