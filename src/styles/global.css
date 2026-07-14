@@ -167,7 +167,7 @@
   --rdp-nav_button-height: 1.25rem;
   --rdp-nav_button-width: 1.25rem;
   --rdp-nav-height: 1.75rem;
-  --rdp-months-gap: 0.5rem;
+  --rdp-months-gap: 0.125rem;
   --rdp-weekday-padding: 0.15rem 0;
   font-size: 11px;
 }
