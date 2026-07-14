@@ -184,3 +184,15 @@
   width: 14px;
   height: 14px;
 }
+.rdp-compact .rdp-root {
+  --rdp-month-caption-padding: 0;
+}
+.rdp-compact .rdp-months {
+  gap: 2px !important;
+}
+.rdp-compact .rdp-month {
+  padding: 0 !important;
+}
+.rdp-compact .rdp-month_grid {
+  border-spacing: 0;
+}
