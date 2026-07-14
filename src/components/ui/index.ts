@@ -97,22 +97,12 @@ export {
 } from './alert-dialog';
 export { Popover, PopoverTrigger, PopoverContent } from './popover';
 
-// Legacy components (backward-compatible API for client pages)
-export { LegacyAvatar as Avatar } from './LegacyAvatar';
-export { LegacyInput as Input, LegacyTextarea as Textarea } from './LegacyInput';
-export type { LegacyInputProps as InputProps, LegacyTextareaProps as TextareaProps } from './LegacyInput';
-export { LegacySelect as Select } from './LegacySelect';
-export type { LegacySelectProps as SelectProps } from './LegacySelect';
-
-// Legacy custom components
 export { Modal } from './Modal';
 export { Drawer } from './Drawer';
 export { Toast } from './Toast';
 export { EmptyState } from './EmptyState';
 export { StatCard } from './StatCard';
-export { ChannelIcon, channelLabel, channelColor } from './ChannelIcon';
 export { DataTable } from './DataTable';
 export type { Column } from './DataTable';
 export { ConfirmProvider, useConfirm } from './ConfirmDialog';
-export { EmojiPicker } from './EmojiPicker';
 export { CommandPalette } from './CommandPalette';
