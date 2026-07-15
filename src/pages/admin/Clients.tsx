@@ -112,19 +112,19 @@ export default function AdminClients(): JSX.Element {
     companyName: string;
     contactName: string;
     email: string;
+    phoneCode: string;
     phone: string;
     country: string;
     industry: string;
-    planId: string;
     password: string;
   }>({
     companyName: '',
     contactName: '',
     email: '',
+    phoneCode: '+968',
     phone: '',
     country: '',
     industry: '',
-    planId: '',
     password: generatePassword(),
   });
   const [showPwd, setShowPwd] = useState(false);
@@ -173,7 +173,7 @@ export default function AdminClients(): JSX.Element {
 
   const openCreate = (): void => {
     setEditing(null);
-    setForm({ companyName: '', contactName: '', email: '', phone: '', country: '', industry: '', planId: '', password: generatePassword() });
+    setForm({ companyName: '', contactName: '', email: '', phoneCode: '+968', phone: '', country: '', industry: '', password: generatePassword() });
     setShowPwd(false);
     setErrors({});
     setModalOpen(true);
@@ -182,8 +182,9 @@ export default function AdminClients(): JSX.Element {
   const openEdit = (c: Client): void => {
     setEditing(c);
     setForm({
-      companyName: c.companyName, contactName: c.contactName, email: c.email, phone: c.phone,
-      country: c.country, industry: c.industry, planId: c.planId ?? '', password: c.password,
+      companyName: c.companyName, contactName: c.contactName, email: c.email,
+      phoneCode: c.phone?.split(' ')[0] || '+968', phone: c.phone?.split(' ').slice(1).join(' ') || c.phone,
+      country: c.country, industry: c.industry, password: c.password,
     });
     setShowPwd(false);
     setErrors({});
@@ -204,29 +205,24 @@ export default function AdminClients(): JSX.Element {
 
     const country = countries.find((c) => c.code === form.country);
     if (!country) return;
+    const fullPhone = `${form.phoneCode} ${form.phone.trim()}`;
     if (editing) {
       updateClient(editing.id, {
         companyName: form.companyName, contactName: form.contactName, email: form.email,
-        phone: form.phone, country: form.country, industry: form.industry, currency: country.currency,
+        phone: fullPhone, country: form.country, industry: form.industry, currency: country.currency,
         username: form.email, password: form.password,
       });
-      if (form.planId && form.planId !== editing.planId) {
-        createSubscription(editing.id, form.planId, 'monthly');
-        showToast('تم التحديث وإنشاء اشتراك جديد', 'success');
-      } else {
-        showToast('تم تحديث بيانات العميل', 'success');
-      }
+      showToast('تم تحديث بيانات العميل', 'success');
     } else {
-      const newClient = addClient({
+      addClient({
         companyName: form.companyName, contactName: form.contactName, email: form.email,
-        phone: form.phone, country: form.country, industry: form.industry, status: 'trial',
-        planId: form.planId || null, currency: country.currency,
+        phone: fullPhone, country: form.country, industry: form.industry, status: 'trial',
+        planId: null, currency: country.currency,
         username: form.email, password: form.password,
         trialEndsAt: new Date(Date.now() + 14 * 86400000).toISOString(),
         dashboardUrl: '',
       });
-      if (form.planId) createSubscription(newClient.id, form.planId, 'monthly');
-      showToast(`تمت إضافة: ${newClient.companyName}`, 'success');
+      showToast(`تمت إضافة: ${form.companyName}`, 'success');
     }
     setModalOpen(false);
   };
@@ -565,7 +561,10 @@ export default function AdminClients(): JSX.Element {
               </div>
               <div className="space-y-2">
                 <Label>الدولة</Label>
-                <Select value={form.country} onValueChange={(v) => { setForm({ ...form, country: v }); setErrors({ ...errors, country: undefined }); }}>
+                <Select value={form.country} onValueChange={(v) => {
+                  const dc = countries.find((c) => c.code === v)?.dialCode || form.phoneCode;
+                  setForm({ ...form, country: v, phoneCode: dc }); setErrors({ ...errors, country: undefined });
+                }}>
                   <SelectTrigger>
                     <SelectValue placeholder="اختر الدولة" />
                   </SelectTrigger>
@@ -590,22 +589,6 @@ export default function AdminClients(): JSX.Element {
                   </SelectContent>
                 </Select>
                 {errors.industry && <p className="text-sm text-destructive">{errors.industry}</p>}
-              </div>
-              <div className="space-y-2 sm:col-span-2">
-                <Label>الباقة</Label>
-                <Select value={form.planId || '__none__'} onValueChange={(v) => setForm({ ...form, planId: v === '__none__' ? '' : v })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="__none__">بدون باقة</SelectItem>
-                    {plans.map((p) => (
-                      <SelectItem key={p.id} value={p.id}>
-                        {p.nameAr} — {formatMoney(p.pricesPerCountry[form.country]?.monthly ?? 0, countries.find((c) => c.code === form.country)?.currency ?? 'USD')}/شهر
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
               </div>
             </div>
 
@@ -633,14 +616,25 @@ export default function AdminClients(): JSX.Element {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="phone">رقم الهاتف</Label>
-                  <div className="relative">
-                    <Phone className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <div className="flex gap-2">
+                    <Select value={form.phoneCode} onValueChange={(v) => setForm({ ...form, phoneCode: v })}>
+                      <SelectTrigger className="w-[130px] shrink-0">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {countries.map((c) => (
+                          <SelectItem key={c.code} value={c.dialCode}>
+                            {c.flag} {c.dialCode}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <Input
                       id="phone"
-                      className="ps-9"
+                      className="flex-1"
                       value={form.phone}
                       onChange={(e) => { setForm({ ...form, phone: e.target.value }); setErrors({ ...errors, phone: undefined }); }}
-                      placeholder="+968 9xxx xxxx"
+                      placeholder="رقم الهاتف"
                     />
                   </div>
                   {errors.phone && <p className="text-sm text-destructive">{errors.phone}</p>}

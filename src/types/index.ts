@@ -154,6 +154,7 @@ export interface Country {
   name: string;
   nameAr: string;
   flag: string;
+  dialCode: string;
   currency: string;
   symbol: string;
   /** USD → local rate, for fast display only */

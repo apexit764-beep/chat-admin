@@ -24,14 +24,14 @@ const nowPlusDays = (days: number): string =>
 // Countries
 // =====================================================================
 export const countries: Country[] = [
-  { code: 'OM', name: 'Oman', nameAr: 'عُمان', flag: '🇴🇲', currency: 'OMR', symbol: 'ر.ع', usdRate: 0.385, active: true },
-  { code: 'AE', name: 'UAE', nameAr: 'الإمارات', flag: '🇦🇪', currency: 'AED', symbol: 'د.إ', usdRate: 3.67, active: true },
-  { code: 'SA', name: 'Saudi Arabia', nameAr: 'السعودية', flag: '🇸🇦', currency: 'SAR', symbol: 'ر.س', usdRate: 3.75, active: true },
-  { code: 'KW', name: 'Kuwait', nameAr: 'الكويت', flag: '🇰🇼', currency: 'KWD', symbol: 'د.ك', usdRate: 0.31, active: true },
-  { code: 'QA', name: 'Qatar', nameAr: 'قطر', flag: '🇶🇦', currency: 'QAR', symbol: 'ر.ق', usdRate: 3.64, active: true },
-  { code: 'BH', name: 'Bahrain', nameAr: 'البحرين', flag: '🇧🇭', currency: 'BHD', symbol: 'د.ب', usdRate: 0.377, active: true },
-  { code: 'EG', name: 'Egypt', nameAr: 'مصر', flag: '🇪🇬', currency: 'EGP', symbol: 'ج.م', usdRate: 49, active: true },
-  { code: 'JO', name: 'Jordan', nameAr: 'الأردن', flag: '🇯🇴', currency: 'JOD', symbol: 'د.أ', usdRate: 0.71, active: true },
+  { code: 'OM', name: 'Oman', nameAr: 'عُمان', flag: '🇴🇲', dialCode: '+968', currency: 'OMR', symbol: 'ر.ع', usdRate: 0.385, active: true },
+  { code: 'AE', name: 'UAE', nameAr: 'الإمارات', flag: '🇦🇪', dialCode: '+971', currency: 'AED', symbol: 'د.إ', usdRate: 3.67, active: true },
+  { code: 'SA', name: 'Saudi Arabia', nameAr: 'السعودية', flag: '🇸🇦', dialCode: '+966', currency: 'SAR', symbol: 'ر.س', usdRate: 3.75, active: true },
+  { code: 'KW', name: 'Kuwait', nameAr: 'الكويت', flag: '🇰🇼', dialCode: '+965', currency: 'KWD', symbol: 'د.ك', usdRate: 0.31, active: true },
+  { code: 'QA', name: 'Qatar', nameAr: 'قطر', flag: '🇶🇦', dialCode: '+974', currency: 'QAR', symbol: 'ر.ق', usdRate: 3.64, active: true },
+  { code: 'BH', name: 'Bahrain', nameAr: 'البحرين', flag: '🇧🇭', dialCode: '+973', currency: 'BHD', symbol: 'د.ب', usdRate: 0.377, active: true },
+  { code: 'EG', name: 'Egypt', nameAr: 'مصر', flag: '🇪🇬', dialCode: '+20', currency: 'EGP', symbol: 'ج.م', usdRate: 49, active: true },
+  { code: 'JO', name: 'Jordan', nameAr: 'الأردن', flag: '🇯🇴', dialCode: '+962', currency: 'JOD', symbol: 'د.أ', usdRate: 0.71, active: true },
 ];
 
 // =====================================================================

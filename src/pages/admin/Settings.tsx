@@ -115,7 +115,7 @@ export default function AdminSettings(): JSX.Element {
   const setCredentialDelivery = useSettingsStore((s) => s.setCredentialDelivery);
   const { confirm } = useConfirm();
 
-  const [countryModal, setCountryModal] = useState<{ code: string; name: string; nameAr: string; flag: string; currency: string; symbol: string; usdRate: number; isNew: boolean } | null>(null);
+  const [countryModal, setCountryModal] = useState<{ code: string; name: string; nameAr: string; flag: string; dialCode: string; currency: string; symbol: string; usdRate: number; isNew: boolean } | null>(null);
   const [currencyModal, setCurrencyModal] = useState<{ code: string; name: string; nameAr: string; symbol: string; usdRate: number; isNew: boolean } | null>(null);
 
   const [profileName, setProfileName] = useState(user?.name ?? '');
@@ -493,7 +493,7 @@ export default function AdminSettings(): JSX.Element {
                   title="إدارة الدول"
                   subtitle="أضف الدول المدعومة وحدّد عملتها"
                   action={
-                    <Button size="sm" onClick={() => setCountryModal({ code: '', name: '', nameAr: '', flag: '', currency: currencies[0]?.code ?? 'USD', symbol: '', usdRate: 1, isNew: true })}>
+                    <Button size="sm" onClick={() => setCountryModal({ code: '', name: '', nameAr: '', flag: '', dialCode: '', currency: currencies[0]?.code ?? 'USD', symbol: '', usdRate: 1, isNew: true })}>
                       <Plus className="h-4 w-4 me-2" /> إضافة دولة
                     </Button>
                   }
@@ -949,7 +949,7 @@ export default function AdminSettings(): JSX.Element {
                 if (!countryModal.code || !countryModal.nameAr) { showToast('الرمز والاسم مطلوبان', 'error'); return; }
                 if (countryModal.isNew) {
                   if (countries.some((c) => c.code === countryModal.code)) { showToast('الرمز موجود مسبقاً', 'error'); return; }
-                  addCountry({ code: countryModal.code, name: countryModal.name, nameAr: countryModal.nameAr, flag: countryModal.flag, currency: countryModal.currency, symbol: countryModal.symbol, usdRate: countryModal.usdRate, active: true });
+                  addCountry({ code: countryModal.code, name: countryModal.name, nameAr: countryModal.nameAr, flag: countryModal.flag, dialCode: countryModal.dialCode || '', currency: countryModal.currency, symbol: countryModal.symbol, usdRate: countryModal.usdRate, active: true });
                   showToast('تمت الإضافة', 'success');
                 } else {
                   updateCountry(countryModal.code, { name: countryModal.name, nameAr: countryModal.nameAr, flag: countryModal.flag, currency: countryModal.currency, symbol: countryModal.symbol, usdRate: countryModal.usdRate });
