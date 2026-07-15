@@ -409,6 +409,14 @@ export default function KnowledgeBase(): JSX.Element {
                               className="h-8 w-8"
                               onClick={() => openEditArticle(article)}
                             >
+                              <Eye className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => openEditArticle(article)}
+                            >
                               <Pencil className="h-3.5 w-3.5" />
                             </Button>
                             <Button
