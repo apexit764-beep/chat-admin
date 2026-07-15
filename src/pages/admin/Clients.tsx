@@ -115,9 +115,7 @@ export default function AdminClients(): JSX.Element {
     phone: string;
     country: string;
     industry: string;
-    status: ClientStatus;
     planId: string;
-    username: string;
     password: string;
   }>({
     companyName: '',
@@ -126,9 +124,7 @@ export default function AdminClients(): JSX.Element {
     phone: '',
     country: '',
     industry: '',
-    status: 'trial',
     planId: '',
-    username: '',
     password: generatePassword(),
   });
   const [showPwd, setShowPwd] = useState(false);
@@ -177,7 +173,7 @@ export default function AdminClients(): JSX.Element {
 
   const openCreate = (): void => {
     setEditing(null);
-    setForm({ companyName: '', contactName: '', email: '', phone: '', country: '', industry: '', status: 'trial', planId: '', username: '', password: generatePassword() });
+    setForm({ companyName: '', contactName: '', email: '', phone: '', country: '', industry: '', planId: '', password: generatePassword() });
     setShowPwd(false);
     setErrors({});
     setModalOpen(true);
@@ -187,8 +183,7 @@ export default function AdminClients(): JSX.Element {
     setEditing(c);
     setForm({
       companyName: c.companyName, contactName: c.contactName, email: c.email, phone: c.phone,
-      country: c.country, industry: c.industry, status: c.status, planId: c.planId ?? '',
-      username: c.username, password: c.password,
+      country: c.country, industry: c.industry, planId: c.planId ?? '', password: c.password,
     });
     setShowPwd(false);
     setErrors({});
@@ -203,8 +198,6 @@ export default function AdminClients(): JSX.Element {
     if (!form.phone.trim()) e.phone = 'الهاتف مطلوب';
     if (!form.contactName.trim()) e.contactName = 'الاسم مطلوب';
     if (!form.country) e.country = 'الدولة مطلوبة';
-    if (!form.industry) e.industry = 'مجال العمل مطلوب';
-    if (!form.username.trim()) e.username = 'اسم المستخدم مطلوب';
     if (!form.password.trim()) e.password = 'كلمة المرور مطلوبة';
     setErrors(e);
     if (Object.keys(e).length > 0) return;
@@ -214,8 +207,8 @@ export default function AdminClients(): JSX.Element {
     if (editing) {
       updateClient(editing.id, {
         companyName: form.companyName, contactName: form.contactName, email: form.email,
-        phone: form.phone, country: form.country, industry: form.industry, status: form.status, currency: country.currency,
-        username: form.username, password: form.password,
+        phone: form.phone, country: form.country, industry: form.industry, currency: country.currency,
+        username: form.email, password: form.password,
       });
       if (form.planId && form.planId !== editing.planId) {
         createSubscription(editing.id, form.planId, 'monthly');
@@ -226,10 +219,10 @@ export default function AdminClients(): JSX.Element {
     } else {
       const newClient = addClient({
         companyName: form.companyName, contactName: form.contactName, email: form.email,
-        phone: form.phone, country: form.country, industry: form.industry, status: form.status,
+        phone: form.phone, country: form.country, industry: form.industry, status: 'trial',
         planId: form.planId || null, currency: country.currency,
-        username: form.username, password: form.password,
-        trialEndsAt: form.status === 'trial' ? new Date(Date.now() + 14 * 86400000).toISOString() : undefined,
+        username: form.email, password: form.password,
+        trialEndsAt: new Date(Date.now() + 14 * 86400000).toISOString(),
         dashboardUrl: '',
       });
       if (form.planId) createSubscription(newClient.id, form.planId, 'monthly');
@@ -547,185 +540,155 @@ export default function AdminClients(): JSX.Element {
           <DialogHeader>
             <DialogTitle>{editing ? `تعديل ${editing.companyName}` : 'إضافة عميل جديد'}</DialogTitle>
           </DialogHeader>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="companyName">اسم الشركة</Label>
-              <Input
-                id="companyName"
-                value={form.companyName}
-                onChange={(e) => { setForm({ ...form, companyName: e.target.value }); setErrors({ ...errors, companyName: undefined }); }}
-                placeholder="مثال: Qhub"
-              />
-              {errors.companyName && <p className="text-sm text-destructive">{errors.companyName}</p>}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="contactName">جهة الاتصال</Label>
-              <Input
-                id="contactName"
-                value={form.contactName}
-                onChange={(e) => { setForm({ ...form, contactName: e.target.value }); setErrors({ ...errors, contactName: undefined }); }}
-                placeholder="الاسم الكامل"
-              />
-              {errors.contactName && <p className="text-sm text-destructive">{errors.contactName}</p>}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">البريد الإلكتروني</Label>
-              <div className="relative">
-                <Mail className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <div className="space-y-4 py-4">
+            {/* معلومات الشركة */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="companyName">اسم الشركة</Label>
                 <Input
-                  id="email"
-                  type="email"
-                  className="ps-9"
-                  value={form.email}
-                  onChange={(e) => { setForm({ ...form, email: e.target.value }); setErrors({ ...errors, email: undefined }); }}
+                  id="companyName"
+                  value={form.companyName}
+                  onChange={(e) => { setForm({ ...form, companyName: e.target.value }); setErrors({ ...errors, companyName: undefined }); }}
+                  placeholder="مثال: Qhub"
                 />
+                {errors.companyName && <p className="text-sm text-destructive">{errors.companyName}</p>}
               </div>
-              {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="phone">رقم الجوال</Label>
-              <div className="relative">
-                <Phone className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <div className="space-y-2">
+                <Label htmlFor="contactName">اسم المدير</Label>
                 <Input
-                  id="phone"
-                  className="ps-9"
-                  value={form.phone}
-                  onChange={(e) => { setForm({ ...form, phone: e.target.value }); setErrors({ ...errors, phone: undefined }); }}
+                  id="contactName"
+                  value={form.contactName}
+                  onChange={(e) => { setForm({ ...form, contactName: e.target.value }); setErrors({ ...errors, contactName: undefined }); }}
+                  placeholder="الاسم الكامل"
                 />
+                {errors.contactName && <p className="text-sm text-destructive">{errors.contactName}</p>}
               </div>
-              {errors.phone && <p className="text-sm text-destructive">{errors.phone}</p>}
-            </div>
-            <div className="space-y-2">
-              <Label>الدولة</Label>
-              <Select value={form.country} onValueChange={(v) => { setForm({ ...form, country: v }); setErrors({ ...errors, country: undefined }); }}>
-                <SelectTrigger>
-                  <SelectValue placeholder="اختر الدولة" />
-                </SelectTrigger>
-                <SelectContent>
-                  {countries.map((c) => (
-                    <SelectItem key={c.code} value={c.code}>{c.flag} {c.nameAr} ({c.currency})</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.country && <p className="text-sm text-destructive">{errors.country}</p>}
-            </div>
-            <div className="space-y-2">
-              <Label>مجال العمل</Label>
-              <Select value={form.industry} onValueChange={(v) => { setForm({ ...form, industry: v }); setErrors({ ...errors, industry: undefined }); }}>
-                <SelectTrigger>
-                  <SelectValue placeholder="اختر مجال العمل" />
-                </SelectTrigger>
-                <SelectContent>
-                  {industries.map((ind) => (
-                    <SelectItem key={ind.id} value={ind.name}>{ind.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.industry && <p className="text-sm text-destructive">{errors.industry}</p>}
-            </div>
-            <div className="space-y-2">
-              <Label>الحالة</Label>
-              <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v as ClientStatus })}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="trial">فترة تجريبية</SelectItem>
-                  <SelectItem value="active">نشط</SelectItem>
-                  <SelectItem value="past_due">متأخر</SelectItem>
-                  <SelectItem value="suspended">موقوف</SelectItem>
-                  <SelectItem value="cancelled">ملغي</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>الباقة</Label>
-              <Select value={form.planId || '__none__'} onValueChange={(v) => setForm({ ...form, planId: v === '__none__' ? '' : v })}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="__none__">بدون باقة</SelectItem>
-                  {plans.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>
-                      {p.nameAr} — {formatMoney(p.pricesPerCountry[form.country]?.monthly ?? 0, countries.find((c) => c.code === form.country)?.currency ?? 'USD')}/شهر
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="space-y-2">
+                <Label>الدولة</Label>
+                <Select value={form.country} onValueChange={(v) => { setForm({ ...form, country: v }); setErrors({ ...errors, country: undefined }); }}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="اختر الدولة" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {countries.map((c) => (
+                      <SelectItem key={c.code} value={c.code}>{c.flag} {c.nameAr} ({c.currency})</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.country && <p className="text-sm text-destructive">{errors.country}</p>}
+              </div>
+              <div className="space-y-2">
+                <Label>مجال العمل</Label>
+                <Select value={form.industry} onValueChange={(v) => { setForm({ ...form, industry: v }); setErrors({ ...errors, industry: undefined }); }}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="اختر مجال العمل" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {industries.map((ind) => (
+                      <SelectItem key={ind.id} value={ind.name}>{ind.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.industry && <p className="text-sm text-destructive">{errors.industry}</p>}
+              </div>
+              <div className="space-y-2 sm:col-span-2">
+                <Label>الباقة</Label>
+                <Select value={form.planId || '__none__'} onValueChange={(v) => setForm({ ...form, planId: v === '__none__' ? '' : v })}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none__">بدون باقة</SelectItem>
+                    {plans.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.nameAr} — {formatMoney(p.pricesPerCountry[form.country]?.monthly ?? 0, countries.find((c) => c.code === form.country)?.currency ?? 'USD')}/شهر
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
-            <div className="sm:col-span-2 pt-2 border-t">
+            {/* بيانات الدخول */}
+            <div className="pt-2 border-t">
               <p className="text-sm font-semibold mb-3 flex items-center gap-2">
                 <Lock className="h-4 w-4 text-muted-foreground" />
                 بيانات الدخول للوحة العميل
               </p>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="username">اسم المستخدم</Label>
-              <div className="relative">
-                <Mail className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="username"
-                  className="ps-9"
-                  value={form.username}
-                  onChange={(e) => { setForm({ ...form, username: e.target.value }); setErrors({ ...errors, username: undefined }); }}
-                  placeholder="البريد أو اسم مستخدم"
-                />
-              </div>
-              {!editing && form.email && !form.username && (
-                <button
-                  type="button"
-                  className="text-xs text-primary hover:underline"
-                  onClick={() => setForm({ ...form, username: form.email })}
-                >
-                  استخدام البريد كاسم مستخدم
-                </button>
-              )}
-              {errors.username && <p className="text-sm text-destructive">{errors.username}</p>}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">كلمة المرور</Label>
-              <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <Lock className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="password"
-                    type={showPwd ? 'text' : 'password'}
-                    className="ps-9 pe-9 font-mono"
-                    value={form.password}
-                    onChange={(e) => { setForm({ ...form, password: e.target.value }); setErrors({ ...errors, password: undefined }); }}
-                  />
-                  <button
-                    type="button"
-                    className="absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                    onClick={() => setShowPwd(!showPwd)}
-                  >
-                    {showPwd ? <EyeOff className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
-                  </button>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">البريد الإلكتروني</Label>
+                  <div className="relative">
+                    <Mail className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="email"
+                      type="email"
+                      className="ps-9"
+                      value={form.email}
+                      onChange={(e) => { setForm({ ...form, email: e.target.value }); setErrors({ ...errors, email: undefined }); }}
+                      placeholder="example@company.com"
+                    />
+                  </div>
+                  {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
                 </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  className="shrink-0"
-                  onClick={() => setForm({ ...form, password: generatePassword() })}
-                  title="توليد كلمة مرور جديدة"
-                >
-                  <RefreshCw className="h-4 w-4" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  className="shrink-0"
-                  onClick={() => { navigator.clipboard.writeText(form.password); showToast('تم نسخ كلمة المرور', 'success'); }}
-                  title="نسخ كلمة المرور"
-                >
-                  <Copy className="h-4 w-4" />
-                </Button>
+                <div className="space-y-2">
+                  <Label htmlFor="phone">رقم الهاتف</Label>
+                  <div className="relative">
+                    <Phone className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="phone"
+                      className="ps-9"
+                      value={form.phone}
+                      onChange={(e) => { setForm({ ...form, phone: e.target.value }); setErrors({ ...errors, phone: undefined }); }}
+                      placeholder="+968 9xxx xxxx"
+                    />
+                  </div>
+                  {errors.phone && <p className="text-sm text-destructive">{errors.phone}</p>}
+                </div>
+                <div className="space-y-2 sm:col-span-2">
+                  <Label htmlFor="password">كلمة المرور</Label>
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Lock className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="password"
+                        type={showPwd ? 'text' : 'password'}
+                        className="ps-9 pe-9 font-mono"
+                        value={form.password}
+                        onChange={(e) => { setForm({ ...form, password: e.target.value }); setErrors({ ...errors, password: undefined }); }}
+                      />
+                      <button
+                        type="button"
+                        className="absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        onClick={() => setShowPwd(!showPwd)}
+                      >
+                        {showPwd ? <EyeOff className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
+                      </button>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      className="shrink-0"
+                      onClick={() => setForm({ ...form, password: generatePassword() })}
+                      title="توليد كلمة مرور جديدة"
+                    >
+                      <RefreshCw className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      className="shrink-0"
+                      onClick={() => { navigator.clipboard.writeText(form.password); showToast('تم نسخ كلمة المرور', 'success'); }}
+                      title="نسخ كلمة المرور"
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
+                </div>
               </div>
-              {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
             </div>
           </div>
           <DialogFooter className="gap-2">
