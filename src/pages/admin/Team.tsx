@@ -251,13 +251,23 @@ const permissionGroups: PermissionGroup[] = [
     ],
   },
   {
+    id: 'team',
+    label: 'الموظفين',
+    permissions: [
+      { id: 'team.view', label: 'عرض الموظفين' },
+      { id: 'team.create', label: 'إضافة موظف' },
+      { id: 'team.edit', label: 'تعديل موظف' },
+      { id: 'team.delete', label: 'حذف موظف' },
+      { id: 'team.roles', label: 'إدارة الأدوار والصلاحيات' },
+    ],
+  },
+  {
     id: 'settings',
     label: 'الإعدادات',
     permissions: [
       { id: 'settings.general', label: 'إعدادات عامة' },
       { id: 'settings.security', label: 'إعدادات الأمان' },
       { id: 'settings.api', label: 'مفاتيح API' },
-      { id: 'settings.team', label: 'الموظفين والصلاحيات' },
     ],
   },
 ];
@@ -302,6 +312,7 @@ const initialRoles: RoleConfig[] = [
       'notifications.view', 'notifications.manage',
       'activity.view', 'activity.export',
       'reports.view', 'reports.export',
+      'team.view', 'team.create', 'team.edit', 'team.delete', 'team.roles',
       'settings.general',
     ]),
   },
