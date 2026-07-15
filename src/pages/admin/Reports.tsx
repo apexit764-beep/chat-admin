@@ -278,13 +278,32 @@ export default function AdminReports(): JSX.Element {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm">معدل التحويل</CardTitle>
-            <CardDescription className="text-xs">نسبة التحويل من تجريبي إلى مدفوع</CardDescription>
+            <CardDescription className="text-xs">نسبة التحويل من الباقة التجريبية إلى الباقات المدفوعة</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2">
-            <FunnelStep label="إجمالي المسجلين" value={totalSignups} color="bg-info" share={100} />
-            <FunnelStep label="تجريبي" value={trialClients.length} color="bg-warning" share={totalSignups ? (trialClients.length / totalSignups) * 100 : 0} />
-            <FunnelStep label="مدفوع (نشط)" value={paidCount} color="bg-success" share={totalSignups ? (paidCount / totalSignups) * 100 : 0} />
-            <FunnelStep label="ملغي" value={churnCount} color="bg-danger" share={totalSignups ? (churnCount / totalSignups) * 100 : 0} />
+          <CardContent className="space-y-3">
+            {(() => {
+              const trialTotal = trialClients.length + paidCount;
+              const conversionRate = trialTotal ? Math.round((paidCount / trialTotal) * 100) : 0;
+              return (
+                <>
+                  <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                    <span className="text-sm font-medium">معدل التحويل</span>
+                    <span className="text-2xl font-bold text-success">{conversionRate}%</span>
+                  </div>
+                  <FunnelStep label="تجريبي" value={trialClients.length} color="bg-warning" share={trialTotal ? (trialClients.length / trialTotal) * 100 : 0} />
+                  {planDist.map((p) => (
+                    <FunnelStep
+                      key={p.label}
+                      label={p.label}
+                      value={p.value}
+                      color=""
+                      colorHex={p.color}
+                      share={trialTotal ? (p.value / trialTotal) * 100 : 0}
+                    />
+                  ))}
+                </>
+              );
+            })()}
           </CardContent>
         </Card>
       </div>
