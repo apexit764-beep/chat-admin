@@ -801,6 +801,13 @@ export type FeedbackType = 'complaint' | 'suggestion';
 export type FeedbackStatus = 'open' | 'in_progress' | 'resolved' | 'closed';
 export type FeedbackPriority = 'low' | 'medium' | 'high';
 
+export interface FeedbackReply {
+  id: string;
+  text: string;
+  author: string;
+  timestamp: string;
+}
+
 export interface FeedbackEntry {
   id: string;
   clientId: string;
@@ -810,8 +817,12 @@ export interface FeedbackEntry {
   priority: FeedbackPriority;
   subject: string;
   message: string;
+  replies?: FeedbackReply[];
+  /** @deprecated Use replies array instead */
   reply?: string;
+  /** @deprecated Use replies array instead */
   repliedBy?: string;
+  /** @deprecated Use replies array instead */
   repliedAt?: string;
   rating?: number;
   timestamp: string;
@@ -827,6 +838,7 @@ export const feedbackEntries: FeedbackEntry[] = [
     priority: 'high',
     subject: 'توقف الواتساب عن الاستقبال',
     message: 'منذ أمس الرسائل الواردة لا تصل للوحة. الرقم الأساسي +965999888777 متوقف عن استقبال المحادثات الجديدة. نرجو الحل العاجل لأننا نخسر عملاء.',
+    replies: [],
     timestamp: nowMinus(25),
   },
   {
@@ -838,6 +850,7 @@ export const feedbackEntries: FeedbackEntry[] = [
     priority: 'medium',
     subject: 'إضافة تكامل مع Zoho CRM',
     message: 'نستخدم Zoho CRM في إدارة العملاء. هل يمكن إضافة تكامل مباشر لمزامنة جهات الاتصال والمحادثات تلقائياً؟ سيوفر علينا وقت كبير.',
+    replies: [],
     timestamp: nowMinus(180),
   },
   {
@@ -849,6 +862,7 @@ export const feedbackEntries: FeedbackEntry[] = [
     priority: 'high',
     subject: 'مشكلة في إرسال الحملات',
     message: 'عند إرسال حملة لأكثر من 500 جهة اتصال، يتوقف الإرسال عند 200 رسالة تقريباً ويظهر خطأ "Rate limit exceeded". المشكلة متكررة من أسبوع.',
+    replies: [{ id: 'fr_3_1', text: 'نعتذر عن الإزعاج. تم تحديد المشكلة وهي متعلقة بحد الإرسال من WhatsApp API. نعمل على تعديل آلية الإرسال بدفعات متتالية.', author: 'علي السالم', timestamp: nowMinus(120) }],
     reply: 'نعتذر عن الإزعاج. تم تحديد المشكلة وهي متعلقة بحد الإرسال من WhatsApp API. نعمل على تعديل آلية الإرسال بدفعات متتالية.',
     repliedBy: 'علي السالم',
     repliedAt: nowMinus(120),
@@ -863,6 +877,7 @@ export const feedbackEntries: FeedbackEntry[] = [
     priority: 'low',
     subject: 'تقارير PDF قابلة للتخصيص',
     message: 'نتمنى إمكانية تصدير تقارير PDF بشعار الشركة وألوانها بدلاً من التنسيق الافتراضي.',
+    replies: [{ id: 'fr_4_1', text: 'شكراً لاقتراحك! تم إضافة الميزة في التحديث الأخير. يمكنك الآن تخصيص شعار وألوان التقارير من الإعدادات.', author: 'Sara Ahmed', timestamp: nowMinus(1440) }],
     reply: 'شكراً لاقتراحك! تم إضافة الميزة في التحديث الأخير. يمكنك الآن تخصيص شعار وألوان التقارير من الإعدادات.',
     repliedBy: 'Sara Ahmed',
     repliedAt: nowMinus(1440),
@@ -877,6 +892,7 @@ export const feedbackEntries: FeedbackEntry[] = [
     priority: 'high',
     subject: 'الإشعارات لا تصل للموظفين الجدد',
     message: 'أضفنا 3 موظفين جدد الأسبوع الماضي ولكنهم لا يتلقون إشعارات المحادثات الجديدة. حاولنا إعادة تسجيل الدخول ولم تحل المشكلة.',
+    replies: [],
     timestamp: nowMinus(480),
   },
   {
@@ -888,6 +904,7 @@ export const feedbackEntries: FeedbackEntry[] = [
     priority: 'low',
     subject: 'شكراً على التحديث الأخير',
     message: 'ميزة الردود الذكية بالذكاء الاصطناعي ممتازة! وفرت على فريقنا وقت كبير. استمروا بالتطوير 👏',
+    replies: [{ id: 'fr_6_1', text: 'شكراً لكلماتك الجميلة! يسعدنا أن الميزة مفيدة لفريقكم. سنستمر بالتطوير إن شاء الله.', author: 'محمد الكندي', timestamp: nowMinus(4000) }],
     reply: 'شكراً لكلماتك الجميلة! يسعدنا أن الميزة مفيدة لفريقكم. سنستمر بالتطوير إن شاء الله.',
     repliedBy: 'محمد الكندي',
     repliedAt: nowMinus(4000),
@@ -903,6 +920,7 @@ export const feedbackEntries: FeedbackEntry[] = [
     priority: 'medium',
     subject: 'بطء في تحميل المحادثات',
     message: 'لوحة التحكم أصبحت بطيئة جداً عند فتح المحادثات، خصوصاً المحادثات التي فيها صور. الانتظار يصل لـ 10 ثواني أحياناً.',
+    replies: [{ id: 'fr_7_1', text: 'تم تحسين أداء تحميل المحادثات والوسائط في التحديث v2.4.1. يرجى تحديث الصفحة والتأكد.', author: 'علي السالم', timestamp: nowMinus(5000) }],
     reply: 'تم تحسين أداء تحميل المحادثات والوسائط في التحديث v2.4.1. يرجى تحديث الصفحة والتأكد.',
     repliedBy: 'علي السالم',
     repliedAt: nowMinus(5000),
@@ -917,6 +935,7 @@ export const feedbackEntries: FeedbackEntry[] = [
     priority: 'medium',
     subject: 'دعم اللغة الإنجليزية بالكامل',
     message: 'فريقنا مختلط عربي وأجنبي. نحتاج واجهة إنجليزية كاملة حتى يتمكن الموظفين الأجانب من استخدام النظام.',
+    replies: [],
     timestamp: nowMinus(7200),
   },
   {
@@ -928,6 +947,7 @@ export const feedbackEntries: FeedbackEntry[] = [
     priority: 'medium',
     subject: 'خطأ في احتساب الإحصائيات',
     message: 'إحصائيات الشهر الحالي تُظهر عدد محادثات أقل من الفعلي. الفرق تقريباً 15-20%. لاحظنا المشكلة بعد التحديث الأخير.',
+    replies: [{ id: 'fr_9_1', text: 'تم رصد المشكلة وهي متعلقة بتوقيت المنطقة الزمنية. جاري العمل على الإصلاح.', author: 'Sara Ahmed', timestamp: nowMinus(6000) }],
     reply: 'تم رصد المشكلة وهي متعلقة بتوقيت المنطقة الزمنية. جاري العمل على الإصلاح.',
     repliedBy: 'Sara Ahmed',
     repliedAt: nowMinus(6000),
@@ -942,6 +962,7 @@ export const feedbackEntries: FeedbackEntry[] = [
     priority: 'low',
     subject: 'قوالب جاهزة للصالونات',
     message: 'نتمنى توفير قوالب رسائل جاهزة خاصة بقطاع الصالونات والتجميل (حجز موعد، تأكيد موعد، تذكير، عرض خاص).',
+    replies: [],
     timestamp: nowMinus(10080),
   },
   {
@@ -953,6 +974,7 @@ export const feedbackEntries: FeedbackEntry[] = [
     priority: 'high',
     subject: 'API للربط مع نظام المبيعات',
     message: 'نحتاج API endpoint لسحب بيانات المحادثات وجهات الاتصال برمجياً للربط مع نظام ERP الداخلي.',
+    replies: [{ id: 'fr_11_1', text: 'تم توفير API كامل مع التوثيق. يمكنكم الوصول من خلال إعدادات > مفاتيح API.', author: 'محمد الكندي', timestamp: nowMinus(11000) }],
     reply: 'تم توفير API كامل مع التوثيق. يمكنكم الوصول من خلال إعدادات > مفاتيح API.',
     repliedBy: 'محمد الكندي',
     repliedAt: nowMinus(11000),
