@@ -16,6 +16,8 @@ import {
   X,
   Sparkles,
   MoreHorizontal,
+  AlertTriangle,
+  ShieldOff,
 } from 'lucide-react';
 import { useConfirm } from '@components/ui';
 import { useAdminStore } from '@/store/useAdminStore';
@@ -107,6 +109,7 @@ export default function AdminPlans(): JSX.Element {
     setActiveFilter('all');
   };
   const [reassignModal, setReassignModal] = useState<{ plan: Plan; targetPlanId: string } | null>(null);
+  const [deactivateModal, setDeactivateModal] = useState<{ plan: Plan; clientCount: number } | null>(null);
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const sortedPlans = useMemo(
@@ -319,7 +322,14 @@ export default function AdminPlans(): JSX.Element {
                         <TableCell className="text-center">
                           <Switch
                             checked={p.active}
-                            onCheckedChange={(checked) => { updatePlan(p.id, { active: checked }); showToast(checked ? 'تم تفعيل الباقة' : 'تم تعطيل الباقة', 'success'); }}
+                            onCheckedChange={(checked) => {
+                              if (!checked && clientCount > 0) {
+                                setDeactivateModal({ plan: p, clientCount });
+                                return;
+                              }
+                              updatePlan(p.id, { active: checked });
+                              showToast(checked ? 'تم تفعيل الباقة' : 'تم تعطيل الباقة', 'success');
+                            }}
                           />
                         </TableCell>
                         <TableCell className="text-center">
@@ -442,7 +452,10 @@ export default function AdminPlans(): JSX.Element {
         <Dialog open={!!reassignModal} onOpenChange={(open) => { if (!open) setReassignModal(null); }}>
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle>نقل العملاء قبل الحذف</DialogTitle>
+              <DialogTitle className="flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5 text-destructive" />
+                نقل العملاء قبل الحذف
+              </DialogTitle>
               <DialogDescription>
                 {reassignModal && (
                   <>
@@ -454,29 +467,116 @@ export default function AdminPlans(): JSX.Element {
               </DialogDescription>
             </DialogHeader>
             {reassignModal && (
-              <div className="space-y-2 py-2">
-                <Label>الباقة البديلة</Label>
-                <Select
-                  value={reassignModal.targetPlanId}
-                  onValueChange={(v) => setReassignModal({ ...reassignModal, targetPlanId: v })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {plans.filter((pl) => pl.id !== reassignModal.plan.id).map((pl) => (
-                      <SelectItem key={pl.id} value={pl.id}>
-                        {pl.nameAr}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <div className="space-y-3 py-2">
+                <div className="space-y-2">
+                  <Label>الباقة البديلة</Label>
+                  <Select
+                    value={reassignModal.targetPlanId}
+                    onValueChange={(v) => setReassignModal({ ...reassignModal, targetPlanId: v })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {plans.filter((pl) => pl.id !== reassignModal.plan.id).map((pl) => (
+                        <SelectItem key={pl.id} value={pl.id}>
+                          {pl.nameAr}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {(() => {
+                  const targetPlan = plans.find((pl) => pl.id === reassignModal.targetPlanId);
+                  if (!targetPlan) return null;
+                  const linkedClients = clients.filter((c) => c.planId === reassignModal.plan.id);
+                  const countriesAffected = [...new Set(linkedClients.map((c) => c.country))];
+                  return (
+                    <div className="p-3 rounded-lg bg-muted space-y-2">
+                      <p className="text-xs font-semibold text-muted-foreground">ملخص النقل</p>
+                      <div className="space-y-1.5">
+                        {countriesAffected.map((cc) => {
+                          const co = countries.find((c) => c.code === cc);
+                          const oldPrice = reassignModal.plan.pricesPerCountry[cc];
+                          const newPrice = targetPlan.pricesPerCountry[cc];
+                          const countryClients = linkedClients.filter((c) => c.country === cc).length;
+                          return (
+                            <div key={cc} className="flex items-center justify-between text-xs">
+                              <span>{co?.flag} {co?.nameAr} ({countryClients} عميل)</span>
+                              <span className="font-mono">
+                                {oldPrice?.monthly ?? 0} → {newPrice?.monthly ?? 0} {co?.symbol}/شهر
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <p className="text-[11px] text-muted-foreground">
+                        السعر الجديد يُطبق في الدورة القادمة لكل عميل
+                      </p>
+                    </div>
+                  );
+                })()}
               </div>
             )}
             <DialogFooter className="gap-2 sm:gap-0">
               <Button variant="outline" onClick={() => setReassignModal(null)}>إلغاء</Button>
               <Button className="bg-destructive hover:bg-destructive/90 text-destructive-foreground" onClick={confirmReassign}>
                 نقل وحذف
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Deactivation confirmation dialog */}
+        <Dialog open={!!deactivateModal} onOpenChange={(open) => { if (!open) setDeactivateModal(null); }}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <ShieldOff className="h-5 w-5 text-amber-500" />
+                تعطيل الباقة
+              </DialogTitle>
+              <DialogDescription>
+                {deactivateModal && (
+                  <>
+                    باقة <span className="font-bold text-foreground">{deactivateModal.plan.nameAr}</span> مرتبطة بـ{' '}
+                    <span className="font-bold text-foreground">{deactivateModal.clientCount}</span> عميل نشط.
+                  </>
+                )}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-2 py-2">
+              <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 space-y-2">
+                <p className="text-sm font-semibold text-amber-700 dark:text-amber-400">ماذا سيحصل؟</p>
+                <ul className="space-y-1.5 text-xs text-muted-foreground">
+                  <li className="flex items-start gap-1.5">
+                    <Check className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                    العملاء الحاليون يحتفظون بباقتهم واشتراكهم دون تغيير
+                  </li>
+                  <li className="flex items-start gap-1.5">
+                    <X className="h-3.5 w-3.5 text-red-500 shrink-0 mt-0.5" />
+                    عملاء جدد لا يمكنهم الاشتراك في هذه الباقة
+                  </li>
+                  <li className="flex items-start gap-1.5">
+                    <Check className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                    يمكنك إعادة تفعيلها في أي وقت
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button variant="outline" onClick={() => setDeactivateModal(null)}>إلغاء</Button>
+              <Button
+                className="bg-amber-600 hover:bg-amber-700 text-white"
+                onClick={() => {
+                  if (deactivateModal) {
+                    updatePlan(deactivateModal.plan.id, { active: false });
+                    showToast(`تم تعطيل الباقة — ${deactivateModal.clientCount} عميل يحتفظون باشتراكهم`, 'success');
+                    setDeactivateModal(null);
+                  }
+                }}
+              >
+                تعطيل الباقة
               </Button>
             </DialogFooter>
           </DialogContent>

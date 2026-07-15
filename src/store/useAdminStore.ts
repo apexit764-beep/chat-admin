@@ -95,6 +95,8 @@ interface AdminState {
   addPlan: (p: Omit<Plan, 'id' | 'createdAt'>) => Plan;
   updatePlan: (id: string, patch: Partial<Plan>) => void;
   deletePlan: (id: string) => void;
+  getClientsOnPlan: (planId: string) => Client[];
+  cascadePlanPriceChange: (planId: string, newPrices: Record<string, { monthly: number; yearly: number }>) => number;
 
   // Country actions
   addCountry: (c: Country) => void;
@@ -434,7 +436,43 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     set((s) => ({ plans: s.plans.map((p) => (p.id === id ? { ...p, ...patch } : p)) })),
 
   deletePlan: (id) =>
-    set((s) => ({ plans: s.plans.filter((p) => p.id !== id) })),
+    set((s) => ({
+      plans: s.plans.filter((p) => p.id !== id),
+      subscriptions: s.subscriptions.map((sub) =>
+        sub.planId === id ? { ...sub, status: 'cancelled' as const, cancelAt: new Date().toISOString() } : sub
+      ),
+    })),
+
+  getClientsOnPlan: (planId) => {
+    return get().clients.filter((c) => c.planId === planId);
+  },
+
+  cascadePlanPriceChange: (planId, newPrices) => {
+    const { subscriptions, clients } = get();
+    let affected = 0;
+    const updatedSubs = subscriptions.map((sub) => {
+      if (sub.planId !== planId || sub.status === 'cancelled') return sub;
+      const client = clients.find((c) => c.id === sub.clientId);
+      if (!client) return sub;
+      const countryPrices = newPrices[client.country];
+      if (!countryPrices) return sub;
+      const newAmount = sub.billingCycle === 'yearly' ? countryPrices.yearly : countryPrices.monthly;
+      if (newAmount !== sub.amount) {
+        affected++;
+        return { ...sub, amount: newAmount };
+      }
+      return sub;
+    });
+    const updatedClients = clients.map((c) => {
+      if (c.planId !== planId) return c;
+      const sub = updatedSubs.find((s) => s.id === c.subscriptionId);
+      if (!sub || sub.status === 'cancelled') return c;
+      const newMrr = sub.billingCycle === 'monthly' ? sub.amount : sub.amount / 12;
+      return { ...c, mrr: newMrr };
+    });
+    set({ subscriptions: updatedSubs, clients: updatedClients });
+    return affected;
+  },
 
   addCountry: (c) =>
     set((s) => ({ countries: [...s.countries.filter((x) => x.code !== c.code), c] })),

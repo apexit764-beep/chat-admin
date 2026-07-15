@@ -11,6 +11,10 @@ import {
   Database,
   Infinity as InfinityIcon,
   ChevronDown,
+  AlertTriangle,
+  TrendingDown,
+  TrendingUp,
+  Bell,
 } from 'lucide-react';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
@@ -21,6 +25,15 @@ import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
 type FeatureGroup = { label: string; icon: React.ComponentType<{ className?: string }>; items: string[] };
@@ -98,9 +111,11 @@ export default function PlanForm(): JSX.Element {
   const navigate = useNavigate();
 
   const plans = useAdminStore((s) => s.plans);
+  const clients = useAdminStore((s) => s.clients);
   const countries = useAdminStore((s) => s.countries);
   const addPlan = useAdminStore((s) => s.addPlan);
   const updatePlan = useAdminStore((s) => s.updatePlan);
+  const cascadePlanPriceChange = useAdminStore((s) => s.cascadePlanPriceChange);
   const showToast = useUIStore((s) => s.showToast);
 
   const editing = useMemo(() => (id ? plans.find((p) => p.id === id) ?? null : null), [id, plans]);
@@ -164,6 +179,139 @@ export default function PlanForm(): JSX.Element {
     setForm({ ...form, features: Array.from(s) });
   };
 
+  interface ChangeImpact {
+    priceChanged: boolean;
+    priceDirection: 'up' | 'down' | 'mixed' | null;
+    limitsDecreased: boolean;
+    decreasedLimits: string[];
+    featuresRemoved: string[];
+    featuresAdded: string[];
+    nameChanged: boolean;
+    activeChanged: boolean;
+    affectedClients: number;
+  }
+
+  const [showImpactDialog, setShowImpactDialog] = useState(false);
+  const [pendingImpact, setPendingImpact] = useState<ChangeImpact | null>(null);
+
+  const linkedClients = useMemo(
+    () => (editing ? clients.filter((c) => c.planId === editing.id) : []),
+    [editing, clients]
+  );
+
+  const detectChanges = (): ChangeImpact | null => {
+    if (!editing) return null;
+
+    const impact: ChangeImpact = {
+      priceChanged: false,
+      priceDirection: null,
+      limitsDecreased: false,
+      decreasedLimits: [],
+      featuresRemoved: [],
+      featuresAdded: [],
+      nameChanged: false,
+      activeChanged: false,
+      affectedClients: linkedClients.length,
+    };
+
+    if (form.name !== editing.name || form.nameAr !== editing.nameAr) {
+      impact.nameChanged = true;
+    }
+
+    if (form.active !== editing.active) {
+      impact.activeChanged = true;
+    }
+
+    let anyUp = false;
+    let anyDown = false;
+    for (const code of Object.keys(form.pricesPerCountry)) {
+      const oldP = editing.pricesPerCountry[code];
+      const newP = form.pricesPerCountry[code];
+      if (!oldP || !newP) continue;
+      if (newP.monthly !== oldP.monthly || newP.yearly !== oldP.yearly) {
+        impact.priceChanged = true;
+        if (newP.monthly > oldP.monthly) anyUp = true;
+        if (newP.monthly < oldP.monthly) anyDown = true;
+      }
+    }
+    if (anyUp && anyDown) impact.priceDirection = 'mixed';
+    else if (anyUp) impact.priceDirection = 'up';
+    else if (anyDown) impact.priceDirection = 'down';
+
+    const limitLabels: Record<string, string> = {
+      agents: 'الموظفين', channels: 'القنوات', conversations: 'المحادثات', contacts: 'جهات الاتصال',
+    };
+    const limitMap: Record<string, [number, number]> = {
+      agents: [editing.limits.agents, form.limitAgents],
+      channels: [editing.limits.channels, form.limitChannels],
+      conversations: [editing.limits.conversations, form.limitConversations],
+      contacts: [editing.limits.contacts, form.limitContacts],
+    };
+    for (const [key, [oldVal, newVal]] of Object.entries(limitMap)) {
+      if (newVal < oldVal && newVal !== -1) {
+        impact.limitsDecreased = true;
+        impact.decreasedLimits.push(limitLabels[key]);
+      }
+    }
+
+    const oldFeatures = new Set(editing.features);
+    const newFeatures = new Set(form.features);
+    impact.featuresRemoved = editing.features.filter((f) => !newFeatures.has(f));
+    impact.featuresAdded = form.features.filter((f) => !oldFeatures.has(f));
+
+    const hasSignificantChange =
+      impact.priceChanged || impact.limitsDecreased || impact.featuresRemoved.length > 0 ||
+      impact.featuresAdded.length > 0 || impact.nameChanged || impact.activeChanged;
+
+    return hasSignificantChange ? impact : null;
+  };
+
+  const buildPayload = () => ({
+    tier: form.tier,
+    name: form.name,
+    nameAr: form.nameAr,
+    tagline: form.tagline,
+    features: form.features,
+    limits: {
+      agents: form.limitAgents,
+      channels: form.limitChannels,
+      conversations: form.limitConversations,
+      contacts: form.limitContacts,
+    },
+    pricesPerCountry: form.pricesPerCountry,
+    popular: form.popular,
+    isTrial: form.isTrial,
+    active: form.active,
+  });
+
+  const applyChanges = (impact: ChangeImpact | null): void => {
+    if (form.popular) {
+      plans.forEach((other) => {
+        if (other.popular && other.id !== editing?.id) {
+          updatePlan(other.id, { popular: false });
+        }
+      });
+    }
+    const payload = buildPayload();
+    if (editing) {
+      updatePlan(editing.id, payload);
+      if (impact?.priceChanged && linkedClients.length > 0) {
+        const affected = cascadePlanPriceChange(editing.id, form.pricesPerCountry);
+        if (affected > 0) {
+          showToast(`تم تحديث الباقة وتعديل أسعار ${affected} اشتراك — يُطبق في الدورة القادمة`, 'success');
+        } else {
+          showToast('تم تحديث الباقة', 'success');
+        }
+      } else {
+        showToast('تم تحديث الباقة', 'success');
+      }
+    } else {
+      addPlan(payload);
+      showToast('تمت إضافة الباقة', 'success');
+    }
+    navigate('/plans');
+  };
+
   const submit = (): void => {
     if (!form.name.trim() || !form.nameAr.trim()) {
       showToast('الاسم بالعربية والإنجليزية مطلوبان', 'error');
@@ -173,38 +321,17 @@ export default function PlanForm(): JSX.Element {
       showToast('اختر ميزة واحدة على الأقل', 'error');
       return;
     }
-    if (form.popular) {
-      plans.forEach((other) => {
-        if (other.popular && other.id !== editing?.id) {
-          updatePlan(other.id, { popular: false });
-        }
-      });
+
+    if (editing && linkedClients.length > 0) {
+      const impact = detectChanges();
+      if (impact) {
+        setPendingImpact(impact);
+        setShowImpactDialog(true);
+        return;
+      }
     }
-    const payload = {
-      tier: form.tier,
-      name: form.name,
-      nameAr: form.nameAr,
-      tagline: form.tagline,
-      features: form.features,
-      limits: {
-        agents: form.limitAgents,
-        channels: form.limitChannels,
-        conversations: form.limitConversations,
-        contacts: form.limitContacts,
-      },
-      pricesPerCountry: form.pricesPerCountry,
-      popular: form.popular,
-      isTrial: form.isTrial,
-      active: form.active,
-    };
-    if (editing) {
-      updatePlan(editing.id, payload);
-      showToast('تم تحديث الباقة', 'success');
-    } else {
-      addPlan(payload);
-      showToast('تمت إضافة الباقة', 'success');
-    }
-    navigate('/plans');
+
+    applyChanges(null);
   };
 
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
@@ -428,6 +555,136 @@ export default function PlanForm(): JSX.Element {
         <Button variant="outline" onClick={() => navigate('/plans')}>إلغاء</Button>
         <Button onClick={submit}>{editing ? 'حفظ التعديلات' : 'إنشاء الباقة'}</Button>
       </div>
+
+      {/* Impact confirmation dialog */}
+      <Dialog open={showImpactDialog} onOpenChange={(open) => { if (!open) setShowImpactDialog(false); }}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-500" />
+              تأكيد تعديل الباقة
+            </DialogTitle>
+            <DialogDescription>
+              هذه الباقة مرتبطة بـ <span className="font-bold text-foreground">{pendingImpact?.affectedClients}</span> عميل.
+              يرجى مراجعة التغييرات قبل التأكيد.
+            </DialogDescription>
+          </DialogHeader>
+
+          {pendingImpact && (
+            <div className="space-y-3 py-2 max-h-[50vh] overflow-y-auto">
+              {pendingImpact.priceChanged && (
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                  <div className="mt-0.5">
+                    {pendingImpact.priceDirection === 'up' ? (
+                      <TrendingUp className="h-4 w-4 text-amber-600" />
+                    ) : pendingImpact.priceDirection === 'down' ? (
+                      <TrendingDown className="h-4 w-4 text-emerald-600" />
+                    ) : (
+                      <TrendingUp className="h-4 w-4 text-amber-600" />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold">
+                      {pendingImpact.priceDirection === 'up' && 'زيادة في الأسعار'}
+                      {pendingImpact.priceDirection === 'down' && 'تخفيض في الأسعار'}
+                      {pendingImpact.priceDirection === 'mixed' && 'تغيير في الأسعار'}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      السعر الجديد يُطبق على الاشتراكات الحالية في الدورة القادمة
+                    </p>
+                  </div>
+                  <Badge variant="outline" className="shrink-0">{pendingImpact.affectedClients} عميل</Badge>
+                </div>
+              )}
+
+              {pendingImpact.limitsDecreased && (
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+                  <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-red-700 dark:text-red-400">تقليل الحدود</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      تم تقليل: {pendingImpact.decreasedLimits.join('، ')}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      العملاء الحاليون يحتفظون باستخدامهم الحالي — لا يمكنهم إضافة المزيد حتى ينزلوا تحت الحد الجديد
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {pendingImpact.featuresRemoved.length > 0 && (
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+                  <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-red-700 dark:text-red-400">ميزات تمت إزالتها</p>
+                    <ul className="mt-1 space-y-0.5">
+                      {pendingImpact.featuresRemoved.map((f) => (
+                        <li key={f} className="text-xs text-muted-foreground flex items-center gap-1">
+                          <span className="h-1.5 w-1.5 rounded-full bg-red-400 shrink-0" />
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              )}
+
+              {pendingImpact.featuresAdded.length > 0 && (
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+                  <Bell className="h-4 w-4 text-emerald-600 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">ميزات جديدة</p>
+                    <ul className="mt-1 space-y-0.5">
+                      {pendingImpact.featuresAdded.map((f) => (
+                        <li key={f} className="text-xs text-muted-foreground flex items-center gap-1">
+                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shrink-0" />
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              )}
+
+              {pendingImpact.nameChanged && (
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+                  <Bell className="h-4 w-4 text-blue-600 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-blue-700 dark:text-blue-400">تغيير اسم الباقة</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      سيتم إشعار العملاء بالاسم الجديد
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {pendingImpact.activeChanged && !form.active && (
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                  <AlertTriangle className="h-4 w-4 text-amber-600 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-amber-700 dark:text-amber-400">تعطيل الباقة</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      العملاء الحاليون ({pendingImpact.affectedClients}) يحتفظون بباقتهم — عملاء جدد لا يمكنهم الاشتراك
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setShowImpactDialog(false)}>إلغاء</Button>
+            <Button
+              onClick={() => {
+                setShowImpactDialog(false);
+                applyChanges(pendingImpact);
+              }}
+            >
+              تأكيد وحفظ
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
