@@ -19,6 +19,7 @@ import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
 import { formatMoney, approxUSD } from '@/utils/money';
 import { formatDate, initials, avatarColor } from '@/utils/format';
+import { subDays } from 'date-fns';
 import { cn } from '@/lib/utils';
 import type { SubscriptionStatus } from '@/types';
 
@@ -56,6 +57,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
+import { DateRangePicker } from '@/components/ui/date-range-picker';
 
 const AdminPlanRequests = lazy(() => import('./PlanRequests'));
 
@@ -97,6 +99,10 @@ export default function AdminSubscriptions(): JSX.Element {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<SubscriptionStatus | 'all'>('all');
   const [planFilter, setPlanFilter] = useState<string>('all');
+  const [dateRange, setDateRange] = useState<{ from: Date; to: Date } | undefined>({
+    from: subDays(new Date(), 29),
+    to: new Date(),
+  });
 
   const clientOf = (id: string) => clients.find((c) => c.id === id);
   const planOf = (id: string) => plans.find((p) => p.id === id);
@@ -122,8 +128,16 @@ export default function AdminSubscriptions(): JSX.Element {
           r.client?.email.toLowerCase().includes(q)
       );
     }
+    if (dateRange) {
+      const from = dateRange.from.getTime();
+      const to = dateRange.to.getTime() + 86400000 - 1;
+      list = list.filter((r) => {
+        const t = Date.parse(r.sub.startedAt);
+        return t >= from && t <= to;
+      });
+    }
     return list;
-  }, [rows, statusFilter, planFilter, search]);
+  }, [rows, statusFilter, planFilter, search, dateRange]);
 
   const stats = useMemo(() => {
     const active = subscriptions.filter((s) => s.status === 'active');
@@ -267,6 +281,7 @@ export default function AdminSubscriptions(): JSX.Element {
                 ))}
               </SelectContent>
             </Select>
+            <DateRangePicker value={dateRange} onChange={setDateRange} />
           </div>
 
           {/* Table */}
@@ -279,6 +294,7 @@ export default function AdminSubscriptions(): JSX.Element {
                 <TableHead>الحالة</TableHead>
                 <TableHead className="hidden md:table-cell">الدورة</TableHead>
                 <TableHead>المبلغ</TableHead>
+                <TableHead className="hidden md:table-cell">تاريخ البداية</TableHead>
                 <TableHead className="hidden lg:table-cell">التجديد القادم</TableHead>
                 <TableHead className="w-[60px]" />
               </TableRow>
@@ -286,7 +302,7 @@ export default function AdminSubscriptions(): JSX.Element {
             <TableBody>
               {filtered.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-12 text-muted-foreground">
+                  <TableCell colSpan={9} className="text-center py-12 text-muted-foreground">
                     لا توجد اشتراكات مطابقة
                   </TableCell>
                 </TableRow>
@@ -346,6 +362,9 @@ export default function AdminSubscriptions(): JSX.Element {
                       </TableCell>
                       <TableCell>
                         <span className="text-sm font-semibold">{formatMoney(sub.amount, sub.currency)}</span>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell text-sm text-muted-foreground">
+                        {formatDate(sub.startedAt)}
                       </TableCell>
                       <TableCell className="hidden lg:table-cell">
                         {sub.status === 'cancelled' ? (
