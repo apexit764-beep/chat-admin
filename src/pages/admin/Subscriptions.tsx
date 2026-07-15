@@ -90,6 +90,7 @@ export default function AdminSubscriptions(): JSX.Element {
   const clients = useAdminStore((s) => s.clients);
   const plans = useAdminStore((s) => s.plans);
   const cancelSubscription = useAdminStore((s) => s.cancelSubscription);
+  const updateSubscription = useAdminStore((s) => s.updateSubscription);
   const showToast = useUIStore((s) => s.showToast);
   const { confirm } = useConfirm();
 
@@ -420,6 +421,9 @@ export default function AdminSubscriptions(): JSX.Element {
               <button
                 key={p.id}
                 onClick={() => {
+                  if (switchModal) {
+                    updateSubscription(switchModal.subId, { planId: p.id });
+                  }
                   setSwitchModal(null);
                   showToast(`تم تبديل الباقة إلى ${p.nameAr}`, 'success');
                 }}

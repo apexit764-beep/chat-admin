@@ -16,6 +16,7 @@ import {
   Download,
   Filter,
 } from 'lucide-react';
+import { subDays } from 'date-fns';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
 import { timeAgo } from '@/utils/format';
@@ -40,6 +41,7 @@ import {
   SelectContent,
   SelectItem,
 } from '@/components/ui/select';
+import { DateRangePicker } from '@/components/ui/date-range-picker';
 
 const actionMeta: Record<ActivityAction, { label: string; icon: React.ElementType; color: string }> = {
   client_created: { label: 'عميل جديد', icon: UserPlus, color: 'text-emerald-500 bg-emerald-500/10' },
@@ -76,9 +78,21 @@ export default function AdminActivityLog(): JSX.Element {
   const showToast = useUIStore((s) => s.showToast);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<ActionFilter>('all');
+  const [dateRange, setDateRange] = useState<{ from: Date; to: Date } | undefined>({
+    from: subDays(new Date(), 29),
+    to: new Date(),
+  });
 
   const filtered = useMemo(() => {
     let list = [...activityLog];
+    if (dateRange) {
+      const from = dateRange.from.getTime();
+      const to = dateRange.to.getTime() + 86400000 - 1;
+      list = list.filter((e) => {
+        const t = Date.parse(e.timestamp);
+        return t >= from && t <= to;
+      });
+    }
     if (filter !== 'all') {
       const actions = filterGroups[filter].actions;
       list = list.filter((e) => actions.includes(e.action));
@@ -93,7 +107,7 @@ export default function AdminActivityLog(): JSX.Element {
       );
     }
     return list.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-  }, [activityLog, filter, search]);
+  }, [activityLog, filter, search, dateRange]);
 
   const exportLog = (): void => {
     downloadCsv(`activity-log-${new Date().toISOString().slice(0, 10)}.csv`,

@@ -103,7 +103,7 @@ export default function ClientDetail(): JSX.Element {
   const clientInvoices = useMemo(() => invoices.filter((i) => i.clientId === id).sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt)), [invoices, id]);
   const clientTransactions = useMemo(() => transactions.filter((t) => t.clientId === id).sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt)), [transactions, id]);
   const clientFeedback = useMemo(() => feedback.filter((f) => f.clientId === id), [feedback, id]);
-  const clientActivity = useMemo(() => activityLog.filter((a) => a.target === client?.companyName), [activityLog, client?.companyName]);
+  const clientActivity = useMemo(() => activityLog.filter((a) => a.target === client?.companyName || a.target === id), [activityLog, client?.companyName, id]);
 
   const [internalNote, setInternalNote] = useState('');
   const [notes, setNotes] = useState<string[]>([]);
@@ -222,7 +222,7 @@ export default function ClientDetail(): JSX.Element {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem onClick={() => navigate(`/clients`)}>
+                <DropdownMenuItem onClick={() => navigate(`/clients`, { state: { editClientId: client.id } })}>
                   <Edit2 className="h-4 w-4 me-2" /> تعديل البيانات
                 </DropdownMenuItem>
                 {client.status === 'suspended' ? (
@@ -510,36 +510,10 @@ export default function ClientDetail(): JSX.Element {
 
           {/* Team Tab */}
           <TabsContent value="team" className="mt-5">
-            <div className="rounded-xl border bg-card p-5">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-sm">فريق العمل</h3>
-                <span className="text-sm text-muted-foreground">{client.agentCount} موظف</span>
-              </div>
-              <div className="space-y-3">
-                {Array.from({ length: Math.min(client.agentCount, 8) }, (_, i) => (
-                  <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-muted">
-                    <Avatar className="h-9 w-9">
-                      <AvatarFallback className="text-xs">م{i + 1}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium">موظف {i + 1}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {i === 0 ? 'مدير' : 'وكيل'} • {i < 3 ? 'متصل' : 'غير متصل'}
-                      </p>
-                    </div>
-                    <Badge className={cn('text-[10px] border-transparent',
-                      i < 3 ? 'bg-success/15 text-success' : 'bg-muted text-muted-foreground'
-                    )}>
-                      {i < 3 ? 'متصل' : 'غير متصل'}
-                    </Badge>
-                  </div>
-                ))}
-                {client.agentCount > 8 && (
-                  <p className="text-center text-sm text-muted-foreground py-2">
-                    +{client.agentCount - 8} موظف آخر
-                  </p>
-                )}
-              </div>
+            <div className="rounded-xl border bg-card p-8 text-center">
+              <Users className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
+              <p className="text-muted-foreground">لا يوجد موظفين مسجلين لهذا العميل</p>
+              <p className="text-xs text-muted-foreground mt-1">بيانات الفريق ستظهر هنا عند تسجيل الموظفين من لوحة العميل</p>
             </div>
           </TabsContent>
 

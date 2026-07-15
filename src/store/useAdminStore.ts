@@ -108,6 +108,7 @@ interface AdminState {
 
   // Subscription actions
   createSubscription: (clientId: string, planId: string, billingCycle: 'monthly' | 'yearly') => Subscription;
+  updateSubscription: (id: string, patch: Partial<Subscription>) => void;
   cancelSubscription: (id: string) => void;
 
   // Invoice / payment actions
@@ -467,6 +468,13 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     }));
     return sub;
   },
+
+  updateSubscription: (id, patch) =>
+    set((s) => ({
+      subscriptions: s.subscriptions.map((sub) =>
+        sub.id === id ? { ...sub, ...patch } : sub
+      ),
+    })),
 
   cancelSubscription: (id) =>
     set((s) => ({

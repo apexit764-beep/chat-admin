@@ -36,16 +36,37 @@ import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { cn } from '@/lib/utils';
 
 export default function AdminReports(): JSX.Element {
-  const clients = useAdminStore((s) => s.clients);
+  const allClients = useAdminStore((s) => s.clients);
   const plans = useAdminStore((s) => s.plans);
   const countries = useAdminStore((s) => s.countries);
-  const subscriptions = useAdminStore((s) => s.subscriptions);
+  const allSubscriptions = useAdminStore((s) => s.subscriptions);
   const showToast = useUIStore((s) => s.showToast);
 
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date } | undefined>({
     from: subDays(new Date(), 6),
     to: new Date(),
   });
+
+  // Date-filtered data for KPIs and charts
+  const clients = useMemo(() => {
+    if (!dateRange) return allClients;
+    const from = dateRange.from.getTime();
+    const to = dateRange.to.getTime() + 86400000 - 1;
+    return allClients.filter((c) => {
+      const t = Date.parse(c.joinedAt);
+      return t >= from && t <= to;
+    });
+  }, [allClients, dateRange]);
+
+  const subscriptions = useMemo(() => {
+    if (!dateRange) return allSubscriptions;
+    const from = dateRange.from.getTime();
+    const to = dateRange.to.getTime() + 86400000 - 1;
+    return allSubscriptions.filter((s) => {
+      const t = Date.parse(s.startedAt);
+      return t >= from && t <= to;
+    });
+  }, [allSubscriptions, dateRange]);
 
   const activeClients = useMemo(() => clients.filter((c) => c.status === 'active'), [clients]);
   const trialClients = useMemo(() => clients.filter((c) => c.status === 'trial'), [clients]);
@@ -105,11 +126,11 @@ export default function AdminReports(): JSX.Element {
     return { labels, signups, cancellations };
   }, [clients]);
 
-  // By country
+  // By country (uses allClients — not affected by date range)
   const byCountry = useMemo(() =>
     countries
       .map((co) => {
-        const coClients = clients.filter((c) => c.country === co.code);
+        const coClients = allClients.filter((c) => c.country === co.code);
         return {
           country: co,
           count: coClients.length,
@@ -121,7 +142,7 @@ export default function AdminReports(): JSX.Element {
       })
       .filter((x) => x.count > 0)
       .sort((a, b) => b.count - a.count),
-    [clients, countries]
+    [allClients, countries]
   );
 
   // Funnel
@@ -185,6 +206,15 @@ export default function AdminReports(): JSX.Element {
           </div>
         </CardContent>
       </Card>
+
+      {allClients.length === 0 && (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+            <Users className="h-12 w-12 mb-3 opacity-20" />
+            <p className="text-sm">لا يوجد عملاء بعد</p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* KPIs */}
       <div className="grid grid-cols-2 gap-3">
@@ -310,7 +340,7 @@ export default function AdminReports(): JSX.Element {
             </TableHeader>
             <TableBody>
               {byCountry.map((x, idx) => {
-                const share = clients.length ? (x.count / clients.length) * 100 : 0;
+                const share = allClients.length ? (x.count / allClients.length) * 100 : 0;
                 return (
                   <TableRow key={x.country.code}>
                     <TableCell className="text-xs text-muted-foreground font-mono">{idx + 1}</TableCell>

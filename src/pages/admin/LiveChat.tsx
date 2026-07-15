@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import {
   Search,
   Send,
@@ -9,13 +9,14 @@ import {
   Hash,
   Clock,
   Tag,
-  ChevronDown,
   Globe,
   ArrowRightLeft,
   StickyNote,
   PanelRightClose,
   PanelRightOpen,
 } from 'lucide-react';
+import { format, isToday, isYesterday } from 'date-fns';
+import { ar } from 'date-fns/locale';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { timeAgo, initials, avatarColor } from '@/utils/format';
@@ -68,6 +69,19 @@ export default function LiveChat() {
   const [showTransferDialog, setShowTransferDialog] = useState(false);
   const [showAssignDialog, setShowAssignDialog] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const autoResize = useCallback((el: HTMLTextAreaElement) => {
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight}px`;
+  }, []);
+
+  const getDateLabel = useCallback((iso: string): string => {
+    const d = new Date(iso);
+    if (isToday(d)) return 'اليوم';
+    if (isYesterday(d)) return 'أمس';
+    return format(d, 'd MMMM yyyy', { locale: ar });
+  }, []);
 
   const clientMap = useMemo(() => {
     const map: Record<string, string> = {};
@@ -125,6 +139,9 @@ export default function LiveChat() {
       sendLiveChatMessage(selectedId, draft.trim(), user?.name ?? 'مشرف');
     }
     setDraft('');
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -353,85 +370,94 @@ export default function LiveChat() {
             {/* Messages area */}
             <ScrollArea className="flex-1 bg-[#f8f9fa] dark:bg-muted/10">
               <div className="px-4 py-4 space-y-4 max-w-3xl mx-auto">
-                {/* Date separator */}
-                <div className="flex items-center justify-center">
-                  <span className="text-[11px] text-muted-foreground bg-muted/80 dark:bg-muted px-3 py-1 rounded-full">
-                    اليوم
-                  </span>
-                </div>
+                {selected.messages.map((msg, msgIdx) => {
+                  const prevMsg = msgIdx > 0 ? selected.messages[msgIdx - 1] : null;
+                  const msgDate = new Date(msg.timestamp).toDateString();
+                  const prevDate = prevMsg ? new Date(prevMsg.timestamp).toDateString() : null;
+                  const showDateSep = msgIdx === 0 || msgDate !== prevDate;
 
-                {selected.messages.map((msg) => {
                   const isVisitor = msg.sender === 'visitor';
                   const isNote = msg.sender === 'note';
 
+                  const dateSeparator = showDateSep ? (
+                    <div className="flex items-center justify-center">
+                      <span className="text-[11px] text-muted-foreground bg-muted/80 dark:bg-muted px-3 py-1 rounded-full">
+                        {getDateLabel(msg.timestamp)}
+                      </span>
+                    </div>
+                  ) : null;
+
                   if (isNote) {
                     return (
-                      <div key={msg.id} className={cn('flex gap-2 items-end', 'justify-start')}>
-                        <div className={cn(
-                          'h-8 w-8 rounded-full flex items-center justify-center shrink-0 font-bold text-xs mb-1',
-                          avatarColor(msg.senderName)
-                        )}>
-                          {initials(msg.senderName)}
-                        </div>
-                        <div className="max-w-[65%]">
-                          <div className="rounded-2xl rounded-tl-md px-4 py-2.5 shadow-sm bg-gradient-to-br from-amber-50 to-amber-100/80 dark:from-amber-900/30 dark:to-amber-800/20 border border-amber-200/40 dark:border-amber-700/30">
-                            <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
-                            <div className="flex items-center gap-1.5 mt-1.5 justify-start">
-                              <span className="text-[10px] text-muted-foreground">{msg.senderName}</span>
-                              <span className="text-[10px] text-muted-foreground">·</span>
-                              <span className="text-[10px] text-muted-foreground">{formatMsgTime(msg.timestamp)}</span>
-                              <span className="text-[10px] text-amber-700 dark:text-amber-400 font-medium">· ملاحظة داخلية</span>
+                      <React.Fragment key={msg.id}>
+                        {dateSeparator}
+                        <div className={cn('flex gap-2 items-end', 'justify-start')}>
+                          <div className={cn(
+                            'h-8 w-8 rounded-full flex items-center justify-center shrink-0 font-bold text-xs mb-1',
+                            avatarColor(msg.senderName)
+                          )}>
+                            {initials(msg.senderName)}
+                          </div>
+                          <div className="max-w-[65%]">
+                            <div className="rounded-2xl rounded-tl-md px-4 py-2.5 shadow-sm bg-gradient-to-br from-amber-50 to-amber-100/80 dark:from-amber-900/30 dark:to-amber-800/20 border border-amber-200/40 dark:border-amber-700/30">
+                              <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                              <div className="flex items-center gap-1.5 mt-1.5 justify-start">
+                                <span className="text-[10px] text-muted-foreground">{msg.senderName}</span>
+                                <span className="text-[10px] text-muted-foreground">·</span>
+                                <span className="text-[10px] text-muted-foreground">{formatMsgTime(msg.timestamp)}</span>
+                                <span className="text-[10px] text-amber-700 dark:text-amber-400 font-medium">· ملاحظة داخلية</span>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
+                      </React.Fragment>
                     );
                   }
 
                   return (
-                    <div
-                      key={msg.id}
-                      className={cn('flex gap-2 items-end', isVisitor ? 'justify-end' : 'justify-start')}
-                    >
-                      {!isVisitor && (
-                        <div className={cn(
-                          'h-8 w-8 rounded-full flex items-center justify-center shrink-0 font-bold text-xs mb-1',
-                          avatarColor(msg.senderName)
-                        )}>
-                          {initials(msg.senderName)}
-                        </div>
-                      )}
-
-                      <div className={cn('max-w-[65%]')}>
-                        <div
-                          className={cn(
-                            'rounded-2xl px-4 py-2.5 shadow-sm',
-                            isVisitor
-                              ? 'bg-white dark:bg-card border border-border/60 rounded-tr-md'
-                              : 'bg-gradient-to-br from-purple-50 to-purple-100/80 dark:from-purple-900/30 dark:to-purple-800/20 border border-purple-200/40 dark:border-purple-700/30 rounded-tl-md'
-                          )}
-                        >
-                          <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                    <React.Fragment key={msg.id}>
+                      {dateSeparator}
+                      <div className={cn('flex gap-2 items-end', isVisitor ? 'justify-end' : 'justify-start')}>
+                        {!isVisitor && (
                           <div className={cn(
-                            'flex items-center gap-1.5 mt-1.5',
-                            isVisitor ? 'justify-start' : 'justify-start'
+                            'h-8 w-8 rounded-full flex items-center justify-center shrink-0 font-bold text-xs mb-1',
+                            avatarColor(msg.senderName)
                           )}>
-                            <span className="text-[10px] text-muted-foreground">{msg.senderName}</span>
-                            <span className="text-[10px] text-muted-foreground">·</span>
-                            <span className="text-[10px] text-muted-foreground">{formatMsgTime(msg.timestamp)}</span>
+                            {initials(msg.senderName)}
+                          </div>
+                        )}
+
+                        <div className={cn('max-w-[65%]')}>
+                          <div
+                            className={cn(
+                              'rounded-2xl px-4 py-2.5 shadow-sm',
+                              isVisitor
+                                ? 'bg-white dark:bg-card border border-border/60 rounded-tr-md'
+                                : 'bg-gradient-to-br from-purple-50 to-purple-100/80 dark:from-purple-900/30 dark:to-purple-800/20 border border-purple-200/40 dark:border-purple-700/30 rounded-tl-md'
+                          )}
+                          >
+                            <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                            <div className={cn(
+                              'flex items-center gap-1.5 mt-1.5',
+                              isVisitor ? 'justify-start' : 'justify-start'
+                            )}>
+                              <span className="text-[10px] text-muted-foreground">{msg.senderName}</span>
+                              <span className="text-[10px] text-muted-foreground">·</span>
+                              <span className="text-[10px] text-muted-foreground">{formatMsgTime(msg.timestamp)}</span>
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                      {isVisitor && (
-                        <div className={cn(
-                          'h-8 w-8 rounded-full flex items-center justify-center shrink-0 font-bold text-xs mb-1',
-                          avatarColor(selected.visitorName)
-                        )}>
-                          {initials(selected.visitorName)}
-                        </div>
-                      )}
-                    </div>
+                        {isVisitor && (
+                          <div className={cn(
+                            'h-8 w-8 rounded-full flex items-center justify-center shrink-0 font-bold text-xs mb-1',
+                            avatarColor(selected.visitorName)
+                          )}>
+                            {initials(selected.visitorName)}
+                          </div>
+                        )}
+                      </div>
+                    </React.Fragment>
                   );
                 })}
                 <div ref={messagesEndRef} />
@@ -474,12 +500,18 @@ export default function LiveChat() {
 
               {/* Input area */}
               <div className={cn('px-4 py-3', activeTab === 'note' && 'bg-amber-50/50 dark:bg-amber-900/10')}>
-                <Input
+                <textarea
+                  ref={textareaRef}
                   value={draft}
-                  onChange={(e) => setDraft(e.target.value)}
+                  onChange={(e) => {
+                    setDraft(e.target.value);
+                    autoResize(e.target);
+                  }}
                   onKeyDown={handleKeyDown}
                   placeholder={activeTab === 'message' ? 'اكتب ردك هنا...' : 'اكتب ملاحظة داخلية (مرئية فقط للموظفين)...'}
-                  className="border-0 shadow-none bg-transparent px-0 text-sm h-8 focus-visible:ring-0"
+                  rows={1}
+                  className="w-full border-0 shadow-none bg-transparent px-0 text-sm leading-6 resize-none focus:outline-none focus-visible:ring-0 overflow-hidden"
+                  style={{ minHeight: '2rem', maxHeight: '10rem' }}
                 />
               </div>
 
@@ -492,7 +524,7 @@ export default function LiveChat() {
                   className={cn('gap-1.5 rounded-lg h-9 px-5', activeTab === 'note' && 'bg-amber-500 hover:bg-amber-600')}
                 >
                   {activeTab === 'note' ? 'حفظ ملاحظة' : 'إرسال'}
-                  {activeTab === 'note' ? <StickyNote className="h-3.5 w-3.5" /> : <Send className="h-3.5 w-3.5 rotate-180" />}
+                  {activeTab === 'note' ? <StickyNote className="h-3.5 w-3.5" /> : <Send className="h-3.5 w-3.5 rtl:rotate-0 ltr:rotate-0" />}
                 </Button>
               </div>
             </div>
