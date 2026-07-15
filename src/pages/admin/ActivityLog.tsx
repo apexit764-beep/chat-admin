@@ -13,14 +13,11 @@ import {
   Shield,
   RefreshCcw,
   XCircle,
-  Download,
   Filter,
 } from 'lucide-react';
 import { subDays } from 'date-fns';
 import { useAdminStore } from '@/store/useAdminStore';
-import { useUIStore } from '@/store/useUIStore';
 import { timeAgo } from '@/utils/format';
-import { downloadCsv } from '@/utils/csv';
 import { cn } from '@/lib/utils';
 import type { ActivityAction } from '@/store/adminMockData';
 
@@ -75,7 +72,6 @@ const filterGroups: Record<ActionFilter, { label: string; actions: ActivityActio
 
 export default function AdminActivityLog(): JSX.Element {
   const activityLog = useAdminStore((s) => s.activityLog);
-  const showToast = useUIStore((s) => s.showToast);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<ActionFilter>('all');
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date } | undefined>({
@@ -109,20 +105,6 @@ export default function AdminActivityLog(): JSX.Element {
     return list.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
   }, [activityLog, filter, search, dateRange]);
 
-  const exportLog = (): void => {
-    downloadCsv(`activity-log-${new Date().toISOString().slice(0, 10)}.csv`,
-      filtered.map((e) => ({
-        Action: actionMeta[e.action].label,
-        Actor: e.actor,
-        Email: e.actorEmail,
-        Target: e.target ?? '',
-        Details: e.details ?? '',
-        IP: e.ip ?? '',
-        Timestamp: e.timestamp,
-      }))
-    );
-    showToast('تم تصدير سجل النشاط', 'success');
-  };
 
   return (
     <div className="p-4 lg:p-6 space-y-5">
@@ -142,15 +124,12 @@ export default function AdminActivityLog(): JSX.Element {
                 تتبع جميع الإجراءات في لوحة الإدارة
               </CardDescription>
             </div>
-            <Button variant="outline" size="sm" onClick={exportLog}>
-              <Download className="h-4 w-4" /> تصدير CSV
-            </Button>
           </div>
         </CardHeader>
         <CardContent className="pt-0">
           <div className="flex flex-wrap items-center gap-3 mb-4">
             <Input
-              placeholder="بحث بالاسم أو الهدف..."
+              placeholder="البحث في سجل النشاط..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="max-w-xs"
