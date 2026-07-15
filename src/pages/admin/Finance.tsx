@@ -8,7 +8,10 @@ import {
   Clock,
   Receipt,
   Inbox,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
+import { subDays } from 'date-fns';
 import { StatCard } from '@components/ui';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
@@ -37,6 +40,7 @@ import {
   SelectItem,
 } from '@/components/ui/select';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { DateRangePicker } from '@/components/ui/date-range-picker';
 
 const COMPANY_NAME = 'Qhub';
 
@@ -59,6 +63,12 @@ export default function AdminFinance(): JSX.Element {
 
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | InvoiceStatus>('all');
+  const [dateRange, setDateRange] = useState<{ from: Date; to: Date } | undefined>({
+    from: subDays(new Date(), 29),
+    to: new Date(),
+  });
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 10;
 
   const totalInvoices = useMemo(
     () => invoices.reduce((acc, inv) => acc + approxUSD(inv.total, inv.currency), 0),
@@ -81,15 +91,25 @@ export default function AdminFinance(): JSX.Element {
   );
 
   const filteredInvoices = useMemo(() => {
+    setCurrentPage(1);
     return invoices.filter((inv) => {
       if (statusFilter !== 'all' && inv.status !== statusFilter) return false;
       if (search) {
         const client = clients.find((c) => c.id === inv.clientId);
         if (!inv.number.includes(search) && !(client?.companyName.includes(search) ?? false)) return false;
       }
+      if (dateRange) {
+        const from = dateRange.from.getTime();
+        const to = dateRange.to.getTime() + 86400000 - 1;
+        const t = Date.parse(inv.createdAt);
+        if (t < from || t > to) return false;
+      }
       return true;
     });
-  }, [invoices, statusFilter, search, clients]);
+  }, [invoices, statusFilter, search, clients, dateRange]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredInvoices.length / PAGE_SIZE));
+  const paginatedInvoices = filteredInvoices.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   const handleExportInvoices = (): void => {
     downloadCsv(
@@ -194,6 +214,7 @@ export default function AdminFinance(): JSX.Element {
               <SelectItem value="failed">فشلت</SelectItem>
             </SelectContent>
           </Select>
+          <DateRangePicker value={dateRange} onChange={setDateRange} />
           <Button variant="outline" size="sm" onClick={handleExportInvoices} className="h-9 ms-auto">
             <Download className="h-4 w-4 me-2" /> CSV
           </Button>
@@ -232,11 +253,11 @@ export default function AdminFinance(): JSX.Element {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredInvoices.map((inv, idx) => {
+                {paginatedInvoices.map((inv, idx) => {
                   const client = clients.find((c) => c.id === inv.clientId);
                   return (
                     <TableRow key={inv.id}>
-                      <TableCell className="text-xs text-muted-foreground font-mono">{idx + 1}</TableCell>
+                      <TableCell className="text-xs text-muted-foreground font-mono">{(currentPage - 1) * PAGE_SIZE + idx + 1}</TableCell>
                       <TableCell className="font-mono font-semibold">{inv.number}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
@@ -274,6 +295,44 @@ export default function AdminFinance(): JSX.Element {
               </TableBody>
             </Table>
           </div>
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between px-4 py-3 border-t">
+              <p className="text-sm text-muted-foreground">
+                عرض {(currentPage - 1) * PAGE_SIZE + 1}–{Math.min(currentPage * PAGE_SIZE, filteredInvoices.length)} من {filteredInvoices.length}
+              </p>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-8 w-8"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage((p) => p - 1)}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <Button
+                    key={page}
+                    variant={page === currentPage ? 'default' : 'outline'}
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => setCurrentPage(page)}
+                  >
+                    {page}
+                  </Button>
+                ))}
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-8 w-8"
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage((p) => p + 1)}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
