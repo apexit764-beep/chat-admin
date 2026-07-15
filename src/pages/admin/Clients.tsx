@@ -20,6 +20,7 @@ import {
   Copy,
   EyeOff,
   Eye as EyeIcon,
+  MessageSquare,
 } from 'lucide-react';
 
 const AdminIndustries = lazy(() => import('./Industries'));
@@ -55,6 +56,7 @@ import {
   SelectContent,
   SelectItem,
 } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import type { Client, ClientStatus } from '@/types';
 
 function generatePassword(): string {
@@ -117,6 +119,8 @@ export default function AdminClients(): JSX.Element {
     country: string;
     industry: string;
     password: string;
+    sendViaWhatsapp: boolean;
+    sendViaEmail: boolean;
   }>({
     companyName: '',
     contactName: '',
@@ -126,6 +130,8 @@ export default function AdminClients(): JSX.Element {
     country: '',
     industry: '',
     password: generatePassword(),
+    sendViaWhatsapp: true,
+    sendViaEmail: false,
   });
   const [showPwd, setShowPwd] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof typeof form, string>>>({});
@@ -173,7 +179,7 @@ export default function AdminClients(): JSX.Element {
 
   const openCreate = (): void => {
     setEditing(null);
-    setForm({ companyName: '', contactName: '', email: '', phoneCode: '+968', phone: '', country: '', industry: '', password: generatePassword() });
+    setForm({ companyName: '', contactName: '', email: '', phoneCode: '+968', phone: '', country: '', industry: '', password: generatePassword(), sendViaWhatsapp: true, sendViaEmail: false });
     setShowPwd(false);
     setErrors({});
     setModalOpen(true);
@@ -184,7 +190,7 @@ export default function AdminClients(): JSX.Element {
     setForm({
       companyName: c.companyName, contactName: c.contactName, email: c.email,
       phoneCode: c.phone?.split(' ')[0] || '+968', phone: c.phone?.split(' ').slice(1).join(' ') || c.phone,
-      country: c.country, industry: c.industry, password: c.password,
+      country: c.country, industry: c.industry, password: c.password, sendViaWhatsapp: true, sendViaEmail: false,
     });
     setShowPwd(false);
     setErrors({});
@@ -683,6 +689,32 @@ export default function AdminClients(): JSX.Element {
                   </div>
                   {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
                 </div>
+
+                {!editing && (
+                  <div className="sm:col-span-2 space-y-3 pt-2 border-t">
+                    <p className="text-xs font-medium text-muted-foreground">إرسال بيانات الدخول للعميل</p>
+                    <div className="flex items-center justify-between rounded-lg border p-3">
+                      <div className="flex items-center gap-3">
+                        <MessageSquare className="h-5 w-5 text-emerald-500" />
+                        <div>
+                          <p className="text-sm font-medium">إرسال عبر واتساب</p>
+                          <p className="text-xs text-muted-foreground">إرسال بيانات الدخول تلقائياً عبر رسالة واتساب</p>
+                        </div>
+                      </div>
+                      <Switch checked={form.sendViaWhatsapp} onCheckedChange={(v) => setForm({ ...form, sendViaWhatsapp: v })} />
+                    </div>
+                    <div className="flex items-center justify-between rounded-lg border p-3">
+                      <div className="flex items-center gap-3">
+                        <Mail className="h-5 w-5 text-blue-500" />
+                        <div>
+                          <p className="text-sm font-medium">إرسال عبر البريد الإلكتروني</p>
+                          <p className="text-xs text-muted-foreground">إرسال بيانات الدخول تلقائياً عبر البريد الإلكتروني</p>
+                        </div>
+                      </div>
+                      <Switch checked={form.sendViaEmail} onCheckedChange={(v) => setForm({ ...form, sendViaEmail: v })} />
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
