@@ -10,6 +10,10 @@ import {
   Plug,
   X,
   Tag,
+  ChevronDown,
+  ChevronUp,
+  GripVertical,
+  Star,
 } from 'lucide-react';
 import { useConfirm } from '@components/ui';
 import { useAdminStore } from '@/store/useAdminStore';
@@ -46,6 +50,17 @@ import {
 
 type PlatformCategory = 'communication' | 'email' | 'ecommerce';
 
+interface ConnectionStep {
+  text: string;
+}
+
+interface ConnectionMethod {
+  id: string;
+  name: string;
+  recommended?: boolean;
+  steps: ConnectionStep[];
+}
+
 interface Platform {
   id: string;
   name: string;
@@ -54,6 +69,7 @@ interface Platform {
   enabled: boolean;
   logo: string;
   countries: string[];
+  connectionMethods: ConnectionMethod[];
 }
 
 const categoryLabels: Record<PlatformCategory, string> = {
@@ -75,20 +91,42 @@ const categoryBadgeColors: Record<PlatformCategory, string> = {
 };
 
 const defaultPlatforms: Platform[] = [
-  { id: 'p1', name: 'WhatsApp Business', slug: 'whatsapp', category: 'communication', enabled: true, logo: '', countries: ['SA', 'EG', 'AE'] },
-  { id: 'p2', name: 'Facebook Messenger', slug: 'facebook-messenger', category: 'communication', enabled: true, logo: '', countries: ['SA', 'EG'] },
-  { id: 'p3', name: 'Instagram Direct', slug: 'instagram', category: 'communication', enabled: false, logo: '', countries: [] },
-  { id: 'p4', name: 'Telegram', slug: 'telegram', category: 'communication', enabled: false, logo: '', countries: [] },
-  { id: 'p5', name: 'Live Chat Widget', slug: 'livechat', category: 'communication', enabled: true, logo: '', countries: ['SA', 'EG', 'AE', 'OM'] },
-  { id: 'p6', name: 'X (Twitter)', slug: 'twitter', category: 'communication', enabled: false, logo: '', countries: [] },
-  { id: 'p7', name: 'Gmail', slug: 'gmail', category: 'email', enabled: true, logo: '', countries: ['SA', 'EG'] },
-  { id: 'p8', name: 'Outlook', slug: 'outlook', category: 'email', enabled: false, logo: '', countries: [] },
-  { id: 'p9', name: 'Yahoo Mail', slug: 'yahoo', category: 'email', enabled: false, logo: '', countries: [] },
-  { id: 'p10', name: 'SMTP', slug: 'smtp', category: 'email', enabled: false, logo: '', countries: [] },
-  { id: 'p11', name: 'سلة', slug: 'salla', category: 'ecommerce', enabled: true, logo: '', countries: ['SA'] },
-  { id: 'p12', name: 'Zid', slug: 'zid', category: 'ecommerce', enabled: false, logo: '', countries: ['SA'] },
-  { id: 'p13', name: 'Shopify', slug: 'shopify', category: 'ecommerce', enabled: false, logo: '', countries: [] },
-  { id: 'p14', name: 'WooCommerce', slug: 'woocommerce', category: 'ecommerce', enabled: true, logo: '', countries: ['SA', 'EG'] },
+  { id: 'p1', name: 'WhatsApp Business', slug: 'whatsapp', category: 'communication', enabled: true, logo: '', countries: ['SA', 'EG', 'AE'], connectionMethods: [
+    { id: 'cm1', name: 'Meta Business Cloud API', recommended: true, steps: [
+      { text: 'سجّل الدخول في business.facebook.com وأنشئ حساب أعمال' },
+      { text: 'من الإعدادات ← WhatsApp Accounts، أنشئ تطبيقاً واربط رقم الواتساب' },
+      { text: 'انسخ Phone Number ID و WABA ID و Access Token من Meta' },
+      { text: 'الصق البيانات في نموذج الربط وفعّل الـ Webhook' },
+    ]},
+    { id: 'cm2', name: 'كود الاقتران (8 أحرف)', steps: [
+      { text: 'افتح واتساب على الهاتف واذهب للإعدادات' },
+      { text: 'اختر "الأجهزة المرتبطة" ثم "ربط جهاز"' },
+      { text: 'أدخل كود الاقتران المكون من 8 أحرف' },
+    ]},
+    { id: 'cm3', name: 'رمز QR', steps: [
+      { text: 'افتح واتساب على الهاتف واذهب للإعدادات' },
+      { text: 'اختر "الأجهزة المرتبطة" ثم "ربط جهاز"' },
+      { text: 'امسح رمز QR الظاهر على الشاشة' },
+    ]},
+  ]},
+  { id: 'p2', name: 'Facebook Messenger', slug: 'facebook-messenger', category: 'communication', enabled: true, logo: '', countries: ['SA', 'EG'], connectionMethods: [
+    { id: 'cm4', name: 'ربط عبر Facebook Login', steps: [
+      { text: 'سجّل الدخول بحساب Facebook وامنح الصلاحيات المطلوبة' },
+      { text: 'اختر الصفحة المراد ربطها' },
+    ]},
+  ]},
+  { id: 'p3', name: 'Instagram Direct', slug: 'instagram', category: 'communication', enabled: false, logo: '', countries: [], connectionMethods: [] },
+  { id: 'p4', name: 'Telegram', slug: 'telegram', category: 'communication', enabled: false, logo: '', countries: [], connectionMethods: [] },
+  { id: 'p5', name: 'Live Chat Widget', slug: 'livechat', category: 'communication', enabled: true, logo: '', countries: ['SA', 'EG', 'AE', 'OM'], connectionMethods: [] },
+  { id: 'p6', name: 'X (Twitter)', slug: 'twitter', category: 'communication', enabled: false, logo: '', countries: [], connectionMethods: [] },
+  { id: 'p7', name: 'Gmail', slug: 'gmail', category: 'email', enabled: true, logo: '', countries: ['SA', 'EG'], connectionMethods: [] },
+  { id: 'p8', name: 'Outlook', slug: 'outlook', category: 'email', enabled: false, logo: '', countries: [], connectionMethods: [] },
+  { id: 'p9', name: 'Yahoo Mail', slug: 'yahoo', category: 'email', enabled: false, logo: '', countries: [], connectionMethods: [] },
+  { id: 'p10', name: 'SMTP', slug: 'smtp', category: 'email', enabled: false, logo: '', countries: [], connectionMethods: [] },
+  { id: 'p11', name: 'سلة', slug: 'salla', category: 'ecommerce', enabled: true, logo: '', countries: ['SA'], connectionMethods: [] },
+  { id: 'p12', name: 'Zid', slug: 'zid', category: 'ecommerce', enabled: false, logo: '', countries: ['SA'], connectionMethods: [] },
+  { id: 'p13', name: 'Shopify', slug: 'shopify', category: 'ecommerce', enabled: false, logo: '', countries: [], connectionMethods: [] },
+  { id: 'p14', name: 'WooCommerce', slug: 'woocommerce', category: 'ecommerce', enabled: true, logo: '', countries: ['SA', 'EG'], connectionMethods: [] },
 ];
 
 const emptyForm: Omit<Platform, 'id'> = {
@@ -98,6 +136,7 @@ const emptyForm: Omit<Platform, 'id'> = {
   enabled: true,
   logo: '',
   countries: [],
+  connectionMethods: [],
 };
 
 import type { Country } from '@/types';
@@ -228,6 +267,7 @@ export default function Integrations() {
       enabled: p.enabled,
       logo: p.logo,
       countries: [...p.countries],
+      connectionMethods: p.connectionMethods.map((m) => ({ ...m, steps: [...m.steps] })),
     });
     setModalOpen(true);
   }
@@ -470,7 +510,7 @@ export default function Integrations() {
 
       {/* Add/Edit Dialog */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingId ? 'تعديل المنصة' : 'إضافة منصة جديدة'}</DialogTitle>
           </DialogHeader>
@@ -524,6 +564,135 @@ export default function Integrations() {
               selected={form.countries}
               onToggle={toggleCountry}
             />
+
+            {/* Connection Methods */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label>طرق الربط</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setForm((prev) => ({
+                      ...prev,
+                      connectionMethods: [
+                        ...prev.connectionMethods,
+                        { id: 'cm_' + Date.now(), name: '', recommended: false, steps: [{ text: '' }] },
+                      ],
+                    }));
+                  }}
+                >
+                  <Plus className="h-3.5 w-3.5 me-1" />
+                  إضافة طريقة
+                </Button>
+              </div>
+
+              {form.connectionMethods.length === 0 && (
+                <p className="text-xs text-muted-foreground text-center py-3 border rounded-lg border-dashed">
+                  لا توجد طرق ربط — أضف طريقة ربط واحدة على الأقل
+                </p>
+              )}
+
+              <div className="space-y-3">
+                {form.connectionMethods.map((method, mIdx) => (
+                  <div key={method.id} className="border rounded-lg">
+                    <div className="flex items-center gap-2 p-3 bg-muted/30">
+                      <GripVertical className="h-4 w-4 text-muted-foreground shrink-0" />
+                      <Input
+                        value={method.name}
+                        onChange={(e) => {
+                          const updated = [...form.connectionMethods];
+                          updated[mIdx] = { ...updated[mIdx], name: e.target.value };
+                          setForm({ ...form, connectionMethods: updated });
+                        }}
+                        placeholder="اسم طريقة الربط"
+                        className="h-8 flex-1"
+                      />
+                      <Button
+                        type="button"
+                        variant={method.recommended ? 'default' : 'ghost'}
+                        size="sm"
+                        className="h-8 gap-1 shrink-0 text-xs"
+                        onClick={() => {
+                          const updated = [...form.connectionMethods];
+                          updated[mIdx] = { ...updated[mIdx], recommended: !updated[mIdx].recommended };
+                          setForm({ ...form, connectionMethods: updated });
+                        }}
+                      >
+                        <Star className={cn('h-3 w-3', method.recommended && 'fill-current')} />
+                        موصى به
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-destructive hover:text-destructive shrink-0"
+                        onClick={() => {
+                          setForm((prev) => ({
+                            ...prev,
+                            connectionMethods: prev.connectionMethods.filter((_, i) => i !== mIdx),
+                          }));
+                        }}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+
+                    <div className="p-3 space-y-2">
+                      {method.steps.map((step, sIdx) => (
+                        <div key={sIdx} className="flex items-center gap-2">
+                          <span className="flex items-center justify-center h-6 w-6 rounded-full bg-emerald-500 text-white text-xs font-bold shrink-0">
+                            {sIdx + 1}
+                          </span>
+                          <Input
+                            value={step.text}
+                            onChange={(e) => {
+                              const updated = [...form.connectionMethods];
+                              const steps = [...updated[mIdx].steps];
+                              steps[sIdx] = { text: e.target.value };
+                              updated[mIdx] = { ...updated[mIdx], steps };
+                              setForm({ ...form, connectionMethods: updated });
+                            }}
+                            placeholder="نص الخطوة..."
+                            className="h-8 flex-1"
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 text-muted-foreground hover:text-destructive shrink-0"
+                            disabled={method.steps.length <= 1}
+                            onClick={() => {
+                              const updated = [...form.connectionMethods];
+                              const steps = updated[mIdx].steps.filter((_, i) => i !== sIdx);
+                              updated[mIdx] = { ...updated[mIdx], steps };
+                              setForm({ ...form, connectionMethods: updated });
+                            }}
+                          >
+                            <X className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      ))}
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 text-xs text-muted-foreground"
+                        onClick={() => {
+                          const updated = [...form.connectionMethods];
+                          updated[mIdx] = { ...updated[mIdx], steps: [...updated[mIdx].steps, { text: '' }] };
+                          setForm({ ...form, connectionMethods: updated });
+                        }}
+                      >
+                        <Plus className="h-3 w-3 me-1" />
+                        إضافة خطوة
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
           <DialogFooter>
