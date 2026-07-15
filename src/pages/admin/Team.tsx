@@ -409,10 +409,10 @@ export default function AdminTeam(): JSX.Element {
     }
     if (editingUser) {
       updateAdminUser(editingUser.id, userForm);
-      showToast('تم تحديث المستخدم', 'success');
+      showToast('تم تحديث الموظف', 'success');
     } else {
       addAdminUser(userForm);
-      showToast('تمت إضافة المستخدم', 'success');
+      showToast('تمت إضافة الموظف', 'success');
     }
     setUserModal(false);
   };
@@ -424,13 +424,13 @@ export default function AdminTeam(): JSX.Element {
     }
     const ok = await confirm({
       title: `حذف ${u.name}؟`,
-      message: 'سيتم إزالة هذا المستخدم من فريق الإدارة نهائياً.',
+      message: 'سيتم إزالة هذا الموظف من فريق الإدارة نهائياً.',
       variant: 'danger',
       confirmText: 'حذف',
     });
     if (ok) {
       deleteAdminUser(u.id);
-      showToast('تم حذف المستخدم', 'success');
+      showToast('تم حذف الموظف', 'success');
     }
   };
 
@@ -809,7 +809,7 @@ export default function AdminTeam(): JSX.Element {
           </Button>
           <Button onClick={openAddUser}>
             <UserPlus className="h-4 w-4" />
-            إضافة عضو
+            إضافة موظف
           </Button>
         </div>
       </div>
@@ -989,7 +989,7 @@ export default function AdminTeam(): JSX.Element {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               {editingUser ? <Edit2 className="h-5 w-5 text-primary" /> : <UserPlus className="h-5 w-5 text-primary" />}
-              {editingUser ? 'تعديل عضو' : 'إضافة عضو جديد'}
+              {editingUser ? 'تعديل موظف' : 'إضافة موظف جديد'}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
@@ -998,7 +998,7 @@ export default function AdminTeam(): JSX.Element {
               <Input
                 value={userForm.name}
                 onChange={(e) => setUserForm({ ...userForm, name: e.target.value })}
-                placeholder="أدخل اسم العضو"
+                placeholder="أدخل اسم الموظف"
               />
             </div>
             <div className="space-y-2">
@@ -1052,7 +1052,7 @@ export default function AdminTeam(): JSX.Element {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setUserModal(false)}>إلغاء</Button>
-            <Button onClick={submitUser}>{editingUser ? 'حفظ التغييرات' : 'إضافة العضو'}</Button>
+            <Button onClick={submitUser}>{editingUser ? 'حفظ التغييرات' : 'إضافة الموظف'}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
