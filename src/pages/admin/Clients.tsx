@@ -616,9 +616,9 @@ export default function AdminClients(): JSX.Element {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="phone">رقم الهاتف</Label>
-                  <div className="flex gap-2">
+                  <div className="flex gap-0 border rounded-md overflow-hidden focus-within:ring-2 focus-within:ring-ring" dir="ltr">
                     <Select value={form.phoneCode} onValueChange={(v) => setForm({ ...form, phoneCode: v })}>
-                      <SelectTrigger className="w-[130px] shrink-0">
+                      <SelectTrigger className="w-[110px] shrink-0 border-0 rounded-none border-e shadow-none focus:ring-0">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -631,10 +631,11 @@ export default function AdminClients(): JSX.Element {
                     </Select>
                     <Input
                       id="phone"
-                      className="flex-1"
+                      dir="ltr"
+                      className="flex-1 border-0 rounded-none shadow-none focus-visible:ring-0"
                       value={form.phone}
                       onChange={(e) => { setForm({ ...form, phone: e.target.value }); setErrors({ ...errors, phone: undefined }); }}
-                      placeholder="رقم الهاتف"
+                      placeholder="9xxx xxxx"
                     />
                   </div>
                   {errors.phone && <p className="text-sm text-destructive">{errors.phone}</p>}
