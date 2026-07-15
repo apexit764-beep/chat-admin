@@ -36,7 +36,7 @@ import {
   industries as initialIndustries,
   planRequests as initialPlanRequests,
 } from './adminMockData';
-import type { ActivityEntry, FeedbackEntry, FeedbackStatus } from './adminMockData';
+import type { ActivityEntry, FeedbackEntry, FeedbackReply, FeedbackStatus } from './adminMockData';
 
 interface AdminState {
   countries: Country[];
@@ -367,12 +367,29 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   updateFeedbackStatus: (id, status) =>
     set((s) => ({ feedback: s.feedback.map((f) => (f.id === id ? { ...f, status } : f)) })),
 
-  replyToFeedback: (id, reply, repliedBy) =>
+  replyToFeedback: (id, reply, repliedBy) => {
+    const now = new Date().toISOString();
+    const newReply: FeedbackReply = {
+      id: `fr_${id}_${Date.now()}`,
+      text: reply,
+      author: repliedBy,
+      timestamp: now,
+    };
     set((s) => ({
       feedback: s.feedback.map((f) =>
-        f.id === id ? { ...f, reply, repliedBy, repliedAt: new Date().toISOString(), status: 'in_progress' as FeedbackStatus } : f
+        f.id === id
+          ? {
+              ...f,
+              replies: [...(f.replies ?? []), newReply],
+              reply,
+              repliedBy,
+              repliedAt: now,
+              status: (f.status === 'open' ? 'in_progress' : f.status) as FeedbackStatus,
+            }
+          : f
       ),
-    })),
+    }));
+  },
 
   addClient: (c) => {
     const client: Client = {

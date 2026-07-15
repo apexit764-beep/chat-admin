@@ -16,7 +16,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { useUIStore } from '@/store/useUIStore';
 import { timeAgo } from '@/utils/format';
 import { cn } from '@/lib/utils';
-import type { FeedbackType, FeedbackStatus, FeedbackPriority } from '@/store/adminMockData';
+import type { FeedbackType, FeedbackStatus, FeedbackPriority, FeedbackReply } from '@/store/adminMockData';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -283,22 +283,24 @@ export default function AdminFeedback(): JSX.Element {
                   <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{selected.message}</p>
                 </div>
 
-                {selected.reply && (
-                  <div className="p-4 rounded-xl bg-primary/5 border border-primary/20">
-                    <div className="flex items-center gap-2 mb-1">
-                      <p className="text-sm font-medium text-primary">{selected.repliedBy}</p>
-                      {selected.repliedAt && (
-                        <span className="text-[11px] text-muted-foreground">{timeAgo(selected.repliedAt)}</span>
-                      )}
-                    </div>
-                    <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{selected.reply}</p>
+                {((selected.replies?.length ?? 0) > 0) && (
+                  <div className="space-y-2">
+                    {selected.replies!.map((r: FeedbackReply) => (
+                      <div key={r.id} className="p-4 rounded-xl bg-primary/5 border border-primary/20">
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="text-sm font-medium text-primary">{r.author}</p>
+                          <span className="text-[11px] text-muted-foreground">{timeAgo(r.timestamp)}</span>
+                        </div>
+                        <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{r.text}</p>
+                      </div>
+                    ))}
                   </div>
                 )}
 
                 {selected.status !== 'closed' && (
                   <div className="space-y-3">
                     <Separator />
-                    <p className="text-sm font-semibold">{selected.reply ? 'تحديث الرد' : 'كتابة رد'}</p>
+                    <p className="text-sm font-semibold">{(selected.replies?.length ?? 0) > 0 ? 'إضافة رد' : 'كتابة رد'}</p>
                     <Textarea
                       value={replyText}
                       onChange={(e) => setReplyText(e.target.value)}

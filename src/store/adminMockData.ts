@@ -989,6 +989,7 @@ export const feedbackEntries: FeedbackEntry[] = [
     priority: 'low',
     subject: 'الدعم الفني ممتاز',
     message: 'أحب أشكر فريق الدعم على سرعة الاستجابة. كل مرة أتواصل يتم حل المشكلة خلال ساعة. خدمة 5 نجوم!',
+    replies: [],
     rating: 5,
     timestamp: nowMinus(14400),
   },
