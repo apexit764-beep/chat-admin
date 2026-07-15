@@ -84,6 +84,9 @@ export default function KnowledgeBase(): JSX.Element {
   const [articleMetaDescription, setArticleMetaDescription] = useState('');
   const [showSeo, setShowSeo] = useState(false);
 
+  // View modal
+  const [viewArticle, setViewArticle] = useState<KnowledgeArticle | null>(null);
+
   // Delete confirm
   const [deleteTarget, setDeleteTarget] = useState<KnowledgeArticle | null>(null);
 
@@ -407,7 +410,7 @@ export default function KnowledgeBase(): JSX.Element {
                               variant="ghost"
                               size="icon"
                               className="h-8 w-8"
-                              onClick={() => openEditArticle(article)}
+                              onClick={() => setViewArticle(article)}
                             >
                               <Eye className="h-3.5 w-3.5" />
                             </Button>
@@ -556,6 +559,51 @@ export default function KnowledgeBase(): JSX.Element {
             </Button>
             <Button onClick={handleSaveArticle} disabled={!articleTitle.trim() || !articleCategoryId}>
               حفظ
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* View article modal */}
+      <Dialog open={!!viewArticle} onOpenChange={(v) => { if (!v) setViewArticle(null); }}>
+        <DialogContent className="max-w-3xl max-h-[92vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{viewArticle?.title}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="flex items-center gap-3 flex-wrap">
+              <Badge variant="outline">{viewArticle ? getCategoryName(viewArticle.categoryId) : ''}</Badge>
+              <Badge variant={viewArticle?.status === 'published' ? 'default' : 'secondary'}>
+                {viewArticle?.status === 'published' ? 'منشور' : 'مسودة'}
+              </Badge>
+              <span className="text-xs text-muted-foreground">
+                {viewArticle ? timeAgo(viewArticle.updatedAt) : ''}
+              </span>
+            </div>
+            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              <span className="inline-flex items-center gap-1">
+                <Eye className="h-3.5 w-3.5" />
+                {viewArticle?.views.toLocaleString('ar-SA')} مشاهدة
+              </span>
+              <span className="inline-flex items-center gap-1 text-emerald-600">
+                <ThumbsUp className="h-3.5 w-3.5" />
+                {viewArticle?.helpful}
+              </span>
+              <span className="inline-flex items-center gap-1 text-red-500">
+                <ThumbsDown className="h-3.5 w-3.5" />
+                {viewArticle?.notHelpful}
+              </span>
+            </div>
+            <div className="border rounded-xl p-4">
+              <div
+                className="prose prose-sm dark:prose-invert max-w-none text-sm leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: viewArticle?.content ?? '' }}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setViewArticle(null)}>
+              إغلاق
             </Button>
           </DialogFooter>
         </DialogContent>
