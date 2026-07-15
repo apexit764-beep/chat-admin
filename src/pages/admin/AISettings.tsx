@@ -21,6 +21,7 @@ import {
   FileImage,
   File as FileIcon,
   Trash2,
+  Save,
 } from 'lucide-react';
 import { useSettingsStore, type AISettings, type AIDocument } from '@/store/useSettingsStore';
 import { useUIStore } from '@/store/useUIStore';
@@ -145,15 +146,9 @@ export default function AISettingsPage(): JSX.Element {
   return (
     <div className="p-4 lg:p-6 space-y-5">
       {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold">إعدادات الذكاء الاصطناعي</h2>
-          <p className="text-sm text-muted-foreground">تحكم كامل في طريقة رد المساعد الذكي على عملائك</p>
-        </div>
-        <Button variant="outline" size="sm" className="gap-1.5 text-xs" onClick={handleReset}>
-          <RotateCcw className="h-3.5 w-3.5" />
-          إعادة ضبط
-        </Button>
+      <div>
+        <h2 className="text-2xl font-bold">إعدادات الذكاء الاصطناعي</h2>
+        <p className="text-sm text-muted-foreground">تحكم كامل في طريقة رد المساعد الذكي على عملائك</p>
       </div>
 
       {/* AI Toggle */}
@@ -218,6 +213,23 @@ export default function AISettingsPage(): JSX.Element {
           toggleDay={toggleDay}
         />
       )}
+
+      {/* Sticky Save Bar */}
+      <div className="sticky bottom-0 z-20 -mx-4 lg:-mx-6 px-4 lg:px-6 py-3 bg-background/95 backdrop-blur-sm border-t flex items-center justify-between gap-4">
+        <p className="text-sm text-muted-foreground flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-amber-500" />
+          لديك تغييرات غير محفوظة في إعدادات الذكاء الاصطناعي
+        </p>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" className="gap-1.5" onClick={handleReset}>
+            تجاهل
+          </Button>
+          <Button size="sm" className="gap-1.5" onClick={() => showToast('تم حفظ التغييرات بنجاح', 'success')}>
+            <Save className="h-3.5 w-3.5" />
+            حفظ التغييرات
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }
