@@ -210,6 +210,8 @@ export interface Client {
   /** Monthly recurring revenue, in their local currency */
   mrr: number;
   currency: string;
+  username: string;
+  password: string;
   /** subdomain or full URL of their dashboard */
   dashboardUrl: string;
   logo?: string;

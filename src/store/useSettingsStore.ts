@@ -114,6 +114,11 @@ export interface WidgetSettings {
   brandingHidden: boolean;
 }
 
+export interface CredentialDeliveryPrefs {
+  sendViaWhatsapp: boolean;
+  sendViaEmail: boolean;
+}
+
 interface SettingsState {
   notifications: NotificationPrefs;
   security: SecurityPrefs;
@@ -123,6 +128,7 @@ interface SettingsState {
   currencies: Currency[];
   widget: WidgetSettings;
   ai: AISettings;
+  credentialDelivery: CredentialDeliveryPrefs;
   setNotifications: (patch: Partial<NotificationPrefs>) => void;
   setSecurity: (patch: Partial<SecurityPrefs>) => void;
   setGeneral: (patch: Partial<GeneralPrefs>) => void;
@@ -130,6 +136,7 @@ interface SettingsState {
   setSocial: (patch: Partial<SocialLinks>) => void;
   setWidget: (patch: Partial<WidgetSettings>) => void;
   setAI: (patch: Partial<AISettings>) => void;
+  setCredentialDelivery: (patch: Partial<CredentialDeliveryPrefs>) => void;
   addCurrency: (c: Currency) => void;
   updateCurrency: (code: string, patch: Partial<Currency>) => void;
   removeCurrency: (code: string) => void;
@@ -138,7 +145,7 @@ interface SettingsState {
 
 const KEY = 'sekaa_settings_v1';
 
-type Persisted = Pick<SettingsState, 'notifications' | 'security' | 'general' | 'company' | 'social' | 'currencies' | 'widget' | 'ai'>;
+type Persisted = Pick<SettingsState, 'notifications' | 'security' | 'general' | 'company' | 'social' | 'currencies' | 'widget' | 'ai' | 'credentialDelivery'>;
 
 const defaultState: Persisted = {
   notifications: { newConv: true, newMsg: true, campaigns: true, browser: false, sound: true },
@@ -222,6 +229,10 @@ const defaultState: Persisted = {
     workTo: '17:00',
     offlineMessage: 'أهلاً خارج ساعات الدوام حالياً، لكن سجّلنا طلبك وسيتواصل معك أحد الموظفين أول الدوام. لأي استفسار سريع تقدر تعتمد عليّ.',
   },
+  credentialDelivery: {
+    sendViaWhatsapp: true,
+    sendViaEmail: true,
+  },
   currencies: [
     { code: 'OMR', name: 'Omani Rial', nameAr: 'ريال عُماني', symbol: 'ر.ع', usdRate: 0.385 },
     { code: 'AED', name: 'UAE Dirham', nameAr: 'درهم إماراتي', symbol: 'د.إ', usdRate: 3.673 },
@@ -248,6 +259,7 @@ function read(): Persisted {
       social: { ...defaultState.social, ...(parsed.social ?? {}) },
       widget: { ...defaultState.widget, ...(parsed.widget ?? {}) },
       ai: { ...defaultState.ai, ...(parsed.ai ?? {}) },
+      credentialDelivery: { ...defaultState.credentialDelivery, ...(parsed.credentialDelivery ?? {}) },
       currencies: parsed.currencies?.length ? parsed.currencies : defaultState.currencies,
     };
   } catch {
@@ -266,6 +278,7 @@ function persist(state: Persisted): void {
       social: state.social,
       widget: state.widget,
       ai: state.ai,
+      credentialDelivery: state.credentialDelivery,
       currencies: state.currencies,
     }));
   } catch {/* ignore */}
@@ -301,6 +314,10 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   },
   setAI: (patch) => {
     set((s) => ({ ai: { ...s.ai, ...patch } }));
+    persist(get());
+  },
+  setCredentialDelivery: (patch) => {
+    set((s) => ({ credentialDelivery: { ...s.credentialDelivery, ...patch } }));
     persist(get());
   },
   addCurrency: (c) => {

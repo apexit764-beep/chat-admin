@@ -15,6 +15,11 @@ import {
   Clock,
   AlertCircle,
   Briefcase,
+  Lock,
+  RefreshCw,
+  Copy,
+  EyeOff,
+  Eye as EyeIcon,
 } from 'lucide-react';
 
 const AdminIndustries = lazy(() => import('./Industries'));
@@ -51,6 +56,15 @@ import {
   SelectItem,
 } from '@/components/ui/select';
 import type { Client, ClientStatus } from '@/types';
+
+function generatePassword(): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+  const specials = '!@#$%&*';
+  let pwd = '';
+  for (let i = 0; i < 10; i++) pwd += chars[Math.floor(Math.random() * chars.length)];
+  pwd += specials[Math.floor(Math.random() * specials.length)];
+  return pwd.split('').sort(() => Math.random() - 0.5).join('');
+}
 
 const statusLabel: Record<ClientStatus, string> = {
   trial: 'فترة تجريبية',
@@ -103,6 +117,8 @@ export default function AdminClients(): JSX.Element {
     industry: string;
     status: ClientStatus;
     planId: string;
+    username: string;
+    password: string;
   }>({
     companyName: '',
     contactName: '',
@@ -112,7 +128,10 @@ export default function AdminClients(): JSX.Element {
     industry: '',
     status: 'trial',
     planId: '',
+    username: '',
+    password: generatePassword(),
   });
+  const [showPwd, setShowPwd] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof typeof form, string>>>({});
 
   // Handle edit navigation from ClientDetail
@@ -158,7 +177,8 @@ export default function AdminClients(): JSX.Element {
 
   const openCreate = (): void => {
     setEditing(null);
-    setForm({ companyName: '', contactName: '', email: '', phone: '', country: '', industry: '', status: 'trial', planId: '' });
+    setForm({ companyName: '', contactName: '', email: '', phone: '', country: '', industry: '', status: 'trial', planId: '', username: '', password: generatePassword() });
+    setShowPwd(false);
     setErrors({});
     setModalOpen(true);
   };
@@ -168,7 +188,9 @@ export default function AdminClients(): JSX.Element {
     setForm({
       companyName: c.companyName, contactName: c.contactName, email: c.email, phone: c.phone,
       country: c.country, industry: c.industry, status: c.status, planId: c.planId ?? '',
+      username: c.username, password: c.password,
     });
+    setShowPwd(false);
     setErrors({});
     setModalOpen(true);
   };
@@ -182,6 +204,8 @@ export default function AdminClients(): JSX.Element {
     if (!form.contactName.trim()) e.contactName = 'الاسم مطلوب';
     if (!form.country) e.country = 'الدولة مطلوبة';
     if (!form.industry) e.industry = 'مجال العمل مطلوب';
+    if (!form.username.trim()) e.username = 'اسم المستخدم مطلوب';
+    if (!form.password.trim()) e.password = 'كلمة المرور مطلوبة';
     setErrors(e);
     if (Object.keys(e).length > 0) return;
 
@@ -191,6 +215,7 @@ export default function AdminClients(): JSX.Element {
       updateClient(editing.id, {
         companyName: form.companyName, contactName: form.contactName, email: form.email,
         phone: form.phone, country: form.country, industry: form.industry, status: form.status, currency: country.currency,
+        username: form.username, password: form.password,
       });
       if (form.planId && form.planId !== editing.planId) {
         createSubscription(editing.id, form.planId, 'monthly');
@@ -203,6 +228,7 @@ export default function AdminClients(): JSX.Element {
         companyName: form.companyName, contactName: form.contactName, email: form.email,
         phone: form.phone, country: form.country, industry: form.industry, status: form.status,
         planId: form.planId || null, currency: country.currency,
+        username: form.username, password: form.password,
         trialEndsAt: form.status === 'trial' ? new Date(Date.now() + 14 * 86400000).toISOString() : undefined,
         dashboardUrl: '',
       });
@@ -627,6 +653,79 @@ export default function AdminClients(): JSX.Element {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="sm:col-span-2 pt-2 border-t">
+              <p className="text-sm font-semibold mb-3 flex items-center gap-2">
+                <Lock className="h-4 w-4 text-muted-foreground" />
+                بيانات الدخول للوحة العميل
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="username">اسم المستخدم</Label>
+              <div className="relative">
+                <Mail className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="username"
+                  className="ps-9"
+                  value={form.username}
+                  onChange={(e) => { setForm({ ...form, username: e.target.value }); setErrors({ ...errors, username: undefined }); }}
+                  placeholder="البريد أو اسم مستخدم"
+                />
+              </div>
+              {!editing && form.email && !form.username && (
+                <button
+                  type="button"
+                  className="text-xs text-primary hover:underline"
+                  onClick={() => setForm({ ...form, username: form.email })}
+                >
+                  استخدام البريد كاسم مستخدم
+                </button>
+              )}
+              {errors.username && <p className="text-sm text-destructive">{errors.username}</p>}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">كلمة المرور</Label>
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <Lock className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    type={showPwd ? 'text' : 'password'}
+                    className="ps-9 pe-9 font-mono"
+                    value={form.password}
+                    onChange={(e) => { setForm({ ...form, password: e.target.value }); setErrors({ ...errors, password: undefined }); }}
+                  />
+                  <button
+                    type="button"
+                    className="absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    onClick={() => setShowPwd(!showPwd)}
+                  >
+                    {showPwd ? <EyeOff className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
+                  </button>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className="shrink-0"
+                  onClick={() => setForm({ ...form, password: generatePassword() })}
+                  title="توليد كلمة مرور جديدة"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className="shrink-0"
+                  onClick={() => { navigator.clipboard.writeText(form.password); showToast('تم نسخ كلمة المرور', 'success'); }}
+                  title="نسخ كلمة المرور"
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+              {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
             </div>
           </div>
           <DialogFooter className="gap-2">

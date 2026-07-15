@@ -19,6 +19,8 @@ import {
   Camera,
   Save,
   Pencil,
+  Send,
+  MessageSquare,
 } from 'lucide-react';
 import { useConfirm } from '@components/ui';
 import { useAdminStore } from '@/store/useAdminStore';
@@ -62,9 +64,9 @@ import {
 } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
 
-type Tab = 'profile' | 'company' | 'countries' | 'currencies' | 'appearance' | 'emails' | 'payments' | 'pages';
+type Tab = 'profile' | 'company' | 'countries' | 'currencies' | 'appearance' | 'emails' | 'payments' | 'pages' | 'credentials';
 
-const validTabs: Tab[] = ['profile', 'company', 'countries', 'currencies', 'appearance', 'emails', 'payments', 'pages'];
+const validTabs: Tab[] = ['profile', 'company', 'countries', 'currencies', 'appearance', 'emails', 'payments', 'pages', 'credentials'];
 
 const PAYMENT_METHODS = [
   { key: 'card', label: 'كارد (Visa / MasterCard)' },
@@ -109,6 +111,8 @@ export default function AdminSettings(): JSX.Element {
   const addCurrency = useSettingsStore((s) => s.addCurrency);
   const updateCurrency = useSettingsStore((s) => s.updateCurrency);
   const removeCurrency = useSettingsStore((s) => s.removeCurrency);
+  const credentialDelivery = useSettingsStore((s) => s.credentialDelivery);
+  const setCredentialDelivery = useSettingsStore((s) => s.setCredentialDelivery);
   const { confirm } = useConfirm();
 
   const [countryModal, setCountryModal] = useState<{ code: string; name: string; nameAr: string; flag: string; currency: string; symbol: string; usdRate: number; isNew: boolean } | null>(null);
@@ -163,6 +167,7 @@ export default function AdminSettings(): JSX.Element {
     { key: 'payments', label: 'بوابات الدفع', icon: <CreditCard className="h-4 w-4" /> },
     { key: 'appearance', label: 'المظهر', icon: <Palette className="h-4 w-4" /> },
     { key: 'pages', label: 'الصفحات', icon: <FileStack className="h-4 w-4" /> },
+    { key: 'credentials', label: 'بيانات الدخول', icon: <Send className="h-4 w-4" /> },
   ];
 
   return (
@@ -805,6 +810,60 @@ export default function AdminSettings(): JSX.Element {
                     ))}
                   </TableBody>
                 </Table>
+              </div>
+            )}
+
+            {/* CREDENTIAL DELIVERY */}
+            {tab === 'credentials' && (
+              <div className="space-y-6">
+                <Header
+                  icon={<Send className="h-5 w-5" />}
+                  title="إرسال بيانات الدخول"
+                  subtitle="حدد طريقة إرسال بيانات الدخول (اسم المستخدم وكلمة المرور) للعملاء الجدد"
+                />
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between rounded-lg border p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-success/15">
+                        <MessageSquare className="h-5 w-5 text-success" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">إرسال عبر واتساب</p>
+                        <p className="text-xs text-muted-foreground">إرسال بيانات الدخول تلقائياً عبر رسالة واتساب للعميل</p>
+                      </div>
+                    </div>
+                    <Switch
+                      checked={credentialDelivery.sendViaWhatsapp}
+                      onCheckedChange={(v) => setCredentialDelivery({ sendViaWhatsapp: v })}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between rounded-lg border p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-info/15">
+                        <Mail className="h-5 w-5 text-info" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">إرسال عبر البريد الإلكتروني</p>
+                        <p className="text-xs text-muted-foreground">إرسال بيانات الدخول تلقائياً عبر البريد الإلكتروني للعميل</p>
+                      </div>
+                    </div>
+                    <Switch
+                      checked={credentialDelivery.sendViaEmail}
+                      onCheckedChange={(v) => setCredentialDelivery({ sendViaEmail: v })}
+                    />
+                  </div>
+                </div>
+                <div className="rounded-lg bg-muted/50 p-4">
+                  <p className="text-xs text-muted-foreground">
+                    {credentialDelivery.sendViaWhatsapp && credentialDelivery.sendViaEmail
+                      ? 'سيتم إرسال بيانات الدخول عبر واتساب والبريد الإلكتروني معاً عند إضافة عميل جديد.'
+                      : credentialDelivery.sendViaWhatsapp
+                        ? 'سيتم إرسال بيانات الدخول عبر واتساب فقط عند إضافة عميل جديد.'
+                        : credentialDelivery.sendViaEmail
+                          ? 'سيتم إرسال بيانات الدخول عبر البريد الإلكتروني فقط عند إضافة عميل جديد.'
+                          : 'لن يتم إرسال بيانات الدخول تلقائياً. يجب إرسالها يدوياً للعميل.'}
+                  </p>
+                </div>
               </div>
             )}
 
