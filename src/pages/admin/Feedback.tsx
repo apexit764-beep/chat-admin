@@ -166,9 +166,9 @@ export default function AdminFeedback(): JSX.Element {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-12">#</TableHead>
-                  <TableHead>العميل</TableHead>
-                  <TableHead>النوع</TableHead>
                   <TableHead>الموضوع</TableHead>
+                  <TableHead>النوع</TableHead>
+                  <TableHead>العميل</TableHead>
                   <TableHead>الأولوية</TableHead>
                   <TableHead>الحالة</TableHead>
                   <TableHead>التاريخ</TableHead>
@@ -185,15 +185,21 @@ export default function AdminFeedback(): JSX.Element {
                   return (
                     <TableRow key={entry.id}>
                       <TableCell className="text-xs text-muted-foreground font-mono">{idx + 1}</TableCell>
-                      <TableCell className="font-medium text-sm">{entry.clientName}</TableCell>
+                      <TableCell>
+                        <button
+                          type="button"
+                          className="text-sm font-medium text-primary hover:underline max-w-[280px] truncate block text-start"
+                          onClick={() => { setSelectedId(entry.id); setReplyText(''); }}
+                        >
+                          {entry.subject}
+                        </button>
+                      </TableCell>
                       <TableCell>
                         <Badge variant={tConfig.badgeVariant} className="text-[10px]">
                           {tConfig.label}
                         </Badge>
                       </TableCell>
-                      <TableCell>
-                        <p className="text-sm font-medium max-w-[200px] truncate">{entry.subject}</p>
-                      </TableCell>
+                      <TableCell className="font-medium text-sm">{entry.clientName}</TableCell>
                       <TableCell>
                         <span className={cn('inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-medium', pConfig.bg, pConfig.border, pConfig.text)}>
                           <span className={cn('h-1.5 w-1.5 rounded-full', pConfig.dot)} />
