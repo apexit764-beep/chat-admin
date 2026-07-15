@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Bell,
   CreditCard,
@@ -18,6 +19,14 @@ import {
   type NotificationType,
 } from '@/store/useNotificationStore';
 import { timeAgo } from '@/utils/format';
+
+const typeRoutes: Record<NotificationType, string> = {
+  client: '/clients',
+  payment: '/finance',
+  subscription: '/subscriptions',
+  system: '/settings',
+  alert: '/feedback',
+};
 
 type FilterTab = 'all' | 'unread' | NotificationType;
 
@@ -48,6 +57,7 @@ const tabs: { value: FilterTab; label: string }[] = [
 ];
 
 export default function Notifications(): JSX.Element {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<FilterTab>('all');
 
   const notifications = useNotificationStore((s) => s.notifications);
@@ -123,7 +133,10 @@ export default function Notifications(): JSX.Element {
                   'group flex items-start gap-3 p-4 cursor-pointer transition-colors hover:bg-muted/50',
                   !notification.read && 'bg-primary/[0.03] border-primary/10'
                 )}
-                onClick={() => markAsRead(notification.id)}
+                onClick={() => {
+                  markAsRead(notification.id);
+                  navigate(typeRoutes[notification.type]);
+                }}
               >
                 {/* Icon */}
                 <div

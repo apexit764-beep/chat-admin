@@ -1,5 +1,5 @@
-import { useMemo, useState, lazy, Suspense } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useState, lazy, Suspense } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Plus,
   Download,
@@ -73,6 +73,7 @@ type View = 'clients' | 'industries';
 
 export default function AdminClients(): JSX.Element {
   const navigate = useNavigate();
+  const location = useLocation();
   const clients = useAdminStore((s) => s.clients);
   const plans = useAdminStore((s) => s.plans);
   const countries = useAdminStore((s) => s.countries);
@@ -113,6 +114,20 @@ export default function AdminClients(): JSX.Element {
     planId: '',
   });
   const [errors, setErrors] = useState<Partial<Record<keyof typeof form, string>>>({});
+
+  // Handle edit navigation from ClientDetail
+  useEffect(() => {
+    const state = location.state as { editClientId?: string } | null;
+    if (state?.editClientId) {
+      const clientToEdit = clients.find((c) => c.id === state.editClientId);
+      if (clientToEdit) {
+        openEdit(clientToEdit);
+      }
+      // Clear the state so it doesn't re-trigger
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const filtered = useMemo(() => {
     return clients.filter((c) => {
@@ -165,10 +180,13 @@ export default function AdminClients(): JSX.Element {
     else if (!/^[\w.+-]+@[\w-]+\.[\w.-]+$/.test(form.email.trim())) e.email = 'صيغة البريد غير صحيحة';
     if (!form.phone.trim()) e.phone = 'الهاتف مطلوب';
     if (!form.contactName.trim()) e.contactName = 'الاسم مطلوب';
+    if (!form.country) e.country = 'الدولة مطلوبة';
+    if (!form.industry) e.industry = 'مجال العمل مطلوب';
     setErrors(e);
     if (Object.keys(e).length > 0) return;
 
-    const country = countries.find((c) => c.code === form.country)!;
+    const country = countries.find((c) => c.code === form.country);
+    if (!country) return;
     if (editing) {
       updateClient(editing.id, {
         companyName: form.companyName, contactName: form.contactName, email: form.email,
@@ -553,7 +571,7 @@ export default function AdminClients(): JSX.Element {
             </div>
             <div className="space-y-2">
               <Label>الدولة</Label>
-              <Select value={form.country} onValueChange={(v) => setForm({ ...form, country: v })}>
+              <Select value={form.country} onValueChange={(v) => { setForm({ ...form, country: v }); setErrors({ ...errors, country: undefined }); }}>
                 <SelectTrigger>
                   <SelectValue placeholder="اختر الدولة" />
                 </SelectTrigger>
@@ -563,10 +581,11 @@ export default function AdminClients(): JSX.Element {
                   ))}
                 </SelectContent>
               </Select>
+              {errors.country && <p className="text-sm text-destructive">{errors.country}</p>}
             </div>
             <div className="space-y-2">
               <Label>مجال العمل</Label>
-              <Select value={form.industry} onValueChange={(v) => setForm({ ...form, industry: v })}>
+              <Select value={form.industry} onValueChange={(v) => { setForm({ ...form, industry: v }); setErrors({ ...errors, industry: undefined }); }}>
                 <SelectTrigger>
                   <SelectValue placeholder="اختر مجال العمل" />
                 </SelectTrigger>
@@ -576,6 +595,7 @@ export default function AdminClients(): JSX.Element {
                   ))}
                 </SelectContent>
               </Select>
+              {errors.industry && <p className="text-sm text-destructive">{errors.industry}</p>}
             </div>
             <div className="space-y-2">
               <Label>الحالة</Label>

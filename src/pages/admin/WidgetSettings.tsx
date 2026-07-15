@@ -114,10 +114,58 @@ export default function WidgetSettingsPage(): JSX.Element {
   };
 
   const handleReset = (): void => {
+    setWidget({
+      enabled: true,
+      primaryColor: '#1565A0',
+      position: 'bottom-right',
+      bubbleIcon: 'chat',
+      welcomeMessage: 'مرحباً! كيف يمكننا مساعدتك؟',
+      teamName: 'فريق الدعم',
+      responseTime: 'نرد عادةً خلال دقائق',
+      showAvatar: true,
+      collectEmail: true,
+      collectPhone: false,
+      autoReply: true,
+      autoReplyMessage: 'شكراً لتواصلك! سيقوم أحد أفراد فريقنا بالرد عليك قريباً.',
+      offlineMessage: 'نحن غير متاحين حالياً. اترك رسالتك وسنرد عليك في أقرب وقت.',
+      brandingHidden: false,
+    });
+    setAI({
+      enabled: true,
+      provider: 'chatgpt',
+      apiKey: '',
+      model: 'gpt-4o-mini',
+      maxTokens: 600,
+      languages: ['ar', 'en'],
+      tone: 'friendly',
+      dialect: 'fus7a',
+      companyPrompt: '',
+      documents: [],
+      learnFromDocs: true,
+      learnFromReplies: true,
+      learnFromKnowledge: true,
+      forbiddenTopics: '',
+      forbiddenReply: 'عذراً لا أستطيع المساعدة في هذا الموضوع. للحصول على إجابة دقيقة سيتواصل معك أحد موظفينا قريباً 🙏',
+      handoffOnRequest: true,
+      handoffOnFailure: true,
+      handoffOnNegative: true,
+      handoffOnRepeat: false,
+      handoffOnPayment: true,
+      handoffOnUrgent: true,
+      handoffKeywords: ['شكوى', 'موظف', 'بشري', 'استرداد', 'مشكلة', 'speak to human'],
+      handoffAssignee: '',
+      is24_7: false,
+      workDays: ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday'],
+      workFrom: '09:00',
+      workTo: '17:00',
+      offlineMessage: 'أهلاً خارج ساعات الدوام حالياً، لكن سجّلنا طلبك وسيتواصل معك أحد الموظفين أول الدوام. لأي استفسار سريع تقدر تعتمد عليّ.',
+    });
     showToast('تم إعادة ضبط الإعدادات', 'success');
   };
 
   const handleSave = (): void => {
+    // setWidget and setAI already persist to localStorage on each call,
+    // so all current state is already saved. Show confirmation.
     showToast('تم حفظ التغييرات بنجاح', 'success');
   };
 

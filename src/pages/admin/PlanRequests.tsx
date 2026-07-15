@@ -43,11 +43,14 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import type { PlanRequest, PlanRequestStatus } from '@/types';
+import type { PlanRequest, PlanRequestStatus, Plan, Country } from '@/types';
 
 const STATUS_MAP: Record<PlanRequestStatus, { label: string; color: string }> = {
   new: { label: 'جديد', color: 'bg-blue-500/15 text-blue-700 dark:text-blue-400' },
   contacted: { label: 'تم التواصل', color: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400' },
+  converted: { label: 'تم التحويل', color: 'bg-green-500/15 text-green-700 dark:text-green-400' },
+  rejected: { label: 'مرفوض', color: 'bg-red-500/15 text-red-700 dark:text-red-400' },
+  cancelled: { label: 'ملغى', color: 'bg-gray-500/15 text-gray-700 dark:text-gray-400' },
 };
 
 
@@ -305,15 +308,17 @@ export default function AdminPlanRequests({ embedded }: { embedded?: boolean }):
   );
 }
 
+interface RequestDetailProps {
+  request: PlanRequest;
+  plan: Plan | undefined;
+  country: Country | undefined;
+}
+
 function RequestDetail({
   request: r,
   plan,
   country,
-}: {
-  request: PlanRequest;
-  plan: ReturnType<typeof Array.prototype.find>;
-  country: ReturnType<typeof Array.prototype.find>;
-}): JSX.Element {
+}: RequestDetailProps): JSX.Element {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">

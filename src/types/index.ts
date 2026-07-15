@@ -288,7 +288,7 @@ export interface PaymobConfig {
   integrationsByCountry: Record<string, string>;
 }
 
-export type PlanRequestStatus = 'new' | 'contacted';
+export type PlanRequestStatus = 'new' | 'contacted' | 'converted' | 'rejected' | 'cancelled';
 export type OrderVolume = '1-5000' | '5000-20000' | '20000-50000' | '50000-100000' | '100000-200000' | '200000+';
 export type BusinessType = 'fixed' | 'seasonal';
 

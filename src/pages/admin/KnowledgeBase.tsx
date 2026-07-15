@@ -236,7 +236,7 @@ export default function KnowledgeBase(): JSX.Element {
               <Eye className="h-5 w-5 text-violet-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{stats.totalViews.toLocaleString('en-US')}</p>
+              <p className="text-2xl font-bold">{stats.totalViews.toLocaleString('ar-SA')}</p>
               <p className="text-xs text-muted-foreground">إجمالي المشاهدات</p>
             </div>
           </div>
@@ -367,7 +367,7 @@ export default function KnowledgeBase(): JSX.Element {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-center text-muted-foreground">
-                          {article.views.toLocaleString('en-US')}
+                          {article.views.toLocaleString('ar-SA')}
                         </TableCell>
                         <TableCell className="text-center">
                           <span className="inline-flex items-center gap-2 text-xs text-muted-foreground">
@@ -516,7 +516,7 @@ export default function KnowledgeBase(): JSX.Element {
               {showSeo && (
                 <div className="p-4 border-t space-y-3">
                   <div className="space-y-1.5">
-                    <label className="text-sm font-medium">Meta Title</label>
+                    <label className="text-sm font-medium">عنوان الميتا</label>
                     <Input
                       value={articleMetaTitle}
                       onChange={(e) => setArticleMetaTitle(e.target.value)}
@@ -526,7 +526,7 @@ export default function KnowledgeBase(): JSX.Element {
                     <p className="text-[11px] text-muted-foreground">{articleMetaTitle.length}/70 حرف</p>
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-sm font-medium">Meta Description</label>
+                    <label className="text-sm font-medium">وصف الميتا</label>
                     <textarea
                       value={articleMetaDescription}
                       onChange={(e) => setArticleMetaDescription(e.target.value)}

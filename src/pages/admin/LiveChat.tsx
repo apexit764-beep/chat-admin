@@ -524,7 +524,7 @@ export default function LiveChat() {
                   className={cn('gap-1.5 rounded-lg h-9 px-5', activeTab === 'note' && 'bg-amber-500 hover:bg-amber-600')}
                 >
                   {activeTab === 'note' ? 'حفظ ملاحظة' : 'إرسال'}
-                  {activeTab === 'note' ? <StickyNote className="h-3.5 w-3.5" /> : <Send className="h-3.5 w-3.5 rtl:rotate-0 ltr:rotate-0" />}
+                  {activeTab === 'note' ? <StickyNote className="h-3.5 w-3.5" /> : <Send className="h-3.5 w-3.5" />}
                 </Button>
               </div>
             </div>

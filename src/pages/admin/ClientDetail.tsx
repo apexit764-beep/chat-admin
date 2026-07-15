@@ -519,30 +519,10 @@ export default function ClientDetail(): JSX.Element {
 
           {/* Channels Tab */}
           <TabsContent value="channels" className="mt-5">
-            <div className="rounded-xl border bg-card p-5">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-sm">القنوات المتصلة</h3>
-                <span className="text-sm text-muted-foreground">{client.channelCount} قناة</span>
-              </div>
-              <div className="space-y-3">
-                {Array.from({ length: Math.min(client.channelCount, 10) }, (_, i) => {
-                  const channelTypes = ['واتساب', 'ماسنجر', 'إنستغرام', 'تلقرام', 'ودجت', 'بريد'];
-                  const channelIcons = ['📱', '💬', '📷', '✈️', '🌐', '📧'];
-                  const idx = i % channelTypes.length;
-                  return (
-                    <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-muted">
-                      <span className="text-xl">{channelIcons[idx]}</span>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium">{channelTypes[idx]} {i > 5 ? `(${i + 1})` : ''}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {i === 0 ? client.phone : `قناة-${i + 1}`}
-                        </p>
-                      </div>
-                      <Badge className="text-[10px] bg-success/15 text-success border-transparent">متصلة</Badge>
-                    </div>
-                  );
-                })}
-              </div>
+            <div className="rounded-xl border bg-card p-8 text-center">
+              <Radio className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
+              <p className="text-muted-foreground">لا توجد قنوات مرتبطة</p>
+              <p className="text-xs text-muted-foreground mt-1">القنوات المتصلة ستظهر هنا عند ربطها من لوحة العميل</p>
             </div>
           </TabsContent>
 

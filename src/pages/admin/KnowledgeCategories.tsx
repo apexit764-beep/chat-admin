@@ -8,6 +8,14 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Badge } from '@/components/ui/badge';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { cn } from '@/lib/utils';
 import {
   Dialog,
@@ -104,23 +112,23 @@ export default function KnowledgeCategories(): JSX.Element {
               }
             />
           ) : (
-            <div className="overflow-x-auto" dir="rtl">
-              <table dir="rtl" className="w-full text-sm">
-                <thead className="bg-muted/50 text-xs text-muted-foreground">
-                  <tr>
-                    <th className="text-start px-2 py-3 w-10"></th>
-                    <th className="text-start px-4 py-3">اسم التصنيف</th>
-                    <th className="text-start px-4 py-3">Slug</th>
-                    <th className="text-center px-4 py-3">عدد المقالات</th>
-                    <th className="text-end px-4 py-3 w-32">إجراءات</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y">
-                  {sorted.map((cat, idx) => {
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-10"></TableHead>
+                    <TableHead>اسم التصنيف</TableHead>
+                    <TableHead>Slug</TableHead>
+                    <TableHead className="text-center">عدد المقالات</TableHead>
+                    <TableHead className="text-center w-32">إجراءات</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {sorted.map((cat) => {
                     const isDragging = dragId === cat.id;
                     const isDragOver = dragOverId === cat.id && dragId !== cat.id;
                     return (
-                      <tr
+                      <TableRow
                         key={cat.id}
                         draggable
                         onDragStart={(e) => {
@@ -139,24 +147,24 @@ export default function KnowledgeCategories(): JSX.Element {
                         className={cn(
                           'transition-colors',
                           isDragging && 'opacity-40',
-                          isDragOver ? 'bg-primary/10' : 'hover:bg-muted/30'
+                          isDragOver && 'bg-primary/10'
                         )}
                       >
-                        <td className="px-2 py-3">
+                        <TableCell>
                           <span
                             className="inline-flex items-center justify-center h-7 w-7 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted cursor-grab active:cursor-grabbing"
                             title="اسحب لإعادة الترتيب"
                           >
                             <GripVertical className="h-4 w-4" />
                           </span>
-                        </td>
-                        <td className="px-4 py-3 font-medium">{cat.name}</td>
-                        <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{cat.slug}</td>
-                        <td className="px-4 py-3 text-center">
+                        </TableCell>
+                        <TableCell className="font-medium">{cat.name}</TableCell>
+                        <TableCell className="font-mono text-xs text-muted-foreground">{cat.slug}</TableCell>
+                        <TableCell className="text-center">
                           <Badge variant="secondary">{cat.articleCount}</Badge>
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-0.5 justify-end">
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-0.5 justify-center">
                             <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => openEdit(cat)}>
                               <Pencil className="h-3.5 w-3.5" />
                             </Button>
@@ -169,12 +177,12 @@ export default function KnowledgeCategories(): JSX.Element {
                               <Trash2 className="h-3.5 w-3.5" />
                             </Button>
                           </div>
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     );
                   })}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             </div>
           )}
         </CardContent>

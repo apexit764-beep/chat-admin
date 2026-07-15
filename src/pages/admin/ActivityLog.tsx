@@ -166,6 +166,7 @@ export default function AdminActivityLog(): JSX.Element {
                 ))}
               </SelectContent>
             </Select>
+            <DateRangePicker value={dateRange} onChange={setDateRange} />
             <Badge variant="secondary" className="text-xs">
               {filtered.length} سجل
             </Badge>

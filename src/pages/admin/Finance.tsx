@@ -7,6 +7,7 @@ import {
   FileText,
   Clock,
   Receipt,
+  Inbox,
 } from 'lucide-react';
 import { StatCard } from '@components/ui';
 import { useAdminStore } from '@/store/useAdminStore';
@@ -36,6 +37,8 @@ import {
   SelectItem,
 } from '@/components/ui/select';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+
+const COMPANY_NAME = 'Qhub';
 
 const invStatusLabel: Record<string, string> = {
   pending: 'معلّقة',
@@ -77,14 +80,16 @@ export default function AdminFinance(): JSX.Element {
     [invoices]
   );
 
-  const filteredInvoices = invoices.filter((inv) => {
-    if (statusFilter !== 'all' && inv.status !== statusFilter) return false;
-    if (search) {
-      const client = clients.find((c) => c.id === inv.clientId);
-      if (!inv.number.includes(search) && !(client?.companyName.includes(search) ?? false)) return false;
-    }
-    return true;
-  });
+  const filteredInvoices = useMemo(() => {
+    return invoices.filter((inv) => {
+      if (statusFilter !== 'all' && inv.status !== statusFilter) return false;
+      if (search) {
+        const client = clients.find((c) => c.id === inv.clientId);
+        if (!inv.number.includes(search) && !(client?.companyName.includes(search) ?? false)) return false;
+      }
+      return true;
+    });
+  }, [invoices, statusFilter, search, clients]);
 
   const handleExportInvoices = (): void => {
     downloadCsv(
@@ -126,7 +131,7 @@ export default function AdminFinance(): JSX.Element {
         <tr><td><strong>الإجمالي المستحق</strong></td><td class="right"><strong>${formatMoney(inv.total, inv.currency)}</strong></td></tr>
       </table>
       <p class="muted">الحالة: ${invStatusLabel[inv.status]} ${inv.paidAt ? ` · مدفوعة في ${formatDate(inv.paidAt)}` : ''}</p>
-      <p class="muted">شكراً لتعاملك مع Apex Solutions</p>
+      <p class="muted">شكراً لتعاملك مع ${COMPANY_NAME}</p>
     `;
     printAsPdf(`Invoice ${inv.number}`, html);
   };
@@ -258,7 +263,12 @@ export default function AdminFinance(): JSX.Element {
                 })}
                 {filteredInvoices.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">لا توجد فواتير</TableCell>
+                    <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
+                      <div className="flex flex-col items-center gap-2">
+                        <Inbox className="h-10 w-10 text-muted-foreground/50" />
+                        <span>لا توجد فواتير</span>
+                      </div>
+                    </TableCell>
                   </TableRow>
                 )}
               </TableBody>

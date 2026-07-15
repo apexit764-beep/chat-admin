@@ -408,7 +408,7 @@ export default function AdminPlans(): JSX.Element {
                 <TableHeader>
                   <TableRow>
                     <TableHead className="text-start sticky start-0 bg-muted">الدولة</TableHead>
-                    {plans.map((p) => (
+                    {filteredPlans.map((p) => (
                       <TableHead key={p.id} className="text-start">{p.nameAr}</TableHead>
                     ))}
                   </TableRow>
@@ -421,7 +421,7 @@ export default function AdminPlans(): JSX.Element {
                         {co.nameAr}
                         <span className="text-sm text-muted-foreground mx-1">({co.currency})</span>
                       </TableCell>
-                      {plans.map((p) => {
+                      {filteredPlans.map((p) => {
                         const price = p.pricesPerCountry[co.code];
                         return (
                           <TableCell key={p.id} className="font-mono">
