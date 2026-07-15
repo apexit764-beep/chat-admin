@@ -412,7 +412,7 @@ export default function AdminTeam(): JSX.Element {
       showToast('تم تحديث الموظف', 'success');
     } else {
       addAdminUser(userForm);
-      showToast('تمت إضافة الموظف', 'success');
+      showToast('تمت إضافة الموظف وإرسال دعوة على بريده الإلكتروني', 'success');
     }
     setUserModal(false);
   };
@@ -1049,10 +1049,21 @@ export default function AdminTeam(): JSX.Element {
                 <p className="text-xs text-muted-foreground">يستطيع تسجيل الدخول واستخدام لوحة التحكم</p>
               </div>
             </div>
+            {!editingUser && (
+              <div className="flex items-start gap-2.5 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900">
+                <Mail className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-sm font-medium text-blue-700 dark:text-blue-400">دعوة عبر البريد الإلكتروني</p>
+                  <p className="text-xs text-blue-600/80 dark:text-blue-400/70 mt-0.5">
+                    سيتم إرسال رسالة دعوة للموظف على بريده الإلكتروني تحتوي على رابط لإنشاء كلمة مرور جديدة والانضمام للوحة التحكم.
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setUserModal(false)}>إلغاء</Button>
-            <Button onClick={submitUser}>{editingUser ? 'حفظ التغييرات' : 'إضافة الموظف'}</Button>
+            <Button onClick={submitUser}>{editingUser ? 'حفظ التغييرات' : 'إرسال الدعوة'}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
