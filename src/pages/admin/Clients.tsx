@@ -691,25 +691,19 @@ export default function AdminClients(): JSX.Element {
                 </div>
 
                 {!editing && (
-                  <div className="sm:col-span-2 space-y-3 pt-2 border-t">
+                  <div className="sm:col-span-2 space-y-2 pt-2 border-t">
                     <p className="text-xs font-medium text-muted-foreground">إرسال بيانات الدخول للعميل</p>
-                    <div className="flex items-center justify-between rounded-lg border p-3">
-                      <div className="flex items-center gap-3">
-                        <MessageSquare className="h-5 w-5 text-emerald-500" />
-                        <div>
-                          <p className="text-sm font-medium">إرسال عبر واتساب</p>
-                          <p className="text-xs text-muted-foreground">إرسال بيانات الدخول تلقائياً عبر رسالة واتساب</p>
-                        </div>
+                    <div className="flex items-center justify-between rounded-md border px-3 py-2">
+                      <div className="flex items-center gap-2">
+                        <MessageSquare className="h-4 w-4 text-emerald-500" />
+                        <span className="text-sm">إرسال عبر واتساب</span>
                       </div>
                       <Switch checked={form.sendViaWhatsapp} onCheckedChange={(v) => setForm({ ...form, sendViaWhatsapp: v })} />
                     </div>
-                    <div className="flex items-center justify-between rounded-lg border p-3">
-                      <div className="flex items-center gap-3">
-                        <Mail className="h-5 w-5 text-blue-500" />
-                        <div>
-                          <p className="text-sm font-medium">إرسال عبر البريد الإلكتروني</p>
-                          <p className="text-xs text-muted-foreground">إرسال بيانات الدخول تلقائياً عبر البريد الإلكتروني</p>
-                        </div>
+                    <div className="flex items-center justify-between rounded-md border px-3 py-2">
+                      <div className="flex items-center gap-2">
+                        <Mail className="h-4 w-4 text-blue-500" />
+                        <span className="text-sm">إرسال عبر البريد الإلكتروني</span>
                       </div>
                       <Switch checked={form.sendViaEmail} onCheckedChange={(v) => setForm({ ...form, sendViaEmail: v })} />
                     </div>
