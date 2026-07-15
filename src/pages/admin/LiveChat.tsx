@@ -10,7 +10,7 @@ import {
   Clock,
   Tag,
   Globe,
-  ArrowRightLeft,
+
   StickyNote,
   PanelRightClose,
   PanelRightOpen,
@@ -56,7 +56,7 @@ const channelConfig: Record<string, { icon: React.ElementType; label: string; co
 type FilterStatus = 'all' | 'open' | 'assigned' | 'resolved';
 
 export default function LiveChat() {
-  const { liveChatConversations, clients, plans, subscriptions, adminUsers, assignLiveChat, transferLiveChat, resolveLiveChat, sendLiveChatMessage, sendLiveChatNote } = useAdminStore();
+  const { liveChatConversations, clients, plans, subscriptions, adminUsers, assignLiveChat, resolveLiveChat, sendLiveChatMessage, sendLiveChatNote } = useAdminStore();
   const user = useAuthStore((s) => s.user);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -66,7 +66,6 @@ export default function LiveChat() {
   const [draft, setDraft] = useState('');
   const [activeTab, setActiveTab] = useState<'message' | 'note'>('message');
   const [showDetails, setShowDetails] = useState(false);
-  const [showTransferDialog, setShowTransferDialog] = useState(false);
   const [showAssignDialog, setShowAssignDialog] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -149,12 +148,6 @@ export default function LiveChat() {
       e.preventDefault();
       handleSend();
     }
-  };
-
-  const handleTransfer = (agentName: string) => {
-    if (!selectedId) return;
-    transferLiveChat(selectedId, agentName);
-    setShowTransferDialog(false);
   };
 
   const handleStatusChange = (newStatus: LiveChatStatus) => {
@@ -348,9 +341,6 @@ export default function LiveChat() {
                 {/* Action icons */}
                 <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setShowAssignDialog(true)} title="تعيين لموظف">
                   <User className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setShowTransferDialog(true)} title="تحويل المحادثة">
-                  <ArrowRightLeft className="h-4 w-4" />
                 </Button>
                 {selected.status !== 'resolved' && selected.status !== 'closed' && (
                   <Button variant="ghost" size="icon" className="h-8 w-8 text-green-600" onClick={() => resolveLiveChat(selected.id)} title="تم الحل">
@@ -671,15 +661,6 @@ export default function LiveChat() {
                     تعيين لموظف
                   </Button>
                 )}
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="w-full h-9 text-xs"
-                  onClick={() => setShowTransferDialog(true)}
-                >
-                  <ArrowRightLeft className="h-3.5 w-3.5 me-1.5" />
-                  تحويل المحادثة
-                </Button>
                 {selected.status !== 'resolved' && selected.status !== 'closed' && (
                   <Button
                     size="sm"
@@ -725,40 +706,6 @@ export default function LiveChat() {
         </div>
       )}
 
-      {/* Transfer Dialog */}
-      <Dialog open={showTransferDialog} onOpenChange={setShowTransferDialog}>
-        <DialogContent className="sm:max-w-sm">
-          <DialogHeader>
-            <DialogTitle>تحويل المحادثة</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-2 pt-2">
-            {adminUsers
-              .filter((a) => a.active && a.name !== selected?.assignedTo)
-              .map((agent) => (
-                <button
-                  key={agent.id}
-                  onClick={() => handleTransfer(agent.name)}
-                  className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-muted/70 transition-colors text-start"
-                >
-                  <div className={cn(
-                    'h-9 w-9 rounded-full flex items-center justify-center font-bold text-sm shrink-0',
-                    avatarColor(agent.name)
-                  )}>
-                    {initials(agent.name)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium">{agent.name}</p>
-                    <p className="text-xs text-muted-foreground">{agent.email}</p>
-                  </div>
-                  <Badge variant="outline" className="text-[10px]">
-                    {agent.role === 'super_admin' ? 'مدير عام' : agent.role === 'admin' ? 'مدير' : agent.role === 'support' ? 'دعم' : 'مالية'}
-                  </Badge>
-                </button>
-              ))}
-          </div>
-        </DialogContent>
-      </Dialog>
-
       {/* Assign Dialog */}
       <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>
         <DialogContent className="sm:max-w-sm">
@@ -767,7 +714,7 @@ export default function LiveChat() {
           </DialogHeader>
           <div className="space-y-2 pt-2">
             {adminUsers
-              .filter((a) => a.active)
+              .filter((a) => a.active && a.name !== selected?.assignedTo)
               .map((agent) => (
                 <button
                   key={agent.id}
