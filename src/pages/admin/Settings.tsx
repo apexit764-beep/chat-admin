@@ -411,18 +411,6 @@ export default function AdminSettings(): JSX.Element {
               <div>
                 <Header icon={<Building className="h-5 w-5" />} title="بيانات الشركة" subtitle="المعلومات الرسمية للشركة وبيانات التواصل" />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <Label>اسم الشركة (عربي)<span className="text-destructive ms-0.5">*</span></Label>
-                    <Input value={company.name} onChange={(e) => { setCompany({ name: e.target.value }); setCompanyErrors((p) => ({ ...p, name: '' })); }} />
-                    {companyErrors.name && <p className="text-xs text-destructive mt-1">{companyErrors.name}</p>}
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label>Company Name (EN)<span className="text-destructive ms-0.5">*</span></Label>
-                    <Input value={company.nameEn} onChange={(e) => { setCompany({ nameEn: e.target.value }); setCompanyErrors((p) => ({ ...p, nameEn: '' })); }} />
-                    {companyErrors.nameEn && <p className="text-xs text-destructive mt-1">{companyErrors.nameEn}</p>}
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                   <div className="space-y-2">
                     <Label>الشعار الكامل</Label>
                     <div className="flex items-center gap-3">
@@ -510,6 +498,18 @@ export default function AdminSettings(): JSX.Element {
                         <p className="text-[11px] text-muted-foreground">مربعة، PNG أو SVG — 2MB</p>
                       </div>
                     </div>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                  <div className="space-y-1.5">
+                    <Label>اسم الشركة (عربي)<span className="text-destructive ms-0.5">*</span></Label>
+                    <Input value={company.name} onChange={(e) => { setCompany({ name: e.target.value }); setCompanyErrors((p) => ({ ...p, name: '' })); }} />
+                    {companyErrors.name && <p className="text-xs text-destructive mt-1">{companyErrors.name}</p>}
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Company Name (EN)<span className="text-destructive ms-0.5">*</span></Label>
+                    <Input value={company.nameEn} onChange={(e) => { setCompany({ nameEn: e.target.value }); setCompanyErrors((p) => ({ ...p, nameEn: '' })); }} />
+                    {companyErrors.nameEn && <p className="text-xs text-destructive mt-1">{companyErrors.nameEn}</p>}
                   </div>
                 </div>
                 <div className="space-y-1.5 mt-4">
