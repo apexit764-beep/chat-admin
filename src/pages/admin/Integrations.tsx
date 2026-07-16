@@ -173,7 +173,7 @@ function CountryTagsInput({ countries, selected, onToggle }: CountryTagsInputPro
 
   return (
     <div className="space-y-2">
-      <Label>الدول</Label>
+      <Label>الدول (اختياري)</Label>
       <div ref={wrapperRef} className="relative">
         <div
           className={cn(
@@ -570,7 +570,7 @@ export default function Integrations() {
             </div>
 
             <div className="space-y-2">
-              <Label>الشعار <span className="text-destructive ms-0.5">*</span></Label>
+              <Label>الشعار</Label>
               <Input
                 type="file"
                 accept="image/*"

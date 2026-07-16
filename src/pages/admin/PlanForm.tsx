@@ -395,7 +395,7 @@ export default function PlanForm(): JSX.Element {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label>وصف قصير (Tagline)</Label>
+                <Label>وصف قصير (Tagline) (اختياري)</Label>
                 <Input value={form.tagline} onChange={(e) => setForm({ ...form, tagline: e.target.value })} placeholder="للشركات النامية" />
               </div>
             </CardContent>
