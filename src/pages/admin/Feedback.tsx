@@ -7,7 +7,6 @@ import {
   Clock,
   CheckCircle2,
   Loader2,
-  XCircle,
   Filter,
   Eye,
 } from 'lucide-react';
@@ -57,7 +56,6 @@ const statusConfig: Record<FeedbackStatus, { label: string; icon: React.ElementT
   open: { label: 'مفتوح', icon: Clock, color: 'text-blue-500' },
   in_progress: { label: 'قيد المعالجة', icon: Loader2, color: 'text-amber-500' },
   resolved: { label: 'تم الحل', icon: CheckCircle2, color: 'text-emerald-500' },
-  closed: { label: 'مغلق', icon: XCircle, color: 'text-slate-400' },
 };
 
 const priorityConfig: Record<FeedbackPriority, { label: string; dot: string; text: string; bg: string; border: string }> = {
@@ -151,7 +149,6 @@ export default function AdminFeedback(): JSX.Element {
                 <SelectItem value="open">مفتوح</SelectItem>
                 <SelectItem value="in_progress">قيد المعالجة</SelectItem>
                 <SelectItem value="resolved">تم الحل</SelectItem>
-                <SelectItem value="closed">مغلق</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -277,7 +274,6 @@ export default function AdminFeedback(): JSX.Element {
                       <SelectItem value="open">مفتوح</SelectItem>
                       <SelectItem value="in_progress">قيد المعالجة</SelectItem>
                       <SelectItem value="resolved">تم الحل</SelectItem>
-                      <SelectItem value="closed">مغلق</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -303,8 +299,7 @@ export default function AdminFeedback(): JSX.Element {
                   </div>
                 )}
 
-                {selected.status !== 'closed' && (
-                  <div className="space-y-3">
+                <div className="space-y-3">
                     <Separator />
                     <p className="text-sm font-semibold">{(selected.replies?.length ?? 0) > 0 ? 'إضافة رد' : 'كتابة رد'}</p>
                     <Textarea
@@ -315,12 +310,10 @@ export default function AdminFeedback(): JSX.Element {
                       dir="rtl"
                     />
                   </div>
-                )}
               </div>
             </ScrollArea>
 
-            {selected.status !== 'closed' && (
-              <DialogFooter className="gap-2">
+            <DialogFooter className="gap-2">
                 <Button variant="outline" onClick={() => setSelectedId(null)}>إغلاق</Button>
                 <Button
                   onClick={handleReply}
@@ -331,7 +324,6 @@ export default function AdminFeedback(): JSX.Element {
                   إرسال الرد
                 </Button>
               </DialogFooter>
-            )}
           </DialogContent>
         )}
       </Dialog>

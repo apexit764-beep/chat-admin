@@ -834,7 +834,7 @@ export const activityLog: ActivityEntry[] = [
 // Feedback & Complaints
 // =====================================================================
 export type FeedbackType = 'complaint' | 'suggestion';
-export type FeedbackStatus = 'open' | 'in_progress' | 'resolved' | 'closed';
+export type FeedbackStatus = 'open' | 'in_progress' | 'resolved';
 export type FeedbackPriority = 'low' | 'medium' | 'high';
 
 export interface FeedbackReply {
@@ -936,7 +936,7 @@ export const feedbackEntries: FeedbackEntry[] = [
     clientId: 'client_7',
     clientName: 'الفجيرة للسياحة',
     type: 'suggestion',
-    status: 'closed',
+    status: 'resolved',
     priority: 'low',
     subject: 'شكراً على التحديث الأخير',
     message: 'ميزة الردود الذكية بالذكاء الاصطناعي ممتازة! وفرت على فريقنا وقت كبير. استمروا بالتطوير 👏',
@@ -1021,7 +1021,7 @@ export const feedbackEntries: FeedbackEntry[] = [
     clientId: 'client_5',
     clientName: 'عيادة الحياة الطبية',
     type: 'suggestion',
-    status: 'closed',
+    status: 'resolved',
     priority: 'low',
     subject: 'الدعم الفني ممتاز',
     message: 'أحب أشكر فريق الدعم على سرعة الاستجابة. كل مرة أتواصل يتم حل المشكلة خلال ساعة. خدمة 5 نجوم!',
@@ -1120,7 +1120,7 @@ export const liveChatConversations: LiveChatConversation[] = [
     id: 'lc_6',
     visitorName: 'نورة الكعبي',
     clientId: 'client_7',
-    status: 'closed',
+    status: 'resolved',
     assignedTo: 'Sara Ahmed',
     channel: 'widget',
     messages: [
