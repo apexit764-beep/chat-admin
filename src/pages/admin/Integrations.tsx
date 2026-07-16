@@ -523,8 +523,16 @@ export default function Integrations() {
               </div>
               <div className="space-y-2">
                 <Label>كود</Label>
-                <Input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} placeholder="salla, zid, shopify..." dir="ltr" />
-                <p className="text-xs text-muted-foreground">slug بحروف صغيرة لنماذج إعداد التاجر (اختياري)</p>
+                <Select value={form.slug || undefined} onValueChange={(v) => setForm({ ...form, slug: v })}>
+                  <SelectTrigger dir="ltr">
+                    <SelectValue placeholder="اختر الكود..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {['whatsapp', 'facebook-messenger', 'instagram', 'telegram', 'livechat', 'twitter', 'tiktok', 'snapchat', 'line', 'wechat', 'viber', 'gmail', 'outlook', 'yahoo', 'smtp', 'salla', 'zid', 'shopify', 'woocommerce', 'magento', 'opencart', 'aramex', 'smsa', 'dhl', 'fedex'].map((s) => (
+                      <SelectItem key={s} value={s}>{s}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
