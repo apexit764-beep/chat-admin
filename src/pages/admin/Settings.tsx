@@ -142,6 +142,7 @@ export default function AdminSettings(): JSX.Element {
   ]);
   const [emailModal, setEmailModal] = useState<(EmailTemplate & { isNew: boolean }) | null>(null);
   const [emailPreview, setEmailPreview] = useState(false);
+  const [previewTemplate, setPreviewTemplate] = useState<EmailTemplate | null>(null);
 
   // Pages CRUD
   type PageItem = { id: string; title: string; slug: string; content: string; status: 'published' | 'draft' };
@@ -735,6 +736,9 @@ export default function AdminSettings(): JSX.Element {
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-0.5 justify-end">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => setPreviewTemplate(t)}>
+                              <Eye className="h-3.5 w-3.5" />
+                            </Button>
                             <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => setEmailModal({ ...t, isNew: false })}>
                               <Edit2 className="h-3.5 w-3.5" />
                             </Button>
@@ -1301,6 +1305,56 @@ export default function AdminSettings(): JSX.Element {
             )}
           </DialogFooter>
         </DialogContent>
+      </Dialog>
+
+      {/* Email Preview-only Dialog */}
+      <Dialog open={!!previewTemplate} onOpenChange={(o) => { if (!o) setPreviewTemplate(null); }}>
+        {previewTemplate && (
+          <DialogContent className="max-w-lg border">
+            <DialogHeader>
+              <DialogTitle>معاينة: {previewTemplate.name}</DialogTitle>
+            </DialogHeader>
+            <div className="border rounded-lg overflow-hidden">
+              <div className="bg-primary px-6 py-4">
+                <p className="text-primary-foreground font-semibold text-center">{company.name || 'Qhub'}</p>
+              </div>
+              <div className="px-6 py-5 space-y-3 bg-card">
+                <p className="text-xs text-muted-foreground">الموضوع: <span className="text-foreground font-medium">{previewTemplate.subject || '—'}</span></p>
+                <Separator />
+                <div dir="rtl" className="prose prose-sm max-w-none text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: previewTemplate.body || '<p class="text-muted-foreground">لا يوجد محتوى</p>' }} />
+                {previewTemplate.buttons && previewTemplate.buttons.length > 0 && (
+                  <>
+                    <Separator />
+                    <div className="flex gap-2 justify-center py-2">
+                      {previewTemplate.buttons.map((btn, idx) => (
+                        <span
+                          key={idx}
+                          className={cn(
+                            'inline-block px-5 py-2 rounded-md text-sm font-medium',
+                            btn.variant === 'primary' && 'bg-primary text-primary-foreground',
+                            btn.variant === 'outline' && 'border border-primary text-primary bg-transparent',
+                            btn.variant === 'link' && 'text-primary underline bg-transparent',
+                          )}
+                        >
+                          {btn.text || 'زر'}
+                        </span>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+              <div className="bg-muted/50 px-6 py-3 text-center">
+                <p className="text-[11px] text-muted-foreground">{company.name || 'Qhub'} &copy; {new Date().getFullYear()}</p>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setPreviewTemplate(null)}>إغلاق</Button>
+              <Button onClick={() => { setEmailModal({ ...previewTemplate, isNew: false }); setPreviewTemplate(null); }}>
+                <Edit2 className="h-4 w-4 ml-1" /> تعديل
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        )}
       </Dialog>
 
       {/* Page Modal */}
