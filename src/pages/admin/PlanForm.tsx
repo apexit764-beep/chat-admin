@@ -325,6 +325,9 @@ export default function PlanForm(): JSX.Element {
     if (!form.name.trim()) {
       newErrors.name = 'الاسم بالإنجليزية مطلوب';
     }
+    if (form.limitAgents === 0 || form.limitChannels === 0 || form.limitConversations === 0 || form.limitContacts === 0) {
+      newErrors.limits = 'يجب تحديد جميع الحدود (استخدم -1 لغير محدود)';
+    }
     if (form.features.length === 0) {
       newErrors.features = 'يجب اختيار ميزة واحدة على الأقل';
     }
@@ -401,28 +404,29 @@ export default function PlanForm(): JSX.Element {
           {/* Limits - 2 per row */}
           <Card>
             <CardHeader>
-              <h3 className="text-lg font-semibold">الحدود</h3>
+              <h3 className="text-lg font-semibold">الحدود<span className="text-destructive ms-0.5">*</span></h3>
+              {errors.limits && <p className="text-xs text-destructive mt-1">{errors.limits}</p>}
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <Label className="flex items-center gap-1.5"><Users className="h-3.5 w-3.5 text-muted-foreground" /> حد الموظفين</Label>
-                  <Input type="number" min={-1} value={form.limitAgents} onChange={(e) => setForm({ ...form, limitAgents: Number(e.target.value) || 0 })} />
+                  <Label className="flex items-center gap-1.5"><Users className="h-3.5 w-3.5 text-muted-foreground" /> حد الموظفين<span className="text-destructive ms-0.5">*</span></Label>
+                  <Input type="number" min={-1} value={form.limitAgents} onChange={(e) => { setForm({ ...form, limitAgents: Number(e.target.value) || 0 }); if (errors.limits) setErrors((prev) => { const { limits, ...rest } = prev; return rest; }); }} />
                   <p className="text-[11px] text-muted-foreground">-1 = غير محدود</p>
                 </div>
                 <div className="space-y-2">
-                  <Label className="flex items-center gap-1.5"><MessageSquare className="h-3.5 w-3.5 text-muted-foreground" /> حد القنوات</Label>
-                  <Input type="number" min={-1} value={form.limitChannels} onChange={(e) => setForm({ ...form, limitChannels: Number(e.target.value) || 0 })} />
+                  <Label className="flex items-center gap-1.5"><MessageSquare className="h-3.5 w-3.5 text-muted-foreground" /> حد القنوات<span className="text-destructive ms-0.5">*</span></Label>
+                  <Input type="number" min={-1} value={form.limitChannels} onChange={(e) => { setForm({ ...form, limitChannels: Number(e.target.value) || 0 }); if (errors.limits) setErrors((prev) => { const { limits, ...rest } = prev; return rest; }); }} />
                   <p className="text-[11px] text-muted-foreground">-1 = غير محدود</p>
                 </div>
                 <div className="space-y-2">
-                  <Label className="flex items-center gap-1.5"><Database className="h-3.5 w-3.5 text-muted-foreground" /> محادثات/شهر</Label>
-                  <Input type="number" min={-1} value={form.limitConversations} onChange={(e) => setForm({ ...form, limitConversations: Number(e.target.value) || 0 })} />
+                  <Label className="flex items-center gap-1.5"><Database className="h-3.5 w-3.5 text-muted-foreground" /> محادثات/شهر<span className="text-destructive ms-0.5">*</span></Label>
+                  <Input type="number" min={-1} value={form.limitConversations} onChange={(e) => { setForm({ ...form, limitConversations: Number(e.target.value) || 0 }); if (errors.limits) setErrors((prev) => { const { limits, ...rest } = prev; return rest; }); }} />
                   <p className="text-[11px] text-muted-foreground">-1 = غير محدود</p>
                 </div>
                 <div className="space-y-2">
-                  <Label className="flex items-center gap-1.5"><InfinityIcon className="h-3.5 w-3.5 text-muted-foreground" /> جهات اتصال</Label>
-                  <Input type="number" min={-1} value={form.limitContacts} onChange={(e) => setForm({ ...form, limitContacts: Number(e.target.value) || 0 })} />
+                  <Label className="flex items-center gap-1.5"><InfinityIcon className="h-3.5 w-3.5 text-muted-foreground" /> جهات اتصال<span className="text-destructive ms-0.5">*</span></Label>
+                  <Input type="number" min={-1} value={form.limitContacts} onChange={(e) => { setForm({ ...form, limitContacts: Number(e.target.value) || 0 }); if (errors.limits) setErrors((prev) => { const { limits, ...rest } = prev; return rest; }); }} />
                   <p className="text-[11px] text-muted-foreground">-1 = غير محدود</p>
                 </div>
               </div>
@@ -446,7 +450,7 @@ export default function PlanForm(): JSX.Element {
           {!form.isTrial && (
             <Card>
               <CardHeader>
-                <h3 className="text-lg font-semibold">الأسعار حسب الدولة</h3>
+                <h3 className="text-lg font-semibold">الأسعار حسب الدولة<span className="text-destructive ms-0.5">*</span></h3>
                 {errors.prices && <p className="text-xs text-destructive mt-1">{errors.prices}</p>}
               </CardHeader>
               <CardContent>
