@@ -21,6 +21,7 @@ import {
   Pencil,
   Link,
   X,
+  ArrowRight,
 } from 'lucide-react';
 import { useConfirm } from '@components/ui';
 import { useAdminStore } from '@/store/useAdminStore';
@@ -140,6 +141,7 @@ export default function AdminSettings(): JSX.Element {
     { id: '3', name: 'تذكير تجديد', subject: 'تجديد اشتراكك في {{plan_name}}', body: 'مرحباً {{client_name}},\n\nاشتراكك في باقة {{plan_name}} سيتجدد خلال 3 أيام.\nالمبلغ: {{amount}} {{currency}}\n\nللتعديل أو الإلغاء تواصل معنا.', trigger: 'before_renewal', triggerDays: '3' },
   ]);
   const [emailModal, setEmailModal] = useState<(EmailTemplate & { isNew: boolean }) | null>(null);
+  const [emailPreview, setEmailPreview] = useState(false);
 
   // Pages CRUD
   type PageItem = { id: string; title: string; slug: string; content: string; status: 'published' | 'draft' };
@@ -1072,13 +1074,13 @@ export default function AdminSettings(): JSX.Element {
       </Dialog>
 
       {/* Email Template Modal */}
-      <Dialog open={!!emailModal} onOpenChange={(o) => { if (!o) setEmailModal(null); }}>
-        <DialogContent className="max-w-lg">
+      <Dialog open={!!emailModal} onOpenChange={(o) => { if (!o) { setEmailModal(null); setEmailPreview(false); } }}>
+        <DialogContent className="max-w-lg border max-h-[85vh] flex flex-col">
           <DialogHeader>
-            <DialogTitle>{emailModal?.isNew ? 'إضافة قالب بريد' : 'تعديل قالب بريد'}</DialogTitle>
+            <DialogTitle>{emailPreview ? 'معاينة القالب' : emailModal?.isNew ? 'إضافة قالب بريد' : 'تعديل قالب بريد'}</DialogTitle>
           </DialogHeader>
-          {emailModal && (
-            <div className="space-y-3">
+          {emailModal && !emailPreview && (
+            <div className="space-y-3 overflow-y-auto flex-1 pl-1">
               <div className="space-y-1.5">
                 <Label>اسم القالب</Label>
                 <Input value={emailModal.name} onChange={(e) => setEmailModal({ ...emailModal, name: e.target.value })} placeholder="رسالة الترحيب" />
@@ -1092,10 +1094,10 @@ export default function AdminSettings(): JSX.Element {
                 <div className={cn('flex gap-2', emailModal.trigger === 'before_renewal' ? 'items-start' : 'items-center')}>
                   <div className="flex-1">
                     <Select value={emailModal.trigger} onValueChange={(v) => setEmailModal({ ...emailModal, trigger: v, triggerDays: v === 'before_renewal' ? (emailModal.triggerDays ?? '3') : undefined })}>
-                      <SelectTrigger>
+                      <SelectTrigger dir="rtl">
                         <SelectValue placeholder="اختر الحدث المشغّل" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent dir="rtl">
                         {TRIGGER_EVENTS.map((ev) => (
                           <SelectItem key={ev.key} value={ev.key}>
                             {ev.label}
@@ -1140,7 +1142,7 @@ export default function AdminSettings(): JSX.Element {
                 <div
                   contentEditable
                   dir="rtl"
-                  className="min-h-[180px] max-h-[350px] overflow-y-auto border border-t-0 rounded-b-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 prose prose-sm max-w-none"
+                  className="min-h-[140px] max-h-[250px] overflow-y-auto border border-t-0 rounded-b-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 prose prose-sm max-w-none"
                   dangerouslySetInnerHTML={{ __html: emailModal.body }}
                   onBlur={(e) => setEmailModal({ ...emailModal, body: e.currentTarget.innerHTML })}
                 />
@@ -1187,10 +1189,10 @@ export default function AdminSettings(): JSX.Element {
                                 setEmailModal({ ...emailModal, buttons: updated });
                               }}
                             >
-                              <SelectTrigger className="w-28 h-8 text-sm">
+                              <SelectTrigger className="w-28 h-8 text-sm" dir="rtl">
                                 <SelectValue />
                               </SelectTrigger>
-                              <SelectContent>
+                              <SelectContent dir="rtl">
                                 <SelectItem value="primary">أساسي</SelectItem>
                                 <SelectItem value="outline">ثانوي</SelectItem>
                                 <SelectItem value="link">رابط</SelectItem>
@@ -1224,21 +1226,6 @@ export default function AdminSettings(): JSX.Element {
                         </button>
                       </div>
                     ))}
-                    <div className="flex gap-2 justify-center pt-1">
-                      {emailModal.buttons.map((btn, idx) => (
-                        <span
-                          key={idx}
-                          className={cn(
-                            'inline-block px-4 py-1.5 rounded text-xs font-medium',
-                            btn.variant === 'primary' && 'bg-primary text-primary-foreground',
-                            btn.variant === 'outline' && 'border border-primary text-primary bg-transparent',
-                            btn.variant === 'link' && 'text-primary underline bg-transparent',
-                          )}
-                        >
-                          {btn.text || 'زر'}
-                        </span>
-                      ))}
-                    </div>
                   </div>
                 ) : (
                   <p className="text-[11px] text-muted-foreground">لم تتم إضافة أزرار بعد (بحد أقصى 3 أزرار)</p>
@@ -1246,21 +1233,72 @@ export default function AdminSettings(): JSX.Element {
               </div>
             </div>
           )}
+          {emailModal && emailPreview && (
+            <div className="flex-1 overflow-y-auto">
+              <div className="border rounded-lg overflow-hidden">
+                <div className="bg-primary px-6 py-4">
+                  <p className="text-primary-foreground font-semibold text-center">{company.name || 'Qhub'}</p>
+                </div>
+                <div className="px-6 py-5 space-y-3 bg-card">
+                  <p className="text-xs text-muted-foreground">الموضوع: <span className="text-foreground font-medium">{emailModal.subject || '—'}</span></p>
+                  <Separator />
+                  <div dir="rtl" className="prose prose-sm max-w-none text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: emailModal.body || '<p class="text-muted-foreground">لا يوجد محتوى</p>' }} />
+                  {emailModal.buttons && emailModal.buttons.length > 0 && (
+                    <>
+                      <Separator />
+                      <div className="flex gap-2 justify-center py-2">
+                        {emailModal.buttons.map((btn, idx) => (
+                          <span
+                            key={idx}
+                            className={cn(
+                              'inline-block px-5 py-2 rounded-md text-sm font-medium',
+                              btn.variant === 'primary' && 'bg-primary text-primary-foreground',
+                              btn.variant === 'outline' && 'border border-primary text-primary bg-transparent',
+                              btn.variant === 'link' && 'text-primary underline bg-transparent',
+                            )}
+                          >
+                            {btn.text || 'زر'}
+                          </span>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+                <div className="bg-muted/50 px-6 py-3 text-center">
+                  <p className="text-[11px] text-muted-foreground">{company.name || 'Qhub'} &copy; {new Date().getFullYear()}</p>
+                </div>
+              </div>
+            </div>
+          )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEmailModal(null)}>إلغاء</Button>
-            <Button onClick={() => {
-              if (!emailModal) return;
-              if (!emailModal.name) { showToast('اسم القالب مطلوب', 'error'); return; }
-              const tpl: EmailTemplate = { id: emailModal.id, name: emailModal.name, subject: emailModal.subject, body: emailModal.body, trigger: emailModal.trigger, triggerDays: emailModal.triggerDays, buttons: emailModal.buttons?.length ? emailModal.buttons : undefined };
-              if (emailModal.isNew) {
-                setEmailTemplates((prev) => [...prev, tpl]);
-                showToast('تمت الإضافة', 'success');
-              } else {
-                setEmailTemplates((prev) => prev.map((t) => t.id === tpl.id ? tpl : t));
-                showToast('تم الحفظ', 'success');
-              }
-              setEmailModal(null);
-            }}>حفظ</Button>
+            {emailPreview ? (
+              <>
+                <Button variant="outline" onClick={() => setEmailPreview(false)}>
+                  <ArrowRight className="h-4 w-4 ml-1" /> رجوع
+                </Button>
+                <Button onClick={() => {
+                  if (!emailModal) return;
+                  if (!emailModal.name) { showToast('اسم القالب مطلوب', 'error'); return; }
+                  const tpl: EmailTemplate = { id: emailModal.id, name: emailModal.name, subject: emailModal.subject, body: emailModal.body, trigger: emailModal.trigger, triggerDays: emailModal.triggerDays, buttons: emailModal.buttons?.length ? emailModal.buttons : undefined };
+                  if (emailModal.isNew) {
+                    setEmailTemplates((prev) => [...prev, tpl]);
+                    showToast('تمت الإضافة', 'success');
+                  } else {
+                    setEmailTemplates((prev) => prev.map((t) => t.id === tpl.id ? tpl : t));
+                    showToast('تم الحفظ', 'success');
+                  }
+                  setEmailModal(null);
+                  setEmailPreview(false);
+                }}>حفظ</Button>
+              </>
+            ) : (
+              <>
+                <Button variant="outline" onClick={() => setEmailModal(null)}>إلغاء</Button>
+                <Button variant="outline" onClick={() => setEmailPreview(true)}>
+                  <Eye className="h-4 w-4 ml-1" /> معاينة
+                </Button>
+              </>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
