@@ -301,7 +301,7 @@ export default function AdminFeedback(): JSX.Element {
 
                 <div className="space-y-3">
                     <Separator />
-                    <p className="text-sm font-semibold">{(selected.replies?.length ?? 0) > 0 ? 'إضافة رد' : 'كتابة رد'}</p>
+                    <p className="text-sm font-semibold">{(selected.replies?.length ?? 0) > 0 ? 'إضافة رد' : 'كتابة رد'}<span className="text-destructive ms-0.5">*</span></p>
                     <Textarea
                       value={replyText}
                       onChange={(e) => setReplyText(e.target.value)}

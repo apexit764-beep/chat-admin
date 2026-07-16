@@ -366,6 +366,8 @@ export default function AdminTeam(): JSX.Element {
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState<AdminRole | 'all'>('all');
   const [userModal, setUserModal] = useState(false);
+  const [userErrors, setUserErrors] = useState<Record<string, string>>({});
+  const [roleErrors, setRoleErrors] = useState<Record<string, string>>({});
   const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
   const [userForm, setUserForm] = useState<{ name: string; email: string; role: AdminRole; active: boolean }>({
     name: '', email: '', role: 'admin', active: true,
@@ -393,20 +395,31 @@ export default function AdminTeam(): JSX.Element {
   const openAddUser = (): void => {
     setEditingUser(null);
     setUserForm({ name: '', email: '', role: 'admin', active: true });
+    setUserErrors({});
     setUserModal(true);
   };
 
   const openEditUser = (u: AdminUser): void => {
     setEditingUser(u);
     setUserForm({ name: u.name, email: u.email, role: u.role, active: u.active });
+    setUserErrors({});
     setUserModal(true);
   };
 
   const submitUser = (): void => {
-    if (!userForm.name.trim() || !userForm.email.trim()) {
-      showToast('الاسم والبريد مطلوبان', 'error');
+    const errs: Record<string, string> = {};
+    if (!userForm.name.trim()) errs.name = 'الاسم الكامل مطلوب';
+    if (!userForm.email.trim()) {
+      errs.email = 'البريد الإلكتروني مطلوب';
+    } else if (!/^[\w.+-]+@[\w-]+\.[\w.-]+$/.test(userForm.email.trim())) {
+      errs.email = 'صيغة البريد الإلكتروني غير صحيحة';
+    }
+    if (Object.keys(errs).length > 0) {
+      setUserErrors(errs);
+      showToast('يرجى تعبئة الحقول المطلوبة', 'error');
       return;
     }
+    setUserErrors({});
     if (editingUser) {
       updateAdminUser(editingUser.id, userForm);
       showToast('تم تحديث الموظف', 'success');
@@ -457,6 +470,7 @@ export default function AdminTeam(): JSX.Element {
   const openAddRole = (): void => {
     setEditingRole(null);
     setRoleForm({ label: '', description: '', permissions: new Set() });
+    setRoleErrors({});
     setView('role-editor');
   };
 
@@ -467,14 +481,19 @@ export default function AdminTeam(): JSX.Element {
       description: role.description,
       permissions: new Set(role.permissions),
     });
+    setRoleErrors({});
     setView('role-editor');
   };
 
   const submitRole = (): void => {
-    if (!roleForm.label.trim()) {
-      showToast('اسم الدور مطلوب', 'error');
+    const errs: Record<string, string> = {};
+    if (!roleForm.label.trim()) errs.label = 'اسم الدور مطلوب';
+    if (Object.keys(errs).length > 0) {
+      setRoleErrors(errs);
+      showToast('يرجى تعبئة الحقول المطلوبة', 'error');
       return;
     }
+    setRoleErrors({});
     if (editingRole) {
       setRoles((prev) =>
         prev.map((r) =>
@@ -572,12 +591,13 @@ export default function AdminTeam(): JSX.Element {
           <CardContent className="p-5 lg:p-6 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>اسم الدور</Label>
+                <Label>اسم الدور<span className="text-destructive ms-0.5">*</span></Label>
                 <Input
                   value={roleForm.label}
                   onChange={(e) => setRoleForm({ ...roleForm, label: e.target.value })}
                   placeholder="مثلاً: مسؤول تسويق"
                 />
+                {roleErrors.label && <p className="text-xs text-destructive mt-1">{roleErrors.label}</p>}
               </div>
               <div className="space-y-2">
                 <Label>الوصف</Label>
@@ -994,15 +1014,16 @@ export default function AdminTeam(): JSX.Element {
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-2">
-              <Label>الاسم الكامل</Label>
+              <Label>الاسم الكامل<span className="text-destructive ms-0.5">*</span></Label>
               <Input
                 value={userForm.name}
                 onChange={(e) => setUserForm({ ...userForm, name: e.target.value })}
                 placeholder="أدخل اسم الموظف"
               />
+              {userErrors.name && <p className="text-xs text-destructive mt-1">{userErrors.name}</p>}
             </div>
             <div className="space-y-2">
-              <Label>البريد الإلكتروني</Label>
+              <Label>البريد الإلكتروني<span className="text-destructive ms-0.5">*</span></Label>
               <div className="relative">
                 <Input
                   type="email"
@@ -1013,9 +1034,10 @@ export default function AdminTeam(): JSX.Element {
                 />
                 <Mail className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               </div>
+              {userErrors.email && <p className="text-xs text-destructive mt-1">{userErrors.email}</p>}
             </div>
             <div className="space-y-2">
-              <Label>الدور</Label>
+              <Label>الدور<span className="text-destructive ms-0.5">*</span></Label>
               <Select
                 value={userForm.role}
                 onValueChange={(v) => setUserForm({ ...userForm, role: v as AdminRole })}

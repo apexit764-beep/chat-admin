@@ -16,6 +16,7 @@ import {
   Settings2,
 } from 'lucide-react';
 import { useAdminStore } from '@/store/useAdminStore';
+import { useUIStore } from '@/store/useUIStore';
 import { timeAgo } from '@/utils/format';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -69,6 +70,7 @@ export default function KnowledgeBase(): JSX.Element {
   const deleteArticle = useAdminStore((s) => s.deleteKnowledgeArticle);
   const moveArticle = useAdminStore((s) => s.moveKnowledgeArticle);
 
+  const showToast = useUIStore((s) => s.showToast);
   const [search, setSearch] = useState('');
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
 
@@ -83,6 +85,7 @@ export default function KnowledgeBase(): JSX.Element {
   const [articleMetaTitle, setArticleMetaTitle] = useState('');
   const [articleMetaDescription, setArticleMetaDescription] = useState('');
   const [showSeo, setShowSeo] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   // View modal
   const [viewArticle, setViewArticle] = useState<KnowledgeArticle | null>(null);
@@ -130,6 +133,7 @@ export default function KnowledgeBase(): JSX.Element {
     setArticleMetaTitle('');
     setArticleMetaDescription('');
     setShowSeo(false);
+    setErrors({});
     setArticleModalOpen(true);
   };
 
@@ -143,11 +147,20 @@ export default function KnowledgeBase(): JSX.Element {
     setArticleMetaTitle(article.metaTitle);
     setArticleMetaDescription(article.metaDescription);
     setShowSeo(false);
+    setErrors({});
     setArticleModalOpen(true);
   };
 
   const handleSaveArticle = (): void => {
-    if (!articleTitle.trim() || !articleCategoryId) return;
+    const newErrors: Record<string, string> = {};
+    if (!articleTitle.trim()) newErrors.title = 'عنوان المقال مطلوب';
+    if (!stripHtml(articleContent).trim()) newErrors.content = 'محتوى المقال مطلوب';
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      showToast('يرجى تعبئة الحقول المطلوبة', 'error');
+      return;
+    }
+    if (!articleCategoryId) return;
     const finalSlug = articleSlug.trim() || slugify(articleTitle);
     const finalMetaTitle = articleMetaTitle.trim() || articleTitle;
     const finalMetaDesc = articleMetaDescription.trim() || stripHtml(articleContent).slice(0, 155);
@@ -451,15 +464,17 @@ export default function KnowledgeBase(): JSX.Element {
           <div className="space-y-4 py-2">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">العنوان</label>
+                <label className="text-sm font-medium">العنوان<span className="text-destructive ms-0.5">*</span></label>
                 <Input
                   value={articleTitle}
                   onChange={(e) => {
                     setArticleTitle(e.target.value);
                     if (!editingArticle) setArticleSlug(slugify(e.target.value));
+                    setErrors((prev) => { const { title, ...rest } = prev; return rest; });
                   }}
                   placeholder="عنوان المقال"
                 />
+                {errors.title && <p className="text-xs text-destructive mt-1">{errors.title}</p>}
               </div>
               <div className="space-y-1.5">
                 <label className="text-sm font-medium">Slug</label>
@@ -474,7 +489,7 @@ export default function KnowledgeBase(): JSX.Element {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">التصنيف</label>
+                <label className="text-sm font-medium">التصنيف <span className="text-muted-foreground text-[10px] ms-1">(اختياري)</span></label>
                 <Select value={articleCategoryId} onValueChange={setArticleCategoryId}>
                   <SelectTrigger>
                     <SelectValue placeholder="اختر التصنيف" />
@@ -503,13 +518,14 @@ export default function KnowledgeBase(): JSX.Element {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-sm font-medium">المحتوى</label>
+              <label className="text-sm font-medium">المحتوى<span className="text-destructive ms-0.5">*</span></label>
               <RichEditor
                 value={articleContent}
-                onChange={setArticleContent}
+                onChange={(v) => { setArticleContent(v); setErrors((prev) => { const { content, ...rest } = prev; return rest; }); }}
                 placeholder="اكتب محتوى المقال هنا..."
                 minHeight={280}
               />
+              {errors.content && <p className="text-xs text-destructive mt-1">{errors.content}</p>}
             </div>
 
             <div className="border rounded-xl">
@@ -557,7 +573,7 @@ export default function KnowledgeBase(): JSX.Element {
             <Button variant="outline" onClick={() => setArticleModalOpen(false)}>
               إلغاء
             </Button>
-            <Button onClick={handleSaveArticle} disabled={!articleTitle.trim() || !articleCategoryId}>
+            <Button onClick={handleSaveArticle}>
               حفظ
             </Button>
           </DialogFooter>

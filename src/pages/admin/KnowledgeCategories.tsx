@@ -36,6 +36,7 @@ export default function KnowledgeCategories(): JSX.Element {
   const moveCategoryTo = useAdminStore((s) => s.moveKnowledgeCategoryTo);
   const showToast = useUIStore((s) => s.showToast);
 
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [editModal, setEditModal] = useState<{ mode: 'new' | 'edit'; id?: string; name: string } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<KnowledgeCategory | null>(null);
   const [dragId, setDragId] = useState<string | null>(null);
@@ -52,11 +53,16 @@ export default function KnowledgeCategories(): JSX.Element {
     setDragOverId(null);
   };
 
-  const openNew = (): void => setEditModal({ mode: 'new', name: '' });
-  const openEdit = (c: KnowledgeCategory): void => setEditModal({ mode: 'edit', id: c.id, name: c.name });
+  const openNew = (): void => { setErrors({}); setEditModal({ mode: 'new', name: '' }); };
+  const openEdit = (c: KnowledgeCategory): void => { setErrors({}); setEditModal({ mode: 'edit', id: c.id, name: c.name }); };
 
   const handleSave = (): void => {
-    if (!editModal || !editModal.name.trim()) return;
+    if (!editModal) return;
+    if (!editModal.name.trim()) {
+      setErrors({ name: 'اسم التصنيف مطلوب' });
+      showToast('يرجى تعبئة الحقول المطلوبة', 'error');
+      return;
+    }
     if (editModal.mode === 'new') {
       addCategory(editModal.name.trim());
       showToast('تمت إضافة التصنيف', 'success');
@@ -195,14 +201,15 @@ export default function KnowledgeCategories(): JSX.Element {
             <DialogTitle>{editModal?.mode === 'new' ? 'تصنيف جديد' : 'تعديل التصنيف'}</DialogTitle>
           </DialogHeader>
           <div className="space-y-1.5 py-2">
-            <label className="text-sm font-medium">اسم التصنيف</label>
+            <label className="text-sm font-medium">اسم التصنيف<span className="text-destructive ms-0.5">*</span></label>
             <Input
               autoFocus
               value={editModal?.name ?? ''}
-              onChange={(e) => setEditModal((m) => (m ? { ...m, name: e.target.value } : m))}
+              onChange={(e) => { setEditModal((m) => (m ? { ...m, name: e.target.value } : m)); setErrors({}); }}
               placeholder="مثل: الأسئلة الشائعة"
               onKeyDown={(e) => { if (e.key === 'Enter') handleSave(); }}
             />
+            {errors.name && <p className="text-xs text-destructive mt-1">{errors.name}</p>}
           </div>
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => setEditModal(null)}>إلغاء</Button>

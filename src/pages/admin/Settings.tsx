@@ -160,6 +160,14 @@ export default function AdminSettings(): JSX.Element {
   const [gatewayModal, setGatewayModal] = useState<(PaymentGateway & { isNew: boolean }) | null>(null);
   const [showSecretKey, setShowSecretKey] = useState(false);
 
+  const [profileErrors, setProfileErrors] = useState<Record<string, string>>({});
+  const [companyErrors, setCompanyErrors] = useState<Record<string, string>>({});
+  const [countryErrors, setCountryErrors] = useState<Record<string, string>>({});
+  const [currencyErrors, setCurrencyErrors] = useState<Record<string, string>>({});
+  const [emailErrors, setEmailErrors] = useState<Record<string, string>>({});
+  const [pageErrors, setPageErrors] = useState<Record<string, string>>({});
+  const [gatewayErrors, setGatewayErrors] = useState<Record<string, string>>({});
+
   const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
     { key: 'profile', label: 'الملف الشخصي', icon: <UserIcon className="h-4 w-4" /> },
     { key: 'company', label: 'الشركة', icon: <Building className="h-4 w-4" /> },
@@ -240,8 +248,9 @@ export default function AdminSettings(): JSX.Element {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <Label>الاسم الكامل</Label>
-                      <Input value={profileName} onChange={(e) => setProfileName(e.target.value)} />
+                      <Label>الاسم الكامل<span className="text-destructive ms-0.5">*</span></Label>
+                      <Input value={profileName} onChange={(e) => { setProfileName(e.target.value); setProfileErrors((p) => ({ ...p, profileName: '' })); }} />
+                      {profileErrors.profileName && <p className="text-xs text-destructive mt-1">{profileErrors.profileName}</p>}
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -274,7 +283,13 @@ export default function AdminSettings(): JSX.Element {
                   </div>
 
                   <div className="flex justify-end">
-                    <Button onClick={() => showToast('تم حفظ البيانات', 'success')}>
+                    <Button onClick={() => {
+                      const errs: Record<string, string> = {};
+                      if (!profileName.trim()) errs.profileName = 'الاسم الكامل مطلوب';
+                      setProfileErrors(errs);
+                      if (Object.keys(errs).length) { showToast('يرجى تعبئة الحقول المطلوبة', 'error'); return; }
+                      showToast('تم حفظ البيانات', 'success');
+                    }}>
                       <Save className="h-4 w-4 me-2" />
                       حفظ التغييرات
                     </Button>
@@ -297,15 +312,15 @@ export default function AdminSettings(): JSX.Element {
                     </DialogHeader>
                     <div className="space-y-4 py-2">
                       <div className="space-y-1.5">
-                        <Label>كلمة المرور الحالية</Label>
+                        <Label>كلمة المرور الحالية<span className="text-destructive ms-0.5">*</span></Label>
                         <Input type="password" value={currentPwd} onChange={(e) => setCurrentPwd(e.target.value)} autoFocus />
                       </div>
                       <div className="space-y-1.5">
-                        <Label>كلمة المرور الجديدة</Label>
+                        <Label>كلمة المرور الجديدة<span className="text-destructive ms-0.5">*</span></Label>
                         <Input type="password" value={newPwd} onChange={(e) => setNewPwd(e.target.value)} />
                       </div>
                       <div className="space-y-1.5">
-                        <Label>تأكيد كلمة المرور</Label>
+                        <Label>تأكيد كلمة المرور<span className="text-destructive ms-0.5">*</span></Label>
                         <Input type="password" value={confirmPwd} onChange={(e) => setConfirmPwd(e.target.value)} />
                       </div>
                     </div>
@@ -397,12 +412,14 @@ export default function AdminSettings(): JSX.Element {
                 <Header icon={<Building className="h-5 w-5" />} title="بيانات الشركة" subtitle="المعلومات الرسمية للشركة وبيانات التواصل" />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <Label>اسم الشركة (عربي)</Label>
-                    <Input value={company.name} onChange={(e) => setCompany({ name: e.target.value })} />
+                    <Label>اسم الشركة (عربي)<span className="text-destructive ms-0.5">*</span></Label>
+                    <Input value={company.name} onChange={(e) => { setCompany({ name: e.target.value }); setCompanyErrors((p) => ({ ...p, name: '' })); }} />
+                    {companyErrors.name && <p className="text-xs text-destructive mt-1">{companyErrors.name}</p>}
                   </div>
                   <div className="space-y-1.5">
-                    <Label>Company Name (EN)</Label>
-                    <Input value={company.nameEn} onChange={(e) => setCompany({ nameEn: e.target.value })} />
+                    <Label>Company Name (EN)<span className="text-destructive ms-0.5">*</span></Label>
+                    <Input value={company.nameEn} onChange={(e) => { setCompany({ nameEn: e.target.value }); setCompanyErrors((p) => ({ ...p, nameEn: '' })); }} />
+                    {companyErrors.nameEn && <p className="text-xs text-destructive mt-1">{companyErrors.nameEn}</p>}
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
@@ -503,12 +520,14 @@ export default function AdminSettings(): JSX.Element {
                 <p className="text-sm font-semibold mb-3">بيانات التواصل</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <Label>البريد الإلكتروني</Label>
-                    <Input type="email" value={company.email} onChange={(e) => setCompany({ email: e.target.value })} />
+                    <Label>البريد الإلكتروني<span className="text-destructive ms-0.5">*</span></Label>
+                    <Input type="email" value={company.email} onChange={(e) => { setCompany({ email: e.target.value }); setCompanyErrors((p) => ({ ...p, email: '' })); }} />
+                    {companyErrors.email && <p className="text-xs text-destructive mt-1">{companyErrors.email}</p>}
                   </div>
                   <div className="space-y-1.5">
-                    <Label>رقم الهاتف</Label>
-                    <Input value={company.phone} onChange={(e) => setCompany({ phone: e.target.value })} />
+                    <Label>رقم الهاتف<span className="text-destructive ms-0.5">*</span></Label>
+                    <Input value={company.phone} onChange={(e) => { setCompany({ phone: e.target.value }); setCompanyErrors((p) => ({ ...p, phone: '' })); }} />
+                    {companyErrors.phone && <p className="text-xs text-destructive mt-1">{companyErrors.phone}</p>}
                   </div>
                   <div className="space-y-1.5">
                     <Label>رقم واتساب</Label>
@@ -523,8 +542,8 @@ export default function AdminSettings(): JSX.Element {
                     <Input value={company.address} onChange={(e) => setCompany({ address: e.target.value })} />
                   </div>
                   <div className="space-y-1.5">
-                    <Label>الدولة</Label>
-                    <Select value={company.country} onValueChange={(v) => setCompany({ country: v })}>
+                    <Label>الدولة<span className="text-destructive ms-0.5">*</span></Label>
+                    <Select value={company.country} onValueChange={(v) => { setCompany({ country: v }); setCompanyErrors((p) => ({ ...p, country: '' })); }}>
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
                         {countries.map((c) => (
@@ -532,6 +551,7 @@ export default function AdminSettings(): JSX.Element {
                         ))}
                       </SelectContent>
                     </Select>
+                    {companyErrors.country && <p className="text-xs text-destructive mt-1">{companyErrors.country}</p>}
                   </div>
                 </div>
                 <Separator className="my-6" />
@@ -571,7 +591,18 @@ export default function AdminSettings(): JSX.Element {
                   ))}
                 </div>
                 <div className="flex justify-end pt-6">
-                  <Button onClick={() => showToast('تم حفظ بيانات الشركة', 'success')}>حفظ التغييرات</Button>
+                  <Button onClick={() => {
+                    const errs: Record<string, string> = {};
+                    if (!company.name.trim()) errs.name = 'اسم الشركة مطلوب';
+                    if (!company.nameEn.trim()) errs.nameEn = 'Company Name is required';
+                    if (!company.email.trim()) errs.email = 'البريد الإلكتروني مطلوب';
+                    else if (!/^[\w.+-]+@[\w-]+\.[\w.-]+$/.test(company.email)) errs.email = 'صيغة البريد الإلكتروني غير صحيحة';
+                    if (!company.phone.trim()) errs.phone = 'رقم الهاتف مطلوب';
+                    if (!company.country) errs.country = 'الدولة مطلوبة';
+                    setCompanyErrors(errs);
+                    if (Object.keys(errs).length) { showToast('يرجى تعبئة الحقول المطلوبة', 'error'); return; }
+                    showToast('تم حفظ بيانات الشركة', 'success');
+                  }}>حفظ التغييرات</Button>
                 </div>
               </div>
             )}
@@ -584,7 +615,7 @@ export default function AdminSettings(): JSX.Element {
                   title="إدارة الدول"
                   subtitle="أضف الدول المدعومة وحدّد عملتها"
                   action={
-                    <Button size="sm" onClick={() => setCountryModal({ code: '', name: '', nameAr: '', flag: '', dialCode: '', currency: currencies[0]?.code ?? 'USD', symbol: '', usdRate: 1, isNew: true })}>
+                    <Button size="sm" onClick={() => { setCountryErrors({}); setCountryModal({ code: '', name: '', nameAr: '', flag: '', dialCode: '', currency: currencies[0]?.code ?? 'USD', symbol: '', usdRate: 1, isNew: true }); }}>
                       <Plus className="h-4 w-4 me-2" /> إضافة دولة
                     </Button>
                   }
@@ -621,7 +652,7 @@ export default function AdminSettings(): JSX.Element {
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-0.5 justify-end">
-                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => setCountryModal({ ...c, isNew: false })}>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => { setCountryErrors({}); setCountryModal({ ...c, isNew: false }); }}>
                               <Edit2 className="h-3.5 w-3.5" />
                             </Button>
                             <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={async () => {
@@ -649,7 +680,7 @@ export default function AdminSettings(): JSX.Element {
                   title="إدارة العملات"
                   subtitle="العملات المدعومة وأسعار الصرف مقابل الدولار"
                   action={
-                    <Button size="sm" onClick={() => setCurrencyModal({ code: '', name: '', nameAr: '', symbol: '', usdRate: 1, isNew: true })}>
+                    <Button size="sm" onClick={() => { setCurrencyErrors({}); setCurrencyModal({ code: '', name: '', nameAr: '', symbol: '', usdRate: 1, isNew: true }); }}>
                       <Plus className="h-4 w-4 me-2" /> إضافة عملة
                     </Button>
                   }
@@ -678,7 +709,7 @@ export default function AdminSettings(): JSX.Element {
                         <TableCell className="font-mono text-xs">{cur.usdRate} {cur.code}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-0.5 justify-end">
-                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => setCurrencyModal({ ...cur, isNew: false })}>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => { setCurrencyErrors({}); setCurrencyModal({ ...cur, isNew: false }); }}>
                               <Edit2 className="h-3.5 w-3.5" />
                             </Button>
                             <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={async () => {
@@ -707,7 +738,7 @@ export default function AdminSettings(): JSX.Element {
                   title="قوالب البريد الإلكتروني"
                   subtitle="إدارة قوالب رسائل البريد المرسلة للعملاء"
                   action={
-                    <Button size="sm" onClick={() => setEmailModal({ id: String(Date.now()), name: '', subject: '', body: '', trigger: '', triggerDays: undefined, isNew: true })}>
+                    <Button size="sm" onClick={() => { setEmailErrors({}); setEmailModal({ id: String(Date.now()), name: '', subject: '', body: '', trigger: '', triggerDays: undefined, isNew: true }); }}>
                       <Plus className="h-4 w-4 me-2" /> إضافة قالب
                     </Button>
                   }
@@ -739,7 +770,7 @@ export default function AdminSettings(): JSX.Element {
                             <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => setPreviewTemplate(t)}>
                               <Eye className="h-3.5 w-3.5" />
                             </Button>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => setEmailModal({ ...t, isNew: false })}>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => { setEmailErrors({}); setEmailModal({ ...t, isNew: false }); }}>
                               <Edit2 className="h-3.5 w-3.5" />
                             </Button>
                             <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={async () => {
@@ -797,7 +828,7 @@ export default function AdminSettings(): JSX.Element {
                   title="الصفحات"
                   subtitle="إدارة الصفحات الثابتة مثل الشروط وسياسة الخصوصية"
                   action={
-                    <Button size="sm" onClick={() => setPageModal({ id: String(Date.now()), title: '', slug: '', content: '', status: 'draft', isNew: true })}>
+                    <Button size="sm" onClick={() => { setPageErrors({}); setPageModal({ id: String(Date.now()), title: '', slug: '', content: '', status: 'draft', isNew: true }); }}>
                       <Plus className="h-4 w-4 me-2" /> إضافة صفحة
                     </Button>
                   }
@@ -829,7 +860,7 @@ export default function AdminSettings(): JSX.Element {
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-0.5 justify-end">
-                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => setPageModal({ ...p, isNew: false })}>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => { setPageErrors({}); setPageModal({ ...p, isNew: false }); }}>
                               <Edit2 className="h-3.5 w-3.5" />
                             </Button>
                             <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={async () => {
@@ -855,7 +886,7 @@ export default function AdminSettings(): JSX.Element {
                   title="بوابات الدفع"
                   subtitle="إدارة بوابات الدفع المتصلة بالنظام"
                   action={
-                    <Button size="sm" onClick={() => setGatewayModal({ id: String(Date.now()), name: '', slug: '', environment: 'sandbox', enabled: true, publicKey: '', secretKey: '', email: '', jsonConfig: '', countries: [], methods: [], isNew: true })}>
+                    <Button size="sm" onClick={() => { setGatewayErrors({}); setGatewayModal({ id: String(Date.now()), name: '', slug: '', environment: 'sandbox', enabled: true, publicKey: '', secretKey: '', email: '', jsonConfig: '', countries: [], methods: [], isNew: true }); }}>
                       <Plus className="h-4 w-4 me-2" /> إضافة بوابة
                     </Button>
                   }
@@ -889,7 +920,7 @@ export default function AdminSettings(): JSX.Element {
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-0.5 justify-end">
-                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => setGatewayModal({ ...g, isNew: false })}>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => { setGatewayErrors({}); setGatewayModal({ ...g, isNew: false }); }}>
                               <Edit2 className="h-3.5 w-3.5" />
                             </Button>
                             <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={async () => {
@@ -921,14 +952,15 @@ export default function AdminSettings(): JSX.Element {
           {countryModal && (
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label>الرمز (ISO)</Label>
+                <Label>الرمز (ISO)<span className="text-destructive ms-0.5">*</span></Label>
                 <Input
                   value={countryModal.code}
-                  onChange={(e) => setCountryModal({ ...countryModal, code: e.target.value.toUpperCase() })}
+                  onChange={(e) => { setCountryModal({ ...countryModal, code: e.target.value.toUpperCase() }); setCountryErrors((p) => ({ ...p, code: '' })); }}
                   placeholder="OM"
                   maxLength={3}
                   disabled={!countryModal.isNew}
                 />
+                {countryErrors.code && <p className="text-xs text-destructive mt-1">{countryErrors.code}</p>}
               </div>
               <div className="space-y-1.5">
                 <Label>العلم</Label>
@@ -939,28 +971,31 @@ export default function AdminSettings(): JSX.Element {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label>الاسم (عربي)</Label>
+                <Label>الاسم (عربي)<span className="text-destructive ms-0.5">*</span></Label>
                 <Input
                   value={countryModal.nameAr}
-                  onChange={(e) => setCountryModal({ ...countryModal, nameAr: e.target.value })}
+                  onChange={(e) => { setCountryModal({ ...countryModal, nameAr: e.target.value }); setCountryErrors((p) => ({ ...p, nameAr: '' })); }}
                   placeholder="سلطنة عُمان"
                 />
+                {countryErrors.nameAr && <p className="text-xs text-destructive mt-1">{countryErrors.nameAr}</p>}
               </div>
               <div className="space-y-1.5">
-                <Label>Name (EN)</Label>
+                <Label>Name (EN)<span className="text-destructive ms-0.5">*</span></Label>
                 <Input
                   value={countryModal.name}
-                  onChange={(e) => setCountryModal({ ...countryModal, name: e.target.value })}
+                  onChange={(e) => { setCountryModal({ ...countryModal, name: e.target.value }); setCountryErrors((p) => ({ ...p, name: '' })); }}
                   placeholder="Oman"
                 />
+                {countryErrors.name && <p className="text-xs text-destructive mt-1">{countryErrors.name}</p>}
               </div>
               <div className="space-y-1.5">
-                <Label>العملة</Label>
+                <Label>العملة<span className="text-destructive ms-0.5">*</span></Label>
                 <Select
                   value={countryModal.currency}
                   onValueChange={(v) => {
                     const cur = currencies.find((c) => c.code === v);
                     setCountryModal({ ...countryModal, currency: v, symbol: cur?.symbol ?? countryModal.symbol, usdRate: cur?.usdRate ?? countryModal.usdRate });
+                    setCountryErrors((p) => ({ ...p, currency: '' }));
                   }}
                 >
                   <SelectTrigger><SelectValue /></SelectTrigger>
@@ -970,6 +1005,7 @@ export default function AdminSettings(): JSX.Element {
                     ))}
                   </SelectContent>
                 </Select>
+                {countryErrors.currency && <p className="text-xs text-destructive mt-1">{countryErrors.currency}</p>}
               </div>
               <div className="space-y-1.5">
                 <Label>سعر الصرف (1 USD)</Label>
@@ -987,7 +1023,13 @@ export default function AdminSettings(): JSX.Element {
             <Button
               onClick={() => {
                 if (!countryModal) return;
-                if (!countryModal.code || !countryModal.nameAr) { showToast('الرمز والاسم مطلوبان', 'error'); return; }
+                const errs: Record<string, string> = {};
+                if (!countryModal.code.trim()) errs.code = 'الرمز مطلوب';
+                if (!countryModal.nameAr.trim()) errs.nameAr = 'الاسم بالعربي مطلوب';
+                if (!countryModal.name.trim()) errs.name = 'Name (EN) is required';
+                if (!countryModal.currency) errs.currency = 'العملة مطلوبة';
+                setCountryErrors(errs);
+                if (Object.keys(errs).length) { showToast('يرجى تعبئة الحقول المطلوبة', 'error'); return; }
                 if (countryModal.isNew) {
                   if (countries.some((c) => c.code === countryModal.code)) { showToast('الرمز موجود مسبقاً', 'error'); return; }
                   addCountry({ code: countryModal.code, name: countryModal.name, nameAr: countryModal.nameAr, flag: countryModal.flag, dialCode: countryModal.dialCode || '', currency: countryModal.currency, symbol: countryModal.symbol, usdRate: countryModal.usdRate, active: true });
@@ -1012,47 +1054,52 @@ export default function AdminSettings(): JSX.Element {
           {currencyModal && (
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label>الرمز (ISO)</Label>
+                <Label>الرمز (ISO)<span className="text-destructive ms-0.5">*</span></Label>
                 <Input
                   value={currencyModal.code}
-                  onChange={(e) => setCurrencyModal({ ...currencyModal, code: e.target.value.toUpperCase() })}
+                  onChange={(e) => { setCurrencyModal({ ...currencyModal, code: e.target.value.toUpperCase() }); setCurrencyErrors((p) => ({ ...p, code: '' })); }}
                   placeholder="OMR"
                   maxLength={3}
                   disabled={!currencyModal.isNew}
                 />
+                {currencyErrors.code && <p className="text-xs text-destructive mt-1">{currencyErrors.code}</p>}
               </div>
               <div className="space-y-1.5">
-                <Label>العلامة</Label>
+                <Label>العلامة<span className="text-destructive ms-0.5">*</span></Label>
                 <Input
                   value={currencyModal.symbol}
-                  onChange={(e) => setCurrencyModal({ ...currencyModal, symbol: e.target.value })}
+                  onChange={(e) => { setCurrencyModal({ ...currencyModal, symbol: e.target.value }); setCurrencyErrors((p) => ({ ...p, symbol: '' })); }}
                   placeholder="ر.ع"
                 />
+                {currencyErrors.symbol && <p className="text-xs text-destructive mt-1">{currencyErrors.symbol}</p>}
               </div>
               <div className="space-y-1.5">
-                <Label>الاسم (عربي)</Label>
+                <Label>الاسم (عربي)<span className="text-destructive ms-0.5">*</span></Label>
                 <Input
                   value={currencyModal.nameAr}
-                  onChange={(e) => setCurrencyModal({ ...currencyModal, nameAr: e.target.value })}
+                  onChange={(e) => { setCurrencyModal({ ...currencyModal, nameAr: e.target.value }); setCurrencyErrors((p) => ({ ...p, nameAr: '' })); }}
                   placeholder="ريال عُماني"
                 />
+                {currencyErrors.nameAr && <p className="text-xs text-destructive mt-1">{currencyErrors.nameAr}</p>}
               </div>
               <div className="space-y-1.5">
-                <Label>Name (EN)</Label>
+                <Label>Name (EN)<span className="text-destructive ms-0.5">*</span></Label>
                 <Input
                   value={currencyModal.name}
-                  onChange={(e) => setCurrencyModal({ ...currencyModal, name: e.target.value })}
+                  onChange={(e) => { setCurrencyModal({ ...currencyModal, name: e.target.value }); setCurrencyErrors((p) => ({ ...p, name: '' })); }}
                   placeholder="Omani Rial"
                 />
+                {currencyErrors.name && <p className="text-xs text-destructive mt-1">{currencyErrors.name}</p>}
               </div>
               <div className="space-y-1.5 col-span-2">
-                <Label>سعر مقابل 1 USD</Label>
+                <Label>سعر مقابل 1 USD<span className="text-destructive ms-0.5">*</span></Label>
                 <Input
                   type="number"
                   step="0.0001"
                   value={currencyModal.usdRate}
-                  onChange={(e) => setCurrencyModal({ ...currencyModal, usdRate: Number(e.target.value) })}
+                  onChange={(e) => { setCurrencyModal({ ...currencyModal, usdRate: Number(e.target.value) }); setCurrencyErrors((p) => ({ ...p, usdRate: '' })); }}
                 />
+                {currencyErrors.usdRate && <p className="text-xs text-destructive mt-1">{currencyErrors.usdRate}</p>}
               </div>
             </div>
           )}
@@ -1061,7 +1108,14 @@ export default function AdminSettings(): JSX.Element {
             <Button
               onClick={() => {
                 if (!currencyModal) return;
-                if (!currencyModal.code || !currencyModal.nameAr) { showToast('الرمز والاسم مطلوبان', 'error'); return; }
+                const errs: Record<string, string> = {};
+                if (!currencyModal.code.trim()) errs.code = 'الرمز مطلوب';
+                if (!currencyModal.nameAr.trim()) errs.nameAr = 'الاسم بالعربي مطلوب';
+                if (!currencyModal.name.trim()) errs.name = 'Name (EN) is required';
+                if (!currencyModal.symbol.trim()) errs.symbol = 'العلامة مطلوبة';
+                if (!currencyModal.usdRate || currencyModal.usdRate <= 0) errs.usdRate = 'سعر الصرف يجب أن يكون أكبر من 0';
+                setCurrencyErrors(errs);
+                if (Object.keys(errs).length) { showToast('يرجى تعبئة الحقول المطلوبة', 'error'); return; }
                 if (currencyModal.isNew) {
                   if (currencies.some((c) => c.code === currencyModal.code)) { showToast('الرمز موجود مسبقاً', 'error'); return; }
                   addCurrency({ code: currencyModal.code, name: currencyModal.name, nameAr: currencyModal.nameAr, symbol: currencyModal.symbol, usdRate: currencyModal.usdRate });
@@ -1086,18 +1140,20 @@ export default function AdminSettings(): JSX.Element {
           {emailModal && !emailPreview && (
             <div className="space-y-3 overflow-y-auto flex-1 pl-1">
               <div className="space-y-1.5">
-                <Label>اسم القالب</Label>
-                <Input value={emailModal.name} onChange={(e) => setEmailModal({ ...emailModal, name: e.target.value })} placeholder="رسالة الترحيب" />
+                <Label>اسم القالب<span className="text-destructive ms-0.5">*</span></Label>
+                <Input value={emailModal.name} onChange={(e) => { setEmailModal({ ...emailModal, name: e.target.value }); setEmailErrors((p) => ({ ...p, name: '' })); }} placeholder="رسالة الترحيب" />
+                {emailErrors.name && <p className="text-xs text-destructive mt-1">{emailErrors.name}</p>}
               </div>
               <div className="space-y-1.5">
-                <Label>الموضوع (Subject)</Label>
-                <Input value={emailModal.subject} onChange={(e) => setEmailModal({ ...emailModal, subject: e.target.value })} placeholder="مرحباً {{client_name}}" />
+                <Label>الموضوع (Subject)<span className="text-destructive ms-0.5">*</span></Label>
+                <Input value={emailModal.subject} onChange={(e) => { setEmailModal({ ...emailModal, subject: e.target.value }); setEmailErrors((p) => ({ ...p, subject: '' })); }} placeholder="مرحباً {{client_name}}" />
+                {emailErrors.subject && <p className="text-xs text-destructive mt-1">{emailErrors.subject}</p>}
               </div>
               <div className="space-y-1.5">
-                <Label>المشغّل (Trigger)</Label>
+                <Label>المشغّل (Trigger)<span className="text-destructive ms-0.5">*</span></Label>
                 <div className={cn('flex gap-2', emailModal.trigger === 'before_renewal' ? 'items-start' : 'items-center')}>
                   <div className="flex-1">
-                    <Select value={emailModal.trigger} onValueChange={(v) => setEmailModal({ ...emailModal, trigger: v, triggerDays: v === 'before_renewal' ? (emailModal.triggerDays ?? '3') : undefined })}>
+                    <Select value={emailModal.trigger} onValueChange={(v) => { setEmailModal({ ...emailModal, trigger: v, triggerDays: v === 'before_renewal' ? (emailModal.triggerDays ?? '3') : undefined }); setEmailErrors((p) => ({ ...p, trigger: '' })); }}>
                       <SelectTrigger dir="rtl">
                         <SelectValue placeholder="اختر الحدث المشغّل" />
                       </SelectTrigger>
@@ -1129,9 +1185,10 @@ export default function AdminSettings(): JSX.Element {
                     {TRIGGER_EVENTS.find((e) => e.key === emailModal.trigger)?.description}
                   </p>
                 )}
+                {emailErrors.trigger && <p className="text-xs text-destructive mt-1">{emailErrors.trigger}</p>}
               </div>
               <div className="space-y-1.5">
-                <Label>محتوى الرسالة</Label>
+                <Label>محتوى الرسالة<span className="text-destructive ms-0.5">*</span></Label>
                 <div className="flex items-center gap-1 border rounded-t-md px-2 py-1.5 bg-muted/50">
                   <button type="button" className="p-1.5 rounded hover:bg-muted text-xs font-bold" onClick={() => document.execCommand('bold')}>B</button>
                   <button type="button" className="p-1.5 rounded hover:bg-muted text-xs italic" onClick={() => document.execCommand('italic')}>I</button>
@@ -1153,6 +1210,7 @@ export default function AdminSettings(): JSX.Element {
                 <p className="text-[11px] text-muted-foreground">
                   المتغيرات: {'{{client_name}}'}, {'{{product_name}}'}, {'{{amount}}'}, {'{{currency}}'}, {'{{invoice_number}}'}, {'{{plan_name}}'}
                 </p>
+                {emailErrors.body && <p className="text-xs text-destructive mt-1">{emailErrors.body}</p>}
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -1175,16 +1233,20 @@ export default function AdminSettings(): JSX.Element {
                       <div key={idx} className="flex gap-2 items-start p-2.5 border rounded-md bg-muted/30">
                         <div className="flex-1 space-y-2">
                           <div className="flex gap-2">
-                            <Input
-                              value={btn.text}
-                              onChange={(e) => {
-                                const updated = [...emailModal.buttons!];
-                                updated[idx] = { ...btn, text: e.target.value };
-                                setEmailModal({ ...emailModal, buttons: updated });
-                              }}
-                              placeholder="نص الزر"
-                              className="flex-1 h-8 text-sm"
-                            />
+                            <div className="flex-1">
+                              <Input
+                                value={btn.text}
+                                onChange={(e) => {
+                                  const updated = [...emailModal.buttons!];
+                                  updated[idx] = { ...btn, text: e.target.value };
+                                  setEmailModal({ ...emailModal, buttons: updated });
+                                  setEmailErrors((p) => ({ ...p, [`buttonText_${idx}`]: '' }));
+                                }}
+                                placeholder="نص الزر *"
+                                className="h-8 text-sm"
+                              />
+                              {emailErrors[`buttonText_${idx}`] && <p className="text-xs text-destructive mt-0.5">{emailErrors[`buttonText_${idx}`]}</p>}
+                            </div>
                             <Select
                               value={btn.variant}
                               onValueChange={(v) => {
@@ -1282,7 +1344,20 @@ export default function AdminSettings(): JSX.Element {
                 </Button>
                 <Button onClick={() => {
                   if (!emailModal) return;
-                  if (!emailModal.name) { showToast('اسم القالب مطلوب', 'error'); return; }
+                  const errs: Record<string, string> = {};
+                  if (!emailModal.name.trim()) errs.name = 'اسم القالب مطلوب';
+                  if (!emailModal.subject.trim()) errs.subject = 'الموضوع مطلوب';
+                  if (!emailModal.trigger) errs.trigger = 'المشغّل مطلوب';
+                  if (emailModal.trigger === 'before_renewal' && !emailModal.triggerDays?.trim()) errs.triggerDays = 'عدد الأيام مطلوب';
+                  const bodyText = emailModal.body.replace(/<[^>]*>/g, '').trim();
+                  if (!bodyText) errs.body = 'المحتوى مطلوب';
+                  if (emailModal.buttons?.length) {
+                    emailModal.buttons.forEach((btn, i) => {
+                      if (!btn.text.trim()) errs[`buttonText_${i}`] = 'نص الزر مطلوب';
+                    });
+                  }
+                  setEmailErrors(errs);
+                  if (Object.keys(errs).length) { showToast('يرجى تعبئة الحقول المطلوبة', 'error'); return; }
                   const tpl: EmailTemplate = { id: emailModal.id, name: emailModal.name, subject: emailModal.subject, body: emailModal.body, trigger: emailModal.trigger, triggerDays: emailModal.triggerDays, buttons: emailModal.buttons?.length ? emailModal.buttons : undefined };
                   if (emailModal.isNew) {
                     setEmailTemplates((prev) => [...prev, tpl]);
@@ -1367,12 +1442,14 @@ export default function AdminSettings(): JSX.Element {
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label>عنوان الصفحة</Label>
-                  <Input value={pageModal.title} onChange={(e) => setPageModal({ ...pageModal, title: e.target.value })} placeholder="شروط الاستخدام" />
+                  <Label>عنوان الصفحة<span className="text-destructive ms-0.5">*</span></Label>
+                  <Input value={pageModal.title} onChange={(e) => { setPageModal({ ...pageModal, title: e.target.value }); setPageErrors((p) => ({ ...p, title: '' })); }} placeholder="شروط الاستخدام" />
+                  {pageErrors.title && <p className="text-xs text-destructive mt-1">{pageErrors.title}</p>}
                 </div>
                 <div className="space-y-1.5">
-                  <Label>الرابط (Slug)</Label>
-                  <Input value={pageModal.slug} onChange={(e) => setPageModal({ ...pageModal, slug: e.target.value })} placeholder="terms" dir="ltr" />
+                  <Label>الرابط (Slug)<span className="text-destructive ms-0.5">*</span></Label>
+                  <Input value={pageModal.slug} onChange={(e) => { setPageModal({ ...pageModal, slug: e.target.value }); setPageErrors((p) => ({ ...p, slug: '' })); }} placeholder="terms" dir="ltr" />
+                  {pageErrors.slug && <p className="text-xs text-destructive mt-1">{pageErrors.slug}</p>}
                 </div>
               </div>
               <div className="flex items-center justify-between">
@@ -1383,7 +1460,7 @@ export default function AdminSettings(): JSX.Element {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label>المحتوى</Label>
+                <Label>المحتوى<span className="text-destructive ms-0.5">*</span></Label>
                 <div className="flex items-center gap-1 border rounded-t-md px-2 py-1.5 bg-muted/50">
                   <button type="button" className="p-1.5 rounded hover:bg-muted text-xs font-bold" onClick={() => document.execCommand('bold')}>B</button>
                   <button type="button" className="p-1.5 rounded hover:bg-muted text-xs italic" onClick={() => document.execCommand('italic')}>I</button>
@@ -1402,6 +1479,7 @@ export default function AdminSettings(): JSX.Element {
                   dangerouslySetInnerHTML={{ __html: pageModal.content }}
                   onBlur={(e) => setPageModal({ ...pageModal, content: e.currentTarget.innerHTML })}
                 />
+                {pageErrors.content && <p className="text-xs text-destructive mt-1">{pageErrors.content}</p>}
               </div>
             </div>
           )}
@@ -1409,7 +1487,14 @@ export default function AdminSettings(): JSX.Element {
             <Button variant="outline" onClick={() => setPageModal(null)}>إلغاء</Button>
             <Button onClick={() => {
               if (!pageModal) return;
-              if (!pageModal.title || !pageModal.slug) { showToast('العنوان والرابط مطلوبان', 'error'); return; }
+              const errs: Record<string, string> = {};
+              if (!pageModal.title.trim()) errs.title = 'عنوان الصفحة مطلوب';
+              if (!pageModal.slug.trim()) errs.slug = 'الرابط مطلوب';
+              else if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(pageModal.slug)) errs.slug = 'الرابط يجب أن يحتوي على أحرف إنجليزية صغيرة وأرقام وشرطات فقط';
+              const contentText = pageModal.content.replace(/<[^>]*>/g, '').trim();
+              if (!contentText) errs.content = 'المحتوى مطلوب';
+              setPageErrors(errs);
+              if (Object.keys(errs).length) { showToast('يرجى تعبئة الحقول المطلوبة', 'error'); return; }
               if (pageModal.isNew) {
                 setPages((prev) => [...prev, { id: pageModal.id, title: pageModal.title, slug: pageModal.slug, content: pageModal.content, status: pageModal.status }]);
                 showToast('تمت الإضافة', 'success');
@@ -1433,18 +1518,20 @@ export default function AdminSettings(): JSX.Element {
             <div className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label>اسم البوابة *</Label>
-                  <Input value={gatewayModal.name} onChange={(e) => setGatewayModal({ ...gatewayModal, name: e.target.value })} placeholder="بايموب" />
+                  <Label>اسم البوابة<span className="text-destructive ms-0.5">*</span></Label>
+                  <Input value={gatewayModal.name} onChange={(e) => { setGatewayModal({ ...gatewayModal, name: e.target.value }); setGatewayErrors((p) => ({ ...p, name: '' })); }} placeholder="بايموب" />
+                  {gatewayErrors.name && <p className="text-xs text-destructive mt-1">{gatewayErrors.name}</p>}
                 </div>
                 <div className="space-y-1.5">
-                  <Label>رمز البوابة (Slug) *</Label>
-                  <Input value={gatewayModal.slug} onChange={(e) => setGatewayModal({ ...gatewayModal, slug: e.target.value })} placeholder="paymob" dir="ltr" />
+                  <Label>رمز البوابة (Slug)<span className="text-destructive ms-0.5">*</span></Label>
+                  <Input value={gatewayModal.slug} onChange={(e) => { setGatewayModal({ ...gatewayModal, slug: e.target.value }); setGatewayErrors((p) => ({ ...p, slug: '' })); }} placeholder="paymob" dir="ltr" />
+                  {gatewayErrors.slug && <p className="text-xs text-destructive mt-1">{gatewayErrors.slug}</p>}
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label>البيئة *</Label>
+                  <Label>البيئة</Label>
                   <Select value={gatewayModal.environment} onValueChange={(v) => setGatewayModal({ ...gatewayModal, environment: v as 'sandbox' | 'production' })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -1466,16 +1553,17 @@ export default function AdminSettings(): JSX.Element {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label>Public Key</Label>
-                  <Input value={gatewayModal.publicKey} onChange={(e) => setGatewayModal({ ...gatewayModal, publicKey: e.target.value })} dir="ltr" className="font-mono text-xs" />
+                  <Label>Public Key<span className="text-destructive ms-0.5">*</span></Label>
+                  <Input value={gatewayModal.publicKey} onChange={(e) => { setGatewayModal({ ...gatewayModal, publicKey: e.target.value }); setGatewayErrors((p) => ({ ...p, publicKey: '' })); }} dir="ltr" className="font-mono text-xs" />
+                  {gatewayErrors.publicKey && <p className="text-xs text-destructive mt-1">{gatewayErrors.publicKey}</p>}
                 </div>
                 <div className="space-y-1.5">
-                  <Label>Secret Key</Label>
+                  <Label>Secret Key<span className="text-destructive ms-0.5">*</span></Label>
                   <div className="flex items-center gap-1">
                     <Input
                       type={showSecretKey ? 'text' : 'password'}
                       value={gatewayModal.secretKey}
-                      onChange={(e) => setGatewayModal({ ...gatewayModal, secretKey: e.target.value })}
+                      onChange={(e) => { setGatewayModal({ ...gatewayModal, secretKey: e.target.value }); setGatewayErrors((p) => ({ ...p, secretKey: '' })); }}
                       dir="ltr"
                       className="font-mono text-xs flex-1"
                     />
@@ -1483,6 +1571,7 @@ export default function AdminSettings(): JSX.Element {
                       {showSecretKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </Button>
                   </div>
+                  {gatewayErrors.secretKey && <p className="text-xs text-destructive mt-1">{gatewayErrors.secretKey}</p>}
                 </div>
               </div>
 
@@ -1553,7 +1642,13 @@ export default function AdminSettings(): JSX.Element {
             <Button variant="outline" onClick={() => setGatewayModal(null)}>إلغاء</Button>
             <Button onClick={() => {
               if (!gatewayModal) return;
-              if (!gatewayModal.name || !gatewayModal.slug) { showToast('الاسم والرمز مطلوبان', 'error'); return; }
+              const errs: Record<string, string> = {};
+              if (!gatewayModal.name.trim()) errs.name = 'اسم البوابة مطلوب';
+              if (!gatewayModal.slug.trim()) errs.slug = 'رمز البوابة مطلوب';
+              if (!gatewayModal.publicKey.trim()) errs.publicKey = 'Public Key مطلوب';
+              if (!gatewayModal.secretKey.trim()) errs.secretKey = 'Secret Key مطلوب';
+              setGatewayErrors(errs);
+              if (Object.keys(errs).length) { showToast('يرجى تعبئة الحقول المطلوبة', 'error'); return; }
               const { isNew, ...data } = gatewayModal;
               if (isNew) {
                 setGateways((prev) => [...prev, data]);

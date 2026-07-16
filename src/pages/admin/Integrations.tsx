@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useConfirm } from '@components/ui';
 import { useAdminStore } from '@/store/useAdminStore';
+import { useUIStore } from '@/store/useUIStore';
 import { cn } from '@/lib/utils';
 
 import { Button } from '@/components/ui/button';
@@ -234,6 +235,8 @@ export default function Integrations() {
   const [form, setForm] = useState<Omit<Platform, 'id'>>(emptyForm);
   const { confirm } = useConfirm();
   const countries = useAdminStore((s) => s.countries);
+  const showToast = useUIStore((s) => s.showToast);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const filtered = useMemo(() => {
     let list = platforms;
@@ -255,6 +258,7 @@ export default function Integrations() {
   function openAdd() {
     setEditingId(null);
     setForm(emptyForm);
+    setErrors({});
     setModalOpen(true);
   }
 
@@ -269,11 +273,19 @@ export default function Integrations() {
       countries: [...p.countries],
       connectionMethods: p.connectionMethods.map((m) => ({ ...m, steps: [...m.steps] })),
     });
+    setErrors({});
     setModalOpen(true);
   }
 
   function submit() {
-    if (!form.name.trim() || !form.slug.trim()) return;
+    const newErrors: Record<string, string> = {};
+    if (!form.name.trim()) newErrors.name = 'اسم المنصة مطلوب';
+    if (!form.slug.trim()) newErrors.slug = 'كود المنصة مطلوب';
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      showToast('يرجى تعبئة الحقول المطلوبة', 'error');
+      return;
+    }
     if (editingId) {
       setPlatforms((prev) => prev.map((p) => (p.id === editingId ? { ...p, ...form } : p)));
     } else {
@@ -518,12 +530,13 @@ export default function Integrations() {
           <div className="space-y-4 py-2">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>الاسم <span className="text-destructive">*</span></Label>
-                <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="الاسم" />
+                <Label>الاسم <span className="text-destructive ms-0.5">*</span></Label>
+                <Input value={form.name} onChange={(e) => { setForm({ ...form, name: e.target.value }); setErrors((prev) => { const { name, ...rest } = prev; return rest; }); }} placeholder="الاسم" />
+                {errors.name && <p className="text-xs text-destructive mt-1">{errors.name}</p>}
               </div>
               <div className="space-y-2">
-                <Label>كود</Label>
-                <Select value={form.slug || undefined} onValueChange={(v) => setForm({ ...form, slug: v })}>
+                <Label>كود <span className="text-destructive ms-0.5">*</span></Label>
+                <Select value={form.slug || undefined} onValueChange={(v) => { setForm({ ...form, slug: v }); setErrors((prev) => { const { slug, ...rest } = prev; return rest; }); }}>
                   <SelectTrigger dir="ltr">
                     <SelectValue placeholder="اختر الكود..." />
                   </SelectTrigger>
@@ -533,11 +546,12 @@ export default function Integrations() {
                     ))}
                   </SelectContent>
                 </Select>
+                {errors.slug && <p className="text-xs text-destructive mt-1">{errors.slug}</p>}
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label>النوع <span className="text-destructive">*</span></Label>
+              <Label>النوع <span className="text-destructive ms-0.5">*</span></Label>
               <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v as PlatformCategory })}>
                 <SelectTrigger>
                   <SelectValue />
@@ -556,7 +570,7 @@ export default function Integrations() {
             </div>
 
             <div className="space-y-2">
-              <Label>الشعار <span className="text-destructive">*</span></Label>
+              <Label>الشعار <span className="text-destructive ms-0.5">*</span></Label>
               <Input
                 type="file"
                 accept="image/*"
@@ -705,7 +719,7 @@ export default function Integrations() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setModalOpen(false)}>إلغاء</Button>
-            <Button onClick={submit} disabled={!form.name.trim()}>
+            <Button onClick={submit}>
               {editingId ? 'حفظ التغييرات' : 'إضافة المنصة'}
             </Button>
           </DialogFooter>

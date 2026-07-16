@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Plus, Edit2, Trash2, Briefcase, ArrowRight } from 'lucide-react';
 import { useAdminStore } from '@/store/useAdminStore';
+import { useUIStore } from '@/store/useUIStore';
 import { useConfirm } from '@components/ui';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,6 +31,7 @@ export default function Industries({ onBack }: { onBack?: () => void }): JSX.Ele
   const updateIndustry = useAdminStore((s) => s.updateIndustry);
   const deleteIndustry = useAdminStore((s) => s.deleteIndustry);
   const { confirm } = useConfirm();
+  const showToast = useUIStore((s) => s.showToast);
 
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
@@ -52,7 +54,7 @@ export default function Industries({ onBack }: { onBack?: () => void }): JSX.Ele
 
   const handleSave = () => {
     const trimmed = name.trim();
-    if (!trimmed) { setError('الاسم مطلوب'); return; }
+    if (!trimmed) { setError('الاسم مطلوب'); showToast('يرجى تعبئة الحقول المطلوبة', 'error'); return; }
     const duplicate = industries.some((i) => i.name === trimmed && i.id !== editId);
     if (duplicate) { setError('مجال العمل موجود مسبقاً'); return; }
 
@@ -161,7 +163,7 @@ export default function Industries({ onBack }: { onBack?: () => void }): JSX.Ele
           </DialogHeader>
           <div className="space-y-3 py-2">
             <div className="space-y-2">
-              <Label htmlFor="ind-name">اسم المجال</Label>
+              <Label htmlFor="ind-name">اسم المجال<span className="text-destructive ms-0.5">*</span></Label>
               <Input
                 id="ind-name"
                 value={name}

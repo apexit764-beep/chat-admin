@@ -206,8 +206,9 @@ export default function AdminClients(): JSX.Element {
     if (!form.contactName.trim()) e.contactName = 'الاسم مطلوب';
     if (!form.country) e.country = 'الدولة مطلوبة';
     if (!form.password.trim()) e.password = 'كلمة المرور مطلوبة';
+    else if (form.password.trim().length < 6) e.password = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
     setErrors(e);
-    if (Object.keys(e).length > 0) return;
+    if (Object.keys(e).length > 0) { showToast('يرجى تعبئة الحقول المطلوبة', 'error'); return; }
 
     const country = countries.find((c) => c.code === form.country);
     if (!country) return;
@@ -546,7 +547,7 @@ export default function AdminClients(): JSX.Element {
             {/* معلومات الشركة */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="companyName">اسم الشركة</Label>
+                <Label htmlFor="companyName">اسم الشركة<span className="text-destructive ms-0.5">*</span></Label>
                 <Input
                   id="companyName"
                   value={form.companyName}
@@ -556,7 +557,7 @@ export default function AdminClients(): JSX.Element {
                 {errors.companyName && <p className="text-sm text-destructive">{errors.companyName}</p>}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="contactName">اسم المدير</Label>
+                <Label htmlFor="contactName">اسم المدير<span className="text-destructive ms-0.5">*</span></Label>
                 <Input
                   id="contactName"
                   value={form.contactName}
@@ -566,7 +567,7 @@ export default function AdminClients(): JSX.Element {
                 {errors.contactName && <p className="text-sm text-destructive">{errors.contactName}</p>}
               </div>
               <div className="space-y-2">
-                <Label>الدولة</Label>
+                <Label>الدولة<span className="text-destructive ms-0.5">*</span></Label>
                 <Select value={form.country} onValueChange={(v) => {
                   const dc = countries.find((c) => c.code === v)?.dialCode || form.phoneCode;
                   setForm({ ...form, country: v, phoneCode: dc }); setErrors({ ...errors, country: undefined });
@@ -583,7 +584,7 @@ export default function AdminClients(): JSX.Element {
                 {errors.country && <p className="text-sm text-destructive">{errors.country}</p>}
               </div>
               <div className="space-y-2">
-                <Label>مجال العمل</Label>
+                <Label>مجال العمل<span className="text-muted-foreground text-[10px] ms-1">(اختياري)</span></Label>
                 <Select value={form.industry} onValueChange={(v) => { setForm({ ...form, industry: v }); setErrors({ ...errors, industry: undefined }); }}>
                   <SelectTrigger>
                     <SelectValue placeholder="اختر مجال العمل" />
@@ -606,7 +607,7 @@ export default function AdminClients(): JSX.Element {
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email">البريد الإلكتروني</Label>
+                  <Label htmlFor="email">البريد الإلكتروني<span className="text-destructive ms-0.5">*</span></Label>
                   <div className="relative">
                     <Mail className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -621,7 +622,7 @@ export default function AdminClients(): JSX.Element {
                   {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="phone">رقم الهاتف</Label>
+                  <Label htmlFor="phone">رقم الهاتف<span className="text-destructive ms-0.5">*</span></Label>
                   <div className="flex gap-0 border rounded-md overflow-hidden focus-within:ring-2 focus-within:ring-ring" dir="ltr">
                     <Select value={form.phoneCode} onValueChange={(v) => setForm({ ...form, phoneCode: v })}>
                       <SelectTrigger className="w-[110px] shrink-0 border-0 rounded-none border-e shadow-none focus:ring-0">
@@ -647,7 +648,7 @@ export default function AdminClients(): JSX.Element {
                   {errors.phone && <p className="text-sm text-destructive">{errors.phone}</p>}
                 </div>
                 <div className="space-y-2 sm:col-span-2">
-                  <Label htmlFor="password">كلمة المرور</Label>
+                  <Label htmlFor="password">كلمة المرور<span className="text-destructive ms-0.5">*</span></Label>
                   <div className="flex gap-2">
                     <div className="relative flex-1">
                       <Lock className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />

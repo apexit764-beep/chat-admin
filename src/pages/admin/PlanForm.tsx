@@ -170,13 +170,17 @@ export default function PlanForm(): JSX.Element {
       ...form,
       pricesPerCountry: { ...form.pricesPerCountry, [countryCode]: { monthly, yearly: autoYearly } },
     });
+    if (errors.prices) setErrors((prev) => { const { prices, ...rest } = prev; return rest; });
   };
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const toggleFeature = (feature: string): void => {
     const s = new Set(form.features);
     if (s.has(feature)) s.delete(feature);
     else s.add(feature);
     setForm({ ...form, features: Array.from(s) });
+    if (errors.features) setErrors((prev) => { const { features, ...rest } = prev; return rest; });
   };
 
   interface ChangeImpact {
@@ -313,12 +317,27 @@ export default function PlanForm(): JSX.Element {
   };
 
   const submit = (): void => {
-    if (!form.name.trim() || !form.nameAr.trim()) {
-      showToast('الاسم بالعربية والإنجليزية مطلوبان', 'error');
-      return;
+    const newErrors: Record<string, string> = {};
+
+    if (!form.nameAr.trim()) {
+      newErrors.nameAr = 'الاسم بالعربية مطلوب';
+    }
+    if (!form.name.trim()) {
+      newErrors.name = 'الاسم بالإنجليزية مطلوب';
     }
     if (form.features.length === 0) {
-      showToast('اختر ميزة واحدة على الأقل', 'error');
+      newErrors.features = 'يجب اختيار ميزة واحدة على الأقل';
+    }
+    if (!form.isTrial) {
+      const hasPrice = Object.values(form.pricesPerCountry).some((p) => p.monthly > 0);
+      if (!hasPrice) {
+        newErrors.prices = 'يجب إدخال سعر شهري لدولة واحدة على الأقل';
+      }
+    }
+
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) {
+      showToast('يرجى تعبئة الحقول المطلوبة', 'error');
       return;
     }
 
@@ -362,12 +381,14 @@ export default function PlanForm(): JSX.Element {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <Label>الاسم بالعربية</Label>
-                  <Input value={form.nameAr} onChange={(e) => setForm({ ...form, nameAr: e.target.value })} placeholder="مثال: الاحترافي" />
+                  <Label>الاسم بالعربية<span className="text-destructive ms-0.5">*</span></Label>
+                  <Input value={form.nameAr} onChange={(e) => { setForm({ ...form, nameAr: e.target.value }); if (errors.nameAr) setErrors((prev) => { const { nameAr, ...rest } = prev; return rest; }); }} placeholder="مثال: الاحترافي" />
+                  {errors.nameAr && <p className="text-xs text-destructive mt-1">{errors.nameAr}</p>}
                 </div>
                 <div className="space-y-2">
-                  <Label>Name (EN)</Label>
-                  <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Pro" />
+                  <Label>Name (EN)<span className="text-destructive ms-0.5">*</span></Label>
+                  <Input value={form.name} onChange={(e) => { setForm({ ...form, name: e.target.value }); if (errors.name) setErrors((prev) => { const { name, ...rest } = prev; return rest; }); }} placeholder="Pro" />
+                  {errors.name && <p className="text-xs text-destructive mt-1">{errors.name}</p>}
                 </div>
               </div>
               <div className="space-y-2">
@@ -426,6 +447,7 @@ export default function PlanForm(): JSX.Element {
             <Card>
               <CardHeader>
                 <h3 className="text-lg font-semibold">الأسعار حسب الدولة</h3>
+                {errors.prices && <p className="text-xs text-destructive mt-1">{errors.prices}</p>}
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
@@ -496,9 +518,10 @@ export default function PlanForm(): JSX.Element {
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold">الميزات</h3>
+                  <h3 className="text-lg font-semibold">الميزات<span className="text-destructive ms-0.5">*</span></h3>
                   <span className="text-xs text-muted-foreground">{form.features.length} ميزة مفعّلة</span>
                 </div>
+                {errors.features && <p className="text-xs text-destructive mt-1">{errors.features}</p>}
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
