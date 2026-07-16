@@ -11,7 +11,7 @@ import {
   PieChart,
   Activity,
 } from 'lucide-react';
-import { subDays } from 'date-fns';
+import { startOfMonth, endOfMonth } from 'date-fns';
 import { StatCard } from '@components/ui';
 import { LineChart } from '@components/charts/LineChart';
 import { DoughnutChart } from '@components/charts/DoughnutChart';
@@ -46,8 +46,8 @@ export default function AdminReports(): JSX.Element {
   const showToast = useUIStore((s) => s.showToast);
 
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date } | undefined>({
-    from: subDays(new Date(), 6),
-    to: new Date(),
+    from: startOfMonth(new Date()),
+    to: endOfMonth(new Date()),
   });
 
   // Date-filtered data for KPIs and charts

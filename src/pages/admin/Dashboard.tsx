@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { subDays } from 'date-fns';
+import { startOfMonth, endOfMonth } from 'date-fns';
 import {
   DollarSign,
   TrendingUp,
@@ -42,8 +42,8 @@ export default function AdminDashboard(): JSX.Element {
   const countries = useAdminStore((s) => s.countries);
 
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
-    from: subDays(new Date(), 29),
-    to: new Date(),
+    from: startOfMonth(new Date()),
+    to: endOfMonth(new Date()),
   });
 
   const clients = useMemo(() => {

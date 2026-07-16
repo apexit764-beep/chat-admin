@@ -19,7 +19,7 @@ import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
 import { formatMoney, approxUSD } from '@/utils/money';
 import { formatDate, initials, avatarColor } from '@/utils/format';
-import { subDays } from 'date-fns';
+import { startOfMonth, endOfMonth } from 'date-fns';
 import { cn } from '@/lib/utils';
 import type { SubscriptionStatus } from '@/types';
 
@@ -100,8 +100,8 @@ export default function AdminSubscriptions(): JSX.Element {
   const [statusFilter, setStatusFilter] = useState<SubscriptionStatus | 'all'>('all');
   const [planFilter, setPlanFilter] = useState<string>('all');
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date } | undefined>({
-    from: subDays(new Date(), 29),
-    to: new Date(),
+    from: startOfMonth(new Date()),
+    to: endOfMonth(new Date()),
   });
 
   const clientOf = (id: string) => clients.find((c) => c.id === id);

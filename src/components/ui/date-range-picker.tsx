@@ -78,7 +78,7 @@ interface DateRangePickerProps {
 
 export function DateRangePicker({ value, onChange, className }: DateRangePickerProps) {
   const [open, setOpen] = useState(false);
-  const [activePreset, setActivePreset] = useState<string>('آخر 7 أيام');
+  const [activePreset, setActivePreset] = useState<string>('هذا الشهر');
 
   const handlePreset = (preset: Preset) => {
     setActivePreset(preset.label);

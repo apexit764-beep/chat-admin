@@ -15,7 +15,7 @@ import {
   XCircle,
   Filter,
 } from 'lucide-react';
-import { subDays } from 'date-fns';
+import { startOfMonth, endOfMonth } from 'date-fns';
 import { useAdminStore } from '@/store/useAdminStore';
 import { timeAgo } from '@/utils/format';
 import { cn } from '@/lib/utils';
@@ -75,8 +75,8 @@ export default function AdminActivityLog(): JSX.Element {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<ActionFilter>('all');
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date } | undefined>({
-    from: subDays(new Date(), 29),
-    to: new Date(),
+    from: startOfMonth(new Date()),
+    to: endOfMonth(new Date()),
   });
 
   const filtered = useMemo(() => {
