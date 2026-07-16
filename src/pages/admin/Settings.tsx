@@ -19,6 +19,8 @@ import {
   Camera,
   Save,
   Pencil,
+  Link,
+  X,
 } from 'lucide-react';
 import { useConfirm } from '@components/ui';
 import { useAdminStore } from '@/store/useAdminStore';
@@ -130,7 +132,8 @@ export default function AdminSettings(): JSX.Element {
   const [emailOtp, setEmailOtp] = useState(['', '', '', '', '', '']);
   const [phoneOtp, setPhoneOtp] = useState(['', '', '', '', '', '']);
   // Email templates CRUD
-  type EmailTemplate = { id: string; name: string; subject: string; body: string; trigger: string; triggerDays?: string };
+  type EmailButton = { text: string; url: string; variant: 'primary' | 'outline' | 'link' };
+  type EmailTemplate = { id: string; name: string; subject: string; body: string; trigger: string; triggerDays?: string; buttons?: EmailButton[] };
   const [emailTemplates, setEmailTemplates] = useState<EmailTemplate[]>([
     { id: '1', name: 'رسالة الترحيب', subject: 'مرحباً بك في {{product_name}}', body: 'مرحباً {{client_name}}!\n\nشكراً لتسجيلك في {{product_name}}. حسابك جاهز للاستخدام.\n\nفريق الدعم', trigger: 'on_client_registered' },
     { id: '2', name: 'إشعار فاتورة', subject: 'فاتورة جديدة #{{invoice_number}}', body: 'مرحباً {{client_name}},\n\nتم إصدار فاتورة جديدة بمبلغ {{amount}} {{currency}}.\nرقم الفاتورة: {{invoice_number}}\n\nشكراً لثقتكم.', trigger: 'on_invoice_created' },
@@ -1055,6 +1058,102 @@ export default function AdminSettings(): JSX.Element {
                   المتغيرات: {'{{client_name}}'}, {'{{product_name}}'}, {'{{amount}}'}, {'{{currency}}'}, {'{{invoice_number}}'}, {'{{plan_name}}'}
                 </p>
               </div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label>الأزرار</Label>
+                  {(!emailModal.buttons || emailModal.buttons.length < 3) && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-7 text-xs gap-1"
+                      onClick={() => setEmailModal({ ...emailModal, buttons: [...(emailModal.buttons || []), { text: '', url: '', variant: 'primary' }] })}
+                    >
+                      <Plus className="h-3 w-3" /> إضافة زر
+                    </Button>
+                  )}
+                </div>
+                {emailModal.buttons && emailModal.buttons.length > 0 ? (
+                  <div className="space-y-2">
+                    {emailModal.buttons.map((btn, idx) => (
+                      <div key={idx} className="flex gap-2 items-start p-2.5 border rounded-md bg-muted/30">
+                        <div className="flex-1 space-y-2">
+                          <div className="flex gap-2">
+                            <Input
+                              value={btn.text}
+                              onChange={(e) => {
+                                const updated = [...emailModal.buttons!];
+                                updated[idx] = { ...btn, text: e.target.value };
+                                setEmailModal({ ...emailModal, buttons: updated });
+                              }}
+                              placeholder="نص الزر"
+                              className="flex-1 h-8 text-sm"
+                            />
+                            <Select
+                              value={btn.variant}
+                              onValueChange={(v) => {
+                                const updated = [...emailModal.buttons!];
+                                updated[idx] = { ...btn, variant: v as EmailButton['variant'] };
+                                setEmailModal({ ...emailModal, buttons: updated });
+                              }}
+                            >
+                              <SelectTrigger className="w-28 h-8 text-sm">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="primary">أساسي</SelectItem>
+                                <SelectItem value="outline">ثانوي</SelectItem>
+                                <SelectItem value="link">رابط</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <Link className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                            <Input
+                              value={btn.url}
+                              onChange={(e) => {
+                                const updated = [...emailModal.buttons!];
+                                updated[idx] = { ...btn, url: e.target.value };
+                                setEmailModal({ ...emailModal, buttons: updated });
+                              }}
+                              placeholder="https://example.com"
+                              dir="ltr"
+                              className="flex-1 h-8 text-sm"
+                            />
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          className="p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive mt-1"
+                          onClick={() => {
+                            const updated = emailModal.buttons!.filter((_, i) => i !== idx);
+                            setEmailModal({ ...emailModal, buttons: updated });
+                          }}
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ))}
+                    <div className="flex gap-2 justify-center pt-1">
+                      {emailModal.buttons.map((btn, idx) => (
+                        <span
+                          key={idx}
+                          className={cn(
+                            'inline-block px-4 py-1.5 rounded text-xs font-medium',
+                            btn.variant === 'primary' && 'bg-primary text-primary-foreground',
+                            btn.variant === 'outline' && 'border border-primary text-primary bg-transparent',
+                            btn.variant === 'link' && 'text-primary underline bg-transparent',
+                          )}
+                        >
+                          {btn.text || 'زر'}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-[11px] text-muted-foreground">لم تتم إضافة أزرار بعد (بحد أقصى 3 أزرار)</p>
+                )}
+              </div>
             </div>
           )}
           <DialogFooter>
@@ -1062,7 +1161,7 @@ export default function AdminSettings(): JSX.Element {
             <Button onClick={() => {
               if (!emailModal) return;
               if (!emailModal.name) { showToast('اسم القالب مطلوب', 'error'); return; }
-              const tpl: EmailTemplate = { id: emailModal.id, name: emailModal.name, subject: emailModal.subject, body: emailModal.body, trigger: emailModal.trigger, triggerDays: emailModal.triggerDays };
+              const tpl: EmailTemplate = { id: emailModal.id, name: emailModal.name, subject: emailModal.subject, body: emailModal.body, trigger: emailModal.trigger, triggerDays: emailModal.triggerDays, buttons: emailModal.buttons?.length ? emailModal.buttons : undefined };
               if (emailModal.isNew) {
                 setEmailTemplates((prev) => [...prev, tpl]);
                 showToast('تمت الإضافة', 'success');
