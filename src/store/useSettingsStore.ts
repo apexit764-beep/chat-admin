@@ -29,6 +29,7 @@ export interface CompanyInfo {
   nameEn: string;
   tagline: string;
   logoUrl: string;
+  iconUrl: string;
   email: string;
   phone: string;
   whatsapp: string;
@@ -164,6 +165,7 @@ const defaultState: Persisted = {
     nameEn: 'Apex Solutions',
     tagline: 'منصة CRM متكاملة للشركات',
     logoUrl: '',
+    iconUrl: '',
     email: 'info@apexes.click',
     phone: '+96891234567',
     whatsapp: '+96891234567',

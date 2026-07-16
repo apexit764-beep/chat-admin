@@ -402,47 +402,93 @@ export default function AdminSettings(): JSX.Element {
                     <Input value={company.nameEn} onChange={(e) => setCompany({ nameEn: e.target.value })} />
                   </div>
                 </div>
-                <div className="space-y-2 mt-4">
-                  <Label>شعار الشركة</Label>
-                  <div className="flex items-center gap-4">
-                    <div className="h-20 w-20 rounded-lg border-2 border-dashed flex items-center justify-center overflow-hidden bg-muted/30 shrink-0">
-                      {company.logoUrl ? (
-                        <img src={company.logoUrl} alt="logo" className="h-full w-full object-contain" />
-                      ) : (
-                        <Camera className="h-6 w-6 text-muted-foreground" />
-                      )}
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex gap-2">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          className="text-xs"
-                          onClick={() => {
-                            const input = document.createElement('input');
-                            input.type = 'file';
-                            input.accept = 'image/*';
-                            input.onchange = (e) => {
-                              const file = (e.target as HTMLInputElement).files?.[0];
-                              if (!file) return;
-                              if (file.size > 2 * 1024 * 1024) { showToast('حجم الملف يجب أن لا يتجاوز 2MB', 'error'); return; }
-                              const reader = new FileReader();
-                              reader.onload = () => setCompany({ logoUrl: reader.result as string });
-                              reader.readAsDataURL(file);
-                            };
-                            input.click();
-                          }}
-                        >
-                          <Camera className="h-3.5 w-3.5 ml-1" /> رفع شعار
-                        </Button>
-                        {company.logoUrl && (
-                          <Button type="button" variant="ghost" size="sm" className="text-xs text-destructive hover:text-destructive" onClick={() => setCompany({ logoUrl: '' })}>
-                            <Trash2 className="h-3.5 w-3.5 ml-1" /> حذف
-                          </Button>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                  <div className="space-y-2">
+                    <Label>الشعار الكامل</Label>
+                    <div className="flex items-center gap-3">
+                      <div className="h-20 w-28 rounded-lg border-2 border-dashed flex items-center justify-center overflow-hidden bg-muted/30 shrink-0">
+                        {company.logoUrl ? (
+                          <img src={company.logoUrl} alt="logo" className="h-full w-full object-contain" />
+                        ) : (
+                          <Camera className="h-6 w-6 text-muted-foreground" />
                         )}
                       </div>
-                      <p className="text-[11px] text-muted-foreground">PNG, JPG أو SVG — بحد أقصى 2MB</p>
+                      <div className="space-y-2">
+                        <div className="flex gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="text-xs"
+                            onClick={() => {
+                              const input = document.createElement('input');
+                              input.type = 'file';
+                              input.accept = 'image/*';
+                              input.onchange = (e) => {
+                                const file = (e.target as HTMLInputElement).files?.[0];
+                                if (!file) return;
+                                if (file.size > 2 * 1024 * 1024) { showToast('حجم الملف يجب أن لا يتجاوز 2MB', 'error'); return; }
+                                const reader = new FileReader();
+                                reader.onload = () => setCompany({ logoUrl: reader.result as string });
+                                reader.readAsDataURL(file);
+                              };
+                              input.click();
+                            }}
+                          >
+                            <Camera className="h-3.5 w-3.5 ml-1" /> رفع
+                          </Button>
+                          {company.logoUrl && (
+                            <Button type="button" variant="ghost" size="sm" className="text-xs text-destructive hover:text-destructive" onClick={() => setCompany({ logoUrl: '' })}>
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          )}
+                        </div>
+                        <p className="text-[11px] text-muted-foreground">PNG, JPG, SVG — 2MB</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>الأيقونة</Label>
+                    <div className="flex items-center gap-3">
+                      <div className="h-20 w-20 rounded-lg border-2 border-dashed flex items-center justify-center overflow-hidden bg-muted/30 shrink-0">
+                        {company.iconUrl ? (
+                          <img src={company.iconUrl} alt="icon" className="h-full w-full object-contain" />
+                        ) : (
+                          <Camera className="h-6 w-6 text-muted-foreground" />
+                        )}
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="text-xs"
+                            onClick={() => {
+                              const input = document.createElement('input');
+                              input.type = 'file';
+                              input.accept = 'image/*';
+                              input.onchange = (e) => {
+                                const file = (e.target as HTMLInputElement).files?.[0];
+                                if (!file) return;
+                                if (file.size > 2 * 1024 * 1024) { showToast('حجم الملف يجب أن لا يتجاوز 2MB', 'error'); return; }
+                                const reader = new FileReader();
+                                reader.onload = () => setCompany({ iconUrl: reader.result as string });
+                                reader.readAsDataURL(file);
+                              };
+                              input.click();
+                            }}
+                          >
+                            <Camera className="h-3.5 w-3.5 ml-1" /> رفع
+                          </Button>
+                          {company.iconUrl && (
+                            <Button type="button" variant="ghost" size="sm" className="text-xs text-destructive hover:text-destructive" onClick={() => setCompany({ iconUrl: '' })}>
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          )}
+                        </div>
+                        <p className="text-[11px] text-muted-foreground">مربعة، PNG أو SVG — 2MB</p>
+                      </div>
                     </div>
                   </div>
                 </div>
