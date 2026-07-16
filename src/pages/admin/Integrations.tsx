@@ -173,7 +173,7 @@ function CountryTagsInput({ countries, selected, onToggle }: CountryTagsInputPro
 
   return (
     <div className="space-y-2">
-      <Label>الدول (اختياري)</Label>
+      <Label>الدول<span className="text-muted-foreground text-[10px] ms-1">(اختياري)</span></Label>
       <div ref={wrapperRef} className="relative">
         <div
           className={cn(

@@ -600,7 +600,7 @@ export default function AdminTeam(): JSX.Element {
                 {roleErrors.label && <p className="text-xs text-destructive mt-1">{roleErrors.label}</p>}
               </div>
               <div className="space-y-2">
-                <Label>الوصف (اختياري)</Label>
+                <Label>الوصف<span className="text-muted-foreground text-[10px] ms-1">(اختياري)</span></Label>
                 <Input
                   value={roleForm.description}
                   onChange={(e) => setRoleForm({ ...roleForm, description: e.target.value })}

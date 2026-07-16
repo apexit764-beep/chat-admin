@@ -477,7 +477,7 @@ export default function KnowledgeBase(): JSX.Element {
                 {errors.title && <p className="text-xs text-destructive mt-1">{errors.title}</p>}
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Slug (اختياري)</label>
+                <label className="text-sm font-medium">Slug<span className="text-muted-foreground text-[10px] ms-1">(اختياري)</span></label>
                 <Input
                   value={articleSlug}
                   onChange={(e) => setArticleSlug(slugify(e.target.value))}

@@ -513,7 +513,7 @@ export default function AdminSettings(): JSX.Element {
                   </div>
                 </div>
                 <div className="space-y-1.5 mt-4">
-                  <Label>وصف قصير (اختياري)</Label>
+                  <Label>وصف قصير<span className="text-muted-foreground text-[10px] ms-1">(اختياري)</span></Label>
                   <Input value={company.tagline} onChange={(e) => setCompany({ tagline: e.target.value })} />
                 </div>
                 <Separator className="my-6" />
@@ -530,15 +530,15 @@ export default function AdminSettings(): JSX.Element {
                     {companyErrors.phone && <p className="text-xs text-destructive mt-1">{companyErrors.phone}</p>}
                   </div>
                   <div className="space-y-1.5">
-                    <Label>رقم واتساب (اختياري)</Label>
+                    <Label>رقم واتساب<span className="text-muted-foreground text-[10px] ms-1">(اختياري)</span></Label>
                     <Input value={company.whatsapp} onChange={(e) => setCompany({ whatsapp: e.target.value })} />
                   </div>
                   <div className="space-y-1.5">
-                    <Label>الموقع الإلكتروني (اختياري)</Label>
+                    <Label>الموقع الإلكتروني<span className="text-muted-foreground text-[10px] ms-1">(اختياري)</span></Label>
                     <Input value={company.website} onChange={(e) => setCompany({ website: e.target.value })} placeholder="https://" />
                   </div>
                   <div className="space-y-1.5 md:col-span-2">
-                    <Label>العنوان (اختياري)</Label>
+                    <Label>العنوان<span className="text-muted-foreground text-[10px] ms-1">(اختياري)</span></Label>
                     <Input value={company.address} onChange={(e) => setCompany({ address: e.target.value })} />
                   </div>
                   <div className="space-y-1.5">
@@ -558,11 +558,11 @@ export default function AdminSettings(): JSX.Element {
                 <p className="text-sm font-semibold mb-3">البيانات القانونية</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <Label>الرقم الضريبي (اختياري)</Label>
+                    <Label>الرقم الضريبي<span className="text-muted-foreground text-[10px] ms-1">(اختياري)</span></Label>
                     <Input value={company.taxId} onChange={(e) => setCompany({ taxId: e.target.value })} />
                   </div>
                   <div className="space-y-1.5">
-                    <Label>رقم السجل التجاري (اختياري)</Label>
+                    <Label>رقم السجل التجاري<span className="text-muted-foreground text-[10px] ms-1">(اختياري)</span></Label>
                     <Input value={company.registrationNumber} onChange={(e) => setCompany({ registrationNumber: e.target.value })} />
                   </div>
                 </div>
@@ -580,7 +580,7 @@ export default function AdminSettings(): JSX.Element {
                     ['snapchat', 'Snapchat', 'https://snapchat.com/add/...'],
                   ] as const).map(([key, label, placeholder]) => (
                     <div key={key} className="space-y-1.5">
-                      <Label>{label} (اختياري)</Label>
+                      <Label>{label}<span className="text-muted-foreground text-[10px] ms-1">(اختياري)</span></Label>
                       <Input
                         value={social[key]}
                         onChange={(e) => setSocial({ [key]: e.target.value })}
@@ -963,7 +963,7 @@ export default function AdminSettings(): JSX.Element {
                 {countryErrors.code && <p className="text-xs text-destructive mt-1">{countryErrors.code}</p>}
               </div>
               <div className="space-y-1.5">
-                <Label>العلم (اختياري)</Label>
+                <Label>العلم<span className="text-muted-foreground text-[10px] ms-1">(اختياري)</span></Label>
                 <Input
                   value={countryModal.flag}
                   onChange={(e) => setCountryModal({ ...countryModal, flag: e.target.value })}
@@ -1008,7 +1008,7 @@ export default function AdminSettings(): JSX.Element {
                 {countryErrors.currency && <p className="text-xs text-destructive mt-1">{countryErrors.currency}</p>}
               </div>
               <div className="space-y-1.5">
-                <Label>سعر الصرف (1 USD) (اختياري)</Label>
+                <Label>سعر الصرف (1 USD)<span className="text-muted-foreground text-[10px] ms-1">(اختياري)</span></Label>
                 <Input
                   type="number"
                   step="0.001"
@@ -1587,19 +1587,19 @@ export default function AdminSettings(): JSX.Element {
               </div>
 
               <div className="space-y-1.5">
-                <Label>البريد الإلكتروني (اختياري)</Label>
+                <Label>البريد الإلكتروني<span className="text-muted-foreground text-[10px] ms-1">(اختياري)</span></Label>
                 <Input type="email" value={gatewayModal.email} onChange={(e) => setGatewayModal({ ...gatewayModal, email: e.target.value })} dir="ltr" />
               </div>
 
               <div className="space-y-1.5">
-                <Label>إعدادات JSON (اختياري)</Label>
+                <Label>إعدادات JSON<span className="text-muted-foreground text-[10px] ms-1">(اختياري)</span></Label>
                 <Textarea value={gatewayModal.jsonConfig} onChange={(e) => setGatewayModal({ ...gatewayModal, jsonConfig: e.target.value })} rows={4} className="font-mono text-xs" dir="ltr" placeholder='{"integration_id": 12345, ...}' />
               </div>
 
               <Separator />
 
               <div className="space-y-2">
-                <Label>الدول المدعومة (اختياري)</Label>
+                <Label>الدول المدعومة<span className="text-muted-foreground text-[10px] ms-1">(اختياري)</span></Label>
                 <div className="flex flex-wrap gap-2">
                   {countries.map((c) => {
                     const selected = gatewayModal.countries.includes(c.code);
@@ -1626,7 +1626,7 @@ export default function AdminSettings(): JSX.Element {
               </div>
 
               <div className="space-y-2">
-                <Label>طرق الدفع (اختياري)</Label>
+                <Label>طرق الدفع<span className="text-muted-foreground text-[10px] ms-1">(اختياري)</span></Label>
                 <div className="grid grid-cols-2 gap-2">
                   {PAYMENT_METHODS.map((m) => {
                     const checked = gatewayModal.methods.includes(m.key);
