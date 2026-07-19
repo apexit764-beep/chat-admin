@@ -19,10 +19,14 @@ interface DateRangeValue {
 
 interface Preset {
   label: string;
-  getValue: () => DateRangeValue;
+  getValue: () => DateRangeValue | undefined;
 }
 
 const presets: Preset[] = [
+  {
+    label: 'جميع الفترات',
+    getValue: () => undefined,
+  },
   {
     label: 'اليوم',
     getValue: () => ({ from: new Date(), to: new Date() }),
@@ -86,7 +90,7 @@ export function DateRangePicker({ value, onChange, className }: DateRangePickerP
   };
 
   const formatRange = (range: DateRangeValue | undefined): string => {
-    if (!range?.from) return 'اختر فترة';
+    if (!range?.from) return 'جميع الفترات';
     if (!range.to) return format(range.from, 'd MMMM yyyy', { locale: ar });
     return `${format(range.from, 'd MMMM', { locale: ar })} — ${format(range.to, 'd MMMM yyyy', { locale: ar })}`;
   };

@@ -41,7 +41,7 @@ export default function AdminDashboard(): JSX.Element {
   const plans = useAdminStore((s) => s.plans);
   const countries = useAdminStore((s) => s.countries);
 
-  const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
+  const [dateRange, setDateRange] = useState<{ from: Date; to: Date } | undefined>({
     from: startOfMonth(new Date()),
     to: endOfMonth(new Date()),
   });
@@ -223,7 +223,7 @@ export default function AdminDashboard(): JSX.Element {
           <h2 className="text-2xl font-bold">نظرة عامة</h2>
           <p className="text-sm text-muted-foreground">ملخّص الأداء المالي والتشغيلي للمنصة</p>
         </div>
-        <DateRangePicker value={dateRange} onChange={(r) => r && setDateRange(r)} />
+        <DateRangePicker value={dateRange} onChange={setDateRange} />
       </div>
 
       {/* ══════════ Section 1: All KPIs in 2 rows ══════════ */}
