@@ -110,6 +110,7 @@ interface AdminState {
   createSubscription: (clientId: string, planId: string, billingCycle: 'monthly' | 'yearly') => Subscription;
   updateSubscription: (id: string, patch: Partial<Subscription>) => void;
   cancelSubscription: (id: string) => void;
+  extendSubscription: (id: string) => void;
 
   // Invoice / payment actions
   recordPayment: (clientId: string, planId: string, amount: number, currency: string, last4: string) => { invoice: Invoice; transaction: Transaction };
@@ -508,6 +509,17 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       subscriptions: s.subscriptions.map((sub) =>
         sub.id === id ? { ...sub, status: 'cancelled', cancelAt: new Date().toISOString() } : sub
       ),
+    })),
+
+  extendSubscription: (id) =>
+    set((s) => ({
+      subscriptions: s.subscriptions.map((sub) => {
+        if (sub.id !== id) return sub;
+        const end = new Date(sub.currentPeriodEnd);
+        const ms = sub.billingCycle === 'yearly' ? 365 * 24 * 60 * 60 * 1000 : 30 * 24 * 60 * 60 * 1000;
+        const newEnd = new Date(end.getTime() + ms);
+        return { ...sub, currentPeriodStart: sub.currentPeriodEnd, currentPeriodEnd: newEnd.toISOString(), status: 'active' as const };
+      }),
     })),
 
   recordPayment: (clientId, planId, amount, currency, last4) => {

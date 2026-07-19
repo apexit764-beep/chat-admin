@@ -92,6 +92,7 @@ export default function AdminSubscriptions(): JSX.Element {
   const clients = useAdminStore((s) => s.clients);
   const plans = useAdminStore((s) => s.plans);
   const cancelSubscription = useAdminStore((s) => s.cancelSubscription);
+  const extendSubscription = useAdminStore((s) => s.extendSubscription);
   const updateSubscription = useAdminStore((s) => s.updateSubscription);
   const showToast = useUIStore((s) => s.showToast);
   const { confirm } = useConfirm();
@@ -393,6 +394,12 @@ export default function AdminSubscriptions(): JSX.Element {
                               <ExternalLink className="h-4 w-4 ml-2" />
                               عرض العميل
                             </DropdownMenuItem>
+                            {sub.status !== 'cancelled' && (
+                              <DropdownMenuItem onClick={() => { extendSubscription(sub.id); showToast('تم تمديد الاشتراك', 'success'); }}>
+                                <CalendarClock className="h-4 w-4 ml-2" />
+                                تمديد
+                              </DropdownMenuItem>
+                            )}
                             {sub.status !== 'cancelled' && (
                               <DropdownMenuItem onClick={() => setSwitchModal({ subId: sub.id, clientId: sub.clientId, currentPlanId: sub.planId, companyName: client?.companyName ?? 'العميل' })}>
                                 <ArrowRightLeft className="h-4 w-4 ml-2" />
