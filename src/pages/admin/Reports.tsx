@@ -86,7 +86,7 @@ export default function AdminReports(): JSX.Element {
 
   // Plan distribution
   const planDist = useMemo(() =>
-    plans.map((p) => ({
+    plans.filter((p) => !p.isTrial).map((p) => ({
       label: p.nameAr,
       value: clients.filter((c) => c.planId === p.id).length,
       color: p.tier === 'starter' ? '#06B6D4' : p.tier === 'pro' ? '#2563EB' : p.tier === 'business' ? '#8B5CF6' : '#F59E0B',
@@ -345,13 +345,6 @@ export default function AdminReports(): JSX.Element {
                         </div>
                       </div>
                     ))}
-                    <div className="flex items-center justify-between p-2.5 rounded-lg bg-blue-500/8 border border-blue-500/15">
-                      <div className="flex items-center gap-2">
-                        <span className="h-2.5 w-2.5 rounded-full bg-blue-500" />
-                        <span className="text-xs font-medium">تجريبي</span>
-                      </div>
-                      <span className="text-sm font-bold">{trialClients.length}</span>
-                    </div>
                   </div>
                 </div>
               );
