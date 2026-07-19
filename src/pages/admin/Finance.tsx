@@ -5,7 +5,6 @@ import {
   Search,
   Download,
   FileText,
-  Clock,
   Receipt,
   Inbox,
   ChevronLeft,
@@ -45,13 +44,11 @@ import { DateRangePicker } from '@/components/ui/date-range-picker';
 const COMPANY_NAME = 'Qhub';
 
 const invStatusLabel: Record<string, string> = {
-  pending: 'معلّقة',
   paid: 'مدفوعة',
   failed: 'فشلت',
 };
 
-const invStatusVariant: Record<string, 'warning' | 'success' | 'destructive'> = {
-  pending: 'warning',
+const invStatusVariant: Record<string, 'success' | 'destructive'> = {
   paid: 'success',
   failed: 'destructive',
 };
@@ -80,13 +77,8 @@ export default function AdminFinance(): JSX.Element {
     [invoices]
   );
 
-  const pendingTotal = useMemo(
-    () => invoices.filter((inv) => inv.status === 'pending').reduce((acc, inv) => acc + approxUSD(inv.total, inv.currency), 0),
-    [invoices]
-  );
-
-  const overdueInvoices = useMemo(
-    () => invoices.filter((inv) => inv.status === 'pending' && new Date(inv.dueDate) < new Date()),
+  const failedTotal = useMemo(
+    () => invoices.filter((inv) => inv.status === 'failed').reduce((acc, inv) => acc + approxUSD(inv.total, inv.currency), 0),
     [invoices]
   );
 
@@ -163,33 +155,11 @@ export default function AdminFinance(): JSX.Element {
         <p className="text-sm text-muted-foreground">إدارة الفواتير والتحصيل</p>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard label="إجمالي الفواتير" value={`$${Math.round(totalInvoices).toLocaleString('en-US')}`} icon={<Receipt className="h-5 w-5" />} iconBg="bg-primary/15" iconColor="text-primary" />
         <StatCard label="المحصّل" value={`$${Math.round(paidTotal).toLocaleString('en-US')}`} icon={<CheckCircle2 className="h-5 w-5" />} iconBg="bg-success/15" iconColor="text-success" />
-        <StatCard label="مستحق التحصيل" value={`$${Math.round(pendingTotal).toLocaleString('en-US')}`} icon={<Clock className="h-5 w-5" />} iconBg="bg-warning/15" iconColor="text-warning" />
-        <StatCard label="فواتير متأخرة" value={overdueInvoices.length} icon={<AlertTriangle className="h-5 w-5" />} iconBg="bg-danger/15" iconColor="text-danger" />
+        <StatCard label="فواتير فاشلة" value={`$${Math.round(failedTotal).toLocaleString('en-US')}`} icon={<AlertTriangle className="h-5 w-5" />} iconBg="bg-danger/15" iconColor="text-danger" />
       </div>
-
-      {overdueInvoices.length > 0 && (
-        <Card className="border-amber-500/30 bg-amber-500/5">
-          <CardContent className="p-4">
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="h-5 w-5 text-amber-500 mt-0.5 flex-shrink-0" />
-              <div className="flex-1">
-                <p className="text-sm font-semibold text-amber-700 dark:text-amber-400">
-                  {overdueInvoices.length} فاتورة متأخرة تحتاج متابعة
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  إجمالي المبالغ المتأخرة: {overdueInvoices.map((inv) => `${formatMoney(inv.total, inv.currency)}`).join(' · ')}
-                </p>
-              </div>
-              <Button variant="outline" size="sm" onClick={() => setStatusFilter('pending')} className="flex-shrink-0">
-                عرض المتأخرة
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       <Card className="overflow-hidden">
         <CardHeader className="flex-row flex-wrap items-center gap-3 border-b justify-start">
@@ -210,7 +180,6 @@ export default function AdminFinance(): JSX.Element {
             <SelectContent>
               <SelectItem value="all">كل الحالات</SelectItem>
               <SelectItem value="paid">مدفوعة</SelectItem>
-              <SelectItem value="pending">معلّقة</SelectItem>
               <SelectItem value="failed">فشلت</SelectItem>
             </SelectContent>
           </Select>

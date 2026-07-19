@@ -798,11 +798,8 @@ function InvoiceStatusBadge({ status }: { status: string }) {
     <Badge className={cn('text-[10px] font-semibold border-transparent',
       status === 'paid' && 'bg-success/15 text-success',
       status === 'failed' && 'bg-danger/15 text-danger',
-      status === 'pending' && 'bg-warning/15 text-warning',
-      status === 'refunded' && 'bg-muted text-muted-foreground',
-      status === 'draft' && 'bg-muted text-muted-foreground',
     )}>
-      {status === 'paid' ? 'مدفوعة' : status === 'failed' ? 'فاشلة' : status === 'pending' ? 'معلّقة' : status === 'refunded' ? 'مرتجعة' : 'مسودة'}
+      {status === 'paid' ? 'مدفوعة' : 'فاشلة'}
     </Badge>
   );
 }

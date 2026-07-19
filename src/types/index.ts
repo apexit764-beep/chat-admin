@@ -242,7 +242,7 @@ export interface Subscription {
   };
 }
 
-export type InvoiceStatus = 'draft' | 'pending' | 'paid' | 'failed' | 'refunded';
+export type InvoiceStatus = 'paid' | 'failed';
 
 export interface Invoice {
   id: string;
