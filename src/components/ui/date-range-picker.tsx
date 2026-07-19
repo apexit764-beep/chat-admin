@@ -113,15 +113,15 @@ export function DateRangePicker({ value, onChange, className }: DateRangePickerP
       <PopoverContent className="w-auto p-0" align="start">
         <div className="flex" dir="rtl">
           {/* Presets sidebar */}
-          <div className="border-e px-2 py-2 space-y-0.5">
-            <p className="text-xs font-semibold text-muted-foreground mb-1.5 px-1">اختيارات سريعة</p>
+          <div className="border-e px-1.5 py-2 space-y-0.5 min-w-0 w-[130px] shrink-0">
+            <p className="text-[11px] font-semibold text-muted-foreground mb-1.5 px-1">اختيارات سريعة</p>
             {presets.map((preset) => (
               <button
                 key={preset.label}
                 type="button"
                 onClick={() => handlePreset(preset)}
                 className={cn(
-                  'w-full text-start text-sm leading-snug px-2 py-1 rounded transition-colors whitespace-nowrap',
+                  'w-full text-start text-xs leading-snug px-1.5 py-1 rounded transition-colors whitespace-nowrap',
                   activePreset === preset.label
                     ? 'bg-primary/10 text-primary font-medium'
                     : 'text-foreground hover:bg-muted'
@@ -133,7 +133,7 @@ export function DateRangePicker({ value, onChange, className }: DateRangePickerP
             ))}
           </div>
           {/* Calendar */}
-          <div className="p-1 rdp-compact [&_.rdp-root]:w-fit">
+          <div className="p-2 flex-1 min-w-0">
             <DayPicker
               mode="range"
               defaultMonth={value?.from}
