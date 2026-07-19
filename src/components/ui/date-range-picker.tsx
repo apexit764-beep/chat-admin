@@ -133,7 +133,7 @@ export function DateRangePicker({ value, onChange, className }: DateRangePickerP
             ))}
           </div>
           {/* Calendar */}
-          <div className="p-2 flex-1 min-w-0">
+          <div className="p-3 flex-1 min-w-0 rdp-sized">
             <DayPicker
               mode="range"
               defaultMonth={value?.from}
