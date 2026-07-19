@@ -182,6 +182,7 @@ export interface Plan {
   pricesPerCountry: Record<string, { monthly: number; yearly: number }>;
   popular?: boolean;
   isTrial?: boolean;
+  requiresContact?: boolean;
   active: boolean;
   createdAt: string;
 }

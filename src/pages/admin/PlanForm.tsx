@@ -103,6 +103,7 @@ interface FormState {
   pricesPerCountry: Record<string, { monthly: number; yearly: number }>;
   popular: boolean;
   isTrial: boolean;
+  requiresContact: boolean;
   active: boolean;
 }
 
@@ -141,6 +142,7 @@ export default function PlanForm(): JSX.Element {
         pricesPerCountry: { ...editing.pricesPerCountry },
         popular: editing.popular ?? false,
         isTrial: editing.isTrial ?? false,
+        requiresContact: editing.requiresContact ?? false,
         active: editing.active,
       };
     }
@@ -157,6 +159,7 @@ export default function PlanForm(): JSX.Element {
       pricesPerCountry: defaultPrices,
       popular: false,
       isTrial: false,
+      requiresContact: false,
       active: true,
     };
   });
@@ -285,6 +288,7 @@ export default function PlanForm(): JSX.Element {
     pricesPerCountry: form.pricesPerCountry,
     popular: form.popular,
     isTrial: form.isTrial,
+    requiresContact: form.requiresContact,
     active: form.active,
   });
 
@@ -433,15 +437,22 @@ export default function PlanForm(): JSX.Element {
             </CardContent>
           </Card>
 
-          {/* Trial toggle - before prices */}
+          {/* Trial & contact toggles */}
           <Card>
-            <CardContent className="pt-6">
+            <CardContent className="pt-6 space-y-3">
               <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
                 <div>
                   <p className="text-sm font-medium">باقة تجريبية</p>
                   <p className="text-xs text-muted-foreground">مجانية للتجربة — لن تحتاج لإدخال أسعار</p>
                 </div>
                 <Switch checked={form.isTrial} onCheckedChange={(checked) => setForm({ ...form, isTrial: checked })} />
+              </div>
+              <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
+                <div>
+                  <p className="text-sm font-medium">يتطلب تواصل</p>
+                  <p className="text-xs text-muted-foreground">العميل يرسل طلب بدلاً من الاشتراك المباشر</p>
+                </div>
+                <Switch checked={form.requiresContact} onCheckedChange={(checked) => setForm({ ...form, requiresContact: checked })} />
               </div>
             </CardContent>
           </Card>

@@ -146,6 +146,7 @@ export const plans: Plan[] = [
     ],
     limits: { agents: -1, channels: -1, conversations: -1, contacts: -1 },
     pricesPerCountry: pricesFromUSD(249),
+    requiresContact: true,
     active: true,
     createdAt: nowMinus(60 * 24 * 150),
   },

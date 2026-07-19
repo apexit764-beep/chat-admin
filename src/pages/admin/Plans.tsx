@@ -278,6 +278,9 @@ export default function AdminPlans(): JSX.Element {
                               <p className={cn('font-bold', style.text)}>{p.nameAr}</p>
                               <p className="text-xs text-muted-foreground line-clamp-1">{p.tagline}</p>
                             </div>
+                            {p.requiresContact && (
+                              <Badge variant="outline" className="text-[10px] shrink-0">يتطلب تواصل</Badge>
+                            )}
                             {p.popular && (
                               <Star className="h-4 w-4 text-primary fill-current shrink-0" />
                             )}
