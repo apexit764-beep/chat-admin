@@ -67,6 +67,25 @@ export const industries: Industry[] = [
 
 export const plans: Plan[] = [
   {
+    id: 'plan_trial',
+    tier: 'starter',
+    name: 'Trial',
+    nameAr: 'تجريبي',
+    tagline: 'تجربة مجانية لمدة 14 يوم',
+    features: [
+      'حتى 2 موظفين',
+      'رقم واتساب واحد',
+      '100 محادثة/شهر',
+      '50 جهة اتصال',
+      'الردود المحفوظة الأساسية',
+    ],
+    limits: { agents: 2, channels: 1, conversations: 100, contacts: 50 },
+    pricesPerCountry: pricesFromUSD(0),
+    isTrial: true,
+    active: true,
+    createdAt: nowMinus(60 * 24 * 250),
+  },
+  {
     id: 'plan_starter',
     tier: 'starter',
     name: 'Starter',

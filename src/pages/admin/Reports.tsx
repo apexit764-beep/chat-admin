@@ -333,13 +333,6 @@ export default function AdminReports(): JSX.Element {
                     </div>
                   </div>
                   <div className="w-full space-y-2">
-                    <div className="flex items-center justify-between p-2.5 rounded-lg bg-blue-500/8 border border-blue-500/15">
-                      <div className="flex items-center gap-2">
-                        <span className="h-2.5 w-2.5 rounded-full bg-blue-500" />
-                        <span className="text-xs font-medium">تجريبي</span>
-                      </div>
-                      <span className="text-sm font-bold">{trialClients.length}</span>
-                    </div>
                     {planDist.map((p) => (
                       <div key={p.label} className="flex items-center justify-between p-2.5 rounded-lg border border-border/60" style={{ backgroundColor: `${p.color}08` }}>
                         <div className="flex items-center gap-2">
@@ -352,6 +345,13 @@ export default function AdminReports(): JSX.Element {
                         </div>
                       </div>
                     ))}
+                    <div className="flex items-center justify-between p-2.5 rounded-lg bg-blue-500/8 border border-blue-500/15">
+                      <div className="flex items-center gap-2">
+                        <span className="h-2.5 w-2.5 rounded-full bg-blue-500" />
+                        <span className="text-xs font-medium">تجريبي</span>
+                      </div>
+                      <span className="text-sm font-bold">{trialClients.length}</span>
+                    </div>
                   </div>
                 </div>
               );
