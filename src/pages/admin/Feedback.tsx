@@ -3,24 +3,17 @@ import {
   MessageSquareWarning,
   Lightbulb,
   Search,
-  Send,
-  Clock,
-  CheckCircle2,
-  Loader2,
   Filter,
   Eye,
 } from 'lucide-react';
 import { useAdminStore } from '@/store/useAdminStore';
-import { useAuthStore } from '@/store/useAuthStore';
-import { useUIStore } from '@/store/useUIStore';
 import { timeAgo } from '@/utils/format';
 import { cn } from '@/lib/utils';
-import type { FeedbackType, FeedbackStatus, FeedbackPriority, FeedbackReply } from '@/store/adminMockData';
+import type { FeedbackType, FeedbackPriority } from '@/store/adminMockData';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   Select,
@@ -52,12 +45,6 @@ const typeConfig: Record<FeedbackType, { label: string; icon: React.ElementType;
   suggestion: { label: 'اقتراح', icon: Lightbulb, badgeVariant: 'secondary' },
 };
 
-const statusConfig: Record<FeedbackStatus, { label: string; icon: React.ElementType; color: string }> = {
-  open: { label: 'مفتوح', icon: Clock, color: 'text-blue-500' },
-  in_progress: { label: 'قيد المعالجة', icon: Loader2, color: 'text-amber-500' },
-  resolved: { label: 'تم الحل', icon: CheckCircle2, color: 'text-emerald-500' },
-};
-
 const priorityConfig: Record<FeedbackPriority, { label: string; dot: string; text: string; bg: string; border: string }> = {
   high: { label: 'عالية', dot: 'bg-red-500', text: 'text-red-700 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-950/30', border: 'border-red-200 dark:border-red-800' },
   medium: { label: 'متوسطة', dot: 'bg-amber-500', text: 'text-amber-700 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-950/30', border: 'border-amber-200 dark:border-amber-800' },
@@ -65,25 +52,17 @@ const priorityConfig: Record<FeedbackPriority, { label: string; dot: string; tex
 };
 
 type TypeFilter = 'all' | FeedbackType;
-type StatusFilter = 'all' | FeedbackStatus;
 
 export default function AdminFeedback(): JSX.Element {
   const feedback = useAdminStore((s) => s.feedback);
-  const updateFeedbackStatus = useAdminStore((s) => s.updateFeedbackStatus);
-  const replyToFeedback = useAdminStore((s) => s.replyToFeedback);
-  const currentUser = useAuthStore((s) => s.user);
-  const showToast = useUIStore((s) => s.showToast);
 
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [replyText, setReplyText] = useState('');
 
   const filtered = useMemo(() => {
     let list = [...feedback];
     if (typeFilter !== 'all') list = list.filter((f) => f.type === typeFilter);
-    if (statusFilter !== 'all') list = list.filter((f) => f.status === statusFilter);
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(
@@ -94,21 +73,9 @@ export default function AdminFeedback(): JSX.Element {
       );
     }
     return list.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-  }, [feedback, typeFilter, statusFilter, search]);
+  }, [feedback, typeFilter, search]);
 
   const selected = feedback.find((f) => f.id === selectedId) ?? null;
-
-  const handleReply = (): void => {
-    if (!selectedId || !replyText.trim()) return;
-    replyToFeedback(selectedId, replyText.trim(), currentUser?.name ?? 'مدير');
-    showToast('تم إرسال الرد', 'success');
-    setReplyText('');
-  };
-
-  const handleStatusChange = (id: string, status: FeedbackStatus): void => {
-    updateFeedbackStatus(id, status);
-    showToast(`تم تحديث الحالة: ${statusConfig[status].label}`, 'success');
-  };
 
   return (
     <div className="p-4 lg:p-6 space-y-5">
@@ -140,17 +107,6 @@ export default function AdminFeedback(): JSX.Element {
                 <SelectItem value="suggestion">اقتراحات</SelectItem>
               </SelectContent>
             </Select>
-            <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as StatusFilter)}>
-              <SelectTrigger className="w-36">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">كل الحالات</SelectItem>
-                <SelectItem value="open">مفتوح</SelectItem>
-                <SelectItem value="in_progress">قيد المعالجة</SelectItem>
-                <SelectItem value="resolved">تم الحل</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
 
           {filtered.length === 0 ? (
@@ -167,17 +123,14 @@ export default function AdminFeedback(): JSX.Element {
                   <TableHead>النوع</TableHead>
                   <TableHead>العميل</TableHead>
                   <TableHead>الأولوية</TableHead>
-                  <TableHead>الحالة</TableHead>
                   <TableHead>التاريخ</TableHead>
-                  <TableHead className="text-end">إجراءات</TableHead>
+                  <TableHead className="text-end">عرض</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filtered.map((entry, idx) => {
                   const tConfig = typeConfig[entry.type];
-                  const sConfig = statusConfig[entry.status];
                   const pConfig = priorityConfig[entry.priority];
-                  const StatusIcon = sConfig.icon;
 
                   return (
                     <TableRow key={entry.id}>
@@ -186,7 +139,7 @@ export default function AdminFeedback(): JSX.Element {
                         <button
                           type="button"
                           className="text-sm font-medium text-primary hover:underline max-w-[280px] truncate block text-start"
-                          onClick={() => { setSelectedId(entry.id); setReplyText(''); }}
+                          onClick={() => setSelectedId(entry.id)}
                         >
                           {entry.subject}
                         </button>
@@ -203,16 +156,10 @@ export default function AdminFeedback(): JSX.Element {
                           {pConfig.label}
                         </span>
                       </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1.5">
-                          <StatusIcon className={cn('h-3.5 w-3.5', sConfig.color)} />
-                          <span className={cn('text-xs font-medium', sConfig.color)}>{sConfig.label}</span>
-                        </div>
-                      </TableCell>
                       <TableCell className="text-xs text-muted-foreground">{timeAgo(entry.timestamp)}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-0.5 justify-end">
-                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => { setSelectedId(entry.id); setReplyText(''); }}>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => setSelectedId(entry.id)}>
                             <Eye className="h-3.5 w-3.5" />
                           </Button>
                         </div>
@@ -226,7 +173,7 @@ export default function AdminFeedback(): JSX.Element {
         </CardContent>
       </Card>
 
-      {/* Detail dialog */}
+      {/* Detail dialog — view only */}
       <Dialog open={!!selected} onOpenChange={(v) => { if (!v) setSelectedId(null); }}>
         {selected && (
           <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
@@ -259,23 +206,6 @@ export default function AdminFeedback(): JSX.Element {
                     <span className={cn('h-1.5 w-1.5 rounded-full', priorityConfig[selected.priority].dot)} />
                     {priorityConfig[selected.priority].label}
                   </span>
-                  <Select
-                    value={selected.status}
-                    onValueChange={(v) => handleStatusChange(selected.id, v as FeedbackStatus)}
-                  >
-                    <SelectTrigger className="w-auto h-7 text-xs gap-1 border-dashed">
-                      {(() => {
-                        const SI = statusConfig[selected.status].icon;
-                        return <SI className={cn('h-3.5 w-3.5', statusConfig[selected.status].color)} />;
-                      })()}
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="open">مفتوح</SelectItem>
-                      <SelectItem value="in_progress">قيد المعالجة</SelectItem>
-                      <SelectItem value="resolved">تم الحل</SelectItem>
-                    </SelectContent>
-                  </Select>
                 </div>
 
                 <Separator />
@@ -284,46 +214,12 @@ export default function AdminFeedback(): JSX.Element {
                   <p className="text-sm font-medium text-foreground/80 mb-1">{selected.clientName}</p>
                   <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{selected.message}</p>
                 </div>
-
-                {((selected.replies?.length ?? 0) > 0) && (
-                  <div className="space-y-2">
-                    {selected.replies!.map((r: FeedbackReply) => (
-                      <div key={r.id} className="p-4 rounded-xl bg-primary/5 border border-primary/20">
-                        <div className="flex items-center gap-2 mb-1">
-                          <p className="text-sm font-medium text-primary">{r.author}</p>
-                          <span className="text-[11px] text-muted-foreground">{timeAgo(r.timestamp)}</span>
-                        </div>
-                        <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{r.text}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <div className="space-y-3">
-                    <Separator />
-                    <p className="text-sm font-semibold">{(selected.replies?.length ?? 0) > 0 ? 'إضافة رد' : 'كتابة رد'}<span className="text-destructive ms-0.5">*</span></p>
-                    <Textarea
-                      value={replyText}
-                      onChange={(e) => setReplyText(e.target.value)}
-                      placeholder="اكتب ردك هنا..."
-                      rows={4}
-                      dir="rtl"
-                    />
-                  </div>
               </div>
             </ScrollArea>
 
-            <DialogFooter className="gap-2">
-                <Button variant="outline" onClick={() => setSelectedId(null)}>إغلاق</Button>
-                <Button
-                  onClick={handleReply}
-                  disabled={!replyText.trim()}
-                  className="gap-2"
-                >
-                  <Send className="h-4 w-4" />
-                  إرسال الرد
-                </Button>
-              </DialogFooter>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setSelectedId(null)}>إغلاق</Button>
+            </DialogFooter>
           </DialogContent>
         )}
       </Dialog>
