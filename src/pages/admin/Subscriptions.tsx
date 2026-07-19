@@ -173,6 +173,8 @@ export default function AdminSubscriptions(): JSX.Element {
   };
 
   const [switchModal, setSwitchModal] = useState<{ subId: string; clientId: string; currentPlanId: string; companyName: string } | null>(null);
+  const [extendModal, setExtendModal] = useState<{ subId: string; companyName: string } | null>(null);
+  const [extendDays, setExtendDays] = useState('');
 
   const [view, setView] = useState<View>('subscriptions');
   const planRequests = useAdminStore((s) => s.planRequests);
@@ -395,7 +397,7 @@ export default function AdminSubscriptions(): JSX.Element {
                               عرض العميل
                             </DropdownMenuItem>
                             {sub.status !== 'cancelled' && (
-                              <DropdownMenuItem onClick={() => { extendSubscription(sub.id); showToast('تم تمديد الاشتراك', 'success'); }}>
+                              <DropdownMenuItem onClick={() => { setExtendModal({ subId: sub.id, companyName: client?.companyName ?? 'العميل' }); setExtendDays(''); }}>
                                 <CalendarClock className="h-4 w-4 ml-2" />
                                 تمديد
                               </DropdownMenuItem>
@@ -467,6 +469,40 @@ export default function AdminSubscriptions(): JSX.Element {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setSwitchModal(null)}>إلغاء</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!extendModal} onOpenChange={(o) => { if (!o) setExtendModal(null); }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>تمديد اشتراك {extendModal?.companyName}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <label className="text-sm font-medium">عدد الأيام</label>
+            <Input
+              type="number"
+              min={1}
+              value={extendDays}
+              onChange={(e) => setExtendDays(e.target.value)}
+              placeholder="مثال: 30"
+              autoFocus
+            />
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setExtendModal(null)}>إلغاء</Button>
+            <Button
+              disabled={!extendDays || Number(extendDays) < 1}
+              onClick={() => {
+                if (extendModal && Number(extendDays) >= 1) {
+                  extendSubscription(extendModal.subId, Number(extendDays));
+                  showToast(`تم تمديد الاشتراك ${Number(extendDays)} يوم`, 'success');
+                  setExtendModal(null);
+                }
+              }}
+            >
+              تمديد
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
