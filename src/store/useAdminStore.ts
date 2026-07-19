@@ -582,8 +582,8 @@ export const useAdminStore = create<AdminState>((set, get) => ({
 
   refundInvoice: (invoiceId) => {
     set((s) => ({
-      invoices: s.invoices.map((inv) => (inv.id === invoiceId ? { ...inv, status: 'refunded' } : inv)),
-      transactions: s.transactions.map((t) => (t.invoiceId === invoiceId ? { ...t, status: 'refunded' } : t)),
+      invoices: s.invoices.map((inv) => (inv.id === invoiceId ? { ...inv, status: 'failed' as const } : inv)),
+      transactions: s.transactions.map((t) => (t.invoiceId === invoiceId ? { ...t, status: 'refunded' as const } : t)),
     }));
   },
 
