@@ -295,7 +295,7 @@ export default function AdminSubscriptions(): JSX.Element {
                 <TableHead className="hidden md:table-cell">الدورة</TableHead>
                 <TableHead>المبلغ</TableHead>
                 <TableHead className="hidden md:table-cell">تاريخ البداية</TableHead>
-                <TableHead className="hidden lg:table-cell">تاريخ النهاية</TableHead>
+                <TableHead className="hidden lg:table-cell">تاريخ انتهاء الاشتراك</TableHead>
                 <TableHead className="w-[60px]" />
               </TableRow>
             </TableHeader>
