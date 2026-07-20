@@ -335,7 +335,7 @@ export default function PlanForm(): JSX.Element {
     if (form.features.length === 0) {
       newErrors.features = 'يجب اختيار ميزة واحدة على الأقل';
     }
-    if (!form.isTrial) {
+    if (!form.isTrial && !form.requiresContact) {
       const hasPrice = Object.values(form.pricesPerCountry).some((p) => p.monthly > 0);
       if (!hasPrice) {
         newErrors.prices = 'يجب إدخال سعر شهري لدولة واحدة على الأقل';
@@ -457,8 +457,8 @@ export default function PlanForm(): JSX.Element {
             </CardContent>
           </Card>
 
-          {/* Prices per country - hidden when trial */}
-          {!form.isTrial && (
+          {/* Prices per country - hidden when trial or requires contact */}
+          {!form.isTrial && !form.requiresContact && (
             <Card>
               <CardHeader>
                 <h3 className="text-lg font-semibold">الأسعار حسب الدولة<span className="text-destructive ms-0.5">*</span></h3>
