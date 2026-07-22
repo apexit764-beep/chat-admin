@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { format, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subWeeks, subMonths } from 'date-fns';
+import { format, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, subWeeks, subMonths, subYears } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import { CalendarDays } from 'lucide-react';
 import { DayPicker } from 'react-day-picker';
@@ -70,6 +70,17 @@ const presets: Preset[] = [
     getValue: () => {
       const last = subMonths(new Date(), 1);
       return { from: startOfMonth(last), to: endOfMonth(last) };
+    },
+  },
+  {
+    label: 'السنة الحالية',
+    getValue: () => ({ from: startOfYear(new Date()), to: endOfYear(new Date()) }),
+  },
+  {
+    label: 'السنة الماضية',
+    getValue: () => {
+      const last = subYears(new Date(), 1);
+      return { from: startOfYear(last), to: endOfYear(last) };
     },
   },
 ];
