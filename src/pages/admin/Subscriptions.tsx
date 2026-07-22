@@ -141,23 +141,21 @@ export default function AdminSubscriptions(): JSX.Element {
   }, [rows, statusFilter, planFilter, search, dateRange]);
 
   const stats = useMemo(() => {
-    const active = subscriptions.filter((s) => s.status === 'active');
-    const mrrUsd = active.reduce((sum, s) => {
-      const monthly = s.billingCycle === 'yearly' ? s.amount / 12 : s.amount;
-      return sum + approxUSD(monthly, s.currency);
-    }, 0);
-    const renewingSoon = active.filter((s) => {
-      const d = daysUntil(s.currentPeriodEnd);
-      return d >= 0 && d <= 30;
-    }).length;
-    const pastDue = subscriptions.filter((s) => s.status === 'past_due').length;
+    const subs = filtered.map((r) => r.sub);
+    const active = subs.filter((s) => s.status === 'active');
+    const totalRevenue = subs
+      .filter((s) => s.status === 'active' || s.status === 'past_due')
+      .reduce((sum, s) => sum + approxUSD(s.amount, s.currency), 0);
+    const renewals = subs.filter((s) => s.status === 'active' && s.billingCycle === 'monthly').length
+      + subs.filter((s) => s.status === 'active' && s.billingCycle === 'yearly').length;
+    const pastDue = subs.filter((s) => s.status === 'past_due').length;
     return {
       active: active.length,
-      mrrUsd: Math.round(mrrUsd),
-      renewingSoon,
+      totalRevenue: Math.round(totalRevenue),
+      renewals,
       pastDue,
     };
-  }, [subscriptions]);
+  }, [filtered]);
 
   const handleCancel = async (subId: string, companyName: string): Promise<void> => {
     const ok = await confirm({
@@ -227,13 +225,13 @@ export default function AdminSubscriptions(): JSX.Element {
           iconColor="text-success"
         />
         <StatCard
-          label="الإيراد الشهري (MRR) ≈"
-          value={`$${stats.mrrUsd.toLocaleString('en-US')}`}
+          label="إجمالي الإيرادات"
+          value={`$${stats.totalRevenue.toLocaleString('en-US')}`}
           icon={<DollarSign className="h-5 w-5" />}
         />
         <StatCard
-          label="تجديدات خلال 30 يوم"
-          value={stats.renewingSoon}
+          label="إجمالي التجديدات"
+          value={stats.renewals}
           icon={<CalendarClock className="h-5 w-5" />}
           iconBg="bg-warning/15"
           iconColor="text-warning"
