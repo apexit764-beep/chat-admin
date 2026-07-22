@@ -155,7 +155,7 @@ export default function LiveChat() {
     if (newStatus === 'resolved') {
       resolveLiveChat(selectedId);
     } else if (newStatus === 'assigned' && !selected.assignedTo) {
-      setShowAssignDialog(true);
+      assignLiveChat(selectedId, user?.name ?? 'مشرف');
     }
   };
 
