@@ -244,12 +244,14 @@ export interface Subscription {
 }
 
 export type InvoiceStatus = 'paid' | 'failed';
+export type InvoiceType = 'subscription' | 'renewal' | 'upgrade';
 
 export interface Invoice {
   id: string;
   number: string;
   clientId: string;
   subscriptionId?: string;
+  invoiceType: InvoiceType;
   amount: number;
   tax: number;
   total: number;

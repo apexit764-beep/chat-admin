@@ -17,7 +17,7 @@ import { useUIStore } from '@/store/useUIStore';
 import { formatMoney, approxUSD } from '@/utils/money';
 import { formatDate, initials, avatarColor } from '@/utils/format';
 import { downloadCsv, printAsPdf } from '@/utils/csv';
-import type { Invoice, InvoiceStatus } from '@/types';
+import type { Invoice, InvoiceStatus, InvoiceType } from '@/types';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
@@ -53,6 +53,18 @@ const invStatusVariant: Record<string, 'success' | 'destructive'> = {
   failed: 'destructive',
 };
 
+const invTypeLabel: Record<InvoiceType, string> = {
+  subscription: 'اشتراك',
+  renewal: 'تجديد',
+  upgrade: 'ترقية',
+};
+
+const invTypeVariant: Record<InvoiceType, 'default' | 'secondary' | 'outline'> = {
+  subscription: 'default',
+  renewal: 'secondary',
+  upgrade: 'outline',
+};
+
 export default function AdminFinance(): JSX.Element {
   const clients = useAdminStore((s) => s.clients);
   const invoices = useAdminStore((s) => s.invoices);
@@ -60,6 +72,7 @@ export default function AdminFinance(): JSX.Element {
 
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | InvoiceStatus>('all');
+  const [typeFilter, setTypeFilter] = useState<'all' | InvoiceType>('all');
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date } | undefined>({
     from: startOfMonth(new Date()),
     to: endOfMonth(new Date()),
@@ -67,38 +80,43 @@ export default function AdminFinance(): JSX.Element {
   const [currentPage, setCurrentPage] = useState(1);
   const PAGE_SIZE = 10;
 
+  const dateFiltered = useMemo(() => {
+    if (!dateRange) return invoices;
+    const from = dateRange.from.getTime();
+    const to = dateRange.to.getTime() + 86400000 - 1;
+    return invoices.filter((inv) => {
+      const t = Date.parse(inv.createdAt);
+      return t >= from && t <= to;
+    });
+  }, [invoices, dateRange]);
+
   const totalInvoices = useMemo(
-    () => invoices.reduce((acc, inv) => acc + approxUSD(inv.total, inv.currency), 0),
-    [invoices]
+    () => dateFiltered.reduce((acc, inv) => acc + approxUSD(inv.total, inv.currency), 0),
+    [dateFiltered]
   );
 
   const paidTotal = useMemo(
-    () => invoices.filter((inv) => inv.status === 'paid').reduce((acc, inv) => acc + approxUSD(inv.total, inv.currency), 0),
-    [invoices]
+    () => dateFiltered.filter((inv) => inv.status === 'paid').reduce((acc, inv) => acc + approxUSD(inv.total, inv.currency), 0),
+    [dateFiltered]
   );
 
   const failedTotal = useMemo(
-    () => invoices.filter((inv) => inv.status === 'failed').reduce((acc, inv) => acc + approxUSD(inv.total, inv.currency), 0),
-    [invoices]
+    () => dateFiltered.filter((inv) => inv.status === 'failed').reduce((acc, inv) => acc + approxUSD(inv.total, inv.currency), 0),
+    [dateFiltered]
   );
 
   const filteredInvoices = useMemo(() => {
     setCurrentPage(1);
-    return invoices.filter((inv) => {
+    return dateFiltered.filter((inv) => {
       if (statusFilter !== 'all' && inv.status !== statusFilter) return false;
+      if (typeFilter !== 'all' && inv.invoiceType !== typeFilter) return false;
       if (search) {
         const client = clients.find((c) => c.id === inv.clientId);
         if (!inv.number.includes(search) && !(client?.companyName.includes(search) ?? false)) return false;
       }
-      if (dateRange) {
-        const from = dateRange.from.getTime();
-        const to = dateRange.to.getTime() + 86400000 - 1;
-        const t = Date.parse(inv.createdAt);
-        if (t < from || t > to) return false;
-      }
       return true;
     });
-  }, [invoices, statusFilter, search, clients, dateRange]);
+  }, [dateFiltered, statusFilter, typeFilter, search, clients]);
 
   const totalPages = Math.max(1, Math.ceil(filteredInvoices.length / PAGE_SIZE));
   const paginatedInvoices = filteredInvoices.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
@@ -111,6 +129,7 @@ export default function AdminFinance(): JSX.Element {
         return {
           'رقم الفاتورة': inv.number,
           'العميل': client?.companyName ?? '—',
+          'النوع': invTypeLabel[inv.invoiceType],
           'المبلغ': inv.amount,
           'الضريبة': inv.tax,
           'الإجمالي': inv.total,
@@ -131,6 +150,7 @@ export default function AdminFinance(): JSX.Element {
       <p class="muted">${formatDate(inv.createdAt)}</p>
       <h3>إلى: ${client?.companyName ?? ''}</h3>
       <p class="muted">${client?.email ?? ''} · ${client?.phone ?? ''}</p>
+      <p>النوع: ${invTypeLabel[inv.invoiceType]}</p>
       <table>
         <thead><tr><th>البيان</th><th class="right">الكمية</th><th class="right">السعر</th><th class="right">المجموع</th></tr></thead>
         <tbody>
@@ -183,6 +203,17 @@ export default function AdminFinance(): JSX.Element {
               <SelectItem value="failed">فشلت</SelectItem>
             </SelectContent>
           </Select>
+          <Select value={typeFilter} onValueChange={(v) => setTypeFilter(v as 'all' | InvoiceType)}>
+            <SelectTrigger className="w-auto min-w-[130px] h-9">
+              <SelectValue placeholder="كل الأنواع" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">كل الأنواع</SelectItem>
+              <SelectItem value="subscription">اشتراك</SelectItem>
+              <SelectItem value="renewal">تجديد</SelectItem>
+              <SelectItem value="upgrade">ترقية</SelectItem>
+            </SelectContent>
+          </Select>
           <DateRangePicker value={dateRange} onChange={setDateRange} />
           <Button variant="outline" size="sm" onClick={handleExportInvoices} className="h-9 ms-auto">
             <Download className="h-4 w-4 me-2" /> CSV
@@ -192,11 +223,11 @@ export default function AdminFinance(): JSX.Element {
               <h1>تقرير الفواتير</h1>
               <p class="muted">${new Date().toLocaleDateString('ar-u-nu-latn')}</p>
               <table>
-                <thead><tr><th>رقم الفاتورة</th><th>العميل</th><th class="right">الإجمالي</th><th>الحالة</th><th>تاريخ الاستحقاق</th></tr></thead>
+                <thead><tr><th>رقم الفاتورة</th><th>العميل</th><th>النوع</th><th class="right">الإجمالي</th><th>الحالة</th><th>تاريخ الاستحقاق</th></tr></thead>
                 <tbody>
                   ${filteredInvoices.map((inv) => {
                     const client = clients.find((c) => c.id === inv.clientId);
-                    return `<tr><td>${inv.number}</td><td>${client?.companyName ?? '—'}</td><td class="right">${formatMoney(inv.total, inv.currency)}</td><td>${invStatusLabel[inv.status]}</td><td>${formatDate(inv.dueDate)}</td></tr>`;
+                    return `<tr><td>${inv.number}</td><td>${client?.companyName ?? '—'}</td><td>${invTypeLabel[inv.invoiceType]}</td><td class="right">${formatMoney(inv.total, inv.currency)}</td><td>${invStatusLabel[inv.status]}</td><td>${formatDate(inv.dueDate)}</td></tr>`;
                   }).join('')}
                 </tbody>
               </table>
@@ -215,6 +246,7 @@ export default function AdminFinance(): JSX.Element {
                   <TableHead className="text-start w-12">#</TableHead>
                   <TableHead className="text-start">رقم الفاتورة</TableHead>
                   <TableHead className="text-start">العميل</TableHead>
+                  <TableHead className="text-start">النوع</TableHead>
                   <TableHead className="text-start">الإجمالي</TableHead>
                   <TableHead className="text-start hidden lg:table-cell">تاريخ الاستحقاق</TableHead>
                   <TableHead className="text-start">الحالة</TableHead>
@@ -236,6 +268,11 @@ export default function AdminFinance(): JSX.Element {
                           <span className="font-medium">{client?.companyName ?? '—'}</span>
                         </div>
                       </TableCell>
+                      <TableCell>
+                        <Badge variant={invTypeVariant[inv.invoiceType]} className="text-[10px]">
+                          {invTypeLabel[inv.invoiceType]}
+                        </Badge>
+                      </TableCell>
                       <TableCell className="font-semibold">{formatMoney(inv.total, inv.currency)}</TableCell>
                       <TableCell className="hidden lg:table-cell text-sm text-muted-foreground">{formatDate(inv.dueDate)}</TableCell>
                       <TableCell>
@@ -253,7 +290,7 @@ export default function AdminFinance(): JSX.Element {
                 })}
                 {filteredInvoices.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
+                    <TableCell colSpan={8} className="text-center py-12 text-muted-foreground">
                       <div className="flex flex-col items-center gap-2">
                         <Inbox className="h-10 w-10 text-muted-foreground/50" />
                         <span>لا توجد فواتير</span>

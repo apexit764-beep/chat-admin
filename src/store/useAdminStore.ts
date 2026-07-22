@@ -543,6 +543,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       number,
       clientId,
       subscriptionId: client.subscriptionId ?? undefined,
+      invoiceType: 'subscription',
       amount,
       tax,
       total,

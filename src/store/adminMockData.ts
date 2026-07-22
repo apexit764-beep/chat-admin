@@ -609,11 +609,14 @@ function makeInvoice(client: Client, monthsAgo: number, status: Invoice['status'
   const amount = plan?.pricesPerCountry[client.country]?.monthly ?? client.mrr;
   const tax = Math.round(amount * 0.05);
   const dueDate = new Date(Date.now() - (monthsAgo - 1) * 30 * 86400000).toISOString();
+  const monthsTotal = Math.min(4, Math.floor((Date.now() - Date.parse(client.joinedAt)) / (30 * 86400000)));
+  const invoiceType: Invoice['invoiceType'] = monthsAgo === monthsTotal ? 'subscription' : monthsAgo <= 1 && plan?.tier === 'enterprise' ? 'upgrade' : 'renewal';
   return {
     id: `inv_${client.id}_${monthsAgo}`,
     number: `INV-2026-${String(parseInt(client.id.split('_')[1]) * 100 + monthsAgo).padStart(5, '0')}`,
     clientId: client.id,
     subscriptionId: client.subscriptionId ?? undefined,
+    invoiceType,
     amount,
     tax,
     total: amount + tax,
