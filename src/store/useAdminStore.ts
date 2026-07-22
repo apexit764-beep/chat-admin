@@ -81,6 +81,7 @@ interface AdminState {
   sendLiveChatNote: (conversationId: string, content: string, senderName: string) => void;
 
   // Feedback actions
+  replyToFeedback: (id: string, text: string, author: string) => void;
 
   // Client actions
   addClient: (c: Omit<Client, 'id' | 'joinedAt' | 'lastActiveAt' | 'subscriptionId' | 'mrr' | 'agentCount' | 'channelCount' | 'conversationCount'>) => Client;
@@ -166,6 +167,15 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   knowledgeCategories: initialKnowledgeCategories,
   knowledgeArticles: hydratedArticles,
   planRequests: initialPlanRequests,
+
+  replyToFeedback: (id, text, author) =>
+    set((s) => ({
+      feedback: s.feedback.map((f) => {
+        if (f.id !== id || f.type !== 'complaint') return f;
+        const reply = { id: `fr_${id}_${Date.now()}`, text, author, timestamp: new Date().toISOString() };
+        return { ...f, status: 'replied' as const, replies: [reply], reply: text, repliedBy: author, repliedAt: reply.timestamp };
+      }),
+    })),
 
   updatePlanRequestStatus: (id, status) =>
     set((s) => ({ planRequests: s.planRequests.map((r) => (r.id === id ? { ...r, status } : r)) })),
