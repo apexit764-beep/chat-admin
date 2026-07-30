@@ -67,7 +67,35 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import type { ClientStatus, Invoice } from '@/types';
+import type { ClientStatus, ChannelType, Invoice } from '@/types';
+
+const channelMeta: Record<ChannelType, { name: string; logo: string; color: string }> = {
+  whatsapp: { name: 'واتساب', logo: '💬', color: 'bg-green-500/10 text-green-600' },
+  messenger: { name: 'ماسنجر', logo: '💙', color: 'bg-blue-500/10 text-blue-600' },
+  instagram: { name: 'انستغرام', logo: '📸', color: 'bg-pink-500/10 text-pink-600' },
+  telegram: { name: 'تيليجرام', logo: '✈️', color: 'bg-sky-500/10 text-sky-600' },
+  x: { name: 'X', logo: '𝕏', color: 'bg-neutral-500/10 text-neutral-700' },
+  widget: { name: 'ويدجت', logo: '🔵', color: 'bg-indigo-500/10 text-indigo-600' },
+  email: { name: 'بريد إلكتروني', logo: '📧', color: 'bg-amber-500/10 text-amber-600' },
+};
+
+const channelPool: ChannelType[] = ['whatsapp', 'messenger', 'instagram', 'telegram', 'x', 'widget', 'email'];
+
+function generateClientChannels(clientId: string, count: number) {
+  if (count <= 0) return [];
+  const seed = clientId.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+  const shuffled = [...channelPool].sort((a, b) => {
+    const ha = ((seed * (channelPool.indexOf(a) + 1)) % 97);
+    const hb = ((seed * (channelPool.indexOf(b) + 1)) % 97);
+    return ha - hb;
+  });
+  return shuffled.slice(0, Math.min(count, channelPool.length)).map((type, i) => ({
+    type,
+    identifier: type === 'whatsapp' ? `+968 9${(seed + i) % 10}${(seed + i * 3) % 10}${(seed + i * 7) % 10} ${(seed + i * 11) % 10}${(seed + i * 13) % 10}${(seed + i * 17) % 10}${(seed + i * 19) % 10}`
+      : type === 'email' ? `support@${clientId.replace('cli_', '')}company.com`
+      : `@client_${clientId.replace('cli_', '')}_${i + 1}`,
+  }));
+}
 
 const statusLabel: Record<ClientStatus, string> = {
   trial: 'فترة تجريبية',
@@ -555,11 +583,52 @@ export default function ClientDetail(): JSX.Element {
 
           {/* Channels Tab */}
           <TabsContent value="channels" className="mt-5">
-            <div className="rounded-xl border bg-card p-8 text-center">
-              <Radio className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-              <p className="text-muted-foreground">لا توجد قنوات مرتبطة</p>
-              <p className="text-xs text-muted-foreground mt-1">القنوات المتصلة ستظهر هنا عند ربطها من لوحة العميل</p>
-            </div>
+            {(() => {
+              const channels = generateClientChannels(client.id, client.channelCount);
+              if (channels.length === 0) return (
+                <div className="rounded-xl border bg-card p-8 text-center">
+                  <Radio className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
+                  <p className="text-muted-foreground">لا توجد قنوات مرتبطة</p>
+                  <p className="text-xs text-muted-foreground mt-1">القنوات المتصلة ستظهر هنا عند ربطها من لوحة العميل</p>
+                </div>
+              );
+              return (
+                <div className="rounded-xl border bg-card">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-right w-12">#</TableHead>
+                        <TableHead className="text-right">المنصة</TableHead>
+                        <TableHead className="text-right">المعرّف</TableHead>
+                        <TableHead className="text-right">النوع</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {channels.map((ch, idx) => {
+                        const meta = channelMeta[ch.type];
+                        return (
+                          <TableRow key={idx}>
+                            <TableCell className="text-xs text-muted-foreground">{idx + 1}</TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <span className={cn('h-8 w-8 rounded-lg flex items-center justify-center text-sm', meta.color)}>{meta.logo}</span>
+                                <span className="font-medium text-sm">{meta.name}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell className="font-mono text-sm text-muted-foreground">{ch.identifier}</TableCell>
+                            <TableCell>
+                              <Badge variant="secondary" className="text-[10px]">
+                                {ch.type === 'whatsapp' || ch.type === 'telegram' ? 'رسائل' : ch.type === 'email' ? 'بريد' : ch.type === 'widget' ? 'محادثة مباشرة' : 'تواصل اجتماعي'}
+                              </Badge>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
+              );
+            })()}
           </TabsContent>
 
           {/* Support Tab */}
