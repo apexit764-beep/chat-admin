@@ -153,9 +153,12 @@ export default function ClientDetail(): JSX.Element {
   };
 
   const handleDelete = async () => {
+    const warning = sub && sub.status === 'active'
+      ? `⚠️ لدى ${client.companyName} اشتراك نشط بـ ${formatMoney(sub.amount, sub.currency)}/${sub.billingCycle === 'monthly' ? 'شهر' : 'سنة'}. سيتم إلغاؤه وحذف الفواتير والمعاملات المرتبطة. لا يمكن التراجع.`
+      : 'سيتم حذف الاشتراك والفواتير والمعاملات المرتبطة معه. هذه العملية لا يمكن التراجع عنها.';
     const ok = await confirm({
       title: `حذف ${client.companyName}؟`,
-      message: 'سيتم حذف الاشتراك والفواتير والمعاملات المرتبطة. لا يمكن التراجع.',
+      message: warning,
       variant: 'danger',
       confirmText: 'حذف نهائي',
     });
