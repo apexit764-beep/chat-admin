@@ -58,6 +58,12 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import type { ClientStatus } from '@/types';
 
 const statusLabel: Record<ClientStatus, string> = {
@@ -107,6 +113,7 @@ export default function ClientDetail(): JSX.Element {
 
   const [internalNote, setInternalNote] = useState('');
   const [notes, setNotes] = useState<string[]>([]);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
 
   if (!client) {
     return (
@@ -146,18 +153,19 @@ export default function ClientDetail(): JSX.Element {
     }
   };
 
-  const handleCancelSub = async () => {
+  const handleCancelSub = () => {
     if (!sub) return;
-    const ok = await confirm({
-      title: 'إلغاء الاشتراك؟',
-      message: `سيتم إلغاء اشتراك ${client.companyName} في باقة ${plan?.nameAr ?? ''}. العميل سيفقد الوصول عند انتهاء الفترة الحالية.`,
-      variant: 'warning',
-      confirmText: 'إلغاء الاشتراك',
-    });
-    if (ok) {
-      cancelSubscription(sub.id);
-      showToast('تم إلغاء الاشتراك', 'success');
-    }
+    setShowCancelDialog(true);
+  };
+
+  const executeCancelSub = (mode: 'now' | 'end_of_period') => {
+    if (!sub) return;
+    cancelSubscription(sub.id, mode);
+    setShowCancelDialog(false);
+    showToast(
+      mode === 'now' ? 'تم إلغاء الاشتراك فورًا' : 'سيتم إلغاء الاشتراك عند نهاية الفترة الحالية',
+      'success',
+    );
   };
 
   const addNote = () => {
@@ -735,6 +743,50 @@ export default function ClientDetail(): JSX.Element {
           </div>
         </div>
       </div>
+
+      {/* Cancel subscription dialog */}
+      <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+        <DialogContent className="max-w-md" dir="rtl">
+          <DialogHeader>
+            <DialogTitle>إلغاء الاشتراك</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground mb-4">
+            اختر طريقة إلغاء اشتراك <span className="font-medium text-foreground">{client.companyName}</span> في باقة <span className="font-medium text-foreground">{plan?.nameAr ?? ''}</span>:
+          </p>
+          <div className="space-y-3">
+            <button
+              type="button"
+              onClick={() => executeCancelSub('now')}
+              className="w-full rounded-lg border border-danger/30 bg-danger/5 p-4 text-start transition-colors hover:bg-danger/10 group"
+            >
+              <div className="flex items-center gap-2 mb-1">
+                <XCircle className="h-4 w-4 text-danger" />
+                <span className="font-semibold text-sm text-danger">إلغاء الباقة حالًا</span>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                سيفقد العميل الوصول فورًا ولن يتمكن من استخدام الخدمة.
+              </p>
+            </button>
+            <button
+              type="button"
+              onClick={() => executeCancelSub('end_of_period')}
+              className="w-full rounded-lg border p-4 text-start transition-colors hover:bg-muted group"
+            >
+              <div className="flex items-center gap-2 mb-1">
+                <Clock className="h-4 w-4 text-warning" />
+                <span className="font-semibold text-sm">إلغاء الباقة عند نهايتها وعدم تجديدها</span>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                سيستمر العميل بالاستخدام حتى نهاية الفترة الحالية
+                {sub?.currentPeriodEnd && (
+                  <span className="font-medium text-foreground"> ({formatDate(sub.currentPeriodEnd)})</span>
+                )}
+                ، ولن يتم التجديد تلقائيًا.
+              </p>
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

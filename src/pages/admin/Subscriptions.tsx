@@ -165,7 +165,7 @@ export default function AdminSubscriptions(): JSX.Element {
       confirmText: 'إلغاء الاشتراك',
     });
     if (ok) {
-      cancelSubscription(subId);
+      cancelSubscription(subId, 'end_of_period');
       showToast('تم إلغاء الاشتراك', 'success');
     }
   };

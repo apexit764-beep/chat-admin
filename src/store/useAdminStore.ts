@@ -111,7 +111,7 @@ interface AdminState {
   // Subscription actions
   createSubscription: (clientId: string, planId: string, billingCycle: 'monthly' | 'yearly') => Subscription;
   updateSubscription: (id: string, patch: Partial<Subscription>) => void;
-  cancelSubscription: (id: string) => void;
+  cancelSubscription: (id: string, mode: 'now' | 'end_of_period') => void;
   extendSubscription: (id: string, days: number) => void;
 
   // Invoice / payment actions
@@ -537,11 +537,15 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       ),
     })),
 
-  cancelSubscription: (id) =>
+  cancelSubscription: (id, mode) =>
     set((s) => ({
-      subscriptions: s.subscriptions.map((sub) =>
-        sub.id === id ? { ...sub, status: 'cancelled', cancelAt: new Date().toISOString() } : sub
-      ),
+      subscriptions: s.subscriptions.map((sub) => {
+        if (sub.id !== id) return sub;
+        if (mode === 'now') {
+          return { ...sub, status: 'cancelled' as const, cancelAt: new Date().toISOString() };
+        }
+        return { ...sub, cancelAt: sub.currentPeriodEnd };
+      }),
     })),
 
   extendSubscription: (id, days) =>
