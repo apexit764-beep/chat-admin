@@ -264,6 +264,19 @@ export default function AdminClients(): JSX.Element {
     }
   };
 
+  const handleReactivate = async (c: Client): Promise<void> => {
+    const ok = await confirm({
+      title: `تفعيل ${c.companyName}؟`,
+      message: 'سيتم استعادة وصول العميل للنظام وتسجيل الدخول.',
+      variant: 'info',
+      confirmText: 'تفعيل',
+    });
+    if (ok) {
+      reactivateClient(c.id);
+      showToast('تم التفعيل', 'success');
+    }
+  };
+
   const handleExport = (rows: Client[]): void => {
     downloadCsv(
       `clients-${new Date().toISOString().slice(0, 10)}.csv`,
@@ -361,7 +374,7 @@ export default function AdminClients(): JSX.Element {
               variant="ghost"
               size="icon"
               className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted"
-              onClick={() => { reactivateClient(r.id); showToast('تم التفعيل', 'success'); }}
+              onClick={() => handleReactivate(r)}
               title="إعادة تفعيل"
               aria-label="إعادة تفعيل"
             >

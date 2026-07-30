@@ -139,6 +139,19 @@ export default function ClientDetail(): JSX.Element {
     }
   };
 
+  const handleReactivate = async () => {
+    const ok = await confirm({
+      title: `تفعيل ${client.companyName}؟`,
+      message: 'سيتم استعادة وصول العميل للنظام وتسجيل الدخول.',
+      variant: 'info',
+      confirmText: 'تفعيل',
+    });
+    if (ok) {
+      reactivateClient(client.id);
+      showToast('تم التفعيل', 'success');
+    }
+  };
+
   const handleDelete = async () => {
     const ok = await confirm({
       title: `حذف ${client.companyName}؟`,
@@ -234,7 +247,7 @@ export default function ClientDetail(): JSX.Element {
                   <Edit2 className="h-4 w-4 me-2" /> تعديل البيانات
                 </DropdownMenuItem>
                 {client.status === 'suspended' ? (
-                  <DropdownMenuItem onClick={() => { reactivateClient(client.id); showToast('تم التفعيل', 'success'); }}>
+                  <DropdownMenuItem onClick={handleReactivate}>
                     <PlayCircle className="h-4 w-4 me-2" /> إعادة تفعيل
                   </DropdownMenuItem>
                 ) : (
