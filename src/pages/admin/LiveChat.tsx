@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Search,
   Send,
@@ -56,11 +57,12 @@ const channelConfig: Record<string, { icon: React.ElementType; label: string; co
   email: { icon: Globe, label: 'البريد', color: 'text-blue-500' },
 };
 
-type FilterStatus = 'all' | 'open' | 'assigned' | 'resolved';
+type FilterStatus = 'all' | 'open' | 'assigned' | 'resolved' | 'closed';
 
 export default function LiveChat() {
-  const { liveChatConversations, clients, plans, subscriptions, adminUsers, assignLiveChat, resolveLiveChat, sendLiveChatMessage, sendLiveChatNote, sendLiveChatAttachment } = useAdminStore();
+  const { liveChatConversations, clients, plans, subscriptions, adminUsers, assignLiveChat, resolveLiveChat, closeLiveChat, markConversationRead, sendLiveChatMessage, sendLiveChatNote, sendLiveChatAttachment } = useAdminStore();
   const user = useAuthStore((s) => s.user);
+  const navigate = useNavigate();
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -102,7 +104,8 @@ export default function LiveChat() {
         (c) =>
           c.visitorName.toLowerCase().includes(q) ||
           (c.visitorEmail && c.visitorEmail.toLowerCase().includes(q)) ||
-          (clientMap[c.clientId] || '').toLowerCase().includes(q)
+          (clientMap[c.clientId] || '').toLowerCase().includes(q) ||
+          c.messages.some((m) => m.content.toLowerCase().includes(q))
       );
     }
     if (sort === 'newest') {
@@ -111,9 +114,7 @@ export default function LiveChat() {
       list.sort((a, b) => new Date(a.lastMessageAt).getTime() - new Date(b.lastMessageAt).getTime());
     } else {
       list.sort((a, b) => {
-        const aUnread = a.status === 'open' ? a.messages.filter((m) => m.sender === 'visitor').length : 0;
-        const bUnread = b.status === 'open' ? b.messages.filter((m) => m.sender === 'visitor').length : 0;
-        if (bUnread !== aUnread) return bUnread - aUnread;
+        if (b.unreadCount !== a.unreadCount) return b.unreadCount - a.unreadCount;
         return new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime();
       });
     }
@@ -176,10 +177,19 @@ export default function LiveChat() {
 
   const handleStatusChange = (newStatus: LiveChatStatus) => {
     if (!selectedId || !selected) return;
+    if (newStatus === selected.status) return;
     if (newStatus === 'resolved') {
       resolveLiveChat(selectedId);
-    } else if (newStatus === 'assigned' && !selected.assignedTo) {
-      assignLiveChat(selectedId, user?.name ?? 'مشرف');
+    } else if (newStatus === 'closed') {
+      closeLiveChat(selectedId);
+    } else if (newStatus === 'assigned') {
+      assignLiveChat(selectedId, selected.assignedTo ?? user?.name ?? 'مشرف');
+    } else if (newStatus === 'open') {
+      useAdminStore.setState((s) => ({
+        liveChatConversations: s.liveChatConversations.map((c) =>
+          c.id === selectedId ? { ...c, status: 'open' } : c
+        ),
+      }));
     }
   };
 
@@ -224,6 +234,7 @@ export default function LiveChat() {
                   <SelectItem value="open">جديدة</SelectItem>
                   <SelectItem value="assigned">قيد المعالجة</SelectItem>
                   <SelectItem value="resolved">تم الحل</SelectItem>
+                  <SelectItem value="closed">مغلقة</SelectItem>
                 </SelectContent>
               </Select>
               <span className="text-xs text-muted-foreground">
@@ -257,12 +268,12 @@ export default function LiveChat() {
                 const lastMsg = visibleMsgs[visibleMsgs.length - 1];
                 const cfg = statusConfig[conv.status];
                 const isActive = conv.id === selectedId;
-                const unread = conv.status === 'open' ? conv.messages.filter(m => m.sender === 'visitor').length : 0;
+                const unread = conv.unreadCount;
 
                 return (
                   <button
                     key={conv.id}
-                    onClick={() => { setSelectedId(conv.id); setShowDetails(false); }}
+                    onClick={() => { setSelectedId(conv.id); setShowDetails(false); if (conv.unreadCount > 0) markConversationRead(conv.id); }}
                     className={cn(
                       'w-full text-right px-3 py-3 transition-colors border-b border-border/40 hover:bg-muted/50',
                       isActive && 'bg-primary/5 border-r-[3px] border-r-primary'
@@ -599,9 +610,13 @@ export default function LiveChat() {
                 {selected.visitorEmail && (
                   <p className="text-xs text-muted-foreground mt-1">{selected.visitorEmail}</p>
                 )}
-                <p className="text-xs text-muted-foreground mt-0.5">
+                <button
+                  type="button"
+                  className="text-xs text-primary hover:underline mt-0.5 cursor-pointer"
+                  onClick={() => navigate(`/clients/${selected.clientId}`)}
+                >
                   {clientMap[selected.clientId] || '—'}
-                </p>
+                </button>
               </div>
 
               {/* Client Plan / Subscription */}
