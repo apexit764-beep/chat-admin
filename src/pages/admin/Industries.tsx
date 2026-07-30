@@ -4,6 +4,7 @@ import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
 import { useConfirm } from '@components/ui';
 import { formatDate } from '@/utils/format';
+import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -31,6 +32,7 @@ export default function Industries({ onBack }: { onBack?: () => void }): JSX.Ele
   const addIndustry = useAdminStore((s) => s.addIndustry);
   const updateIndustry = useAdminStore((s) => s.updateIndustry);
   const deleteIndustry = useAdminStore((s) => s.deleteIndustry);
+  const toggleIndustryActive = useAdminStore((s) => s.toggleIndustryActive);
   const adminUsers = useAdminStore((s) => s.adminUsers);
   const currentAdmin = adminUsers[0];
   const { confirm } = useConfirm();
@@ -80,6 +82,24 @@ export default function Industries({ onBack }: { onBack?: () => void }): JSX.Ele
 
   const getClientCount = (indName: string) => clients.filter((c) => c.industry === indName).length;
 
+  const handleToggleActive = async (id: string, indName: string, currentlyActive: boolean) => {
+    if (currentlyActive) {
+      const ok = await confirm({
+        title: `تعطيل "${indName}"؟`,
+        message: 'لن يظهر هذا المجال في قائمة الخيارات عند إضافة أو تعديل العملاء. العملاء المرتبطون به حالياً لن يتأثروا.',
+        variant: 'warning',
+        confirmText: 'تعطيل',
+      });
+      if (ok) {
+        toggleIndustryActive(id);
+        showToast('تم تعطيل مجال العمل', 'success');
+      }
+    } else {
+      toggleIndustryActive(id);
+      showToast('تم تفعيل مجال العمل', 'success');
+    }
+  };
+
   return (
     <div className="p-4 lg:p-6 space-y-4 page-fade">
       <div className="flex items-center justify-between">
@@ -119,13 +139,14 @@ export default function Industries({ onBack }: { onBack?: () => void }): JSX.Ele
                 <TableHead className="text-start">عدد العملاء</TableHead>
                 <TableHead className="text-start">أُضيف بواسطة</TableHead>
                 <TableHead className="text-start">تاريخ الإضافة</TableHead>
+                <TableHead className="text-center">الحالة</TableHead>
                 <TableHead className="text-start w-[120px]">إجراءات</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {industries.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-muted-foreground py-10">
+                  <TableCell colSpan={7} className="text-center text-muted-foreground py-10">
                     لا توجد مجالات عمل. أضف مجالاً جديداً للبدء.
                   </TableCell>
                 </TableRow>
@@ -145,6 +166,12 @@ export default function Industries({ onBack }: { onBack?: () => void }): JSX.Ele
                     </TableCell>
                     <TableCell className="text-sm">{ind.addedBy}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">{formatDate(ind.createdAt)}</TableCell>
+                    <TableCell className="text-center">
+                      <Switch
+                        checked={ind.active}
+                        onCheckedChange={() => handleToggleActive(ind.id, ind.name, ind.active)}
+                      />
+                    </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
                         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(ind.id, ind.name)}>

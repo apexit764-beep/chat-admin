@@ -107,6 +107,7 @@ interface AdminState {
   addIndustry: (name: string, addedBy: string) => Industry;
   updateIndustry: (id: string, name: string) => void;
   deleteIndustry: (id: string) => void;
+  toggleIndustryActive: (id: string) => void;
 
   // Subscription actions
   createSubscription: (clientId: string, planId: string, billingCycle: 'monthly' | 'yearly') => Subscription;
@@ -490,7 +491,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     set((s) => ({ countries: s.countries.filter((c) => c.code !== code) })),
 
   addIndustry: (name, addedBy) => {
-    const ind: Industry = { id: newId('ind'), name, addedBy, createdAt: new Date().toISOString() };
+    const ind: Industry = { id: newId('ind'), name, addedBy, createdAt: new Date().toISOString(), active: true };
     set((s) => ({ industries: [...s.industries, ind] }));
     return ind;
   },
@@ -500,6 +501,9 @@ export const useAdminStore = create<AdminState>((set, get) => ({
 
   deleteIndustry: (id) =>
     set((s) => ({ industries: s.industries.filter((i) => i.id !== id) })),
+
+  toggleIndustryActive: (id) =>
+    set((s) => ({ industries: s.industries.map((i) => (i.id === id ? { ...i, active: !i.active } : i)) })),
 
   createSubscription: (clientId, planId, billingCycle) => {
     const client = get().clients.find((c) => c.id === clientId);

@@ -192,6 +192,7 @@ export interface Industry {
   name: string;
   addedBy: string;
   createdAt: string;
+  active: boolean;
 }
 
 export type ClientStatus = 'trial' | 'active' | 'past_due' | 'suspended' | 'cancelled';

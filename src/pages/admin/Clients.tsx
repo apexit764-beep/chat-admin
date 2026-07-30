@@ -610,7 +610,7 @@ export default function AdminClients(): JSX.Element {
                     <SelectValue placeholder="اختر مجال العمل" />
                   </SelectTrigger>
                   <SelectContent>
-                    {industries.map((ind) => (
+                    {industries.filter((ind) => ind.active || ind.name === form.industry).map((ind) => (
                       <SelectItem key={ind.id} value={ind.name}>{ind.name}</SelectItem>
                     ))}
                   </SelectContent>

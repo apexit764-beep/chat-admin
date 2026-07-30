@@ -48,21 +48,21 @@ function pricesFromUSD(usd: number): Record<string, { monthly: number; yearly: n
 }
 
 export const industries: Industry[] = [
-  { id: 'ind_1', name: 'عقارات', addedBy: 'محمد الكندي', createdAt: nowMinus(60 * 24 * 300) },
-  { id: 'ind_2', name: 'مطاعم', addedBy: 'محمد الكندي', createdAt: nowMinus(60 * 24 * 295) },
-  { id: 'ind_3', name: 'تعليم', addedBy: 'محمد الكندي', createdAt: nowMinus(60 * 24 * 290) },
-  { id: 'ind_4', name: 'صحة', addedBy: 'Sara Ahmed', createdAt: nowMinus(60 * 24 * 280) },
-  { id: 'ind_5', name: 'تقنية', addedBy: 'Sara Ahmed', createdAt: nowMinus(60 * 24 * 270) },
-  { id: 'ind_6', name: 'سياحة', addedBy: 'محمد الكندي', createdAt: nowMinus(60 * 24 * 260) },
-  { id: 'ind_7', name: 'سيارات', addedBy: 'علي السالم', createdAt: nowMinus(60 * 24 * 250) },
-  { id: 'ind_8', name: 'تجزئة', addedBy: 'محمد الكندي', createdAt: nowMinus(60 * 24 * 240) },
-  { id: 'ind_9', name: 'لوجستيات', addedBy: 'Sara Ahmed', createdAt: nowMinus(60 * 24 * 220) },
-  { id: 'ind_10', name: 'تجميل', addedBy: 'علي السالم', createdAt: nowMinus(60 * 24 * 200) },
-  { id: 'ind_11', name: 'زراعة', addedBy: 'محمد الكندي', createdAt: nowMinus(60 * 24 * 180) },
-  { id: 'ind_12', name: 'تمويل وبنوك', addedBy: 'Sara Ahmed', createdAt: nowMinus(60 * 24 * 150) },
-  { id: 'ind_13', name: 'إعلام ونشر', addedBy: 'محمد الكندي', createdAt: nowMinus(60 * 24 * 120) },
-  { id: 'ind_14', name: 'بناء ومقاولات', addedBy: 'علي السالم', createdAt: nowMinus(60 * 24 * 90) },
-  { id: 'ind_15', name: 'تصنيع', addedBy: 'محمد الكندي', createdAt: nowMinus(60 * 24 * 60) },
+  { id: 'ind_1', name: 'عقارات', addedBy: 'محمد الكندي', createdAt: nowMinus(60 * 24 * 300), active: true },
+  { id: 'ind_2', name: 'مطاعم', addedBy: 'محمد الكندي', createdAt: nowMinus(60 * 24 * 295), active: true },
+  { id: 'ind_3', name: 'تعليم', addedBy: 'محمد الكندي', createdAt: nowMinus(60 * 24 * 290), active: true },
+  { id: 'ind_4', name: 'صحة', addedBy: 'Sara Ahmed', createdAt: nowMinus(60 * 24 * 280), active: true },
+  { id: 'ind_5', name: 'تقنية', addedBy: 'Sara Ahmed', createdAt: nowMinus(60 * 24 * 270), active: true },
+  { id: 'ind_6', name: 'سياحة', addedBy: 'محمد الكندي', createdAt: nowMinus(60 * 24 * 260), active: true },
+  { id: 'ind_7', name: 'سيارات', addedBy: 'علي السالم', createdAt: nowMinus(60 * 24 * 250), active: true },
+  { id: 'ind_8', name: 'تجزئة', addedBy: 'محمد الكندي', createdAt: nowMinus(60 * 24 * 240), active: true },
+  { id: 'ind_9', name: 'لوجستيات', addedBy: 'Sara Ahmed', createdAt: nowMinus(60 * 24 * 220), active: true },
+  { id: 'ind_10', name: 'تجميل', addedBy: 'علي السالم', createdAt: nowMinus(60 * 24 * 200), active: true },
+  { id: 'ind_11', name: 'زراعة', addedBy: 'محمد الكندي', createdAt: nowMinus(60 * 24 * 180), active: true },
+  { id: 'ind_12', name: 'تمويل وبنوك', addedBy: 'Sara Ahmed', createdAt: nowMinus(60 * 24 * 150), active: true },
+  { id: 'ind_13', name: 'إعلام ونشر', addedBy: 'محمد الكندي', createdAt: nowMinus(60 * 24 * 120), active: true },
+  { id: 'ind_14', name: 'بناء ومقاولات', addedBy: 'علي السالم', createdAt: nowMinus(60 * 24 * 90), active: true },
+  { id: 'ind_15', name: 'تصنيع', addedBy: 'محمد الكندي', createdAt: nowMinus(60 * 24 * 60), active: true },
 ];
 
 export const plans: Plan[] = [
