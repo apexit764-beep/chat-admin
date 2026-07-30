@@ -140,7 +140,7 @@ export default function ClientDetail(): JSX.Element {
   const clientInvoices = useMemo(() => invoices.filter((i) => i.clientId === id).sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt)), [invoices, id]);
   const clientTransactions = useMemo(() => transactions.filter((t) => t.clientId === id).sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt)), [transactions, id]);
   const clientFeedback = useMemo(() => feedback.filter((f) => f.clientId === id), [feedback, id]);
-  const clientActivity = useMemo(() => activityLog.filter((a) => a.target === client?.companyName || a.target === id), [activityLog, client?.companyName, id]);
+  const clientActivity = useMemo(() => activityLog.filter((a) => a.clientId === id || a.target === client?.companyName || a.target === id).sort((a, b) => Date.parse(b.timestamp) - Date.parse(a.timestamp)), [activityLog, client?.companyName, id]);
 
   const [internalNote, setInternalNote] = useState('');
   const [notes, setNotes] = useState<{ text: string; by: string; at: string }[]>([]);
@@ -688,19 +688,30 @@ export default function ClientDetail(): JSX.Element {
                 </div>
               ) : (
                 <div className="divide-y">
-                  {clientActivity.map((entry) => (
-                    <div key={entry.id} className="p-4 flex items-start gap-3">
-                      <div className="mt-0.5">
-                        <ActivityIcon action={entry.action} />
+                  {clientActivity.map((entry) => {
+                    const role = entry.actorRole ?? 'admin';
+                    const roleBadge = role === 'client'
+                      ? { label: 'العميل', cls: 'bg-info/15 text-info' }
+                      : role === 'system'
+                        ? { label: 'النظام', cls: 'bg-muted text-muted-foreground' }
+                        : { label: 'المشرف', cls: 'bg-primary/15 text-primary' };
+                    return (
+                      <div key={entry.id} className="p-4 flex items-start gap-3">
+                        <div className="mt-0.5">
+                          <ActivityIcon action={entry.action} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="text-sm font-medium">{entry.details || actionLabel(entry.action)}</p>
+                            <Badge className={cn('text-[10px] px-1.5 py-0 h-4 border-transparent', roleBadge.cls)}>{roleBadge.label}</Badge>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            {entry.actor} • {timeAgo(entry.timestamp)}
+                          </p>
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium">{entry.details || actionLabel(entry.action)}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {entry.actor} • {timeAgo(entry.timestamp)}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -1062,7 +1073,17 @@ function ActivityIcon({ action }: { action: string }) {
     case 'payment_received': return <CreditCard className={cn(cls, 'text-success')} />;
     case 'subscription_created': return <CreditCard className={cn(cls, 'text-info')} />;
     case 'subscription_cancelled': return <XCircle className={cn(cls, 'text-warning')} />;
+    case 'subscription_cancel_scheduled': return <Clock className={cn(cls, 'text-warning')} />;
+    case 'subscription_upgraded': return <TrendingUp className={cn(cls, 'text-success')} />;
     case 'invoice_refunded': return <FileText className={cn(cls, 'text-warning')} />;
+    case 'invoice_resent': return <Send className={cn(cls, 'text-info')} />;
+    case 'client_email_changed': return <Mail className={cn(cls, 'text-info')} />;
+    case 'client_password_changed': return <Shield className={cn(cls, 'text-warning')} />;
+    case 'employee_registered': return <Users className={cn(cls, 'text-info')} />;
+    case 'channel_connected': return <Radio className={cn(cls, 'text-success')} />;
+    case 'channel_disconnected': return <Radio className={cn(cls, 'text-danger')} />;
+    case 'complaint_submitted': return <AlertTriangle className={cn(cls, 'text-warning')} />;
+    case 'support_replied': return <Headphones className={cn(cls, 'text-info')} />;
     default: return <Activity className={cn(cls, 'text-muted-foreground')} />;
   }
 }
@@ -1076,7 +1097,17 @@ function actionLabel(action: string): string {
     payment_received: 'تم استلام دفعة',
     subscription_created: 'تم إنشاء اشتراك',
     subscription_cancelled: 'تم إلغاء الاشتراك',
+    subscription_cancel_scheduled: 'تم جدولة إلغاء الاشتراك',
+    subscription_upgraded: 'تم ترقية الاشتراك',
     invoice_refunded: 'تم استرجاع فاتورة',
+    invoice_resent: 'تم إعادة إرسال الفاتورة',
+    client_email_changed: 'تم تغيير البريد الإلكتروني',
+    client_password_changed: 'تم تغيير كلمة المرور',
+    employee_registered: 'تم تسجيل موظف',
+    channel_connected: 'تم ربط قناة',
+    channel_disconnected: 'تم فصل قناة',
+    complaint_submitted: 'تم تقديم شكوى',
+    support_replied: 'تم الرد على تذكرة دعم',
   };
   return map[action] ?? action;
 }
