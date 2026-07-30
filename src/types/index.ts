@@ -385,6 +385,7 @@ export interface LiveChatConversation {
   assignedTo?: string;
   channel: 'widget' | 'whatsapp' | 'email';
   messages: LiveChatMessage[];
+  unreadCount: number;
   startedAt: string;
   lastMessageAt: string;
 }

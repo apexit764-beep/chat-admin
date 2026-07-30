@@ -77,6 +77,8 @@ interface AdminState {
   assignLiveChat: (id: string, agentName: string) => void;
   transferLiveChat: (id: string, toAgent: string) => void;
   resolveLiveChat: (id: string) => void;
+  closeLiveChat: (id: string) => void;
+  markConversationRead: (id: string) => void;
   sendLiveChatMessage: (conversationId: string, content: string, senderName: string) => void;
   sendLiveChatNote: (conversationId: string, content: string, senderName: string) => void;
   sendLiveChatAttachment: (conversationId: string, senderName: string, file: { url: string; name: string; size: number; type: 'image' | 'file' }) => void;
@@ -337,23 +339,43 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       ),
     })),
 
+  closeLiveChat: (id) =>
+    set((s) => ({
+      liveChatConversations: s.liveChatConversations.map((c) =>
+        c.id === id ? { ...c, status: 'closed' } : c
+      ),
+    })),
+
+  markConversationRead: (id) =>
+    set((s) => ({
+      liveChatConversations: s.liveChatConversations.map((c) =>
+        c.id === id ? { ...c, unreadCount: 0 } : c
+      ),
+    })),
+
   sendLiveChatMessage: (conversationId, content, senderName) =>
     set((s) => {
       const now = new Date().toISOString();
+      const conv = s.liveChatConversations.find((c) => c.id === conversationId);
+      const isVisitor = conv?.visitorName === senderName;
       const msg: LiveChatMessage = {
         id: `lm_${Math.random().toString(36).slice(2, 10)}`,
         conversationId,
-        sender: 'agent',
+        sender: isVisitor ? 'visitor' : 'agent',
         senderName,
         content,
         timestamp: now,
       };
       return {
-        liveChatConversations: s.liveChatConversations.map((c) =>
-          c.id === conversationId
-            ? { ...c, messages: [...c.messages, msg], lastMessageAt: now }
-            : c
-        ),
+        liveChatConversations: s.liveChatConversations.map((c) => {
+          if (c.id !== conversationId) return c;
+          const patch: Partial<typeof c> = { messages: [...c.messages, msg], lastMessageAt: now };
+          if (isVisitor) {
+            patch.unreadCount = (c.unreadCount ?? 0) + 1;
+            if (c.status === 'closed') patch.status = 'open';
+          }
+          return { ...c, ...patch };
+        }),
       };
     }),
 

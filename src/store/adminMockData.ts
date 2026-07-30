@@ -805,13 +805,23 @@ export type ActivityAction =
   | 'client_suspended'
   | 'client_reactivated'
   | 'client_deleted'
+  | 'client_email_changed'
+  | 'client_password_changed'
   | 'plan_created'
   | 'plan_updated'
   | 'plan_deleted'
   | 'subscription_created'
   | 'subscription_cancelled'
+  | 'subscription_cancel_scheduled'
+  | 'subscription_upgraded'
   | 'invoice_refunded'
+  | 'invoice_resent'
   | 'payment_received'
+  | 'employee_registered'
+  | 'channel_connected'
+  | 'channel_disconnected'
+  | 'complaint_submitted'
+  | 'support_replied'
   | 'admin_login'
   | 'admin_logout'
   | 'admin_user_added'
@@ -824,6 +834,8 @@ export interface ActivityEntry {
   action: ActivityAction;
   actor: string;
   actorEmail: string;
+  actorRole?: 'admin' | 'client' | 'system';
+  clientId?: string;
   target?: string;
   details?: string;
   timestamp: string;
@@ -831,26 +843,69 @@ export interface ActivityEntry {
 }
 
 export const activityLog: ActivityEntry[] = [
-  { id: 'act_1', action: 'admin_login', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', timestamp: nowMinus(2), ip: '185.69.144.12' },
-  { id: 'act_2', action: 'client_created', actor: 'Sara Ahmed', actorEmail: 'sara@apexes.click', target: 'صالون لمسة جمال', details: 'تسجيل عميل جديد — البحرين', timestamp: nowMinus(15) },
-  { id: 'act_3', action: 'payment_received', actor: 'النظام', actorEmail: 'system', target: 'Royal Auto Kuwait', details: '77 د.ك — باقة المؤسسات', timestamp: nowMinus(45) },
-  { id: 'act_4', action: 'subscription_created', actor: 'Sara Ahmed', actorEmail: 'sara@apexes.click', target: 'عيادة الحياة الطبية', details: 'باقة الاحترافي — شهري', timestamp: nowMinus(90) },
-  { id: 'act_5', action: 'client_suspended', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', target: 'مكتبة المعرفة', details: 'دفع متأخر 10 أيام', timestamp: nowMinus(180) },
-  { id: 'act_6', action: 'invoice_refunded', actor: 'Layla Khalid', actorEmail: 'layla@apexes.click', target: 'TechFlow Egypt', details: '978 ج.م — فاتورة INV-2026-00601', timestamp: nowMinus(300) },
-  { id: 'act_7', action: 'plan_updated', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', target: 'الاحترافي', details: 'تحديث حدود المحادثات: 5,000 → 10,000', timestamp: nowMinus(420) },
-  { id: 'act_8', action: 'admin_user_added', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', target: 'Layla Khalid', details: 'دور: مالية', timestamp: nowMinus(600) },
-  { id: 'act_9', action: 'paymob_updated', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', details: 'تحديث مفتاح API وتفعيل الوضع الحي', timestamp: nowMinus(720) },
-  { id: 'act_10', action: 'settings_updated', actor: 'Sara Ahmed', actorEmail: 'sara@apexes.click', details: 'تحديث بيانات الدعم الفني', timestamp: nowMinus(960) },
-  { id: 'act_11', action: 'client_reactivated', actor: 'علي السالم', actorEmail: 'ali@apexes.click', target: 'مزرعة البركة', details: 'تم استلام الدفعة المتأخرة', timestamp: nowMinus(1200) },
-  { id: 'act_12', action: 'admin_login', actor: 'Sara Ahmed', actorEmail: 'sara@apexes.click', timestamp: nowMinus(1440), ip: '91.74.32.55' },
-  { id: 'act_13', action: 'payment_received', actor: 'النظام', actorEmail: 'system', target: 'Dubai Real Estate Co.', details: '363 د.إ — باقة الأعمال', timestamp: nowMinus(1500) },
-  { id: 'act_14', action: 'client_created', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', target: 'مدرسة الفجر الذهبي', details: 'تسجيل عميل جديد — السعودية', timestamp: nowMinus(1800) },
-  { id: 'act_15', action: 'subscription_cancelled', actor: 'النظام', actorEmail: 'system', target: 'مزرعة البركة', details: 'إلغاء تلقائي — عدم الدفع', timestamp: nowMinus(2400) },
-  { id: 'act_16', action: 'admin_login', actor: 'علي السالم', actorEmail: 'ali@apexes.click', timestamp: nowMinus(2880), ip: '185.69.144.15' },
-  { id: 'act_17', action: 'plan_created', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', target: 'المؤسسات', details: 'باقة جديدة — $249/شهر', timestamp: nowMinus(3600) },
-  { id: 'act_18', action: 'client_deleted', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', target: 'شركة تجريبية', details: 'حذف حساب تجريبي منتهي', timestamp: nowMinus(4320) },
-  { id: 'act_19', action: 'admin_logout', actor: 'Layla Khalid', actorEmail: 'layla@apexes.click', timestamp: nowMinus(5000) },
-  { id: 'act_20', action: 'payment_received', actor: 'النظام', actorEmail: 'system', target: 'Qatar Logistics Group', details: '360 ر.ق — باقة الأعمال', timestamp: nowMinus(5760) },
+  // Global admin actions
+  { id: 'act_1', action: 'admin_login', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', actorRole: 'admin', timestamp: nowMinus(2), ip: '185.69.144.12' },
+  { id: 'act_7', action: 'plan_updated', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', actorRole: 'admin', target: 'الاحترافي', details: 'تحديث حدود المحادثات: 5,000 → 10,000', timestamp: nowMinus(420) },
+  { id: 'act_8', action: 'admin_user_added', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', actorRole: 'admin', target: 'Layla Khalid', details: 'دور: مالية', timestamp: nowMinus(600) },
+  { id: 'act_9', action: 'paymob_updated', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', actorRole: 'admin', details: 'تحديث مفتاح API وتفعيل الوضع الحي', timestamp: nowMinus(720) },
+  { id: 'act_10', action: 'settings_updated', actor: 'Sara Ahmed', actorEmail: 'sara@apexes.click', actorRole: 'admin', details: 'تحديث بيانات الدعم الفني', timestamp: nowMinus(960) },
+  { id: 'act_12', action: 'admin_login', actor: 'Sara Ahmed', actorEmail: 'sara@apexes.click', actorRole: 'admin', timestamp: nowMinus(1440), ip: '91.74.32.55' },
+  { id: 'act_16', action: 'admin_login', actor: 'علي السالم', actorEmail: 'ali@apexes.click', actorRole: 'admin', timestamp: nowMinus(2880), ip: '185.69.144.15' },
+  { id: 'act_17', action: 'plan_created', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', actorRole: 'admin', target: 'المؤسسات', details: 'باقة جديدة — $249/شهر', timestamp: nowMinus(3600) },
+  { id: 'act_18', action: 'client_deleted', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', actorRole: 'admin', target: 'شركة تجريبية', details: 'حذف حساب تجريبي منتهي', timestamp: nowMinus(4320) },
+  { id: 'act_19', action: 'admin_logout', actor: 'Layla Khalid', actorEmail: 'layla@apexes.click', actorRole: 'admin', timestamp: nowMinus(5000) },
+
+  // Client-specific: صالون لمسة جمال (client_11)
+  { id: 'act_2', action: 'client_created', actor: 'Sara Ahmed', actorEmail: 'sara@apexes.click', actorRole: 'admin', clientId: 'client_11', target: 'صالون لمسة جمال', details: 'تسجيل عميل جديد — البحرين', timestamp: nowMinus(15) },
+  { id: 'act_c11a', action: 'channel_connected', actor: 'صالون لمسة جمال', actorEmail: 'salon@beautybh.com', actorRole: 'client', clientId: 'client_11', details: 'واتساب — +973 3344 5566', timestamp: nowMinus(10) },
+
+  // Client-specific: Royal Auto Kuwait (client_8)
+  { id: 'act_3', action: 'payment_received', actor: 'النظام', actorEmail: 'system', actorRole: 'system', clientId: 'client_8', target: 'Royal Auto Kuwait', details: '77 د.ك — باقة المؤسسات', timestamp: nowMinus(45) },
+  { id: 'act_c8a', action: 'subscription_upgraded', actor: 'Royal Auto Kuwait', actorEmail: 'info@royalauto.kw', actorRole: 'client', clientId: 'client_8', details: 'ترقية من الأعمال إلى المؤسسات', timestamp: nowMinus(50) },
+  { id: 'act_c8b', action: 'employee_registered', actor: 'Royal Auto Kuwait', actorEmail: 'info@royalauto.kw', actorRole: 'client', clientId: 'client_8', details: 'موظف جديد: أحمد المطيري', timestamp: nowMinus(100) },
+  { id: 'act_c8c', action: 'channel_connected', actor: 'Royal Auto Kuwait', actorEmail: 'info@royalauto.kw', actorRole: 'client', clientId: 'client_8', details: 'انستغرام — @royalauto_kw', timestamp: nowMinus(200) },
+
+  // Client-specific: عيادة الحياة الطبية (client_5)
+  { id: 'act_4', action: 'subscription_created', actor: 'Sara Ahmed', actorEmail: 'sara@apexes.click', actorRole: 'admin', clientId: 'client_5', target: 'عيادة الحياة الطبية', details: 'باقة الاحترافي — شهري', timestamp: nowMinus(90) },
+  { id: 'act_c5a', action: 'complaint_submitted', actor: 'عيادة الحياة الطبية', actorEmail: 'clinic@hayat.om', actorRole: 'client', clientId: 'client_5', details: 'الموضوع: مشكلة في إرسال الرسائل الجماعية', timestamp: nowMinus(60) },
+  { id: 'act_c5b', action: 'support_replied', actor: 'علي السالم', actorEmail: 'ali@apexes.click', actorRole: 'admin', clientId: 'client_5', details: 'رد على: مشكلة في إرسال الرسائل الجماعية', timestamp: nowMinus(55) },
+  { id: 'act_c5c', action: 'employee_registered', actor: 'عيادة الحياة الطبية', actorEmail: 'clinic@hayat.om', actorRole: 'client', clientId: 'client_5', details: 'موظف جديد: فاطمة الريامي', timestamp: nowMinus(120) },
+
+  // Client-specific: مكتبة المعرفة (client_9)
+  { id: 'act_5', action: 'client_suspended', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', actorRole: 'admin', clientId: 'client_9', target: 'مكتبة المعرفة', details: 'دفع متأخر 10 أيام', timestamp: nowMinus(180) },
+
+  // Client-specific: TechFlow Egypt (client_6)
+  { id: 'act_6', action: 'invoice_refunded', actor: 'Layla Khalid', actorEmail: 'layla@apexes.click', actorRole: 'admin', clientId: 'client_6', target: 'TechFlow Egypt', details: '978 ج.م — فاتورة INV-2026-00601', timestamp: nowMinus(300) },
+  { id: 'act_c6a', action: 'client_email_changed', actor: 'Sara Ahmed', actorEmail: 'sara@apexes.click', actorRole: 'admin', clientId: 'client_6', details: 'البريد: old@techflow.eg → info@techflow.eg', timestamp: nowMinus(280) },
+  { id: 'act_c6b', action: 'invoice_resent', actor: 'Layla Khalid', actorEmail: 'layla@apexes.click', actorRole: 'admin', clientId: 'client_6', details: 'إعادة إرسال فاتورة INV-2026-00601 عبر البريد والواتساب', timestamp: nowMinus(295) },
+  { id: 'act_c6c', action: 'channel_connected', actor: 'TechFlow Egypt', actorEmail: 'info@techflow.eg', actorRole: 'client', clientId: 'client_6', details: 'تيليجرام — @techflow_eg', timestamp: nowMinus(400) },
+  { id: 'act_c6d', action: 'channel_disconnected', actor: 'TechFlow Egypt', actorEmail: 'info@techflow.eg', actorRole: 'client', clientId: 'client_6', details: 'ماسنجر — TechFlow Egypt', timestamp: nowMinus(350) },
+
+  // Client-specific: مزرعة البركة (client_12)
+  { id: 'act_11', action: 'client_reactivated', actor: 'علي السالم', actorEmail: 'ali@apexes.click', actorRole: 'admin', clientId: 'client_12', target: 'مزرعة البركة', details: 'تم استلام الدفعة المتأخرة', timestamp: nowMinus(1200) },
+  { id: 'act_15', action: 'subscription_cancelled', actor: 'النظام', actorEmail: 'system', actorRole: 'system', clientId: 'client_12', target: 'مزرعة البركة', details: 'إلغاء تلقائي — عدم الدفع', timestamp: nowMinus(2400) },
+
+  // Client-specific: Dubai Real Estate Co. (client_3)
+  { id: 'act_13', action: 'payment_received', actor: 'النظام', actorEmail: 'system', actorRole: 'system', clientId: 'client_3', target: 'Dubai Real Estate Co.', details: '363 د.إ — باقة الأعمال', timestamp: nowMinus(1500) },
+  { id: 'act_c3a', action: 'client_password_changed', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', actorRole: 'admin', clientId: 'client_3', details: 'تم تغيير كلمة المرور وإرسال البيانات الجديدة', timestamp: nowMinus(1000) },
+  { id: 'act_c3b', action: 'subscription_cancel_scheduled', actor: 'Dubai Real Estate Co.', actorEmail: 'info@dubaire.ae', actorRole: 'client', clientId: 'client_3', details: 'طلب إلغاء عند نهاية الفترة الحالية', timestamp: nowMinus(800) },
+  { id: 'act_c3c', action: 'employee_registered', actor: 'Dubai Real Estate Co.', actorEmail: 'info@dubaire.ae', actorRole: 'client', clientId: 'client_3', details: 'موظف جديد: خالد النعيمي', timestamp: nowMinus(1600) },
+  { id: 'act_c3d', action: 'channel_connected', actor: 'Dubai Real Estate Co.', actorEmail: 'info@dubaire.ae', actorRole: 'client', clientId: 'client_3', details: 'واتساب — +971 50 123 4567', timestamp: nowMinus(1700) },
+
+  // Client-specific: مدرسة الفجر الذهبي (client_4)
+  { id: 'act_14', action: 'client_created', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', actorRole: 'admin', clientId: 'client_4', target: 'مدرسة الفجر الذهبي', details: 'تسجيل عميل جديد — السعودية', timestamp: nowMinus(1800) },
+  { id: 'act_c4a', action: 'complaint_submitted', actor: 'مدرسة الفجر الذهبي', actorEmail: 'info@fajr.sa', actorRole: 'client', clientId: 'client_4', details: 'الموضوع: طلب تخصيص واجهة الويدجت', timestamp: nowMinus(500) },
+
+  // Client-specific: Qatar Logistics Group (client_10)
+  { id: 'act_20', action: 'payment_received', actor: 'النظام', actorEmail: 'system', actorRole: 'system', clientId: 'client_10', target: 'Qatar Logistics Group', details: '360 ر.ق — باقة الأعمال', timestamp: nowMinus(5760) },
+
+  // Client-specific: Qhub (client_1)
+  { id: 'act_c1a', action: 'client_created', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', actorRole: 'admin', clientId: 'client_1', target: 'Qhub', details: 'تسجيل عميل جديد — عُمان', timestamp: nowMinus(60 * 24 * 250) },
+  { id: 'act_c1b', action: 'subscription_created', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', actorRole: 'admin', clientId: 'client_1', details: 'باقة المؤسسات — شهري', timestamp: nowMinus(60 * 24 * 249) },
+  { id: 'act_c1c', action: 'channel_connected', actor: 'Qhub', actorEmail: 'admin@qhub.om', actorRole: 'client', clientId: 'client_1', details: 'واتساب — +968 9123 4567', timestamp: nowMinus(60 * 24 * 248) },
+  { id: 'act_c1d', action: 'employee_registered', actor: 'Qhub', actorEmail: 'admin@qhub.om', actorRole: 'client', clientId: 'client_1', details: 'موظف جديد: سالم الحارثي', timestamp: nowMinus(60 * 24 * 200) },
+  { id: 'act_c1e', action: 'channel_connected', actor: 'Qhub', actorEmail: 'admin@qhub.om', actorRole: 'client', clientId: 'client_1', details: 'انستغرام — @qhub_om', timestamp: nowMinus(60 * 24 * 180) },
+  { id: 'act_c1f', action: 'payment_received', actor: 'النظام', actorEmail: 'system', actorRole: 'system', clientId: 'client_1', details: '96 ر.ع — باقة المؤسسات', timestamp: nowMinus(60 * 24 * 30) },
 ];
 
 // =====================================================================
@@ -1071,6 +1126,7 @@ export const liveChatConversations: LiveChatConversation[] = [
       { id: 'lm_1_3', conversationId: 'lc_1', sender: 'agent', senderName: 'علي السالم', content: 'وعليكم السلام أحمد، أهلاً بك! هل يمكنك إرسال رابط موقعك حتى أتحقق من المشكلة؟', timestamp: nowMinus(8) },
       { id: 'lm_1_4', conversationId: 'lc_1', sender: 'visitor', senderName: 'أحمد الحارثي', content: 'الموقع هو www.alharthy-store.com', timestamp: nowMinus(5) },
     ],
+    unreadCount: 2,
     startedAt: nowMinus(12),
     lastMessageAt: nowMinus(5),
   },
@@ -1089,6 +1145,7 @@ export const liveChatConversations: LiveChatConversation[] = [
       { id: 'lm_2_4', conversationId: 'lc_2', sender: 'agent', senderName: 'Sara Ahmed', content: 'نعم، من نفس الصفحة يمكنك تعديل رسالة الترحيب واسم الفريق ووقت الاستجابة المتوقع', timestamp: nowMinus(38) },
       { id: 'lm_2_5', conversationId: 'lc_2', sender: 'visitor', senderName: 'سارة المنذري', content: 'شكراً جزيلاً لكم!', timestamp: nowMinus(35) },
     ],
+    unreadCount: 0,
     startedAt: nowMinus(45),
     lastMessageAt: nowMinus(35),
   },
@@ -1102,6 +1159,7 @@ export const liveChatConversations: LiveChatConversation[] = [
       { id: 'lm_3_1', conversationId: 'lc_3', sender: 'visitor', senderName: 'خالد البلوشي', content: 'أريد الاستفسار عن أسعار الباقات', timestamp: nowMinus(3) },
       { id: 'lm_3_2', conversationId: 'lc_3', sender: 'visitor', senderName: 'خالد البلوشي', content: 'هل عندكم باقة مناسبة لشركة عقارية صغيرة؟', timestamp: nowMinus(2) },
     ],
+    unreadCount: 2,
     startedAt: nowMinus(3),
     lastMessageAt: nowMinus(2),
   },
@@ -1120,6 +1178,7 @@ export const liveChatConversations: LiveChatConversation[] = [
       { id: 'lm_4_4', conversationId: 'lc_4', sender: 'agent', senderName: 'علي السالم', content: 'تفضلي، اضغطي على أيقونة القفل في شريط العنوان واسمحي بالإشعارات. بعدها أعيدي تحميل الصفحة', timestamp: nowMinus(110) },
       { id: 'lm_4_5', conversationId: 'lc_4', sender: 'visitor', senderName: 'فاطمة الرئيسي', content: 'تمام اشتغلت! شكراً', timestamp: nowMinus(105) },
     ],
+    unreadCount: 0,
     startedAt: nowMinus(120),
     lastMessageAt: nowMinus(105),
   },
@@ -1136,6 +1195,7 @@ export const liveChatConversations: LiveChatConversation[] = [
       { id: 'lm_5_2', conversationId: 'lc_5', sender: 'agent', senderName: 'علي السالم', content: 'نعم محمد، يمكنك إرسال صور ومستندات PDF وملفات صوتية', timestamp: nowMinus(55) },
       { id: 'lm_5_3', conversationId: 'lc_5', sender: 'visitor', senderName: 'محمد العامري', content: 'ممتاز! وما الحد الأقصى لحجم الملف؟', timestamp: nowMinus(50) },
     ],
+    unreadCount: 1,
     startedAt: nowMinus(60),
     lastMessageAt: nowMinus(50),
   },
@@ -1151,6 +1211,7 @@ export const liveChatConversations: LiveChatConversation[] = [
       { id: 'lm_6_2', conversationId: 'lc_6', sender: 'agent', senderName: 'Sara Ahmed', content: 'أهلاً نورة! من قائمة القنوات اختاري إضافة قناة جديدة ثم Instagram وسجلي الدخول بحسابك', timestamp: nowMinus(1435) },
       { id: 'lm_6_3', conversationId: 'lc_6', sender: 'visitor', senderName: 'نورة الكعبي', content: 'تم بنجاح، شكراً لكم', timestamp: nowMinus(1430) },
     ],
+    unreadCount: 0,
     startedAt: nowMinus(1440),
     lastMessageAt: nowMinus(1430),
   },
@@ -1166,6 +1227,7 @@ export const liveChatConversations: LiveChatConversation[] = [
       { id: 'lm_7_2', conversationId: 'lc_7', sender: 'visitor', senderName: 'يوسف الهاشمي', content: 'كل ما أضغط تصدير يطلع لي خطأ', timestamp: nowMinus(6) },
       { id: 'lm_7_3', conversationId: 'lc_7', sender: 'agent', senderName: 'محمد الكندي', content: 'مساء النور يوسف. هل يمكنك إرسال لقطة شاشة للخطأ؟', timestamp: nowMinus(4) },
     ],
+    unreadCount: 1,
     startedAt: nowMinus(8),
     lastMessageAt: nowMinus(4),
   },
@@ -1183,6 +1245,7 @@ export const liveChatConversations: LiveChatConversation[] = [
       { id: 'lm_8_3', conversationId: 'lc_8', sender: 'visitor', senderName: 'عائشة السيابي', content: 'حلو! وكيف أضيف الرقم الجديد؟', timestamp: nowMinus(230) },
       { id: 'lm_8_4', conversationId: 'lc_8', sender: 'agent', senderName: 'محمد الكندي', content: 'من لوحة التحكم > القنوات > إضافة قناة > WhatsApp ثم أدخلي الرقم الجديد وأكملي خطوات التحقق', timestamp: nowMinus(225) },
     ],
+    unreadCount: 0,
     startedAt: nowMinus(240),
     lastMessageAt: nowMinus(225),
   },
@@ -1195,6 +1258,7 @@ export const liveChatConversations: LiveChatConversation[] = [
     messages: [
       { id: 'lm_9_1', conversationId: 'lc_9', sender: 'visitor', senderName: 'سلطان الراشدي', content: 'هل تدعمون الدفع بالتحويل البنكي؟', timestamp: nowMinus(1) },
     ],
+    unreadCount: 1,
     startedAt: nowMinus(1),
     lastMessageAt: nowMinus(1),
   },
@@ -1211,6 +1275,7 @@ export const liveChatConversations: LiveChatConversation[] = [
       { id: 'lm_10_2', conversationId: 'lc_10', sender: 'agent', senderName: 'محمد الكندي', content: 'أهلاً مريم! من إعدادات المحادثات يمكنك إضافة ردود تلقائية لخارج أوقات العمل ورسائل الترحيب', timestamp: nowMinus(22) },
       { id: 'lm_10_3', conversationId: 'lc_10', sender: 'visitor', senderName: 'مريم الزعابي', content: 'وهل أقدر أحدد أوقات العمل لكل يوم؟', timestamp: nowMinus(20) },
     ],
+    unreadCount: 1,
     startedAt: nowMinus(25),
     lastMessageAt: nowMinus(20),
   },
