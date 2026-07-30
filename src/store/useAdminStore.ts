@@ -104,7 +104,7 @@ interface AdminState {
   deleteCountry: (code: string) => void;
 
   // Industry actions
-  addIndustry: (name: string) => Industry;
+  addIndustry: (name: string, addedBy: string) => Industry;
   updateIndustry: (id: string, name: string) => void;
   deleteIndustry: (id: string) => void;
 
@@ -489,8 +489,8 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   deleteCountry: (code) =>
     set((s) => ({ countries: s.countries.filter((c) => c.code !== code) })),
 
-  addIndustry: (name) => {
-    const ind: Industry = { id: newId('ind'), name };
+  addIndustry: (name, addedBy) => {
+    const ind: Industry = { id: newId('ind'), name, addedBy, createdAt: new Date().toISOString() };
     set((s) => ({ industries: [...s.industries, ind] }));
     return ind;
   },

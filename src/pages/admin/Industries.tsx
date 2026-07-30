@@ -3,6 +3,7 @@ import { Plus, Edit2, Trash2, Briefcase, ArrowRight } from 'lucide-react';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
 import { useConfirm } from '@components/ui';
+import { formatDate } from '@/utils/format';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -30,6 +31,8 @@ export default function Industries({ onBack }: { onBack?: () => void }): JSX.Ele
   const addIndustry = useAdminStore((s) => s.addIndustry);
   const updateIndustry = useAdminStore((s) => s.updateIndustry);
   const deleteIndustry = useAdminStore((s) => s.deleteIndustry);
+  const adminUsers = useAdminStore((s) => s.adminUsers);
+  const currentAdmin = adminUsers[0];
   const { confirm } = useConfirm();
   const showToast = useUIStore((s) => s.showToast);
 
@@ -61,7 +64,7 @@ export default function Industries({ onBack }: { onBack?: () => void }): JSX.Ele
     if (editId) {
       updateIndustry(editId, trimmed);
     } else {
-      addIndustry(trimmed);
+      addIndustry(trimmed, currentAdmin?.name ?? 'مشرف');
     }
     setOpen(false);
   };
@@ -114,13 +117,15 @@ export default function Industries({ onBack }: { onBack?: () => void }): JSX.Ele
                 <TableHead className="text-start">#</TableHead>
                 <TableHead className="text-start">مجال العمل</TableHead>
                 <TableHead className="text-start">عدد العملاء</TableHead>
+                <TableHead className="text-start">أُضيف بواسطة</TableHead>
+                <TableHead className="text-start">تاريخ الإضافة</TableHead>
                 <TableHead className="text-start w-[120px]">إجراءات</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {industries.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center text-muted-foreground py-10">
+                  <TableCell colSpan={6} className="text-center text-muted-foreground py-10">
                     لا توجد مجالات عمل. أضف مجالاً جديداً للبدء.
                   </TableCell>
                 </TableRow>
@@ -138,6 +143,8 @@ export default function Industries({ onBack }: { onBack?: () => void }): JSX.Ele
                         <span className="text-xs text-muted-foreground">—</span>
                       )}
                     </TableCell>
+                    <TableCell className="text-sm">{ind.addedBy}</TableCell>
+                    <TableCell className="text-sm text-muted-foreground">{formatDate(ind.createdAt)}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
                         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(ind.id, ind.name)}>

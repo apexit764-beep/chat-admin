@@ -48,21 +48,21 @@ function pricesFromUSD(usd: number): Record<string, { monthly: number; yearly: n
 }
 
 export const industries: Industry[] = [
-  { id: 'ind_1', name: 'عقارات' },
-  { id: 'ind_2', name: 'مطاعم' },
-  { id: 'ind_3', name: 'تعليم' },
-  { id: 'ind_4', name: 'صحة' },
-  { id: 'ind_5', name: 'تقنية' },
-  { id: 'ind_6', name: 'سياحة' },
-  { id: 'ind_7', name: 'سيارات' },
-  { id: 'ind_8', name: 'تجزئة' },
-  { id: 'ind_9', name: 'لوجستيات' },
-  { id: 'ind_10', name: 'تجميل' },
-  { id: 'ind_11', name: 'زراعة' },
-  { id: 'ind_12', name: 'تمويل وبنوك' },
-  { id: 'ind_13', name: 'إعلام ونشر' },
-  { id: 'ind_14', name: 'بناء ومقاولات' },
-  { id: 'ind_15', name: 'تصنيع' },
+  { id: 'ind_1', name: 'عقارات', addedBy: 'محمد الكندي', createdAt: nowMinus(60 * 24 * 300) },
+  { id: 'ind_2', name: 'مطاعم', addedBy: 'محمد الكندي', createdAt: nowMinus(60 * 24 * 295) },
+  { id: 'ind_3', name: 'تعليم', addedBy: 'محمد الكندي', createdAt: nowMinus(60 * 24 * 290) },
+  { id: 'ind_4', name: 'صحة', addedBy: 'Sara Ahmed', createdAt: nowMinus(60 * 24 * 280) },
+  { id: 'ind_5', name: 'تقنية', addedBy: 'Sara Ahmed', createdAt: nowMinus(60 * 24 * 270) },
+  { id: 'ind_6', name: 'سياحة', addedBy: 'محمد الكندي', createdAt: nowMinus(60 * 24 * 260) },
+  { id: 'ind_7', name: 'سيارات', addedBy: 'علي السالم', createdAt: nowMinus(60 * 24 * 250) },
+  { id: 'ind_8', name: 'تجزئة', addedBy: 'محمد الكندي', createdAt: nowMinus(60 * 24 * 240) },
+  { id: 'ind_9', name: 'لوجستيات', addedBy: 'Sara Ahmed', createdAt: nowMinus(60 * 24 * 220) },
+  { id: 'ind_10', name: 'تجميل', addedBy: 'علي السالم', createdAt: nowMinus(60 * 24 * 200) },
+  { id: 'ind_11', name: 'زراعة', addedBy: 'محمد الكندي', createdAt: nowMinus(60 * 24 * 180) },
+  { id: 'ind_12', name: 'تمويل وبنوك', addedBy: 'Sara Ahmed', createdAt: nowMinus(60 * 24 * 150) },
+  { id: 'ind_13', name: 'إعلام ونشر', addedBy: 'محمد الكندي', createdAt: nowMinus(60 * 24 * 120) },
+  { id: 'ind_14', name: 'بناء ومقاولات', addedBy: 'علي السالم', createdAt: nowMinus(60 * 24 * 90) },
+  { id: 'ind_15', name: 'تصنيع', addedBy: 'محمد الكندي', createdAt: nowMinus(60 * 24 * 60) },
 ];
 
 export const plans: Plan[] = [

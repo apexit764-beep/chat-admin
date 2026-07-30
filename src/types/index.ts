@@ -190,6 +190,8 @@ export interface Plan {
 export interface Industry {
   id: string;
   name: string;
+  addedBy: string;
+  createdAt: string;
 }
 
 export type ClientStatus = 'trial' | 'active' | 'past_due' | 'suspended' | 'cancelled';
