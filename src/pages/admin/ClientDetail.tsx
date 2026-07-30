@@ -29,6 +29,9 @@ import {
   AlertTriangle,
   TrendingUp,
   Hash,
+  Eye,
+  Download,
+  Send,
 } from 'lucide-react';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
@@ -64,7 +67,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import type { ClientStatus } from '@/types';
+import type { ClientStatus, Invoice } from '@/types';
 
 const statusLabel: Record<ClientStatus, string> = {
   trial: 'فترة تجريبية',
@@ -114,6 +117,7 @@ export default function ClientDetail(): JSX.Element {
   const [internalNote, setInternalNote] = useState('');
   const [notes, setNotes] = useState<{ text: string; by: string; at: string }[]>([]);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [viewInvoice, setViewInvoice] = useState<Invoice | null>(null);
   const adminUsers = useAdminStore((s) => s.adminUsers);
   const currentAdmin = adminUsers[0];
 
@@ -392,12 +396,13 @@ export default function ClientDetail(): JSX.Element {
                     <TableHead className="text-right">الضريبة</TableHead>
                     <TableHead className="text-right">الإجمالي</TableHead>
                     <TableHead className="text-right">الحالة</TableHead>
+                    <TableHead className="text-right w-[100px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {clientInvoices.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">لا توجد فواتير</TableCell>
+                      <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">لا توجد فواتير</TableCell>
                     </TableRow>
                   ) : (
                     clientInvoices.map((inv, idx) => (
@@ -409,6 +414,11 @@ export default function ClientDetail(): JSX.Element {
                         <TableCell className="text-muted-foreground">{formatMoney(inv.tax, inv.currency)}</TableCell>
                         <TableCell className="font-semibold">{formatMoney(inv.total, inv.currency)}</TableCell>
                         <TableCell><InvoiceStatusBadge status={inv.status} /></TableCell>
+                        <TableCell>
+                          <Button variant="ghost" size="sm" className="h-7 gap-1.5 text-xs" onClick={() => setViewInvoice(inv)}>
+                            <Eye className="h-3.5 w-3.5" /> عرض
+                          </Button>
+                        </TableCell>
                       </TableRow>
                     ))
                   )}
@@ -806,6 +816,102 @@ export default function ClientDetail(): JSX.Element {
               </p>
             </button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* View Invoice Modal */}
+      <Dialog open={!!viewInvoice} onOpenChange={(open) => { if (!open) setViewInvoice(null); }}>
+        <DialogContent className="max-w-lg" dir="rtl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <span>فاتورة {viewInvoice?.number}</span>
+              {viewInvoice && <InvoiceStatusBadge status={viewInvoice.status} />}
+            </DialogTitle>
+          </DialogHeader>
+          {viewInvoice && (() => {
+            const invSub = subscriptions.find((s) => s.id === viewInvoice.subscriptionId);
+            const invPlan = invSub ? plans.find((p) => p.id === invSub.planId) : null;
+            const invTxn = clientTransactions.find((t) => t.invoiceId === viewInvoice.id);
+            const invCountry = countries.find((c) => c.code === client.country);
+            return (
+              <div className="space-y-4 text-sm">
+                <div className="rounded-lg border p-3 space-y-1.5">
+                  <p className="font-semibold text-xs text-muted-foreground">بيانات العميل</p>
+                  <p className="font-medium">{client.companyName}</p>
+                  <p className="text-muted-foreground">{client.contactName}</p>
+                  <p className="text-muted-foreground">{client.email}</p>
+                  <p className="text-muted-foreground">{invCountry?.nameAr ?? client.country}</p>
+                </div>
+
+                {invPlan && invSub && (
+                  <div className="rounded-lg border p-3 space-y-1.5">
+                    <p className="font-semibold text-xs text-muted-foreground">الباقة وفترة الفوترة</p>
+                    <p className="font-medium">{invPlan.nameAr}</p>
+                    <p className="text-muted-foreground">
+                      {formatDate(invSub.currentPeriodStart)} — {formatDate(invSub.currentPeriodEnd)}
+                    </p>
+                  </div>
+                )}
+
+                <div className="rounded-lg border p-3">
+                  <p className="font-semibold text-xs text-muted-foreground mb-2">تفاصيل المبلغ</p>
+                  <div className="space-y-1">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">المبلغ</span>
+                      <span>{formatMoney(viewInvoice.amount, viewInvoice.currency)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">الضريبة</span>
+                      <span>{formatMoney(viewInvoice.tax, viewInvoice.currency)}</span>
+                    </div>
+                    <Separator className="my-1.5" />
+                    <div className="flex justify-between font-semibold">
+                      <span>الإجمالي</span>
+                      <span>{formatMoney(viewInvoice.total, viewInvoice.currency)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {invTxn && (
+                  <div className="rounded-lg border p-3 space-y-1.5">
+                    <p className="font-semibold text-xs text-muted-foreground">الدفع</p>
+                    <div className="flex items-center gap-2">
+                      <CreditCard className="h-4 w-4 text-muted-foreground" />
+                      <span>{invTxn.method.toUpperCase()} •••• {invTxn.last4}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground">حالة الدفع</span>
+                      <Badge className={cn('text-[10px] font-semibold border-transparent',
+                        invTxn.status === 'succeeded' && 'bg-success/15 text-success',
+                        invTxn.status === 'failed' && 'bg-danger/15 text-danger',
+                      )}>
+                        {invTxn.status === 'succeeded' ? 'ناجحة' : 'فاشلة'}
+                      </Badge>
+                    </div>
+                    {viewInvoice.paidAt && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">تاريخ الدفع</span>
+                        <span>{formatDate(viewInvoice.paidAt)}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <div className="flex gap-2 pt-1">
+                  <Button variant="outline" size="sm" className="flex-1 gap-1.5" onClick={() => {
+                    showToast('جارٍ تصدير الفاتورة كـ PDF...', 'success');
+                  }}>
+                    <Download className="h-3.5 w-3.5" /> تصدير
+                  </Button>
+                  <Button variant="outline" size="sm" className="flex-1 gap-1.5" onClick={() => {
+                    showToast('تم إرسال الفاتورة للعميل عبر واتساب والبريد', 'success');
+                  }}>
+                    <Send className="h-3.5 w-3.5" /> إعادة الإرسال للعميل
+                  </Button>
+                </div>
+              </div>
+            );
+          })()}
         </DialogContent>
       </Dialog>
     </div>
