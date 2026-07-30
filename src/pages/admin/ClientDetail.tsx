@@ -112,8 +112,10 @@ export default function ClientDetail(): JSX.Element {
   const clientActivity = useMemo(() => activityLog.filter((a) => a.target === client?.companyName || a.target === id), [activityLog, client?.companyName, id]);
 
   const [internalNote, setInternalNote] = useState('');
-  const [notes, setNotes] = useState<string[]>([]);
+  const [notes, setNotes] = useState<{ text: string; by: string; at: string }[]>([]);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const adminUsers = useAdminStore((s) => s.adminUsers);
+  const currentAdmin = adminUsers[0];
 
   if (!client) {
     return (
@@ -186,7 +188,7 @@ export default function ClientDetail(): JSX.Element {
 
   const addNote = () => {
     if (!internalNote.trim()) return;
-    setNotes((prev) => [internalNote.trim(), ...prev]);
+    setNotes((prev) => [{ text: internalNote.trim(), by: currentAdmin?.name ?? 'مشرف', at: new Date().toISOString() }, ...prev]);
     setInternalNote('');
     showToast('تمت إضافة الملاحظة', 'success');
   };
@@ -750,8 +752,11 @@ export default function ClientDetail(): JSX.Element {
               <div className="space-y-2 pt-2">
                 {notes.map((note, i) => (
                   <div key={i} className="p-2.5 rounded-lg bg-muted text-sm">
-                    <p>{note}</p>
-                    <p className="text-[10px] text-muted-foreground mt-1">الآن</p>
+                    <p>{note.text}</p>
+                    <div className="flex items-center justify-between mt-1.5">
+                      <span className="text-[10px] font-medium text-muted-foreground">{note.by}</span>
+                      <span className="text-[10px] text-muted-foreground">{timeAgo(note.at)}</span>
+                    </div>
                   </div>
                 ))}
               </div>
