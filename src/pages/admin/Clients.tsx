@@ -214,12 +214,19 @@ export default function AdminClients(): JSX.Element {
     if (!country) return;
     const fullPhone = `${form.phoneCode} ${form.phone.trim()}`;
     if (editing) {
+      const emailChanged = form.email.trim() !== editing.email;
+      const passwordChanged = form.password.trim() !== editing.password;
       updateClient(editing.id, {
         companyName: form.companyName, contactName: form.contactName, email: form.email,
         phone: fullPhone, country: form.country, industry: form.industry, currency: country.currency,
         username: form.email, password: form.password,
       });
-      showToast('تم تحديث بيانات العميل', 'success');
+      if (emailChanged || passwordChanged) {
+        const changed = [emailChanged && 'البريد الإلكتروني', passwordChanged && 'كلمة المرور'].filter(Boolean).join(' و');
+        showToast(`تم تحديث ${changed} — تم إرسال بيانات الدخول الجديدة للعميل عبر واتساب والبريد`, 'success');
+      } else {
+        showToast('تم تحديث بيانات العميل', 'success');
+      }
     } else {
       addClient({
         companyName: form.companyName, contactName: form.contactName, email: form.email,
