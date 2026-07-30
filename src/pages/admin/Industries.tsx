@@ -60,6 +60,7 @@ export default function Industries({ onBack }: { onBack?: () => void }): JSX.Ele
   const handleSave = () => {
     const trimmed = name.trim();
     if (!trimmed) { setError('الاسم مطلوب'); showToast('يرجى تعبئة الحقول المطلوبة', 'error'); return; }
+    if (!/^[؀-ۿa-zA-Z0-9\s]+$/.test(trimmed)) { setError('اسم المجال يقبل فقط حروف وأرقام'); return; }
     const duplicate = industries.some((i) => i.name === trimmed && i.id !== editId);
     if (duplicate) { setError('مجال العمل موجود مسبقاً'); return; }
 
@@ -73,10 +74,11 @@ export default function Industries({ onBack }: { onBack?: () => void }): JSX.Ele
 
   const handleDelete = async (id: string, indName: string) => {
     const usedBy = clients.filter((c) => c.industry === indName).length;
-    const msg = usedBy > 0
-      ? `هذا المجال مستخدم في ${usedBy} عميل. هل تريد حذفه؟`
-      : `هل تريد حذف "${indName}"؟`;
-    const ok = await confirm({ title: 'حذف مجال العمل', message: msg });
+    if (usedBy > 0) {
+      await confirm({ title: 'لا يمكن الحذف', message: `لا يمكن حذف هذا المجال لأنه مرتبط بـ ${usedBy} عميل. يمكنك تعطيله بدلاً من ذلك.`, confirmText: 'حسناً' });
+      return;
+    }
+    const ok = await confirm({ title: 'حذف مجال العمل', message: `هل تريد حذف "${indName}"؟` });
     if (ok) deleteIndustry(id);
   };
 
