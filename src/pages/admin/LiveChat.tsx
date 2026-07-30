@@ -10,7 +10,10 @@ import {
   Clock,
   Tag,
   Globe,
-
+  Image,
+  Paperclip,
+  FileText,
+  Download,
   StickyNote,
   PanelRightClose,
   PanelRightOpen,
@@ -56,7 +59,7 @@ const channelConfig: Record<string, { icon: React.ElementType; label: string; co
 type FilterStatus = 'all' | 'open' | 'assigned' | 'resolved';
 
 export default function LiveChat() {
-  const { liveChatConversations, clients, plans, subscriptions, adminUsers, assignLiveChat, resolveLiveChat, sendLiveChatMessage, sendLiveChatNote } = useAdminStore();
+  const { liveChatConversations, clients, plans, subscriptions, adminUsers, assignLiveChat, resolveLiveChat, sendLiveChatMessage, sendLiveChatNote, sendLiveChatAttachment } = useAdminStore();
   const user = useAuthStore((s) => s.user);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -69,6 +72,8 @@ export default function LiveChat() {
   const [showAssignDialog, setShowAssignDialog] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const autoResize = useCallback((el: HTMLTextAreaElement) => {
     el.style.height = 'auto';
@@ -148,6 +153,25 @@ export default function LiveChat() {
       e.preventDefault();
       handleSend();
     }
+  };
+
+  const handleAttachment = (e: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'file') => {
+    const file = e.target.files?.[0];
+    if (!file || !selectedId) return;
+    const url = URL.createObjectURL(file);
+    sendLiveChatAttachment(selectedId, user?.name ?? 'مشرف', {
+      url,
+      name: file.name,
+      size: file.size,
+      type,
+    });
+    e.target.value = '';
+  };
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / 1048576).toFixed(1)} MB`;
   };
 
   const handleStatusChange = (newStatus: LiveChatStatus) => {
@@ -426,7 +450,22 @@ export default function LiveChat() {
                                 : 'bg-gradient-to-br from-purple-50 to-purple-100/80 dark:from-purple-900/30 dark:to-purple-800/20 border border-purple-200/40 dark:border-purple-700/30 rounded-tl-md'
                           )}
                           >
-                            <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                            {msg.messageType === 'image' ? (
+                              <img src={msg.content} alt={msg.fileName ?? 'صورة'} className="rounded-lg max-w-full max-h-60 object-cover cursor-pointer" onClick={() => window.open(msg.content, '_blank')} />
+                            ) : msg.messageType === 'file' ? (
+                              <a href={msg.content} download={msg.fileName} className="flex items-center gap-3 p-2 rounded-lg bg-background/50 hover:bg-background/80 transition-colors">
+                                <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                                  <FileText className="h-5 w-5 text-primary" />
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-sm font-medium truncate">{msg.fileName}</p>
+                                  <p className="text-[11px] text-muted-foreground">{formatFileSize(msg.fileSize ?? 0)}</p>
+                                </div>
+                                <Download className="h-4 w-4 text-muted-foreground shrink-0" />
+                              </a>
+                            ) : (
+                              <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                            )}
                             <div className={cn(
                               'flex items-center gap-1.5 mt-1.5',
                               isVisitor ? 'justify-start' : 'justify-start'
@@ -505,8 +544,22 @@ export default function LiveChat() {
                 />
               </div>
 
-              {/* Toolbar - send button */}
-              <div className={cn('flex items-center justify-end px-3 py-2 border-t border-border/40', activeTab === 'note' && 'bg-amber-50/30 dark:bg-amber-900/5')}>
+              {/* Toolbar */}
+              <div className={cn('flex items-center justify-between px-3 py-2 border-t border-border/40', activeTab === 'note' && 'bg-amber-50/30 dark:bg-amber-900/5')}>
+                {activeTab === 'message' ? (
+                  <div className="flex items-center gap-1">
+                    <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={(e) => handleAttachment(e, 'image')} />
+                    <input ref={fileInputRef} type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar" className="hidden" onChange={(e) => handleAttachment(e, 'file')} />
+                    <Button type="button" variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground" title="إرفاق صورة" onClick={() => imageInputRef.current?.click()}>
+                      <Image className="h-4 w-4" />
+                    </Button>
+                    <Button type="button" variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground" title="إرفاق ملف" onClick={() => fileInputRef.current?.click()}>
+                      <Paperclip className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <div />
+                )}
                 <Button
                   size="sm"
                   onClick={handleSend}

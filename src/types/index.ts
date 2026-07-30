@@ -359,12 +359,17 @@ export interface KnowledgeArticle {
 
 export type LiveChatStatus = 'open' | 'assigned' | 'resolved' | 'closed';
 
+export type LiveChatMessageType = 'text' | 'image' | 'file';
+
 export interface LiveChatMessage {
   id: string;
   conversationId: string;
   sender: 'visitor' | 'agent' | 'note';
   senderName: string;
   content: string;
+  messageType?: LiveChatMessageType;
+  fileName?: string;
+  fileSize?: number;
   timestamp: string;
 }
 

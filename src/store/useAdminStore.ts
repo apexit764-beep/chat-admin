@@ -79,6 +79,7 @@ interface AdminState {
   resolveLiveChat: (id: string) => void;
   sendLiveChatMessage: (conversationId: string, content: string, senderName: string) => void;
   sendLiveChatNote: (conversationId: string, content: string, senderName: string) => void;
+  sendLiveChatAttachment: (conversationId: string, senderName: string, file: { url: string; name: string; size: number; type: 'image' | 'file' }) => void;
 
   // Feedback actions
   replyToFeedback: (id: string, text: string, author: string) => void;
@@ -375,6 +376,28 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       };
     }),
 
+  sendLiveChatAttachment: (conversationId, senderName, file) =>
+    set((s) => {
+      const now = new Date().toISOString();
+      const msg: LiveChatMessage = {
+        id: `lm_${Math.random().toString(36).slice(2, 10)}`,
+        conversationId,
+        sender: 'agent',
+        senderName,
+        content: file.url,
+        messageType: file.type,
+        fileName: file.name,
+        fileSize: file.size,
+        timestamp: now,
+      };
+      return {
+        liveChatConversations: s.liveChatConversations.map((c) =>
+          c.id === conversationId
+            ? { ...c, messages: [...c.messages, msg], lastMessageAt: now }
+            : c
+        ),
+      };
+    }),
 
   addClient: (c) => {
     const client: Client = {
