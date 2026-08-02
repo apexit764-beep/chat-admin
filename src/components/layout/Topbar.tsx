@@ -9,7 +9,7 @@ import { useAdminStore } from '@/store/useAdminStore';
 import { Avatar, CommandPalette } from '@components/ui';
 import { HelpDrawer } from './HelpDrawer';
 
-// In the demo, the client logged in is Sekaa (client_1 in admin store)
+// In the demo, the client logged in is Qhub (client_1 in admin store)
 const CURRENT_CLIENT_ID = 'client_1';
 
 const titleMap: Record<string, string> = {
@@ -40,7 +40,7 @@ export function Topbar(): JSX.Element {
   const clients = useAdminStore((s) => s.clients);
   const plans = useAdminStore((s) => s.plans);
   const unreadCount = notifications.filter((n) => !n.read).length;
-  const title = titleMap[location.pathname] ?? 'سكة';
+  const title = titleMap[location.pathname] ?? 'Qhub';
   const [cmdOpen, setCmdOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const client = clients.find((c) => c.id === CURRENT_CLIENT_ID);

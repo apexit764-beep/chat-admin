@@ -1,6 +1,6 @@
 export type AppMode = 'admin' | 'client';
 
-const STORAGE_KEY = 'sekaa_app_mode_override';
+const STORAGE_KEY = 'qhub_app_mode_override';
 const CLIENT_PATH_PREFIX = '/client';
 
 function pathStartsWithClient(path: string): boolean {

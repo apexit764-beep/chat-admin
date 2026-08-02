@@ -1,4 +1,4 @@
-# Apex Sekaa — Source Code (apexes.click scope)
+# Apex Qhub — Source Code (apexes.click scope)
 
 ## Location
 - **Source code:** `/var/www/source.apexes.click/`
@@ -44,7 +44,7 @@ curl -N "https://chat-admin.apexes.click/api/deploy?token=sekaa-deploy-2026"
 
 ## Demo credentials
 - Admin:  admin@apexes.click / admin123
-- Client: admin@sekaa.com   / admin123
+- Client: admin@qhub.com   / admin123
 
 ## Stack
 React 18 + Vite + TypeScript (strict) + Tailwind + Zustand + Framer Motion + RTL Arabic.

@@ -210,7 +210,7 @@ function WhatsAppTab(): JSX.Element {
   const [config, setConfig] = useState({
     phoneNumberId: '108234567890',
     accessToken: 'EAAJxxxxxxxxxxxxxxxxxxxxxxxxxx',
-    verifyToken: 'sekaa_verify_2026',
+    verifyToken: 'qhub_verify_2026',
     businessHours: true,
     startTime: '08:00',
     endTime: '20:00',
@@ -420,7 +420,7 @@ function DataTab(): JSX.Element {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `sekaa-data-${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `qhub-data-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
     showToast('تم تصدير البيانات', 'success');

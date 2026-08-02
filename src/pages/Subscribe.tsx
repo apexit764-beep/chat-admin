@@ -22,7 +22,7 @@ import { formatMoney } from '@/utils/money';
 import { cn } from '@/utils/cn';
 import type { Plan } from '@/types';
 
-// In the demo, the client is Sekaa (client_1 in admin store)
+// In the demo, the client is Qhub (client_1 in admin store)
 const CURRENT_CLIENT_ID = 'client_1';
 
 type Step = 'select' | 'checkout' | 'processing' | 'success' | 'failed';
@@ -217,7 +217,7 @@ export default function Subscribe(): JSX.Element {
           </div>
           <h2 className="text-h1 font-bold mb-1">تم الاشتراك بنجاح! 🎉</h2>
           <p className="text-body text-muted-light dark:text-muted-dark mb-5">
-            تم تفعيل باقة <strong>{selectedPlan.nameAr}</strong> على حسابك. مرحباً بك في عائلة سكة الممتدة!
+            تم تفعيل باقة <strong>{selectedPlan.nameAr}</strong> على حسابك. مرحباً بك في عائلة Qhub الممتدة!
           </p>
           <div className="grid grid-cols-2 gap-2">
             <button onClick={() => navigate('/billing')} className="h-11 rounded-full border border-border-light dark:border-border-dark text-small font-medium hover:bg-bg-light dark:hover:bg-bg-dark">

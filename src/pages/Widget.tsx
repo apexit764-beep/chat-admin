@@ -33,23 +33,23 @@ export default function Widget(): JSX.Element {
   const [previewOpen, setPreviewOpen] = useState(true);
   const [copied, setCopied] = useState(false);
 
-  const widgetId = 'wdgt_sekaa_8f3a2b';
-  const installCode = `<!-- Sekaa Live Chat Widget -->
+  const widgetId = 'wdgt_qhub_8f3a2b';
+  const installCode = `<!-- Qhub Live Chat Widget -->
 <script>
   (function(s,e,k,a){
-    s.SekaaChat=k;
+    s.QhubChat=k;
     s[k]=s[k]||function(){(s[k].q=s[k].q||[]).push(arguments)};
     var d=e.createElement('script'),x=e.getElementsByTagName('script')[0];
     d.async=1;d.src='https://chat-client.apexes.click/widget.js';
     d.setAttribute('data-id',a);x.parentNode.insertBefore(d,x);
-  })(window,document,'sekaa','${widgetId}');
+  })(window,document,'qhub','${widgetId}');
 </script>`;
 
-  const npmInstall = `npm install @sekaa/chat-widget
+  const npmInstall = `npm install @qhub/chat-widget
 
 // In your app:
-import SekaaChat from '@sekaa/chat-widget';
-SekaaChat.init({ widgetId: '${widgetId}' });`;
+import QhubChat from '@qhub/chat-widget';
+QhubChat.init({ widgetId: '${widgetId}' });`;
 
   const copyToClipboard = (text: string): void => {
     navigator.clipboard.writeText(text).catch(() => undefined);
@@ -70,7 +70,7 @@ SekaaChat.init({ widgetId: '${widgetId}' });`;
               Live Chat Widget
             </h2>
             <p className="text-small text-muted-light dark:text-muted-dark">
-              widget على موقعك يستقبل رسائل العملاء مباشرة في صندوق سكة
+              widget على موقعك يستقبل رسائل العملاء مباشرة في صندوق Qhub
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -223,7 +223,7 @@ SekaaChat.init({ widgetId: '${widgetId}' });`;
                 label="اسم الفريق"
                 value={config.teamName}
                 onChange={(e) => updateConfig({ teamName: e.target.value })}
-                placeholder="فريق سكة"
+                placeholder="فريق Qhub"
                 icon={<ImageIcon className="h-4 w-4" />}
               />
               <Textarea
@@ -336,7 +336,7 @@ SekaaChat.init({ widgetId: '${widgetId}' });`;
                   جرّبه الآن
                 </h4>
                 <p className="text-small text-muted-light dark:text-muted-dark mb-3">
-                  بعد إضافة الكود، سيظهر زر شات في الموقع. كل رسالة تصل ستظهر في صندوق سكة فوراً
+                  بعد إضافة الكود، سيظهر زر شات في الموقع. كل رسالة تصل ستظهر في صندوق Qhub فوراً
                 </p>
                 <a
                   href={`https://chat-client.apexes.click/preview/widget?id=${widgetId}`}
@@ -365,7 +365,7 @@ SekaaChat.init({ widgetId: '${widgetId}' });`;
             <Eye className="h-4 w-4 text-primary" />
             معاينة مباشرة
           </p>
-          <span className="text-[10px] text-muted-light dark:text-muted-dark font-mono">sekaaoman.com</span>
+          <span className="text-[10px] text-muted-light dark:text-muted-dark font-mono">qhuboman.com</span>
         </div>
         <div className="flex-1 relative overflow-hidden" style={{
           backgroundImage: 'linear-gradient(to bottom right, #f1f5f9, #e2e8f0)',
@@ -474,7 +474,7 @@ function WidgetPreview({ config }: { config: WidgetConfig }): JSX.Element {
             </button>
           </div>
           <div className="text-center py-1.5 text-[10px] text-muted-light border-t border-border-light/60">
-            🚀 يعمل بواسطة سكة
+            🚀 يعمل بواسطة Qhub
           </div>
         </div>
       )}

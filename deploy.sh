@@ -1,5 +1,5 @@
 #!/bin/bash
-# Apex Sekaa — build + deploy. Preserves source archives served via chat-admin.
+# Apex Qhub — build + deploy. Preserves source archives served via chat-admin.
 set -e
 SRC=/var/www/source.apexes.click
 cd "$SRC"

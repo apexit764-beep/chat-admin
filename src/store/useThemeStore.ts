@@ -9,7 +9,7 @@ interface ThemeState {
 }
 
 const initialTheme: Theme =
-  typeof window !== 'undefined' && localStorage.getItem('sekaa_theme') === 'dark'
+  typeof window !== 'undefined' && localStorage.getItem('qhub_theme') === 'dark'
     ? 'dark'
     : 'light';
 
@@ -19,14 +19,14 @@ export const useThemeStore = create<ThemeState>((set) => ({
     set((state) => {
       const next: Theme = state.theme === 'dark' ? 'light' : 'dark';
       if (typeof window !== 'undefined') {
-        localStorage.setItem('sekaa_theme', next);
+        localStorage.setItem('qhub_theme', next);
         document.documentElement.classList.toggle('dark', next === 'dark');
       }
       return { theme: next };
     }),
   setTheme: (theme) => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('sekaa_theme', theme);
+      localStorage.setItem('qhub_theme', theme);
       document.documentElement.classList.toggle('dark', theme === 'dark');
     }
     set({ theme });

@@ -15,7 +15,7 @@ interface AuthState {
   logout: () => void;
 }
 
-const STORAGE_KEY_CLIENT = 'sekaa_auth';
+const STORAGE_KEY_CLIENT = 'qhub_auth';
 const STORAGE_KEY_ADMIN = 'apex_admin_auth';
 const storageKey = (): string => (getAppMode() === 'admin' ? STORAGE_KEY_ADMIN : STORAGE_KEY_CLIENT);
 
@@ -33,7 +33,7 @@ function readInitial(): { isAuthenticated: boolean; user: AuthUser | null } {
 
 const initial = readInitial();
 
-const CLIENT_CREDS = { email: 'admin@sekaa.com', password: 'admin123', name: 'سالم الرواحي' };
+const CLIENT_CREDS = { email: 'admin@qhub.com', password: 'admin123', name: 'سالم الرواحي' };
 const ADMIN_CREDS = { email: 'admin@apexes.click', password: 'admin123', name: 'محمد الكندي' };
 
 export const useAuthStore = create<AuthState>((set) => ({
