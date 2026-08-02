@@ -113,42 +113,6 @@ function formatFileSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} ميجابايت`;
 }
 
-const attachmentSeeds: Record<string, { fileName: string; fileType: string; fileSize: number; daysAgo: number }[]> = {
-  cli_1: [
-    { fileName: 'عقد_الخدمة.pdf', fileType: 'PDF', fileSize: 482_300, daysAgo: 40 },
-    { fileName: 'بيانات_الشركة.docx', fileType: 'DOCX', fileSize: 128_450, daysAgo: 25 },
-  ],
-  cli_2: [
-    { fileName: 'اتفاقية_الاشتراك.pdf', fileType: 'PDF', fileSize: 356_800, daysAgo: 60 },
-    { fileName: 'شعار_الشركة.png', fileType: 'PNG', fileSize: 94_200, daysAgo: 30 },
-    { fileName: 'فاتورة_ضريبية.pdf', fileType: 'PDF', fileSize: 210_500, daysAgo: 10 },
-  ],
-  cli_3: [
-    { fileName: 'السجل_التجاري.pdf', fileType: 'PDF', fileSize: 512_000, daysAgo: 90 },
-    { fileName: 'عرض_الأسعار.docx', fileType: 'DOCX', fileSize: 76_300, daysAgo: 15 },
-  ],
-  cli_4: [
-    { fileName: 'نموذج_تسجيل.pdf', fileType: 'PDF', fileSize: 300_100, daysAgo: 5 },
-  ],
-  cli_5: [
-    { fileName: 'عقد_الخدمة_الموقّع.pdf', fileType: 'PDF', fileSize: 620_000, daysAgo: 75 },
-    { fileName: 'شهادة_الضريبة.png', fileType: 'PNG', fileSize: 152_700, daysAgo: 22 },
-  ],
-};
-
-function seedAttachments(clientId: string, uploadedBy: string): Attachment[] {
-  const seeds = attachmentSeeds[clientId];
-  if (!seeds) return [];
-  const now = Date.now();
-  return seeds.map((s, i) => ({
-    id: `${clientId}_att_${i + 1}`,
-    fileName: s.fileName,
-    fileType: s.fileType,
-    fileSize: s.fileSize,
-    uploadDate: new Date(now - s.daysAgo * 86400000).toISOString(),
-    uploadedBy,
-  }));
-}
 
 const statusLabel: Record<ClientStatus, string> = {
   trial: 'فترة تجريبية',
@@ -201,7 +165,7 @@ export default function ClientDetail(): JSX.Element {
   const [viewInvoice, setViewInvoice] = useState<Invoice | null>(null);
   const adminUsers = useAdminStore((s) => s.adminUsers);
   const currentAdmin = adminUsers[0];
-  const [attachments, setAttachments] = useState<Attachment[]>(() => seedAttachments(id ?? '', currentAdmin?.name ?? 'مشرف'));
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!client) {
