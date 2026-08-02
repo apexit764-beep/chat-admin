@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   ArrowRight,
@@ -32,6 +32,7 @@ import {
   Eye,
   Download,
   Send,
+  Upload,
 } from 'lucide-react';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
@@ -97,6 +98,58 @@ function generateClientChannels(clientId: string, count: number) {
   }));
 }
 
+interface Attachment {
+  id: string;
+  fileName: string;
+  fileType: string;
+  fileSize: number;
+  uploadDate: string;
+  uploadedBy: string;
+}
+
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} بايت`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} كيلوبايت`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} ميجابايت`;
+}
+
+const attachmentSeeds: Record<string, { fileName: string; fileType: string; fileSize: number; daysAgo: number }[]> = {
+  cli_1: [
+    { fileName: 'عقد_الخدمة.pdf', fileType: 'PDF', fileSize: 482_300, daysAgo: 40 },
+    { fileName: 'بيانات_الشركة.docx', fileType: 'DOCX', fileSize: 128_450, daysAgo: 25 },
+  ],
+  cli_2: [
+    { fileName: 'اتفاقية_الاشتراك.pdf', fileType: 'PDF', fileSize: 356_800, daysAgo: 60 },
+    { fileName: 'شعار_الشركة.png', fileType: 'PNG', fileSize: 94_200, daysAgo: 30 },
+    { fileName: 'فاتورة_ضريبية.pdf', fileType: 'PDF', fileSize: 210_500, daysAgo: 10 },
+  ],
+  cli_3: [
+    { fileName: 'السجل_التجاري.pdf', fileType: 'PDF', fileSize: 512_000, daysAgo: 90 },
+    { fileName: 'عرض_الأسعار.docx', fileType: 'DOCX', fileSize: 76_300, daysAgo: 15 },
+  ],
+  cli_4: [
+    { fileName: 'نموذج_تسجيل.pdf', fileType: 'PDF', fileSize: 300_100, daysAgo: 5 },
+  ],
+  cli_5: [
+    { fileName: 'عقد_الخدمة_الموقّع.pdf', fileType: 'PDF', fileSize: 620_000, daysAgo: 75 },
+    { fileName: 'شهادة_الضريبة.png', fileType: 'PNG', fileSize: 152_700, daysAgo: 22 },
+  ],
+};
+
+function seedAttachments(clientId: string, uploadedBy: string): Attachment[] {
+  const seeds = attachmentSeeds[clientId];
+  if (!seeds) return [];
+  const now = Date.now();
+  return seeds.map((s, i) => ({
+    id: `${clientId}_att_${i + 1}`,
+    fileName: s.fileName,
+    fileType: s.fileType,
+    fileSize: s.fileSize,
+    uploadDate: new Date(now - s.daysAgo * 86400000).toISOString(),
+    uploadedBy,
+  }));
+}
+
 const statusLabel: Record<ClientStatus, string> = {
   trial: 'فترة تجريبية',
   active: 'نشط',
@@ -148,6 +201,8 @@ export default function ClientDetail(): JSX.Element {
   const [viewInvoice, setViewInvoice] = useState<Invoice | null>(null);
   const adminUsers = useAdminStore((s) => s.adminUsers);
   const currentAdmin = adminUsers[0];
+  const [attachments, setAttachments] = useState<Attachment[]>(() => seedAttachments(id ?? '', currentAdmin?.name ?? 'مشرف'));
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!client) {
     return (
@@ -223,6 +278,41 @@ export default function ClientDetail(): JSX.Element {
     setNotes((prev) => [{ text: internalNote.trim(), by: currentAdmin?.name ?? 'مشرف', at: new Date().toISOString() }, ...prev]);
     setInternalNote('');
     showToast('تمت إضافة الملاحظة', 'success');
+  };
+
+  const handleFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const ext = file.name.includes('.') ? file.name.split('.').pop()!.toUpperCase() : 'FILE';
+    setAttachments((prev) => [
+      {
+        id: `att_${Date.now()}`,
+        fileName: file.name,
+        fileType: ext,
+        fileSize: file.size,
+        uploadDate: new Date().toISOString(),
+        uploadedBy: currentAdmin?.name ?? 'مشرف',
+      },
+      ...prev,
+    ]);
+    showToast('تم رفع الملف بنجاح', 'success');
+    e.target.value = '';
+  };
+
+  const handleDownloadAttachment = (att: Attachment) => {
+    showToast(`جارٍ تنزيل ${att.fileName}...`, 'success');
+  };
+
+  const handleDeleteAttachment = async (att: Attachment) => {
+    const ok = await confirm({
+      title: `حذف ${att.fileName}؟`,
+      message: 'لا يمكن التراجع عن هذا الإجراء.',
+      variant: 'danger',
+      confirmText: 'حذف',
+    });
+    if (!ok) return;
+    setAttachments((prev) => prev.filter((a) => a.id !== att.id));
+    showToast('تم حذف المرفق', 'success');
   };
 
   const limits = plan?.limits;
@@ -718,12 +808,83 @@ export default function ClientDetail(): JSX.Element {
           </TabsContent>
 
           {/* Attachments Tab */}
-          <TabsContent value="attachments" className="mt-5">
-            <div className="rounded-xl border bg-card p-8 text-center">
-              <Paperclip className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-              <p className="text-muted-foreground">لا توجد مرفقات</p>
-              <p className="text-xs text-muted-foreground mt-1">يمكنك رفع ملفات العقود والمستندات المتعلقة بهذا العميل</p>
-            </div>
+          <TabsContent value="attachments" className="mt-5 space-y-4">
+            <input
+              ref={fileInputRef}
+              type="file"
+              className="hidden"
+              onChange={handleFileSelected}
+            />
+            {attachments.length === 0 ? (
+              <div className="rounded-xl border bg-card p-8 text-center">
+                <Paperclip className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
+                <p className="text-muted-foreground">لا توجد مرفقات</p>
+                <p className="text-xs text-muted-foreground mt-1">يمكنك رفع ملفات العقود والمستندات المتعلقة بهذا العميل</p>
+                <Button size="sm" className="rounded-full mt-4" onClick={() => fileInputRef.current?.click()}>
+                  <Upload className="h-4 w-4 me-1.5" /> رفع ملف
+                </Button>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center justify-end">
+                  <Button size="sm" className="rounded-full" onClick={() => fileInputRef.current?.click()}>
+                    <Upload className="h-4 w-4 me-1.5" /> رفع ملف
+                  </Button>
+                </div>
+                <div className="rounded-xl border bg-card">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-right">اسم الملف</TableHead>
+                        <TableHead className="text-right">النوع</TableHead>
+                        <TableHead className="text-right">الحجم</TableHead>
+                        <TableHead className="text-right">تاريخ الرفع</TableHead>
+                        <TableHead className="text-right">بواسطة</TableHead>
+                        <TableHead className="text-right w-[100px]">إجراءات</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {attachments.map((att) => (
+                        <TableRow key={att.id}>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
+                              <span className="font-medium text-sm truncate max-w-[220px]">{att.fileName}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="secondary" className="text-[10px] font-semibold">{att.fileType}</Badge>
+                          </TableCell>
+                          <TableCell className="text-muted-foreground text-sm">{formatFileSize(att.fileSize)}</TableCell>
+                          <TableCell className="text-muted-foreground text-sm">{formatDate(att.uploadDate)}</TableCell>
+                          <TableCell className="text-sm">{att.uploadedBy}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-1">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7"
+                                onClick={() => handleDownloadAttachment(att)}
+                              >
+                                <Download className="h-3.5 w-3.5" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7 text-danger hover:text-danger"
+                                onClick={() => handleDeleteAttachment(att)}
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </>
+            )}
           </TabsContent>
         </Tabs>
 
