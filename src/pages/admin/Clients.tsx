@@ -42,6 +42,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { BilingualInput } from '@/components/ui/bilingual-input';
 import {
   Dialog,
   DialogContent,
@@ -112,7 +113,9 @@ export default function AdminClients(): JSX.Element {
   const [editing, setEditing] = useState<Client | null>(null);
   const [form, setForm] = useState<{
     companyName: string;
+    companyNameAr: string;
     contactName: string;
+    contactNameAr: string;
     email: string;
     phoneCode: string;
     phone: string;
@@ -123,7 +126,9 @@ export default function AdminClients(): JSX.Element {
     sendViaEmail: boolean;
   }>({
     companyName: '',
+    companyNameAr: '',
     contactName: '',
+    contactNameAr: '',
     email: '',
     phoneCode: '+968',
     phone: '',
@@ -179,7 +184,7 @@ export default function AdminClients(): JSX.Element {
 
   const openCreate = (): void => {
     setEditing(null);
-    setForm({ companyName: '', contactName: '', email: '', phoneCode: '+968', phone: '', country: '', industry: '', password: generatePassword(), sendViaWhatsapp: true, sendViaEmail: false });
+    setForm({ companyName: '', companyNameAr: '', contactName: '', contactNameAr: '', email: '', phoneCode: '+968', phone: '', country: '', industry: '', password: generatePassword(), sendViaWhatsapp: true, sendViaEmail: false });
     setShowPwd(false);
     setErrors({});
     setModalOpen(true);
@@ -188,7 +193,7 @@ export default function AdminClients(): JSX.Element {
   const openEdit = (c: Client): void => {
     setEditing(c);
     setForm({
-      companyName: c.companyName, contactName: c.contactName, email: c.email,
+      companyName: c.companyName, companyNameAr: c.companyNameAr || '', contactName: c.contactName, contactNameAr: c.contactNameAr || '', email: c.email,
       phoneCode: c.phone?.split(' ')[0] || '+968', phone: c.phone?.split(' ').slice(1).join(' ') || c.phone,
       country: c.country, industry: c.industry, password: c.password, sendViaWhatsapp: true, sendViaEmail: false,
     });
@@ -199,11 +204,13 @@ export default function AdminClients(): JSX.Element {
 
   const submit = (): void => {
     const e: Partial<Record<keyof typeof form, string>> = {};
-    if (!form.companyName.trim()) e.companyName = 'اسم الشركة مطلوب';
+    if (!form.companyName.trim()) e.companyName = 'اسم الشركة (English) مطلوب';
+    if (!form.companyNameAr.trim()) e.companyNameAr = 'اسم الشركة (العربية) مطلوب';
     if (!form.email.trim()) e.email = 'البريد مطلوب';
     else if (!/^[\w.+-]+@[\w-]+\.[\w.-]+$/.test(form.email.trim())) e.email = 'صيغة البريد غير صحيحة';
     if (!form.phone.trim()) e.phone = 'الهاتف مطلوب';
-    if (!form.contactName.trim()) e.contactName = 'الاسم مطلوب';
+    if (!form.contactName.trim()) e.contactName = 'الاسم (English) مطلوب';
+    if (!form.contactNameAr.trim()) e.contactNameAr = 'الاسم (العربية) مطلوب';
     if (!form.country) e.country = 'الدولة مطلوبة';
     if (!form.password.trim()) e.password = 'كلمة المرور مطلوبة';
     else if (form.password.trim().length < 6) e.password = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
@@ -217,7 +224,7 @@ export default function AdminClients(): JSX.Element {
       const emailChanged = form.email.trim() !== editing.email;
       const passwordChanged = form.password.trim() !== editing.password;
       updateClient(editing.id, {
-        companyName: form.companyName, contactName: form.contactName, email: form.email,
+        companyName: form.companyName, companyNameAr: form.companyNameAr, contactName: form.contactName, contactNameAr: form.contactNameAr, email: form.email,
         phone: fullPhone, country: form.country, industry: form.industry, currency: country.currency,
         username: form.email, password: form.password,
       });
@@ -229,7 +236,7 @@ export default function AdminClients(): JSX.Element {
       }
     } else {
       addClient({
-        companyName: form.companyName, contactName: form.contactName, email: form.email,
+        companyName: form.companyName, companyNameAr: form.companyNameAr, contactName: form.contactName, contactNameAr: form.contactNameAr, email: form.email,
         phone: fullPhone, country: form.country, industry: form.industry, status: 'trial',
         planId: null, currency: country.currency,
         username: form.email, password: form.password,
@@ -566,26 +573,24 @@ export default function AdminClients(): JSX.Element {
           <div className="space-y-4 py-4">
             {/* معلومات الشركة */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="companyName">اسم الشركة<span className="text-destructive ms-0.5">*</span></Label>
-                <Input
-                  id="companyName"
-                  value={form.companyName}
-                  onChange={(e) => { setForm({ ...form, companyName: e.target.value }); setErrors({ ...errors, companyName: undefined }); }}
-                  placeholder="مثال: Qhub"
-                />
-                {errors.companyName && <p className="text-sm text-destructive">{errors.companyName}</p>}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="contactName">اسم المدير<span className="text-destructive ms-0.5">*</span></Label>
-                <Input
-                  id="contactName"
-                  value={form.contactName}
-                  onChange={(e) => { setForm({ ...form, contactName: e.target.value }); setErrors({ ...errors, contactName: undefined }); }}
-                  placeholder="الاسم الكامل"
-                />
-                {errors.contactName && <p className="text-sm text-destructive">{errors.contactName}</p>}
-              </div>
+              <BilingualInput
+                label="اسم الشركة"
+                valueAr={form.companyNameAr}
+                valueEn={form.companyName}
+                onChangeAr={(v) => { setForm({ ...form, companyNameAr: v }); setErrors({ ...errors, companyNameAr: undefined }); }}
+                onChangeEn={(v) => { setForm({ ...form, companyName: v }); setErrors({ ...errors, companyName: undefined }); }}
+                required
+                error={errors.companyName || errors.companyNameAr}
+              />
+              <BilingualInput
+                label="اسم المدير"
+                valueAr={form.contactNameAr}
+                valueEn={form.contactName}
+                onChangeAr={(v) => { setForm({ ...form, contactNameAr: v }); setErrors({ ...errors, contactNameAr: undefined }); }}
+                onChangeEn={(v) => { setForm({ ...form, contactName: v }); setErrors({ ...errors, contactName: undefined }); }}
+                required
+                error={errors.contactName || errors.contactNameAr}
+              />
               <div className="space-y-2">
                 <Label>الدولة<span className="text-destructive ms-0.5">*</span></Label>
                 <Select value={form.country} onValueChange={(v) => {
