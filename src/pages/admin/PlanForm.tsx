@@ -25,6 +25,7 @@ import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { BilingualInput } from '@/components/ui/bilingual-input';
 import {
   Dialog,
   DialogContent,
@@ -386,18 +387,21 @@ export default function PlanForm(): JSX.Element {
               <h3 className="text-lg font-semibold">البيانات الأساسية</h3>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Label>الاسم بالعربية<span className="text-destructive ms-0.5">*</span></Label>
-                  <Input value={form.nameAr} onChange={(e) => { setForm({ ...form, nameAr: e.target.value }); if (errors.nameAr) setErrors((prev) => { const { nameAr, ...rest } = prev; return rest; }); }} placeholder="مثال: الاحترافي" />
-                  {errors.nameAr && <p className="text-xs text-destructive mt-1">{errors.nameAr}</p>}
-                </div>
-                <div className="space-y-2">
-                  <Label>Name (EN)<span className="text-destructive ms-0.5">*</span></Label>
-                  <Input value={form.name} onChange={(e) => { setForm({ ...form, name: e.target.value }); if (errors.name) setErrors((prev) => { const { name, ...rest } = prev; return rest; }); }} placeholder="Pro" />
-                  {errors.name && <p className="text-xs text-destructive mt-1">{errors.name}</p>}
-                </div>
-              </div>
+              <BilingualInput
+                label="اسم الباقة"
+                valueAr={form.nameAr}
+                valueEn={form.name}
+                onChangeAr={(value) => {
+                  setForm({ ...form, nameAr: value });
+                  if (errors.nameAr) setErrors((prev) => { const { nameAr, ...rest } = prev; return rest; });
+                }}
+                onChangeEn={(value) => {
+                  setForm({ ...form, name: value });
+                  if (errors.name) setErrors((prev) => { const { name, ...rest } = prev; return rest; });
+                }}
+                required
+                error={errors.nameAr || errors.name}
+              />
               <div className="space-y-2">
                 <Label>وصف قصير (Tagline)<span className="text-muted-foreground text-[10px] ms-1">(اختياري)</span></Label>
                 <Input value={form.tagline} onChange={(e) => setForm({ ...form, tagline: e.target.value })} placeholder="للشركات النامية" />
