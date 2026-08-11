@@ -190,6 +190,7 @@ export interface Plan {
 export interface Industry {
   id: string;
   name: string;
+  nameAr?: string;
   addedBy: string;
   createdAt: string;
   active: boolean;
@@ -336,6 +337,7 @@ export type ArticleStatus = 'published' | 'draft';
 export interface KnowledgeCategory {
   id: string;
   name: string;
+  nameAr?: string;
   slug: string;
   articleCount: number;
   order: number;
@@ -344,8 +346,10 @@ export interface KnowledgeCategory {
 export interface KnowledgeArticle {
   id: string;
   title: string;
+  titleAr?: string;
   slug: string;
   content: string;
+  contentAr?: string;
   categoryId: string;
   status: ArticleStatus;
   views: number;
@@ -353,7 +357,9 @@ export interface KnowledgeArticle {
   notHelpful: number;
   sortOrder: number;
   metaTitle: string;
+  metaTitleAr?: string;
   metaDescription: string;
+  metaDescriptionAr?: string;
   createdAt: string;
   updatedAt: string;
 }

@@ -8,6 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { BilingualInput } from '@/components/ui/bilingual-input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -41,33 +42,38 @@ export default function Industries({ onBack }: { onBack?: () => void }): JSX.Ele
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [name, setName] = useState('');
+  const [nameAr, setNameAr] = useState('');
   const [error, setError] = useState('');
 
   const openAdd = () => {
     setEditId(null);
     setName('');
+    setNameAr('');
     setError('');
     setOpen(true);
   };
 
-  const openEdit = (id: string, currentName: string) => {
+  const openEdit = (id: string, currentName: string, currentNameAr: string) => {
     setEditId(id);
     setName(currentName);
+    setNameAr(currentNameAr);
     setError('');
     setOpen(true);
   };
 
   const handleSave = () => {
     const trimmed = name.trim();
-    if (!trimmed) { setError('الاسم مطلوب'); showToast('يرجى تعبئة الحقول المطلوبة', 'error'); return; }
+    const trimmedAr = nameAr.trim();
+    if (!trimmed) { setError('اسم المجال (English) مطلوب'); showToast('يرجى تعبئة الحقول المطلوبة', 'error'); return; }
+    if (!trimmedAr) { setError('اسم المجال (العربية) مطلوب'); showToast('يرجى تعبئة الحقول المطلوبة', 'error'); return; }
     if (!/^[؀-ۿa-zA-Z0-9\s]+$/.test(trimmed)) { setError('اسم المجال يقبل فقط حروف وأرقام'); return; }
     const duplicate = industries.some((i) => i.name === trimmed && i.id !== editId);
     if (duplicate) { setError('مجال العمل موجود مسبقاً'); return; }
 
     if (editId) {
-      updateIndustry(editId, trimmed);
+      updateIndustry(editId, trimmed, trimmedAr);
     } else {
-      addIndustry(trimmed, currentAdmin?.name ?? 'مشرف');
+      addIndustry(trimmed, currentAdmin?.name ?? 'مشرف', trimmedAr);
     }
     setOpen(false);
   };
@@ -176,7 +182,7 @@ export default function Industries({ onBack }: { onBack?: () => void }): JSX.Ele
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(ind.id, ind.name)}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(ind.id, ind.name, ind.nameAr || '')}>
                           <Edit2 className="h-3.5 w-3.5" />
                         </Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => handleDelete(ind.id, ind.name)}>
@@ -198,18 +204,15 @@ export default function Industries({ onBack }: { onBack?: () => void }): JSX.Ele
             <DialogTitle>{editId ? 'تعديل مجال العمل' : 'إضافة مجال عمل'}</DialogTitle>
           </DialogHeader>
           <div className="space-y-3 py-2">
-            <div className="space-y-2">
-              <Label htmlFor="ind-name">اسم المجال<span className="text-destructive ms-0.5">*</span></Label>
-              <Input
-                id="ind-name"
-                value={name}
-                onChange={(e) => { setName(e.target.value); setError(''); }}
-                placeholder="مثال: عقارات، تقنية، صحة..."
-                autoFocus
-                onKeyDown={(e) => e.key === 'Enter' && handleSave()}
-              />
-              {error && <p className="text-sm text-destructive">{error}</p>}
-            </div>
+            <BilingualInput
+              label="اسم المجال"
+              valueAr={nameAr}
+              valueEn={name}
+              onChangeAr={(v) => { setNameAr(v); setError(''); }}
+              onChangeEn={(v) => { setName(v); setError(''); }}
+              required
+              error={error}
+            />
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)}>إلغاء</Button>

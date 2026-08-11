@@ -63,8 +63,8 @@ interface AdminState {
   deletePlanRequest: (id: string) => void;
 
   // Knowledge Base actions
-  addKnowledgeCategory: (name: string) => KnowledgeCategory;
-  updateKnowledgeCategory: (id: string, name: string) => void;
+  addKnowledgeCategory: (name: string, nameAr?: string) => KnowledgeCategory;
+  updateKnowledgeCategory: (id: string, name: string, nameAr?: string) => void;
   deleteKnowledgeCategory: (id: string) => void;
   addKnowledgeArticle: (article: Omit<KnowledgeArticle, 'id' | 'views' | 'helpful' | 'notHelpful' | 'createdAt' | 'updatedAt' | 'sortOrder'> & { sortOrder?: number }) => KnowledgeArticle;
   updateKnowledgeArticle: (id: string, patch: Partial<KnowledgeArticle>) => void;
@@ -106,8 +106,8 @@ interface AdminState {
   deleteCountry: (code: string) => void;
 
   // Industry actions
-  addIndustry: (name: string, addedBy: string) => Industry;
-  updateIndustry: (id: string, name: string) => void;
+  addIndustry: (name: string, addedBy: string, nameAr?: string) => Industry;
+  updateIndustry: (id: string, name: string, nameAr?: string) => void;
   deleteIndustry: (id: string) => void;
   toggleIndustryActive: (id: string) => void;
 
@@ -187,11 +187,12 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   deletePlanRequest: (id) =>
     set((s) => ({ planRequests: s.planRequests.filter((r) => r.id !== id) })),
 
-  addKnowledgeCategory: (name) => {
+  addKnowledgeCategory: (name, nameAr) => {
     const slug = name.replace(/\s+/g, '-').toLowerCase();
     const cat: KnowledgeCategory = {
       id: newId('kc'),
       name,
+      nameAr,
       slug,
       articleCount: 0,
       order: get().knowledgeCategories.length + 1,
@@ -200,10 +201,10 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     return cat;
   },
 
-  updateKnowledgeCategory: (id, name) =>
+  updateKnowledgeCategory: (id, name, nameAr) =>
     set((s) => ({
       knowledgeCategories: s.knowledgeCategories.map((c) =>
-        c.id === id ? { ...c, name, slug: name.replace(/\s+/g, '-').toLowerCase() } : c
+        c.id === id ? { ...c, name, nameAr, slug: name.replace(/\s+/g, '-').toLowerCase() } : c
       ),
     })),
 
@@ -512,14 +513,14 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   deleteCountry: (code) =>
     set((s) => ({ countries: s.countries.filter((c) => c.code !== code) })),
 
-  addIndustry: (name, addedBy) => {
-    const ind: Industry = { id: newId('ind'), name, addedBy, createdAt: new Date().toISOString(), active: true };
+  addIndustry: (name, addedBy, nameAr) => {
+    const ind: Industry = { id: newId('ind'), name, nameAr, addedBy, createdAt: new Date().toISOString(), active: true };
     set((s) => ({ industries: [...s.industries, ind] }));
     return ind;
   },
 
-  updateIndustry: (id, name) =>
-    set((s) => ({ industries: s.industries.map((i) => (i.id === id ? { ...i, name } : i)) })),
+  updateIndustry: (id, name, nameAr) =>
+    set((s) => ({ industries: s.industries.map((i) => (i.id === id ? { ...i, name, nameAr } : i)) })),
 
   deleteIndustry: (id) =>
     set((s) => ({ industries: s.industries.filter((i) => i.id !== id) })),

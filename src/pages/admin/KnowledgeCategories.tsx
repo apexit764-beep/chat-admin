@@ -6,6 +6,7 @@ import { useUIStore } from '@/store/useUIStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
+import { BilingualInput } from '@/components/ui/bilingual-input';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -37,7 +38,7 @@ export default function KnowledgeCategories(): JSX.Element {
   const showToast = useUIStore((s) => s.showToast);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [editModal, setEditModal] = useState<{ mode: 'new' | 'edit'; id?: string; name: string } | null>(null);
+  const [editModal, setEditModal] = useState<{ mode: 'new' | 'edit'; id?: string; name: string; nameAr: string } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<KnowledgeCategory | null>(null);
   const [dragId, setDragId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
@@ -53,21 +54,26 @@ export default function KnowledgeCategories(): JSX.Element {
     setDragOverId(null);
   };
 
-  const openNew = (): void => { setErrors({}); setEditModal({ mode: 'new', name: '' }); };
-  const openEdit = (c: KnowledgeCategory): void => { setErrors({}); setEditModal({ mode: 'edit', id: c.id, name: c.name }); };
+  const openNew = (): void => { setErrors({}); setEditModal({ mode: 'new', name: '', nameAr: '' }); };
+  const openEdit = (c: KnowledgeCategory): void => { setErrors({}); setEditModal({ mode: 'edit', id: c.id, name: c.name, nameAr: c.nameAr || '' }); };
 
   const handleSave = (): void => {
     if (!editModal) return;
     if (!editModal.name.trim()) {
-      setErrors({ name: 'اسم التصنيف مطلوب' });
+      setErrors({ name: 'اسم التصنيف (English) مطلوب' });
+      showToast('يرجى تعبئة الحقول المطلوبة', 'error');
+      return;
+    }
+    if (!editModal.nameAr.trim()) {
+      setErrors({ nameAr: 'اسم التصنيف (العربية) مطلوب' });
       showToast('يرجى تعبئة الحقول المطلوبة', 'error');
       return;
     }
     if (editModal.mode === 'new') {
-      addCategory(editModal.name.trim());
+      addCategory(editModal.name.trim(), editModal.nameAr.trim());
       showToast('تمت إضافة التصنيف', 'success');
     } else if (editModal.id) {
-      updateCategory(editModal.id, editModal.name.trim());
+      updateCategory(editModal.id, editModal.name.trim(), editModal.nameAr.trim());
       showToast('تم تحديث التصنيف', 'success');
     }
     setEditModal(null);
@@ -201,19 +207,19 @@ export default function KnowledgeCategories(): JSX.Element {
             <DialogTitle>{editModal?.mode === 'new' ? 'تصنيف جديد' : 'تعديل التصنيف'}</DialogTitle>
           </DialogHeader>
           <div className="space-y-1.5 py-2">
-            <label className="text-sm font-medium">اسم التصنيف<span className="text-destructive ms-0.5">*</span></label>
-            <Input
-              autoFocus
-              value={editModal?.name ?? ''}
-              onChange={(e) => { setEditModal((m) => (m ? { ...m, name: e.target.value } : m)); setErrors({}); }}
-              placeholder="مثل: الأسئلة الشائعة"
-              onKeyDown={(e) => { if (e.key === 'Enter') handleSave(); }}
+            <BilingualInput
+              label="اسم التصنيف"
+              valueAr={editModal?.nameAr ?? ''}
+              valueEn={editModal?.name ?? ''}
+              onChangeAr={(v) => { setEditModal((m) => (m ? { ...m, nameAr: v } : m)); setErrors({}); }}
+              onChangeEn={(v) => { setEditModal((m) => (m ? { ...m, name: v } : m)); setErrors({}); }}
+              required
+              error={errors.name || errors.nameAr}
             />
-            {errors.name && <p className="text-xs text-destructive mt-1">{errors.name}</p>}
           </div>
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => setEditModal(null)}>إلغاء</Button>
-            <Button onClick={handleSave} disabled={!editModal?.name.trim()}>حفظ</Button>
+            <Button onClick={handleSave} disabled={!editModal?.name.trim() || !editModal?.nameAr.trim()}>حفظ</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
