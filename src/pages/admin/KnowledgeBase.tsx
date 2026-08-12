@@ -25,7 +25,7 @@ import { Badge } from '@/components/ui/badge';
 import { BilingualInput } from '@/components/ui/bilingual-input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
-import { RichEditor } from '@/components/ui/rich-editor';
+import { BilingualRichEditor } from '@/components/ui/bilingual-rich-editor';
 import {
   Select,
   SelectTrigger,
@@ -542,27 +542,17 @@ export default function KnowledgeBase(): JSX.Element {
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">المحتوى (English)<span className="text-destructive ms-0.5">*</span></label>
-              <RichEditor
-                value={articleContent}
-                onChange={(v) => { setArticleContent(v); setErrors((prev) => { const { content, ...rest } = prev; return rest; }); }}
-                placeholder="Write article content here..."
-                minHeight={280}
-              />
-              {errors.content && <p className="text-xs text-destructive mt-1">{errors.content}</p>}
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">المحتوى (العربية)<span className="text-destructive ms-0.5">*</span></label>
-              <RichEditor
-                value={articleContentAr}
-                onChange={(v) => { setArticleContentAr(v); setErrors((prev) => { const { contentAr, ...rest } = prev; return rest; }); }}
-                placeholder="اكتب محتوى المقال بالعربية هنا..."
-                minHeight={280}
-              />
-              {errors.contentAr && <p className="text-xs text-destructive mt-1">{errors.contentAr}</p>}
-            </div>
+            <BilingualRichEditor
+              label="المحتوى"
+              valueAr={articleContentAr}
+              valueEn={articleContent}
+              onChangeAr={(v) => { setArticleContentAr(v); setErrors((prev) => { const { contentAr, ...rest } = prev; return rest; }); }}
+              onChangeEn={(v) => { setArticleContent(v); setErrors((prev) => { const { content, ...rest } = prev; return rest; }); }}
+              required
+              placeholderAr="اكتب محتوى المقال بالعربية هنا..."
+              placeholderEn="Write article content here..."
+              error={errors.content || errors.contentAr}
+            />
 
             <div className="border rounded-xl">
               <button
@@ -578,53 +568,27 @@ export default function KnowledgeBase(): JSX.Element {
               </button>
               {showSeo && (
                 <div className="p-4 border-t space-y-3">
-                  <div className="space-y-1.5">
-                    <label className="text-sm font-medium">Meta Title (English)</label>
-                    <Input
-                      value={articleMetaTitle}
-                      onChange={(e) => setArticleMetaTitle(e.target.value)}
-                      placeholder={articleTitle || 'Uses article title if empty'}
-                      maxLength={70}
-                    />
-                    <p className="text-[11px] text-muted-foreground">{articleMetaTitle.length}/70</p>
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-sm font-medium">عنوان الميتا (العربية)</label>
-                    <Input
-                      value={articleMetaTitleAr}
-                      onChange={(e) => setArticleMetaTitleAr(e.target.value)}
-                      placeholder={articleTitleAr || 'يستخدم عنوان المقال إذا تُرك فارغاً'}
-                      maxLength={70}
-                      dir="rtl"
-                    />
-                    <p className="text-[11px] text-muted-foreground">{articleMetaTitleAr.length}/70</p>
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-sm font-medium">Meta Description (English)</label>
-                    <textarea
-                      value={articleMetaDescription}
-                      onChange={(e) => setArticleMetaDescription(e.target.value)}
-                      placeholder="Brief description shown in search results"
-                      rows={3}
-                      maxLength={160}
-                      className="w-full rounded-lg border bg-background px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                      dir="ltr"
-                    />
-                    <p className="text-[11px] text-muted-foreground">{articleMetaDescription.length}/160</p>
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-sm font-medium">وصف الميتا (العربية)</label>
-                    <textarea
-                      value={articleMetaDescriptionAr}
-                      onChange={(e) => setArticleMetaDescriptionAr(e.target.value)}
-                      placeholder="وصف مختصر يظهر في نتائج البحث"
-                      rows={3}
-                      maxLength={160}
-                      className="w-full rounded-lg border bg-background px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                      dir="rtl"
-                    />
-                    <p className="text-[11px] text-muted-foreground">{articleMetaDescriptionAr.length}/160</p>
-                  </div>
+                  <BilingualInput
+                    label="عنوان الميتا"
+                    valueAr={articleMetaTitleAr}
+                    valueEn={articleMetaTitle}
+                    onChangeAr={setArticleMetaTitleAr}
+                    onChangeEn={setArticleMetaTitle}
+                    placeholderAr={articleTitleAr || 'يستخدم عنوان المقال إذا تُرك فارغاً'}
+                    placeholderEn={articleTitle || 'Uses article title if empty'}
+                    maxLength={70}
+                  />
+                  <BilingualInput
+                    label="وصف الميتا"
+                    type="textarea"
+                    valueAr={articleMetaDescriptionAr}
+                    valueEn={articleMetaDescription}
+                    onChangeAr={setArticleMetaDescriptionAr}
+                    onChangeEn={setArticleMetaDescription}
+                    placeholderAr="وصف مختصر يظهر في نتائج البحث"
+                    placeholderEn="Brief description shown in search results"
+                    maxLength={160}
+                  />
                 </div>
               )}
             </div>

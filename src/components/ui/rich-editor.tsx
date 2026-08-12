@@ -21,6 +21,7 @@ interface RichEditorProps {
   placeholder?: string;
   className?: string;
   minHeight?: number;
+  dir?: 'rtl' | 'ltr';
 }
 
 interface ToolButtonProps {
@@ -43,7 +44,7 @@ function ToolButton({ onClick, title, children }: ToolButtonProps): JSX.Element 
   );
 }
 
-export function RichEditor({ value, onChange, placeholder, className, minHeight = 240 }: RichEditorProps): JSX.Element {
+export function RichEditor({ value, onChange, placeholder, className, minHeight = 240, dir = 'rtl' }: RichEditorProps): JSX.Element {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -89,7 +90,7 @@ export function RichEditor({ value, onChange, placeholder, className, minHeight 
         ref={ref}
         contentEditable
         onInput={handleInput}
-        dir="rtl"
+        dir={dir}
         className="px-4 py-3 outline-none prose-sm max-w-none rich-editor-content"
         style={{ minHeight }}
         data-placeholder={placeholder}
