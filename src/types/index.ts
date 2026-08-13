@@ -332,6 +332,18 @@ export interface AdminUser {
   createdAt: string;
 }
 
+/** Accent colours a platform type can be tagged with */
+export type PlatformTypeColor = 'red' | 'purple' | 'blue' | 'emerald' | 'amber';
+
+export interface PlatformType {
+  id: string;
+  /** stable slug stored on each platform */
+  key: string;
+  name: string;
+  nameAr: string;
+  color: PlatformTypeColor;
+}
+
 export type ArticleStatus = 'published' | 'draft';
 
 export interface KnowledgeCategory {

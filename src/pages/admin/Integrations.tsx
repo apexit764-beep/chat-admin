@@ -1,4 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Plus,
   Search,
@@ -49,98 +50,14 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-type PlatformCategory = 'communication' | 'email' | 'ecommerce';
-
-interface ConnectionStep {
-  text: string;
-}
-
-interface ConnectionMethod {
-  id: string;
-  name: string;
-  recommended?: boolean;
-  steps: ConnectionStep[];
-}
-
-interface Platform {
-  id: string;
-  name: string;
-  slug: string;
-  category: PlatformCategory;
-  enabled: boolean;
-  logo: string;
-  countries: string[];
-  connectionMethods: ConnectionMethod[];
-}
-
-const categoryLabels: Record<PlatformCategory, string> = {
-  communication: 'قنوات التواصل',
-  email: 'البريد الإلكتروني',
-  ecommerce: 'منصات التجارة الإلكترونية وشركات الشحن',
-};
-
-const categoryIcons: Record<PlatformCategory, React.ElementType> = {
-  communication: MessageCircle,
-  email: Mail,
-  ecommerce: ShoppingBag,
-};
-
-const categoryBadgeColors: Record<PlatformCategory, string> = {
-  communication: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-  email: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-  ecommerce: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
-};
-
-const defaultPlatforms: Platform[] = [
-  { id: 'p1', name: 'WhatsApp Business', slug: 'whatsapp', category: 'communication', enabled: true, logo: '', countries: ['SA', 'EG', 'AE'], connectionMethods: [
-    { id: 'cm1', name: 'Meta Business Cloud API', recommended: true, steps: [
-      { text: 'سجّل الدخول في business.facebook.com وأنشئ حساب أعمال' },
-      { text: 'من الإعدادات ← WhatsApp Accounts، أنشئ تطبيقاً واربط رقم الواتساب' },
-      { text: 'انسخ Phone Number ID و WABA ID و Access Token من Meta' },
-      { text: 'الصق البيانات في نموذج الربط وفعّل الـ Webhook' },
-    ]},
-    { id: 'cm2', name: 'كود الاقتران (8 أحرف)', steps: [
-      { text: 'افتح واتساب على الهاتف واذهب للإعدادات' },
-      { text: 'اختر "الأجهزة المرتبطة" ثم "ربط جهاز"' },
-      { text: 'أدخل كود الاقتران المكون من 8 أحرف' },
-    ]},
-    { id: 'cm3', name: 'رمز QR', steps: [
-      { text: 'افتح واتساب على الهاتف واذهب للإعدادات' },
-      { text: 'اختر "الأجهزة المرتبطة" ثم "ربط جهاز"' },
-      { text: 'امسح رمز QR الظاهر على الشاشة' },
-    ]},
-  ]},
-  { id: 'p2', name: 'Facebook Messenger', slug: 'facebook-messenger', category: 'communication', enabled: true, logo: '', countries: ['SA', 'EG'], connectionMethods: [
-    { id: 'cm4', name: 'ربط عبر Facebook Login', steps: [
-      { text: 'سجّل الدخول بحساب Facebook وامنح الصلاحيات المطلوبة' },
-      { text: 'اختر الصفحة المراد ربطها' },
-    ]},
-  ]},
-  { id: 'p3', name: 'Instagram Direct', slug: 'instagram', category: 'communication', enabled: false, logo: '', countries: [], connectionMethods: [] },
-  { id: 'p4', name: 'Telegram', slug: 'telegram', category: 'communication', enabled: false, logo: '', countries: [], connectionMethods: [] },
-  { id: 'p5', name: 'Live Chat Widget', slug: 'livechat', category: 'communication', enabled: true, logo: '', countries: ['SA', 'EG', 'AE', 'OM'], connectionMethods: [] },
-  { id: 'p6', name: 'X (Twitter)', slug: 'twitter', category: 'communication', enabled: false, logo: '', countries: [], connectionMethods: [] },
-  { id: 'p7', name: 'Gmail', slug: 'gmail', category: 'email', enabled: true, logo: '', countries: ['SA', 'EG'], connectionMethods: [] },
-  { id: 'p8', name: 'Outlook', slug: 'outlook', category: 'email', enabled: false, logo: '', countries: [], connectionMethods: [] },
-  { id: 'p9', name: 'Yahoo Mail', slug: 'yahoo', category: 'email', enabled: false, logo: '', countries: [], connectionMethods: [] },
-  { id: 'p10', name: 'SMTP', slug: 'smtp', category: 'email', enabled: false, logo: '', countries: [], connectionMethods: [] },
-  { id: 'p11', name: 'سلة', slug: 'salla', category: 'ecommerce', enabled: true, logo: '', countries: ['SA'], connectionMethods: [] },
-  { id: 'p12', name: 'Zid', slug: 'zid', category: 'ecommerce', enabled: false, logo: '', countries: ['SA'], connectionMethods: [] },
-  { id: 'p13', name: 'Shopify', slug: 'shopify', category: 'ecommerce', enabled: false, logo: '', countries: [], connectionMethods: [] },
-  { id: 'p14', name: 'WooCommerce', slug: 'woocommerce', category: 'ecommerce', enabled: true, logo: '', countries: ['SA', 'EG'], connectionMethods: [] },
-];
-
-const emptyForm: Omit<Platform, 'id'> = {
-  name: '',
-  slug: '',
-  category: 'communication',
-  enabled: true,
-  logo: '',
-  countries: [],
-  connectionMethods: [],
-};
-
 import type { Country } from '@/types';
+import {
+  type Platform,
+  type PlatformCategory,
+  categoryIcons,
+  emptyForm,
+  platformTypeBadgeClass,
+} from '@/data/platforms';
 
 interface CountryTagsInputProps {
   countries: Country[];
@@ -227,7 +144,9 @@ function CountryTagsInput({ countries, selected, onToggle }: CountryTagsInputPro
 }
 
 export default function Integrations() {
-  const [platforms, setPlatforms] = useState<Platform[]>(defaultPlatforms);
+  const navigate = useNavigate();
+  const platforms = useAdminStore((s) => s.platforms);
+  const setPlatforms = useAdminStore((s) => s.setPlatforms);
   const [search, setSearch] = useState('');
   const [filterCategory, setFilterCategory] = useState<PlatformCategory | 'all'>('all');
   const [modalOpen, setModalOpen] = useState(false);
@@ -248,12 +167,7 @@ export default function Integrations() {
     return list;
   }, [platforms, search, filterCategory]);
 
-  const [categories, setCategories] = useState<{ key: string; label: string }[]>(
-    Object.entries(categoryLabels).map(([key, label]) => ({ key, label }))
-  );
-  const [catModalOpen, setCatModalOpen] = useState(false);
-  const [catEditIdx, setCatEditIdx] = useState<number | null>(null);
-  const [catForm, setCatForm] = useState({ key: '', label: '' });
+  const platformTypes = useAdminStore((s) => s.platformTypes);
 
   function openAdd() {
     setEditingId(null);
@@ -325,7 +239,7 @@ export default function Integrations() {
           <p className="text-muted-foreground mt-1">إدارة وتفعيل منصات التكامل المتاحة</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => { setCatEditIdx(null); setCatForm({ key: '', label: '' }); setCatModalOpen(true); }}>
+          <Button variant="outline" onClick={() => navigate('/integrations/types')}>
             <Tag className="h-4 w-4 me-2" />
             إدارة الأنواع
           </Button>
@@ -355,8 +269,8 @@ export default function Integrations() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">جميع الفئات</SelectItem>
-                {categories.map((cat) => (
-                  <SelectItem key={cat.key} value={cat.key}>{cat.label}</SelectItem>
+                {platformTypes.map((t) => (
+                  <SelectItem key={t.id} value={t.key}>{t.nameAr}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -395,7 +309,7 @@ export default function Integrations() {
                         <TableCell className="text-center text-muted-foreground font-mono text-sm">{i + 1}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <div className={cn('h-8 w-8 rounded-lg flex items-center justify-center', categoryBadgeColors[p.category])}>
+                            <div className={cn('h-8 w-8 rounded-lg flex items-center justify-center', platformTypeBadgeClass(platformTypes.find((t) => t.key === p.category)?.color))}>
                               <CatIcon className="h-4 w-4" />
                             </div>
                             <span className="font-medium">{p.name}</span>
@@ -405,8 +319,8 @@ export default function Integrations() {
                           <code className="text-xs bg-muted px-2 py-1 rounded">{p.slug}</code>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="secondary" className={cn('text-xs', categoryBadgeColors[p.category] ?? 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400')}>
-                            {categories.find((c) => c.key === p.category)?.label ?? categoryLabels[p.category] ?? p.category}
+                          <Badge variant="secondary" className={cn('text-xs', platformTypeBadgeClass(platformTypes.find((t) => t.key === p.category)?.color))}>
+                            {platformTypes.find((t) => t.key === p.category)?.nameAr ?? p.category}
                           </Badge>
                         </TableCell>
                         <TableCell>
@@ -446,79 +360,6 @@ export default function Integrations() {
         </CardContent>
       </Card>
 
-      {/* Categories Management Dialog */}
-      <Dialog open={catModalOpen} onOpenChange={setCatModalOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>إدارة أنواع المنصات</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-3 py-2">
-            {categories.map((cat, idx) => (
-              <div key={cat.key} className="flex items-center gap-2">
-                {catEditIdx === idx ? (
-                  <>
-                    <Input
-                      value={catForm.label}
-                      onChange={(e) => setCatForm({ ...catForm, label: e.target.value })}
-                      className="flex-1 h-9"
-                      autoFocus
-                    />
-                    <Button size="sm" variant="default" onClick={() => {
-                      if (!catForm.label.trim()) return;
-                      setCategories((prev) => prev.map((c, i) => i === idx ? { ...c, label: catForm.label } : c));
-                      setCatEditIdx(null);
-                    }}>حفظ</Button>
-                    <Button size="sm" variant="ghost" onClick={() => setCatEditIdx(null)}>إلغاء</Button>
-                  </>
-                ) : (
-                  <>
-                    <span className="flex-1 text-sm font-medium">{cat.label}</span>
-                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setCatEditIdx(idx); setCatForm({ key: cat.key, label: cat.label }); }}>
-                      <Edit2 className="h-3.5 w-3.5" />
-                    </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={async () => {
-                      const inUse = platforms.some((p) => p.category === cat.key);
-                      if (inUse) { return; }
-                      const ok = await confirm({ title: 'حذف النوع', message: `هل أنت متأكد من حذف "${cat.label}"؟` });
-                      if (ok) setCategories((prev) => prev.filter((_, i) => i !== idx));
-                    }}>
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
-                  </>
-                )}
-              </div>
-            ))}
-          </div>
-          <div className="flex items-center gap-2 border-t pt-3">
-            <Input
-              placeholder="اسم النوع الجديد..."
-              value={catEditIdx === -1 ? catForm.label : ''}
-              onChange={(e) => { setCatEditIdx(-1); setCatForm({ key: '', label: e.target.value }); }}
-              className="flex-1 h-9"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && catForm.label.trim() && catEditIdx === -1) {
-                  const key = catForm.label.trim().toLowerCase().replace(/\s+/g, '-');
-                  setCategories((prev) => [...prev, { key, label: catForm.label.trim() }]);
-                  setCatForm({ key: '', label: '' });
-                  setCatEditIdx(null);
-                }
-              }}
-            />
-            <Button size="sm" variant="default" disabled={catEditIdx !== -1 || !catForm.label.trim()}
-              onClick={() => {
-                if (!catForm.label.trim()) return;
-                const key = catForm.label.trim().toLowerCase().replace(/\s+/g, '-');
-                setCategories((prev) => [...prev, { key, label: catForm.label.trim() }]);
-                setCatForm({ key: '', label: '' });
-                setCatEditIdx(null);
-              }}
-            >
-              <Plus className="h-4 w-4 me-1" />
-              إضافة
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       {/* Add/Edit Dialog */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
@@ -557,8 +398,8 @@ export default function Integrations() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat.key} value={cat.key}>{cat.label}</SelectItem>
+                  {platformTypes.map((t) => (
+                    <SelectItem key={t.id} value={t.key}>{t.nameAr}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>

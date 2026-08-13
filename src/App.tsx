@@ -23,6 +23,7 @@ const AdminLiveChat = lazy(() => import('@pages/admin/LiveChat'));
 const AdminNotifications = lazy(() => import('@pages/admin/Notifications'));
 const AdminIntegrations = lazy(() => import('@pages/admin/Integrations'));
 const AdminIndustries = lazy(() => import('@pages/admin/Industries'));
+const AdminPlatformTypes = lazy(() => import('@pages/admin/PlatformTypes'));
 const AdminWidgetSettings = lazy(() => import('@pages/admin/WidgetSettings'));
 const AdminPlanRequests = lazy(() => import('@pages/admin/PlanRequests'));
 
@@ -66,6 +67,7 @@ export default function App(): JSX.Element {
           <Route path="/conversations" element={<AdminLiveChat />} />
           <Route path="/notifications" element={<AdminNotifications />} />
           <Route path="/integrations" element={<AdminIntegrations />} />
+          <Route path="/integrations/types" element={<AdminPlatformTypes />} />
           <Route path="/industries" element={<AdminIndustries />} />
           <Route path="/widget" element={<AdminWidgetSettings />} />
           <Route path="/profile" element={<AdminProfile />} />
