@@ -201,7 +201,7 @@ export default function PlatformTypes(): JSX.Element {
                       <TableRow key={type.id}>
                         <TableCell className="text-center text-muted-foreground text-sm">{i + 1}</TableCell>
                         <TableCell className="font-medium">{type.nameAr}</TableCell>
-                        <TableCell dir="ltr" className="text-start">{type.name}</TableCell>
+                        <TableCell className="text-start">{type.name}</TableCell>
                         <TableCell>
                           <code className="text-xs bg-muted px-2 py-1 rounded">{type.key}</code>
                         </TableCell>
