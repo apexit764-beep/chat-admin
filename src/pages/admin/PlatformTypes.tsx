@@ -188,7 +188,6 @@ export default function PlatformTypes(): JSX.Element {
                     <TableHead className="w-12 text-center">#</TableHead>
                     <TableHead className="text-start">الاسم (العربية)</TableHead>
                     <TableHead className="text-start">Name (English)</TableHead>
-                    <TableHead className="text-start">الكود</TableHead>
                     <TableHead className="text-start">اللون</TableHead>
                     <TableHead className="text-start">عدد المنصات</TableHead>
                     <TableHead className="w-24" />
@@ -202,9 +201,6 @@ export default function PlatformTypes(): JSX.Element {
                         <TableCell className="text-center text-muted-foreground text-sm">{i + 1}</TableCell>
                         <TableCell className="font-medium">{type.nameAr}</TableCell>
                         <TableCell className="text-start">{type.name}</TableCell>
-                        <TableCell>
-                          <code className="text-xs bg-muted px-2 py-1 rounded">{type.key}</code>
-                        </TableCell>
                         <TableCell>
                           <Badge variant="secondary" className={cn('text-xs', platformTypeBadgeClass(type.color))}>
                             {type.nameAr}
