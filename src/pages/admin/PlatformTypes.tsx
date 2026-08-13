@@ -4,7 +4,7 @@ import { ArrowRight, Plus, Edit2, Trash2, Tag } from 'lucide-react';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
 import { useConfirm } from '@components/ui';
-import { PLATFORM_TYPE_COLORS, platformTypeBadgeClass } from '@/data/platforms';
+import { PLATFORM_TYPE_COLORS } from '@/data/platforms';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -196,15 +196,17 @@ export default function PlatformTypes(): JSX.Element {
                 <TableBody>
                   {types.map((type, i) => {
                     const used = usageCount(type.key);
+                    const colorMeta = PLATFORM_TYPE_COLORS.find((c) => c.value === type.color);
                     return (
                       <TableRow key={type.id}>
                         <TableCell className="text-center text-muted-foreground text-sm">{i + 1}</TableCell>
                         <TableCell className="font-medium">{type.nameAr}</TableCell>
                         <TableCell className="text-start">{type.name}</TableCell>
                         <TableCell>
-                          <Badge variant="secondary" className={cn('text-xs', platformTypeBadgeClass(type.color))}>
-                            {type.nameAr}
-                          </Badge>
+                          <div className="flex items-center gap-2">
+                            <span className={cn('h-5 w-5 rounded-md border border-black/10', colorMeta?.swatch)} />
+                            <span className="text-xs text-muted-foreground">{colorMeta?.label}</span>
+                          </div>
                         </TableCell>
                         <TableCell>
                           {used > 0 ? (
