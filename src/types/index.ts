@@ -201,9 +201,7 @@ export type ClientStatus = 'trial' | 'active' | 'past_due' | 'suspended' | 'canc
 export interface Client {
   id: string;
   companyName: string;
-  companyNameAr?: string;
   contactName: string;
-  contactNameAr?: string;
   email: string;
   phone: string;
   country: string;
