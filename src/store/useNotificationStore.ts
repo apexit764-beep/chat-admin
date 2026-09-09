@@ -13,6 +13,7 @@ export interface Notification {
 
 interface NotificationState {
   notifications: Notification[];
+  addNotification: (entry: Omit<Notification, 'id' | 'timestamp' | 'read'>) => void;
   markAsRead: (id: string) => void;
   markAllAsRead: () => void;
   deleteNotification: (id: string) => void;
@@ -193,6 +194,21 @@ function persist(notifications: Notification[]): void {
 
 export const useNotificationStore = create<NotificationState>((set, get) => ({
   notifications: loadNotifications(),
+
+  addNotification: (entry) =>
+    set((state) => {
+      const notifications = [
+        {
+          ...entry,
+          id: `n_${Math.random().toString(36).slice(2, 10)}`,
+          timestamp: new Date().toISOString(),
+          read: false,
+        },
+        ...state.notifications,
+      ];
+      persist(notifications);
+      return { notifications };
+    }),
 
   markAsRead: (id: string) =>
     set((state) => {

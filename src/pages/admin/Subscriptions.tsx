@@ -2,6 +2,8 @@ import { useMemo, useState, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Search,
+  Plus,
+  Info,
   MoreHorizontal,
   ExternalLink,
   XCircle,
@@ -17,11 +19,12 @@ import {
 import { StatCard, useConfirm } from '@components/ui';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
+import { useNotificationStore } from '@/store/useNotificationStore';
 import { formatMoney, approxUSD } from '@/utils/money';
 import { formatDate, initials, avatarColor } from '@/utils/format';
 import { startOfMonth, endOfMonth } from 'date-fns';
 import { cn } from '@/lib/utils';
-import type { SubscriptionStatus } from '@/types';
+import type { Client, Plan, SubscriptionStatus } from '@/types';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -57,9 +60,53 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
+import { Switch } from '@/components/ui/switch';
 import { DateRangePicker } from '@/components/ui/date-range-picker';
 
 const AdminPlanRequests = lazy(() => import('./PlanRequests'));
+
+type SwitchMode = 'now' | 'end_of_period';
+
+/**
+ * Timing choice for replacing a live plan. Shared by the row-level تبديل الباقة
+ * action and the create-subscription flow so both behave identically.
+ */
+function PlanSwitchOptions({ value, onChange }: { value: SwitchMode; onChange: (mode: SwitchMode) => void }): JSX.Element {
+  const options: Array<{ mode: SwitchMode; title: string; detail: string }> = [
+    { mode: 'now', title: 'تبديل الباقة حالاً', detail: 'يتم حساب الفرق (Proration) تلقائياً وتوليد فاتورة أو رصيد فوراً' },
+    { mode: 'end_of_period', title: 'تبديل الباقة عند انتهاء الباقة الحالية', detail: 'الباقة الحالية تفضل شغالة لحد التجديد، وبعدين الباقة الجديدة تتفعّل تلقائياً' },
+  ];
+  return (
+    <div className="space-y-2">
+      {options.map((o) => (
+        <button
+          key={o.mode}
+          type="button"
+          onClick={() => onChange(o.mode)}
+          className={cn(
+            'w-full text-start p-3 rounded-xl border-2 transition-colors',
+            value === o.mode ? 'border-foreground bg-muted/40' : 'border-border hover:border-muted-foreground/40'
+          )}
+        >
+          <div className="flex items-start gap-3">
+            <span
+              className={cn(
+                'mt-0.5 h-4 w-4 rounded-full border-2 flex items-center justify-center shrink-0',
+                value === o.mode ? 'border-foreground' : 'border-muted-foreground/40'
+              )}
+            >
+              {value === o.mode && <span className="h-2 w-2 rounded-full bg-foreground" />}
+            </span>
+            <div>
+              <p className="text-sm font-semibold">{o.title}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{o.detail}</p>
+            </div>
+          </div>
+        </button>
+      ))}
+    </div>
+  );
+}
 
 type View = 'subscriptions' | 'requests';
 
@@ -94,8 +141,21 @@ export default function AdminSubscriptions(): JSX.Element {
   const cancelSubscription = useAdminStore((s) => s.cancelSubscription);
   const extendSubscription = useAdminStore((s) => s.extendSubscription);
   const updateSubscription = useAdminStore((s) => s.updateSubscription);
+  const createSubscription = useAdminStore((s) => s.createSubscription);
+  const markSubscriptionPaid = useAdminStore((s) => s.markSubscriptionPaid);
+  const switchSubscriptionPlan = useAdminStore((s) => s.switchSubscriptionPlan);
+  const addNotification = useNotificationStore((s) => s.addNotification);
   const showToast = useUIStore((s) => s.showToast);
   const { confirm } = useConfirm();
+
+  /* ── Create subscription flow (US-136) ── */
+  const [createStep, setCreateStep] = useState<'form' | 'replace' | 'switch' | 'confirm' | null>(null);
+  const [createClientId, setCreateClientId] = useState('');
+  const [clientQuery, setClientQuery] = useState('');
+  const [createPlanId, setCreatePlanId] = useState('');
+  const [createCycle, setCreateCycle] = useState<'monthly' | 'yearly'>('monthly');
+  const [createAsTrial, setCreateAsTrial] = useState(false);
+  const [switchMode, setSwitchMode] = useState<SwitchMode>('now');
 
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<SubscriptionStatus | 'all'>('all');
@@ -107,6 +167,72 @@ export default function AdminSubscriptions(): JSX.Element {
 
   const clientOf = (id: string) => clients.find((c) => c.id === id);
   const planOf = (id: string) => plans.find((p) => p.id === id);
+
+  /** The free trial is one-time per client, whatever plan the earlier trial was on. */
+  const hasUsedTrial = (clientId: string): boolean => {
+    const client = clientOf(clientId);
+    if (client?.trialEndsAt) return true;
+    return subscriptions.some((s) => s.clientId === clientId && s.status === 'trial');
+  };
+
+  const activeSubOf = (clientId: string) =>
+    subscriptions.find((s) => s.clientId === clientId && (s.status === 'active' || s.status === 'trial'));
+
+  const createClient: Client | undefined = createClientId ? clientOf(createClientId) : undefined;
+  const createPlan: Plan | undefined = createPlanId ? planOf(createPlanId) : undefined;
+  const createPrice = createClient && createPlan
+    ? createPlan.pricesPerCountry[createClient.country]?.[createCycle === 'yearly' ? 'yearly' : 'monthly']
+    : undefined;
+  const createTrialBlocked = createClientId ? hasUsedTrial(createClientId) : false;
+
+  const clientResults = useMemo(() => {
+    const q = clientQuery.trim().toLowerCase();
+    const list = q
+      ? clients.filter((c) => c.companyName.toLowerCase().includes(q) || c.email.toLowerCase().includes(q))
+      : clients;
+    return list.slice(0, 8);
+  }, [clients, clientQuery]);
+
+  const openCreate = (): void => {
+    setCreateClientId('');
+    setClientQuery('');
+    setCreatePlanId('');
+    setCreateCycle('monthly');
+    setCreateAsTrial(false);
+    setSwitchMode('now');
+    setCreateStep('form');
+  };
+
+  const proceedFromForm = (): void => {
+    if (!createClientId) { showToast('اختر العميل أولاً', 'error'); return; }
+    if (!createPlanId) { showToast('اختر الباقة أولاً', 'error'); return; }
+    setCreateStep(activeSubOf(createClientId) ? 'replace' : 'confirm');
+  };
+
+  const confirmCreate = (): void => {
+    if (!createClient || !createPlan) return;
+    createSubscription(createClient.id, createPlan.id, createCycle, { asTrial: createAsTrial });
+    addNotification({
+      type: 'subscription',
+      title: 'تم إرسال إشعار الدفع للعميل',
+      body: `تم إنشاء اشتراك ${createPlan.nameAr} لعميل «${createClient.companyName}»، ووصله إشعار بالباقة الجديدة مع زر الانتقال للدفع.`,
+    });
+    showToast(`تم إنشاء الاشتراك بنجاح لعميل «${createClient.companyName}»`, 'success');
+    setCreateStep(null);
+  };
+
+  const confirmSwitch = (): void => {
+    const current = createClientId ? activeSubOf(createClientId) : undefined;
+    if (!current || !createPlan) return;
+    switchSubscriptionPlan(current.id, createPlan.id, switchMode);
+    showToast(
+      switchMode === 'now'
+        ? `تم تبديل الباقة إلى ${createPlan.nameAr}`
+        : `سيتم التبديل إلى ${createPlan.nameAr} عند انتهاء الباقة الحالية`,
+      'success'
+    );
+    setCreateStep(null);
+  };
 
   const rows = useMemo(() => {
     return subscriptions.map((sub) => ({
@@ -170,7 +296,7 @@ export default function AdminSubscriptions(): JSX.Element {
     }
   };
 
-  const [switchModal, setSwitchModal] = useState<{ subId: string; clientId: string; currentPlanId: string; companyName: string } | null>(null);
+  const [switchModal, setSwitchModal] = useState<{ subId: string; clientId: string; currentPlanId: string; companyName: string; newPlanId?: string } | null>(null);
   const [extendModal, setExtendModal] = useState<{ subId: string; companyName: string } | null>(null);
   const [extendDays, setExtendDays] = useState('');
 
@@ -204,15 +330,21 @@ export default function AdminSubscriptions(): JSX.Element {
           <h2 className="text-2xl font-bold">الاشتراكات</h2>
           <p className="text-sm text-muted-foreground">إدارة اشتراكات العملاء والتجديدات</p>
         </div>
-        <Button variant="outline" onClick={() => setView('requests')} className="gap-2">
-          <ClipboardList className="h-4 w-4" />
-          طلبات الاشتراك
-          {pendingRequestsCount > 0 && (
-            <Badge className="h-5 min-w-[20px] px-1.5 text-[10px] bg-primary text-primary-foreground rounded-full">
-              {pendingRequestsCount}
-            </Badge>
-          )}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={() => setView('requests')} className="gap-2">
+            <ClipboardList className="h-4 w-4" />
+            طلبات الاشتراك
+            {pendingRequestsCount > 0 && (
+              <Badge className="h-5 min-w-[20px] px-1.5 text-[10px] bg-primary text-primary-foreground rounded-full">
+                {pendingRequestsCount}
+              </Badge>
+            )}
+          </Button>
+          <Button onClick={openCreate} className="gap-2">
+            <Plus className="h-4 w-4" />
+            إنشاء اشتراك
+          </Button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -365,7 +497,16 @@ export default function AdminSubscriptions(): JSX.Element {
                         <span className="text-sm font-semibold">{formatMoney(sub.amount, sub.currency)}</span>
                       </TableCell>
                       <TableCell className="hidden md:table-cell text-sm text-muted-foreground">
-                        {formatDate(sub.startedAt)}
+                        {sub.pendingStart ? (
+                          <span className="text-xs">يتحدد عند نجاح الدفع</span>
+                        ) : (
+                          formatDate(sub.startedAt)
+                        )}
+                        {sub.scheduledPlanId && (
+                          <span className="block text-[11px] text-warning mt-0.5">
+                            تبديل إلى {planOf(sub.scheduledPlanId)?.nameAr} عند التجديد
+                          </span>
+                        )}
                       </TableCell>
                       <TableCell className="hidden lg:table-cell">
                         {sub.status === 'cancelled' ? (
@@ -394,6 +535,17 @@ export default function AdminSubscriptions(): JSX.Element {
                               <ExternalLink className="h-4 w-4 ml-2" />
                               عرض العميل
                             </DropdownMenuItem>
+                            {sub.status === 'past_due' && (
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  markSubscriptionPaid(sub.id);
+                                  showToast(`تم تفعيل اشتراك ${client?.companyName ?? 'العميل'} بعد نجاح الدفع`, 'success');
+                                }}
+                              >
+                                <CheckCircle2 className="h-4 w-4 ml-2" />
+                                تأكيد استلام الدفع
+                              </DropdownMenuItem>
+                            )}
                             {sub.status !== 'cancelled' && (
                               <DropdownMenuItem onClick={() => { setExtendModal({ subId: sub.id, companyName: client?.companyName ?? 'العميل' }); setExtendDays(''); }}>
                                 <CalendarClock className="h-4 w-4 ml-2" />
@@ -401,7 +553,7 @@ export default function AdminSubscriptions(): JSX.Element {
                               </DropdownMenuItem>
                             )}
                             {sub.status !== 'cancelled' && (
-                              <DropdownMenuItem onClick={() => setSwitchModal({ subId: sub.id, clientId: sub.clientId, currentPlanId: sub.planId, companyName: client?.companyName ?? 'العميل' })}>
+                              <DropdownMenuItem onClick={() => { setSwitchMode('now'); setSwitchModal({ subId: sub.id, clientId: sub.clientId, currentPlanId: sub.planId, companyName: client?.companyName ?? 'العميل' }); }}>
                                 <ArrowRightLeft className="h-4 w-4 ml-2" />
                                 تبديل الباقة
                               </DropdownMenuItem>
@@ -435,38 +587,276 @@ export default function AdminSubscriptions(): JSX.Element {
         </CardContent>
       </Card>
 
+      {/* ── Create subscription — step 1: the form ── */}
+      <Dialog open={createStep === 'form'} onOpenChange={(o) => { if (!o) setCreateStep(null); }}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>إنشاء اشتراك</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-5 py-1 max-h-[65vh] overflow-y-auto">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">اختيار العميل<span className="text-destructive ms-0.5">*</span></label>
+              {createClient ? (
+                <div className="flex items-center justify-between gap-2 p-2.5 rounded-lg border">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className={cn('text-[11px]', avatarColor(createClient.companyName))}>
+                        {initials(createClient.companyName)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium truncate">{createClient.companyName}</p>
+                      <p className="text-xs text-muted-foreground truncate">{createClient.email}</p>
+                    </div>
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={() => { setCreateClientId(''); setCreateAsTrial(false); }}>تغيير</Button>
+                </div>
+              ) : (
+                <>
+                  <div className="relative">
+                    <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      value={clientQuery}
+                      onChange={(e) => setClientQuery(e.target.value)}
+                      placeholder="بحث في قائمة العملاء بالاسم أو البريد..."
+                      className="ps-9"
+                    />
+                  </div>
+                  <div className="border rounded-lg divide-y max-h-52 overflow-y-auto">
+                    {clientResults.length === 0 ? (
+                      <p className="text-xs text-muted-foreground text-center py-6">لا يوجد عملاء مطابقون</p>
+                    ) : (
+                      clientResults.map((c) => (
+                        <button
+                          key={c.id}
+                          type="button"
+                          onClick={() => setCreateClientId(c.id)}
+                          className="w-full text-start p-2.5 hover:bg-muted/50 transition-colors flex items-center gap-2"
+                        >
+                          <Avatar className="h-7 w-7">
+                            <AvatarFallback className={cn('text-[10px]', avatarColor(c.companyName))}>
+                              {initials(c.companyName)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium truncate">{c.companyName}</p>
+                            <p className="text-[11px] text-muted-foreground truncate">{c.email}</p>
+                          </div>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">اختيار من عملاء موجودين مسبقاً فقط — هذا النموذج لا يُنشئ عميلاً جديداً.</p>
+                </>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">اختيار الباقة<span className="text-destructive ms-0.5">*</span></label>
+              <Select value={createPlanId} onValueChange={setCreatePlanId}>
+                <SelectTrigger><SelectValue placeholder="اختر الباقة" /></SelectTrigger>
+                <SelectContent>
+                  {/* the trial plan is not pickable here — trials are the toggle below */}
+                  {plans.filter((p) => !p.isTrial).map((p) => (
+                    <SelectItem key={p.id} value={p.id}>{p.nameAr}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">المدة</label>
+              <div className="inline-flex p-1 rounded-lg bg-muted">
+                {([['monthly', 'شهري'], ['yearly', 'سنوي']] as const).map(([v, label]) => (
+                  <button
+                    key={v}
+                    type="button"
+                    onClick={() => setCreateCycle(v)}
+                    className={cn(
+                      'px-4 py-1.5 rounded-md text-sm font-medium transition-colors',
+                      createCycle === v ? 'bg-background shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                    )}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div
+              className={cn('p-3 rounded-xl border', createTrialBlocked && 'opacity-60')}
+              title={createTrialBlocked ? 'العميل استخدم الفترة التجريبية قبل كده — الباقة التجريبية متاحة مرة واحدة فقط لكل عميل' : undefined}
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm font-medium">بدء بباقة تجريبية{createTrialBlocked && ' (معطّل)'}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {createTrialBlocked
+                      ? 'العميل استخدم الفترة التجريبية قبل كده — متاحة مرة واحدة فقط'
+                      : 'متاحة مرة واحدة بس لكل عميل من بداية استخدامه للنظام'}
+                  </p>
+                </div>
+                <Switch
+                  checked={createAsTrial && !createTrialBlocked}
+                  disabled={createTrialBlocked}
+                  onCheckedChange={setCreateAsTrial}
+                />
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setCreateStep(null)}>إلغاء</Button>
+            <Button onClick={proceedFromForm}>متابعة</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Create subscription — step 2a: client already subscribed ── */}
+      <Dialog open={createStep === 'replace'} onOpenChange={(o) => { if (!o) setCreateStep(null); }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>العميل مشترك حالياً</DialogTitle>
+          </DialogHeader>
+          <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-3.5">
+            <div className="flex items-center gap-2 mb-1.5">
+              <AlertTriangle className="h-4 w-4 text-destructive" />
+              <p className="text-sm font-semibold text-destructive">العميل مشترك حالياً</p>
+            </div>
+            <p className="text-sm">
+              العميل «{createClient?.companyName}» مشترك في باقة{' '}
+              <span className="font-semibold">
+                {planOf(activeSubOf(createClientId)?.planId ?? '')?.nameAr ?? '—'}
+              </span>{' '}
+              حالياً. هل تريد استبدال الباقة بـ <span className="font-semibold">{createPlan?.nameAr}</span>؟
+            </p>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setCreateStep('form')}>إلغاء</Button>
+            <Button onClick={() => setCreateStep('switch')}>نعم، استبدال الباقة</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Create subscription — step 2b: same تبديل الباقة flow as the row action ── */}
+      <Dialog open={createStep === 'switch'} onOpenChange={(o) => { if (!o) setCreateStep(null); }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>تبديل الباقة إلى {createPlan?.nameAr}</DialogTitle>
+          </DialogHeader>
+          <PlanSwitchOptions value={switchMode} onChange={setSwitchMode} />
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setCreateStep('replace')}>رجوع</Button>
+            <Button onClick={confirmSwitch}>تأكيد التبديل</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Create subscription — step 3: final confirmation ── */}
+      <Dialog open={createStep === 'confirm'} onOpenChange={(o) => { if (!o) setCreateStep(null); }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>تأكيد إنشاء الاشتراك</DialogTitle>
+          </DialogHeader>
+
+          <div className="rounded-xl border p-4 space-y-2.5">
+            <p className="text-xs text-muted-foreground">ملخص الاشتراك</p>
+            {[
+              ['العميل', createClient?.companyName ?? '—'],
+              ['الباقة', createPlan?.nameAr ?? '—'],
+              ['المدة', createCycle === 'monthly' ? 'شهري' : 'سنوي'],
+              ['تاريخ البدء', createAsTrial ? 'من لحظة الإنشاء' : 'يتحدد عند نجاح الدفع'],
+            ].map(([label, value]) => (
+              <div key={label} className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">{label}</span>
+                <span className="font-medium">{value}</span>
+              </div>
+            ))}
+            <div className="border-t border-dashed pt-2.5 flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">السعر</span>
+              <span className="font-bold">
+                {createPrice !== undefined && createClient
+                  ? `${formatMoney(createPrice, createClient.currency)} / ${createCycle === 'monthly' ? 'شهرياً' : 'سنوياً'}`
+                  : '—'}
+              </span>
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-dashed p-3.5">
+            <div className="flex items-center gap-2 mb-1">
+              <Info className="h-4 w-4 text-muted-foreground" />
+              <p className="text-sm font-semibold">حالة الاشتراك بعد الإنشاء</p>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              {createAsTrial
+                ? 'الاشتراك هيتسجل بحالة تجريبي ويشتغل فوراً من غير ما العميل يحتاج يدفع.'
+                : 'الاشتراك هيتسجل بحالة متأخر الدفع ومش هيتحول لـ نشط إلا بعد ما العميل يدفع بنجاح.'}
+            </p>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setCreateStep('form')}>رجوع</Button>
+            <Button onClick={confirmCreate}>تأكيد إنشاء الاشتراك</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Plan Switch Dialog */}
       <Dialog open={!!switchModal} onOpenChange={(o) => { if (!o) setSwitchModal(null); }}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>تبديل باقة {switchModal?.companyName}</DialogTitle>
           </DialogHeader>
-          <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">اختر الباقة الجديدة:</p>
-            {plans.filter((p) => p.active && p.id !== switchModal?.currentPlanId).map((p) => (
-              <button
-                key={p.id}
-                onClick={() => {
-                  if (switchModal) {
-                    updateSubscription(switchModal.subId, { planId: p.id });
-                  }
-                  setSwitchModal(null);
-                  showToast(`تم تبديل الباقة إلى ${p.nameAr}`, 'success');
-                }}
-                className="w-full text-start p-3 rounded-lg border hover:border-primary hover:bg-primary/5 transition-colors"
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-semibold">{p.nameAr}</p>
-                    <p className="text-xs text-muted-foreground">{p.tagline}</p>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">اختر الباقة الجديدة:</p>
+              {plans.filter((p) => p.active && p.id !== switchModal?.currentPlanId).map((p) => (
+                <button
+                  key={p.id}
+                  onClick={() => setSwitchModal((m) => (m ? { ...m, newPlanId: p.id } : m))}
+                  className={cn(
+                    'w-full text-start p-3 rounded-lg border-2 transition-colors',
+                    switchModal?.newPlanId === p.id ? 'border-foreground bg-muted/40' : 'border-border hover:border-muted-foreground/40'
+                  )}
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-semibold">{p.nameAr}</p>
+                      <p className="text-xs text-muted-foreground">{p.tagline}</p>
+                    </div>
+                    <Badge variant="secondary" className="text-[10px]">{p.tier}</Badge>
                   </div>
-                  <Badge variant="secondary" className="text-[10px]">{p.tier}</Badge>
-                </div>
-              </button>
-            ))}
+                </button>
+              ))}
+            </div>
+
+            {switchModal?.newPlanId && (
+              <div className="space-y-2 border-t pt-3">
+                <p className="text-sm text-muted-foreground">متى يتم التبديل؟</p>
+                <PlanSwitchOptions value={switchMode} onChange={setSwitchMode} />
+              </div>
+            )}
           </div>
-          <DialogFooter>
+          <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => setSwitchModal(null)}>إلغاء</Button>
+            <Button
+              disabled={!switchModal?.newPlanId}
+              onClick={() => {
+                if (!switchModal?.newPlanId) return;
+                const target = planOf(switchModal.newPlanId);
+                switchSubscriptionPlan(switchModal.subId, switchModal.newPlanId, switchMode);
+                setSwitchModal(null);
+                showToast(
+                  switchMode === 'now'
+                    ? `تم تبديل الباقة إلى ${target?.nameAr ?? ''}`
+                    : `سيتم التبديل إلى ${target?.nameAr ?? ''} عند انتهاء الباقة الحالية`,
+                  'success'
+                );
+              }}
+            >
+              تأكيد التبديل
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

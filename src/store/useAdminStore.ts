@@ -120,7 +120,14 @@ interface AdminState {
   toggleIndustryActive: (id: string) => void;
 
   // Subscription actions
-  createSubscription: (clientId: string, planId: string, billingCycle: 'monthly' | 'yearly') => Subscription;
+  createSubscription: (
+    clientId: string,
+    planId: string,
+    billingCycle: 'monthly' | 'yearly',
+    options?: { asTrial?: boolean },
+  ) => Subscription;
+  markSubscriptionPaid: (id: string) => void;
+  switchSubscriptionPlan: (id: string, newPlanId: string, mode: 'now' | 'end_of_period') => void;
   updateSubscription: (id: string, patch: Partial<Subscription>) => void;
   cancelSubscription: (id: string, mode: 'now' | 'end_of_period') => void;
   extendSubscription: (id: string, days: number) => void;
@@ -139,6 +146,9 @@ interface AdminState {
 }
 
 const newId = (prefix: string): string => `${prefix}_${Math.random().toString(36).slice(2, 10)}`;
+
+/** Length of the one-time free trial, in days */
+export const TRIAL_DAYS = 14;
 
 const slugify = (s: string): string =>
   s.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w\-ء-ي]/g, '');
@@ -555,33 +565,111 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   toggleIndustryActive: (id) =>
     set((s) => ({ industries: s.industries.map((i) => (i.id === id ? { ...i, active: !i.active } : i)) })),
 
-  createSubscription: (clientId, planId, billingCycle) => {
+  createSubscription: (clientId, planId, billingCycle, options) => {
     const client = get().clients.find((c) => c.id === clientId);
     const plan = get().plans.find((p) => p.id === planId);
     if (!client || !plan) throw new Error('client or plan not found');
     const price = plan.pricesPerCountry[client.country];
     const amount = billingCycle === 'yearly' ? price.yearly : price.monthly;
+    const asTrial = options?.asTrial ?? false;
+    const now = new Date();
+    // A trial runs from creation; a paid subscription only starts once payment succeeds,
+    // so it is parked as past_due and its dates are provisional until then.
+    const periodDays = asTrial ? TRIAL_DAYS : billingCycle === 'yearly' ? 365 : 30;
     const sub: Subscription = {
       id: newId('sub'),
       clientId,
       planId,
-      status: 'active',
+      status: asTrial ? 'trial' : 'past_due',
       billingCycle,
       amount,
       currency: client.currency,
-      startedAt: new Date().toISOString(),
-      currentPeriodStart: new Date().toISOString(),
-      currentPeriodEnd: new Date(Date.now() + (billingCycle === 'yearly' ? 365 : 30) * 86400000).toISOString(),
+      startedAt: now.toISOString(),
+      currentPeriodStart: now.toISOString(),
+      currentPeriodEnd: new Date(now.getTime() + periodDays * 86400000).toISOString(),
+      ...(asTrial ? {} : { pendingStart: true }),
     };
     set((s) => ({
       subscriptions: [...s.subscriptions, sub],
       clients: s.clients.map((c) =>
         c.id === clientId
-          ? { ...c, planId, subscriptionId: sub.id, status: 'active', mrr: billingCycle === 'monthly' ? amount : amount / 12, currency: client.currency }
+          ? {
+              ...c,
+              planId,
+              subscriptionId: sub.id,
+              status: asTrial ? 'trial' : 'past_due',
+              // no revenue is counted until the client actually pays
+              mrr: 0,
+              currency: client.currency,
+              ...(asTrial ? { trialEndsAt: sub.currentPeriodEnd } : {}),
+            }
           : c
       ),
     }));
     return sub;
+  },
+
+  markSubscriptionPaid: (id) => {
+    const sub = get().subscriptions.find((s) => s.id === id);
+    if (!sub) return;
+    const now = new Date();
+    const periodDays = sub.billingCycle === 'yearly' ? 365 : 30;
+    set((s) => ({
+      subscriptions: s.subscriptions.map((x) =>
+        x.id === id
+          ? {
+              ...x,
+              status: 'active' as const,
+              pendingStart: false,
+              startedAt: now.toISOString(),
+              currentPeriodStart: now.toISOString(),
+              currentPeriodEnd: new Date(now.getTime() + periodDays * 86400000).toISOString(),
+            }
+          : x
+      ),
+      clients: s.clients.map((c) =>
+        c.id === sub.clientId
+          ? {
+              ...c,
+              status: 'active' as const,
+              planId: sub.planId,
+              subscriptionId: sub.id,
+              mrr: sub.billingCycle === 'monthly' ? sub.amount : sub.amount / 12,
+            }
+          : c
+      ),
+    }));
+  },
+
+  switchSubscriptionPlan: (id, newPlanId, mode) => {
+    const sub = get().subscriptions.find((s) => s.id === id);
+    const client = sub && get().clients.find((c) => c.id === sub.clientId);
+    const plan = get().plans.find((p) => p.id === newPlanId);
+    if (!sub || !client || !plan) return;
+
+    if (mode === 'end_of_period') {
+      set((s) => ({
+        subscriptions: s.subscriptions.map((x) => (x.id === id ? { ...x, scheduledPlanId: newPlanId } : x)),
+      }));
+      return;
+    }
+
+    const price = plan.pricesPerCountry[client.country];
+    const amount = sub.billingCycle === 'yearly' ? price.yearly : price.monthly;
+    set((s) => ({
+      subscriptions: s.subscriptions.map((x) =>
+        x.id === id ? { ...x, planId: newPlanId, amount, scheduledPlanId: undefined } : x
+      ),
+      clients: s.clients.map((c) =>
+        c.id === sub.clientId
+          ? {
+              ...c,
+              planId: newPlanId,
+              mrr: c.status === 'active' ? (sub.billingCycle === 'monthly' ? amount : amount / 12) : c.mrr,
+            }
+          : c
+      ),
+    }));
   },
 
   updateSubscription: (id, patch) =>

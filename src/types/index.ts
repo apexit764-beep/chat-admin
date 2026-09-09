@@ -239,6 +239,10 @@ export interface Subscription {
   currentPeriodStart: string;
   currentPeriodEnd: string;
   cancelAt?: string;
+  /** true while a paid subscription is still waiting on the client's first payment */
+  pendingStart?: boolean;
+  /** plan this subscription switches to once the current period ends */
+  scheduledPlanId?: string;
   paymentMethod?: {
     brand: 'visa' | 'mastercard';
     last4: string;
