@@ -588,10 +588,10 @@ export default function AdminSubscriptions(): JSX.Element {
             <DialogTitle>إنشاء اشتراك</DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-5 py-1 max-h-[65vh] overflow-y-auto">
+          <div className="space-y-5 py-2 px-0.5 max-h-[65vh] overflow-y-auto">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-medium">اختيار العميل<span className="text-destructive ms-0.5">*</span></label>
+                <label className="block text-sm font-medium">اختيار العميل<span className="text-destructive ms-0.5">*</span></label>
                 <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs" onClick={() => setQuickAddClient(true)}>
                   <Plus className="h-3.5 w-3.5" />
                   عميل جديد
@@ -661,7 +661,7 @@ export default function AdminSubscriptions(): JSX.Element {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">اختيار الباقة<span className="text-destructive ms-0.5">*</span></label>
+              <label className="block text-sm font-medium">اختيار الباقة<span className="text-destructive ms-0.5">*</span></label>
               <Select value={createPlanId} onValueChange={setCreatePlanId}>
                 <SelectTrigger><SelectValue placeholder="اختر الباقة" /></SelectTrigger>
                 <SelectContent>
@@ -674,7 +674,7 @@ export default function AdminSubscriptions(): JSX.Element {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">المدة</label>
+              <label className="block text-sm font-medium">المدة</label>
               <div className="inline-flex p-1 rounded-lg bg-muted">
                 {([['monthly', 'شهري'], ['yearly', 'سنوي']] as const).map(([v, label]) => (
                   <button
@@ -860,7 +860,7 @@ export default function AdminSubscriptions(): JSX.Element {
             <DialogTitle>تمديد اشتراك {extendModal?.companyName}</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
-            <label className="text-sm font-medium">عدد الأيام</label>
+            <label className="block text-sm font-medium">عدد الأيام</label>
             <Input
               type="number"
               min={1}
