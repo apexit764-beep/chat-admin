@@ -82,6 +82,13 @@ interface AdminState {
   moveKnowledgeCategoryTo: (id: string, targetIndex: number) => void;
 
   // Live Chat actions
+  createLiveChat: (input: {
+    visitorName: string;
+    visitorEmail?: string;
+    clientId: string;
+    channel: LiveChatConversation['channel'];
+    firstMessage?: string;
+  }) => LiveChatConversation;
   assignLiveChat: (id: string, agentName: string) => void;
   transferLiveChat: (id: string, toAgent: string) => void;
   resolveLiveChat: (id: string) => void;
@@ -338,6 +345,36 @@ export const useAdminStore = create<AdminState>((set, get) => ({
         })),
       };
     }),
+
+  createLiveChat: ({ visitorName, visitorEmail, clientId, channel, firstMessage }) => {
+    const now = new Date().toISOString();
+    const id = newId('lc');
+    const messages: LiveChatMessage[] = firstMessage?.trim()
+      ? [{
+          id: newId('lcm'),
+          conversationId: id,
+          sender: 'visitor',
+          senderName: visitorName,
+          content: firstMessage.trim(),
+          messageType: 'text',
+          timestamp: now,
+        }]
+      : [];
+    const conv: LiveChatConversation = {
+      id,
+      visitorName,
+      ...(visitorEmail?.trim() ? { visitorEmail: visitorEmail.trim() } : {}),
+      clientId,
+      status: 'open',
+      channel,
+      messages,
+      unreadCount: messages.length,
+      startedAt: now,
+      lastMessageAt: now,
+    };
+    set((s) => ({ liveChatConversations: [conv, ...s.liveChatConversations] }));
+    return conv;
+  },
 
   assignLiveChat: (id, agentName) =>
     set((s) => ({

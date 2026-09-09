@@ -2,6 +2,7 @@ import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom';
 import {
   Search,
+  Plus,
   Send,
   MessageCircle,
   Phone,
@@ -23,6 +24,7 @@ import { format, isToday, isYesterday } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useUIStore } from '@/store/useUIStore';
 import { timeAgo, initials, avatarColor } from '@/utils/format';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -41,6 +43,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from '@/components/ui/dialog';
 import type { LiveChatConversation, LiveChatStatus } from '@/types';
 
@@ -60,10 +63,11 @@ const channelConfig: Record<string, { icon: React.ElementType; label: string; co
 type FilterStatus = 'all' | 'open' | 'assigned' | 'resolved' | 'closed';
 
 export default function LiveChat() {
-  const { liveChatConversations, clients, plans, subscriptions, adminUsers, assignLiveChat, resolveLiveChat, closeLiveChat, markConversationRead, sendLiveChatMessage, sendLiveChatNote, sendLiveChatAttachment } = useAdminStore();
+  const { liveChatConversations, clients, plans, subscriptions, adminUsers, assignLiveChat, resolveLiveChat, closeLiveChat, markConversationRead, sendLiveChatMessage, sendLiveChatNote, sendLiveChatAttachment, createLiveChat } = useAdminStore();
   const user = useAuthStore((s) => s.user);
   const navigate = useNavigate();
 
+  const showToast = useUIStore((s) => s.showToast);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<FilterStatus>('all');
@@ -72,6 +76,8 @@ export default function LiveChat() {
   const [activeTab, setActiveTab] = useState<'message' | 'note'>('message');
   const [showDetails, setShowDetails] = useState(false);
   const [showAssignDialog, setShowAssignDialog] = useState(false);
+  const [newChatOpen, setNewChatOpen] = useState(false);
+  const [newChat, setNewChat] = useState({ visitorName: '', visitorEmail: '', clientId: '', channel: 'widget' as LiveChatConversation['channel'], firstMessage: '' });
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -206,6 +212,17 @@ export default function LiveChat() {
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b">
           <h2 className="text-lg font-bold">المحادثات</h2>
+          <Button
+            size="sm"
+            className="h-8 gap-1.5 text-xs"
+            onClick={() => {
+              setNewChat({ visitorName: '', visitorEmail: '', clientId: '', channel: 'widget', firstMessage: '' });
+              setNewChatOpen(true);
+            }}
+          >
+            <Plus className="h-3.5 w-3.5" />
+            محادثة جديدة
+          </Button>
         </div>
 
         {/* Search + Filter */}
@@ -775,6 +792,92 @@ export default function LiveChat() {
       )}
 
       {/* Assign Dialog */}
+      {/* New conversation */}
+      <Dialog open={newChatOpen} onOpenChange={setNewChatOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>محادثة جديدة</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">اسم الزائر<span className="text-destructive ms-0.5">*</span></label>
+              <Input
+                value={newChat.visitorName}
+                onChange={(e) => setNewChat({ ...newChat, visitorName: e.target.value })}
+                placeholder="مثال: سالم الحارثي"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">
+                البريد الإلكتروني<span className="text-muted-foreground text-[10px] ms-1">(اختياري)</span>
+              </label>
+              <Input
+                type="email"
+                value={newChat.visitorEmail}
+                onChange={(e) => setNewChat({ ...newChat, visitorEmail: e.target.value })}
+                placeholder="example@company.com"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">العميل<span className="text-destructive ms-0.5">*</span></label>
+              <Select value={newChat.clientId} onValueChange={(v) => setNewChat({ ...newChat, clientId: v })}>
+                <SelectTrigger><SelectValue placeholder="اختر العميل" /></SelectTrigger>
+                <SelectContent>
+                  {clients.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>{c.companyName}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">القناة</label>
+              <Select
+                value={newChat.channel}
+                onValueChange={(v) => setNewChat({ ...newChat, channel: v as LiveChatConversation['channel'] })}
+              >
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="widget">ويدجت الموقع</SelectItem>
+                  <SelectItem value="whatsapp">واتساب</SelectItem>
+                  <SelectItem value="email">البريد الإلكتروني</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">
+                أول رسالة<span className="text-muted-foreground text-[10px] ms-1">(اختياري)</span>
+              </label>
+              <Input
+                value={newChat.firstMessage}
+                onChange={(e) => setNewChat({ ...newChat, firstMessage: e.target.value })}
+                placeholder="نص رسالة الزائر الأولى"
+              />
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setNewChatOpen(false)}>إلغاء</Button>
+            <Button
+              onClick={() => {
+                if (!newChat.visitorName.trim()) { showToast('اسم الزائر مطلوب', 'error'); return; }
+                if (!newChat.clientId) { showToast('اختر العميل أولاً', 'error'); return; }
+                const conv = createLiveChat({
+                  visitorName: newChat.visitorName.trim(),
+                  visitorEmail: newChat.visitorEmail,
+                  clientId: newChat.clientId,
+                  channel: newChat.channel,
+                  firstMessage: newChat.firstMessage,
+                });
+                setNewChatOpen(false);
+                setSelectedId(conv.id);
+                showToast('تم إنشاء المحادثة', 'success');
+              }}
+            >
+              إنشاء
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
