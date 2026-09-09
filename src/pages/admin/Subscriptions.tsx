@@ -4,6 +4,7 @@ import {
   Search,
   Plus,
   Info,
+  ChevronDown,
   MoreHorizontal,
   ExternalLink,
   XCircle,
@@ -61,7 +62,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { Switch } from '@/components/ui/switch';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { DateRangePicker } from '@/components/ui/date-range-picker';
 
 const AdminPlanRequests = lazy(() => import('./PlanRequests'));
@@ -155,9 +156,9 @@ export default function AdminSubscriptions(): JSX.Element {
   const [clientQuery, setClientQuery] = useState('');
   const [createPlanId, setCreatePlanId] = useState('');
   const [createCycle, setCreateCycle] = useState<'monthly' | 'yearly'>('monthly');
-  const [createAsTrial, setCreateAsTrial] = useState(false);
   const [switchMode, setSwitchMode] = useState<SwitchMode>('now');
   const [quickAddClient, setQuickAddClient] = useState(false);
+  const [clientPickerOpen, setClientPickerOpen] = useState(false);
 
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<SubscriptionStatus | 'all'>('all');
@@ -170,13 +171,6 @@ export default function AdminSubscriptions(): JSX.Element {
   const clientOf = (id: string) => clients.find((c) => c.id === id);
   const planOf = (id: string) => plans.find((p) => p.id === id);
 
-  /** The free trial is one-time per client, whatever plan the earlier trial was on. */
-  const hasUsedTrial = (clientId: string): boolean => {
-    const client = clientOf(clientId);
-    if (client?.trialEndsAt) return true;
-    return subscriptions.some((s) => s.clientId === clientId && s.status === 'trial');
-  };
-
   const activeSubOf = (clientId: string) =>
     subscriptions.find((s) => s.clientId === clientId && (s.status === 'active' || s.status === 'trial'));
 
@@ -185,7 +179,6 @@ export default function AdminSubscriptions(): JSX.Element {
   const createPrice = createClient && createPlan
     ? createPlan.pricesPerCountry[createClient.country]?.[createCycle === 'yearly' ? 'yearly' : 'monthly']
     : undefined;
-  const createTrialBlocked = createClientId ? hasUsedTrial(createClientId) : false;
 
   const clientResults = useMemo(() => {
     const q = clientQuery.trim().toLowerCase();
@@ -200,7 +193,6 @@ export default function AdminSubscriptions(): JSX.Element {
     setClientQuery('');
     setCreatePlanId('');
     setCreateCycle('monthly');
-    setCreateAsTrial(false);
     setSwitchMode('now');
     setCreateStep('form');
   };
@@ -213,7 +205,7 @@ export default function AdminSubscriptions(): JSX.Element {
 
   const confirmCreate = (): void => {
     if (!createClient || !createPlan) return;
-    createSubscription(createClient.id, createPlan.id, createCycle, { asTrial: createAsTrial });
+    createSubscription(createClient.id, createPlan.id, createCycle);
     addNotification({
       type: 'subscription',
       title: 'تم إرسال إشعار الدفع للعميل',
@@ -605,33 +597,41 @@ export default function AdminSubscriptions(): JSX.Element {
                   عميل جديد
                 </Button>
               </div>
-              {createClient ? (
-                <div className="flex items-center justify-between gap-2 p-2.5 rounded-lg border">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback className={cn('text-[11px]', avatarColor(createClient.companyName))}>
-                        {initials(createClient.companyName)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium truncate">{createClient.companyName}</p>
-                      <p className="text-xs text-muted-foreground truncate">{createClient.email}</p>
+              <Popover open={clientPickerOpen} onOpenChange={(o) => { setClientPickerOpen(o); if (o) setClientQuery(''); }}>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    className="w-full flex items-center justify-between gap-2 h-10 px-3 rounded-md border border-input bg-background text-sm"
+                  >
+                    {createClient ? (
+                      <span className="flex items-center gap-2 min-w-0">
+                        <Avatar className="h-6 w-6">
+                          <AvatarFallback className={cn('text-[10px]', avatarColor(createClient.companyName))}>
+                            {initials(createClient.companyName)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="truncate">{createClient.companyName}</span>
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground">اختر العميل</span>
+                    )}
+                    <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] p-0">
+                  <div className="p-2 border-b">
+                    <div className="relative">
+                      <Search className="absolute start-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                      <Input
+                        autoFocus
+                        value={clientQuery}
+                        onChange={(e) => setClientQuery(e.target.value)}
+                        placeholder="بحث بالاسم أو البريد..."
+                        className="h-8 ps-8 text-sm"
+                      />
                     </div>
                   </div>
-                  <Button variant="ghost" size="sm" onClick={() => { setCreateClientId(''); setCreateAsTrial(false); }}>تغيير</Button>
-                </div>
-              ) : (
-                <>
-                  <div className="relative">
-                    <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      value={clientQuery}
-                      onChange={(e) => setClientQuery(e.target.value)}
-                      placeholder="بحث في قائمة العملاء بالاسم أو البريد..."
-                      className="ps-9"
-                    />
-                  </div>
-                  <div className="border rounded-lg divide-y max-h-52 overflow-y-auto">
+                  <div className="max-h-56 overflow-y-auto py-1">
                     {clientResults.length === 0 ? (
                       <p className="text-xs text-muted-foreground text-center py-6">لا يوجد عملاء مطابقون</p>
                     ) : (
@@ -639,25 +639,25 @@ export default function AdminSubscriptions(): JSX.Element {
                         <button
                           key={c.id}
                           type="button"
-                          onClick={() => setCreateClientId(c.id)}
-                          className="w-full text-start p-2.5 hover:bg-muted/50 transition-colors flex items-center gap-2"
+                          onClick={() => { setCreateClientId(c.id); setClientPickerOpen(false); }}
+                          className="w-full text-start px-2.5 py-2 hover:bg-muted/60 transition-colors flex items-center gap-2"
                         >
                           <Avatar className="h-7 w-7">
                             <AvatarFallback className={cn('text-[10px]', avatarColor(c.companyName))}>
                               {initials(c.companyName)}
                             </AvatarFallback>
                           </Avatar>
-                          <div className="min-w-0">
-                            <p className="text-sm font-medium truncate">{c.companyName}</p>
-                            <p className="text-[11px] text-muted-foreground truncate">{c.email}</p>
-                          </div>
+                          <span className="min-w-0">
+                            <span className="block text-sm font-medium truncate">{c.companyName}</span>
+                            <span className="block text-[11px] text-muted-foreground truncate">{c.email}</span>
+                          </span>
                         </button>
                       ))
                     )}
                   </div>
-                  <p className="text-[11px] text-muted-foreground">اختيار من عملاء موجودين مسبقاً فقط — هذا النموذج لا يُنشئ عميلاً جديداً.</p>
-                </>
-              )}
+                </PopoverContent>
+              </Popover>
+              <p className="text-[11px] text-muted-foreground">اختيار من عملاء موجودين مسبقاً فقط — هذا النموذج لا يُنشئ عميلاً جديداً.</p>
             </div>
 
             <div className="space-y-2">
@@ -692,26 +692,6 @@ export default function AdminSubscriptions(): JSX.Element {
               </div>
             </div>
 
-            <div
-              className={cn('p-3 rounded-xl border', createTrialBlocked && 'opacity-60')}
-              title={createTrialBlocked ? 'العميل استخدم الفترة التجريبية قبل كده — الباقة التجريبية متاحة مرة واحدة فقط لكل عميل' : undefined}
-            >
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-sm font-medium">بدء بباقة تجريبية{createTrialBlocked && ' (معطّل)'}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {createTrialBlocked
-                      ? 'العميل استخدم الفترة التجريبية قبل كده — متاحة مرة واحدة فقط'
-                      : 'متاحة مرة واحدة بس لكل عميل من بداية استخدامه للنظام'}
-                  </p>
-                </div>
-                <Switch
-                  checked={createAsTrial && !createTrialBlocked}
-                  disabled={createTrialBlocked}
-                  onCheckedChange={setCreateAsTrial}
-                />
-              </div>
-            </div>
           </div>
 
           <DialogFooter className="gap-2">
@@ -725,7 +705,7 @@ export default function AdminSubscriptions(): JSX.Element {
       <ClientFormDialog
         open={quickAddClient}
         onOpenChange={setQuickAddClient}
-        onSaved={(c) => { setCreateClientId(c.id); setClientQuery(''); setCreateAsTrial(false); }}
+        onSaved={(c) => { setCreateClientId(c.id); setClientQuery(''); }}
       />
 
       {/* ── Create subscription — step 2a: client already subscribed ── */}
@@ -781,7 +761,7 @@ export default function AdminSubscriptions(): JSX.Element {
               ['العميل', createClient?.companyName ?? '—'],
               ['الباقة', createPlan?.nameAr ?? '—'],
               ['المدة', createCycle === 'monthly' ? 'شهري' : 'سنوي'],
-              ['تاريخ البدء', createAsTrial ? 'من لحظة الإنشاء' : 'يتحدد عند نجاح الدفع'],
+              ['تاريخ البدء', 'يتحدد عند نجاح الدفع'],
             ].map(([label, value]) => (
               <div key={label} className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">{label}</span>
@@ -804,9 +784,7 @@ export default function AdminSubscriptions(): JSX.Element {
               <p className="text-sm font-semibold">حالة الاشتراك بعد الإنشاء</p>
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              {createAsTrial
-                ? 'الاشتراك هيتسجل بحالة تجريبي ويشتغل فوراً من غير ما العميل يحتاج يدفع.'
-                : 'الاشتراك هيتسجل بحالة متأخر الدفع ومش هيتحول لـ نشط إلا بعد ما العميل يدفع بنجاح.'}
+              الاشتراك هيتسجل بحالة متأخر الدفع ومش هيتحول لـ نشط إلا بعد ما العميل يدفع بنجاح.
             </p>
           </div>
 

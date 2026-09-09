@@ -120,12 +120,7 @@ interface AdminState {
   toggleIndustryActive: (id: string) => void;
 
   // Subscription actions
-  createSubscription: (
-    clientId: string,
-    planId: string,
-    billingCycle: 'monthly' | 'yearly',
-    options?: { asTrial?: boolean },
-  ) => Subscription;
+  createSubscription: (clientId: string, planId: string, billingCycle: 'monthly' | 'yearly') => Subscription;
   markSubscriptionPaid: (id: string) => void;
   switchSubscriptionPlan: (id: string, newPlanId: string, mode: 'now' | 'end_of_period') => void;
   updateSubscription: (id: string, patch: Partial<Subscription>) => void;
@@ -565,29 +560,28 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   toggleIndustryActive: (id) =>
     set((s) => ({ industries: s.industries.map((i) => (i.id === id ? { ...i, active: !i.active } : i)) })),
 
-  createSubscription: (clientId, planId, billingCycle, options) => {
+  createSubscription: (clientId, planId, billingCycle) => {
     const client = get().clients.find((c) => c.id === clientId);
     const plan = get().plans.find((p) => p.id === planId);
     if (!client || !plan) throw new Error('client or plan not found');
     const price = plan.pricesPerCountry[client.country];
     const amount = billingCycle === 'yearly' ? price.yearly : price.monthly;
-    const asTrial = options?.asTrial ?? false;
     const now = new Date();
-    // A trial runs from creation; a paid subscription only starts once payment succeeds,
-    // so it is parked as past_due and its dates are provisional until then.
-    const periodDays = asTrial ? TRIAL_DAYS : billingCycle === 'yearly' ? 365 : 30;
+    // A subscription only starts once payment succeeds, so it is parked as
+    // past_due and its dates stay provisional until then.
+    const periodDays = billingCycle === 'yearly' ? 365 : 30;
     const sub: Subscription = {
       id: newId('sub'),
       clientId,
       planId,
-      status: asTrial ? 'trial' : 'past_due',
+      status: 'past_due',
       billingCycle,
       amount,
       currency: client.currency,
       startedAt: now.toISOString(),
       currentPeriodStart: now.toISOString(),
       currentPeriodEnd: new Date(now.getTime() + periodDays * 86400000).toISOString(),
-      ...(asTrial ? {} : { pendingStart: true }),
+      pendingStart: true,
     };
     set((s) => ({
       subscriptions: [...s.subscriptions, sub],
@@ -597,11 +591,10 @@ export const useAdminStore = create<AdminState>((set, get) => ({
               ...c,
               planId,
               subscriptionId: sub.id,
-              status: asTrial ? 'trial' : 'past_due',
+              status: 'past_due',
               // no revenue is counted until the client actually pays
               mrr: 0,
               currency: client.currency,
-              ...(asTrial ? { trialEndsAt: sub.currentPeriodEnd } : {}),
             }
           : c
       ),
