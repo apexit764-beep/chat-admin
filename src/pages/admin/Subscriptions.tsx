@@ -131,6 +131,9 @@ const cycleLabel: Record<'monthly' | 'yearly', string> = {
   yearly: 'سنوي',
 };
 
+/** plan tiers from cheapest to richest, used to label a switch as upgrade or downgrade */
+const TIER_RANK: Record<string, number> = { starter: 1, pro: 2, business: 3, enterprise: 4 };
+
 function daysUntil(iso: string): number {
   return Math.ceil((new Date(iso).getTime() - Date.now()) / (24 * 60 * 60 * 1000));
 }
@@ -180,6 +183,24 @@ export default function AdminSubscriptions(): JSX.Element {
     ? createPlan.pricesPerCountry[createClient.country]?.[createCycle === 'yearly' ? 'yearly' : 'monthly']
     : undefined;
 
+  /** the plan a client sits on right now, for the picker rows and the switch notice */
+  const currentPlanOf = (clientId: string): Plan | undefined => {
+    const sub = activeSubOf(clientId);
+    return sub ? planOf(sub.planId) : undefined;
+  };
+
+  const createCurrentSub = createClientId ? activeSubOf(createClientId) : undefined;
+  const createCurrentPlan = createCurrentSub ? planOf(createCurrentSub.planId) : undefined;
+
+  /** none = free to subscribe · same/upgrade/downgrade = replacing a live plan */
+  const switchScenario: 'none' | 'same' | 'upgrade' | 'downgrade' = !createCurrentPlan
+    ? 'none'
+    : !createPlan || createPlan.id === createCurrentPlan.id
+      ? (createPlan ? 'same' : 'none')
+      : (TIER_RANK[createPlan.tier] ?? 0) > (TIER_RANK[createCurrentPlan.tier] ?? 0)
+        ? 'upgrade'
+        : 'downgrade';
+
   const clientResults = useMemo(() => {
     const q = clientQuery.trim().toLowerCase();
     const list = q
@@ -200,6 +221,7 @@ export default function AdminSubscriptions(): JSX.Element {
   const proceedFromForm = (): void => {
     if (!createClientId) { showToast('اختر العميل أولاً', 'error'); return; }
     if (!createPlanId) { showToast('اختر الباقة أولاً', 'error'); return; }
+    if (switchScenario === 'same') { showToast('العميل مشترك في هذه الباقة بالفعل — اختر باقة مختلفة', 'error'); return; }
     setCreateStep(activeSubOf(createClientId) ? 'replace' : 'confirm');
   };
 
@@ -605,12 +627,15 @@ export default function AdminSubscriptions(): JSX.Element {
                   >
                     {createClient ? (
                       <span className="flex items-center gap-2 min-w-0">
-                        <Avatar className="h-6 w-6">
+                        <Avatar className="h-6 w-6 shrink-0">
                           <AvatarFallback className={cn('text-[10px]', avatarColor(createClient.companyName))}>
                             {initials(createClient.companyName)}
                           </AvatarFallback>
                         </Avatar>
                         <span className="truncate">{createClient.companyName}</span>
+                        {createCurrentPlan && (
+                          <Badge variant="secondary" className="text-[10px] shrink-0">{createCurrentPlan.nameAr}</Badge>
+                        )}
                       </span>
                     ) : (
                       <span className="text-muted-foreground">اختر العميل</span>
@@ -635,24 +660,32 @@ export default function AdminSubscriptions(): JSX.Element {
                     {clientResults.length === 0 ? (
                       <p className="text-xs text-muted-foreground text-center py-6">لا يوجد عملاء مطابقون</p>
                     ) : (
-                      clientResults.map((c) => (
-                        <button
-                          key={c.id}
-                          type="button"
-                          onClick={() => { setCreateClientId(c.id); setClientPickerOpen(false); }}
-                          className="w-full text-start px-2.5 py-2 hover:bg-muted/60 transition-colors flex items-center gap-2"
-                        >
-                          <Avatar className="h-7 w-7">
-                            <AvatarFallback className={cn('text-[10px]', avatarColor(c.companyName))}>
-                              {initials(c.companyName)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <span className="min-w-0">
-                            <span className="block text-sm font-medium truncate">{c.companyName}</span>
-                            <span className="block text-[11px] text-muted-foreground truncate">{c.email}</span>
-                          </span>
-                        </button>
-                      ))
+                      clientResults.map((c) => {
+                        const rowPlan = currentPlanOf(c.id);
+                        return (
+                          <button
+                            key={c.id}
+                            type="button"
+                            onClick={() => { setCreateClientId(c.id); setClientPickerOpen(false); }}
+                            className="w-full text-start px-2.5 py-2 hover:bg-muted/60 transition-colors flex items-center gap-2"
+                          >
+                            <Avatar className="h-7 w-7 shrink-0">
+                              <AvatarFallback className={cn('text-[10px]', avatarColor(c.companyName))}>
+                                {initials(c.companyName)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span className="min-w-0 flex-1">
+                              <span className="block text-sm font-medium truncate">{c.companyName}</span>
+                              <span className="block text-[11px] text-muted-foreground truncate">{c.email}</span>
+                            </span>
+                            {rowPlan ? (
+                              <Badge variant="secondary" className="text-[10px] shrink-0">{rowPlan.nameAr}</Badge>
+                            ) : (
+                              <span className="text-[10px] text-muted-foreground shrink-0">بدون اشتراك</span>
+                            )}
+                          </button>
+                        );
+                      })
                     )}
                   </div>
                 </PopoverContent>
@@ -690,6 +723,38 @@ export default function AdminSubscriptions(): JSX.Element {
                   </button>
                 ))}
               </div>
+
+            {createCurrentPlan && (
+              <div
+                className={cn(
+                  'rounded-xl border p-3.5',
+                  switchScenario === 'same'
+                    ? 'border-warning/40 bg-warning/5'
+                    : 'border-destructive/30 bg-destructive/5'
+                )}
+              >
+                <div className="flex items-center gap-2 mb-1.5">
+                  <AlertTriangle className={cn('h-4 w-4', switchScenario === 'same' ? 'text-warning' : 'text-destructive')} />
+                  <p className={cn('text-sm font-semibold', switchScenario === 'same' ? 'text-warning' : 'text-destructive')}>
+                    {switchScenario === 'same' ? 'نفس الباقة الحالية' :
+                     switchScenario === 'upgrade' ? 'ترقية باقة' :
+                     switchScenario === 'downgrade' ? 'تخفيض باقة' : 'العميل مشترك حالياً'}
+                  </p>
+                </div>
+                <p className="text-sm leading-relaxed">
+                  العميل «{createClient?.companyName}» مشترك حالياً في باقة{' '}
+                  <span className="font-semibold">{createCurrentPlan.nameAr}</span>
+                  {switchScenario === 'none' && ' — اختر الباقة الجديدة للمتابعة.'}
+                  {switchScenario === 'same' && ' — اختر باقة مختلفة للترقية أو التخفيض.'}
+                  {(switchScenario === 'upgrade' || switchScenario === 'downgrade') && (
+                    <>
+                      . هل تريد استبدالها بباقة{' '}
+                      <span className="font-semibold">{createPlan?.nameAr}</span>؟
+                    </>
+                  )}
+                </p>
+              </div>
+            )}
             </div>
 
           </div>
@@ -712,12 +777,20 @@ export default function AdminSubscriptions(): JSX.Element {
       <Dialog open={createStep === 'replace'} onOpenChange={(o) => { if (!o) setCreateStep(null); }}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>العميل مشترك حالياً</DialogTitle>
+            <DialogTitle>
+              {switchScenario === 'upgrade' ? 'ترقية باقة العميل'
+                : switchScenario === 'downgrade' ? 'تخفيض باقة العميل'
+                : 'العميل مشترك حالياً'}
+            </DialogTitle>
           </DialogHeader>
           <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-3.5">
             <div className="flex items-center gap-2 mb-1.5">
               <AlertTriangle className="h-4 w-4 text-destructive" />
-              <p className="text-sm font-semibold text-destructive">العميل مشترك حالياً</p>
+              <p className="text-sm font-semibold text-destructive">
+                {switchScenario === 'upgrade' ? 'ترقية من باقة أقل إلى أعلى'
+                  : switchScenario === 'downgrade' ? 'تخفيض من باقة أعلى إلى أقل'
+                  : 'العميل مشترك حالياً'}
+              </p>
             </div>
             <p className="text-sm">
               العميل «{createClient?.companyName}» مشترك في باقة{' '}

@@ -1,0 +1,1 @@
+import{aE as t,Q as e}from"./index-B3JrW8FC.js";function a(){return t.jsx(e,{to:"/settings#profile",replace:!0})}export{a as default};
