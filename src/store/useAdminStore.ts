@@ -59,11 +59,9 @@ interface AdminState {
   knowledgeCategories: KnowledgeCategory[];
   knowledgeArticles: KnowledgeArticle[];
   planRequests: PlanRequest[];
+  /** seeded from the backend — the panel only reads them */
   platformTypes: PlatformType[];
   platforms: Platform[];
-  addPlatformType: (type: Omit<PlatformType, 'id' | 'key'>) => PlatformType;
-  updatePlatformType: (id: string, patch: Partial<Omit<PlatformType, 'id' | 'key'>>) => void;
-  deletePlatformType: (id: string) => void;
   setPlatforms: (updater: (prev: Platform[]) => Platform[]) => void;
 
   // Plan Request actions
@@ -193,21 +191,6 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   planRequests: initialPlanRequests,
   platformTypes: defaultPlatformTypes,
   platforms: defaultPlatforms,
-
-  addPlatformType: (type) => {
-    const key = type.name.trim().toLowerCase().replace(/\s+/g, '-') || `type-${Date.now()}`;
-    const created: PlatformType = { id: `pt_${Date.now()}`, key, ...type };
-    set((s) => ({ platformTypes: [...s.platformTypes, created] }));
-    return created;
-  },
-
-  updatePlatformType: (id, patch) =>
-    set((s) => ({
-      platformTypes: s.platformTypes.map((t) => (t.id === id ? { ...t, ...patch } : t)),
-    })),
-
-  deletePlatformType: (id) =>
-    set((s) => ({ platformTypes: s.platformTypes.filter((t) => t.id !== id) })),
 
   setPlatforms: (updater) => set((s) => ({ platforms: updater(s.platforms) })),
 

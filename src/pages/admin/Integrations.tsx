@@ -1,5 +1,4 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Plus,
   Search,
@@ -10,7 +9,6 @@ import {
   ShoppingBag,
   Plug,
   X,
-  Tag,
   ChevronDown,
   ChevronUp,
   GripVertical,
@@ -144,7 +142,6 @@ function CountryTagsInput({ countries, selected, onToggle }: CountryTagsInputPro
 }
 
 export default function Integrations() {
-  const navigate = useNavigate();
   const platforms = useAdminStore((s) => s.platforms);
   const setPlatforms = useAdminStore((s) => s.setPlatforms);
   const [search, setSearch] = useState('');
@@ -239,10 +236,6 @@ export default function Integrations() {
           <p className="text-muted-foreground mt-1">إدارة وتفعيل منصات التكامل المتاحة</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => navigate('/integrations/types')}>
-            <Tag className="h-4 w-4 me-2" />
-            إدارة الأنواع
-          </Button>
           <Button onClick={openAdd}>
             <Plus className="h-4 w-4 me-2" />
             إضافة منصة
