@@ -53,6 +53,7 @@ import type { Client, ClientStatus } from '@/types';
 
 
 const statusLabel: Record<ClientStatus, string> = {
+  inactive: 'غير مفعّل',
   trial: 'فترة تجريبية',
   active: 'نشط',
   past_due: 'متأخر',
@@ -61,6 +62,7 @@ const statusLabel: Record<ClientStatus, string> = {
 };
 
 const statusBadgeClass: Record<ClientStatus, string> = {
+  inactive: 'bg-muted text-muted-foreground border-transparent',
   trial: 'bg-info/15 text-info border-transparent',
   active: 'bg-success/15 text-success border-transparent',
   past_due: 'bg-warning/15 text-warning border-transparent',
@@ -411,6 +413,7 @@ export default function AdminClients(): JSX.Element {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">كل الحالات</SelectItem>
+                <SelectItem value="inactive">غير مفعّل</SelectItem>
                 <SelectItem value="trial">تجريبي</SelectItem>
                 <SelectItem value="active">نشط</SelectItem>
                 <SelectItem value="past_due">متأخر</SelectItem>

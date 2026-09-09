@@ -115,6 +115,7 @@ function formatFileSize(bytes: number): string {
 
 
 const statusLabel: Record<ClientStatus, string> = {
+  inactive: 'غير مفعّل',
   trial: 'فترة تجريبية',
   active: 'نشط',
   past_due: 'متأخر',
@@ -123,6 +124,7 @@ const statusLabel: Record<ClientStatus, string> = {
 };
 
 const statusBadgeClass: Record<ClientStatus, string> = {
+  inactive: 'bg-muted text-muted-foreground border-transparent',
   trial: 'bg-info/15 text-info border-transparent',
   active: 'bg-success/15 text-success border-transparent',
   past_due: 'bg-warning/15 text-warning border-transparent',

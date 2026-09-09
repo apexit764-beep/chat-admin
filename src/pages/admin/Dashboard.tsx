@@ -565,6 +565,7 @@ export default function AdminDashboard(): JSX.Element {
 
 function StatusPill({ status }: { status: Client['status'] }): JSX.Element {
   const map: Record<Client['status'], { label: string; variant: 'success' | 'default' | 'warning' | 'destructive' | 'secondary' | 'outline' }> = {
+    inactive: { label: 'غير مفعّل', variant: 'outline' },
     active: { label: 'نشط', variant: 'success' },
     trial: { label: 'تجريبي', variant: 'default' },
     past_due: { label: 'متأخر', variant: 'warning' },

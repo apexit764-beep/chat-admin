@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Mail, Lock, RefreshCw, Copy, EyeOff, Eye as EyeIcon, MessageSquare } from 'lucide-react';
-import { useAdminStore } from '@/store/useAdminStore';
+import { useAdminStore, TRIAL_DAYS } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -40,6 +40,7 @@ interface ClientFormState {
   country: string;
   industry: string;
   password: string;
+  startWithTrial: boolean;
   sendViaWhatsapp: boolean;
   sendViaEmail: boolean;
 }
@@ -53,6 +54,7 @@ const emptyForm = (): ClientFormState => ({
   country: '',
   industry: '',
   password: generatePassword(),
+  startWithTrial: true,
   sendViaWhatsapp: true,
   sendViaEmail: false,
 });
@@ -98,6 +100,7 @@ export function ClientFormDialog({ open, onOpenChange, client, onSaved }: Client
             country: editing.country,
             industry: editing.industry,
             password: editing.password,
+            startWithTrial: Boolean(editing.trialEndsAt),
             sendViaWhatsapp: true,
             sendViaEmail: false,
           }
@@ -144,10 +147,13 @@ export function ClientFormDialog({ open, onOpenChange, client, onSaved }: Client
     } else {
       const created = addClient({
         companyName: form.companyName, contactName: form.contactName, email: form.email,
-        phone: fullPhone, country: form.country, industry: form.industry, status: 'trial',
+        phone: fullPhone, country: form.country, industry: form.industry,
+        status: form.startWithTrial ? 'trial' : 'inactive',
         planId: null, currency: country.currency,
         username: form.email, password: form.password,
-        trialEndsAt: new Date(Date.now() + 14 * 86400000).toISOString(),
+        ...(form.startWithTrial
+          ? { trialEndsAt: new Date(Date.now() + TRIAL_DAYS * 86400000).toISOString() }
+          : {}),
         dashboardUrl: '',
       });
       showToast(`تمت إضافة: ${form.companyName}`, 'success');
@@ -307,6 +313,20 @@ export function ClientFormDialog({ open, onOpenChange, client, onSaved }: Client
 
               {!editing && (
                 <div className="sm:col-span-2 pt-2 border-t">
+                  <div className="flex items-center justify-between gap-3 rounded-md border px-3 py-2.5 mb-3">
+                    <div>
+                      <p className="text-sm font-medium">تفعيل الباقة التجريبية</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {form.startWithTrial
+                          ? `يبدأ العميل بفترة تجريبية ${TRIAL_DAYS} يوماً — وهي متاحة مرة واحدة فقط له`
+                          : 'يُسجَّل العميل بحالة غير مفعّل، وتبقى تجربته متاحة لاستخدامها لاحقاً'}
+                      </p>
+                    </div>
+                    <Switch
+                      checked={form.startWithTrial}
+                      onCheckedChange={(v) => setForm({ ...form, startWithTrial: v })}
+                    />
+                  </div>
                   <p className="text-xs font-medium text-muted-foreground mb-2">إرسال بيانات الدخول للعميل</p>
                   <div className="flex gap-3">
                     <div className="flex items-center gap-2 rounded-md border px-3 py-2 flex-1">

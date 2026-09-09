@@ -196,7 +196,7 @@ export interface Industry {
   active: boolean;
 }
 
-export type ClientStatus = 'trial' | 'active' | 'past_due' | 'suspended' | 'cancelled';
+export type ClientStatus = 'inactive' | 'trial' | 'active' | 'past_due' | 'suspended' | 'cancelled';
 
 export interface Client {
   id: string;
