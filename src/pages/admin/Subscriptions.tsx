@@ -20,6 +20,7 @@ import { StatCard, useConfirm } from '@components/ui';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
 import { useNotificationStore } from '@/store/useNotificationStore';
+import { ClientFormDialog } from '@/components/admin/ClientFormDialog';
 import { formatMoney, approxUSD } from '@/utils/money';
 import { formatDate, initials, avatarColor } from '@/utils/format';
 import { startOfMonth, endOfMonth } from 'date-fns';
@@ -156,6 +157,7 @@ export default function AdminSubscriptions(): JSX.Element {
   const [createCycle, setCreateCycle] = useState<'monthly' | 'yearly'>('monthly');
   const [createAsTrial, setCreateAsTrial] = useState(false);
   const [switchMode, setSwitchMode] = useState<SwitchMode>('now');
+  const [quickAddClient, setQuickAddClient] = useState(false);
 
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<SubscriptionStatus | 'all'>('all');
@@ -596,7 +598,13 @@ export default function AdminSubscriptions(): JSX.Element {
 
           <div className="space-y-5 py-1 max-h-[65vh] overflow-y-auto">
             <div className="space-y-2">
-              <label className="text-sm font-medium">اختيار العميل<span className="text-destructive ms-0.5">*</span></label>
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium">اختيار العميل<span className="text-destructive ms-0.5">*</span></label>
+                <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs" onClick={() => setQuickAddClient(true)}>
+                  <Plus className="h-3.5 w-3.5" />
+                  عميل جديد
+                </Button>
+              </div>
               {createClient ? (
                 <div className="flex items-center justify-between gap-2 p-2.5 rounded-lg border">
                   <div className="flex items-center gap-2 min-w-0">
@@ -712,6 +720,13 @@ export default function AdminSubscriptions(): JSX.Element {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* new client created from inside the flow lands selected in the picker */}
+      <ClientFormDialog
+        open={quickAddClient}
+        onOpenChange={setQuickAddClient}
+        onSaved={(c) => { setCreateClientId(c.id); setClientQuery(''); setCreateAsTrial(false); }}
+      />
 
       {/* ── Create subscription — step 2a: client already subscribed ── */}
       <Dialog open={createStep === 'replace'} onOpenChange={(o) => { if (!o) setCreateStep(null); }}>
