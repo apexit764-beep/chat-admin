@@ -77,7 +77,7 @@ type SwitchMode = 'now' | 'end_of_period';
 function PlanSwitchOptions({ value, onChange }: { value: SwitchMode; onChange: (mode: SwitchMode) => void }): JSX.Element {
   const options: Array<{ mode: SwitchMode; title: string; detail: string }> = [
     { mode: 'now', title: 'تبديل الباقة حالاً', detail: 'يتم حساب الفرق (Proration) تلقائياً وتوليد فاتورة أو رصيد فوراً' },
-    { mode: 'end_of_period', title: 'تبديل الباقة عند انتهاء الباقة الحالية', detail: 'الباقة الحالية تفضل شغالة لحد التجديد، وبعدين الباقة الجديدة تتفعّل تلقائياً' },
+    { mode: 'end_of_period', title: 'تبديل الباقة عند انتهاء الباقة الحالية', detail: 'تبقى الباقة الحالية سارية حتى موعد التجديد، ثم تُفعَّل الباقة الجديدة تلقائياً' },
   ];
   return (
     <div className="space-y-2">
@@ -785,7 +785,7 @@ export default function AdminSubscriptions(): JSX.Element {
                       . سيتم التخفيض إلى باقة{' '}
                       <span className="font-semibold">{createPlan?.nameAr}</span>{' '}
                       <span className="font-semibold">عند انتهاء الاشتراك الحالي</span> — تبقى الباقة
-                      الحالية شغالة حتى ذلك الحين.
+                      الحالية سارية حتى ذلك الحين.
                     </>
                   )}
                 </p>
@@ -851,10 +851,10 @@ export default function AdminSubscriptions(): JSX.Element {
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">
               {!createCurrentPlan
-                ? 'الاشتراك هيتسجل بحالة متأخر الدفع ومش هيتحول لـ نشط إلا بعد ما العميل يدفع بنجاح.'
+                ? 'يُسجَّل الاشتراك بحالة متأخر الدفع، ولا يتحوّل إلى نشط إلا بعد أن يُتمّ العميل الدفع بنجاح.'
                 : createSwitchMode === 'now'
-                  ? 'الباقة هتتبدل فوراً، وهيتحسب فرق السعر (Proration) وتتولد فاتورة أو رصيد.'
-                  : 'الباقة الحالية هتفضل شغالة لحد ما تخلص، وبعدين الباقة الأقل هتتفعل تلقائياً. هتتولد فاتورة بحالة «مجدولة» للفترة الجاية، وتقدر تلغيها من إجراء «إلغاء الجدولة».'}
+                  ? 'تُبدَّل الباقة فوراً، ويُحتسب فرق السعر (Proration) فتُولَّد فاتورة أو رصيد.'
+                  : 'تبقى الباقة الحالية سارية حتى انتهائها، ثم تُفعَّل الباقة الأقل تلقائياً. وتُولَّد فاتورة بحالة «مجدولة» للفترة القادمة، يمكن إلغاؤها من إجراء «إلغاء الجدولة».'}
             </p>
           </div>
 

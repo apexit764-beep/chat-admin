@@ -229,7 +229,7 @@ const defaultState: Persisted = {
     workDays: ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday'],
     workFrom: '09:00',
     workTo: '17:00',
-    offlineMessage: 'أهلاً خارج ساعات الدوام حالياً، لكن سجّلنا طلبك وسيتواصل معك أحد الموظفين أول الدوام. لأي استفسار سريع تقدر تعتمد عليّ.',
+    offlineMessage: 'أهلاً خارج ساعات الدوام حالياً، لكن سجّلنا طلبك وسيتواصل معك أحد الموظفين أول الدوام. ولأي استفسار سريع يمكنك الاعتماد عليّ.',
   },
   credentialDelivery: {
     sendViaWhatsapp: true,
