@@ -14,7 +14,7 @@ import { startOfMonth, endOfMonth } from 'date-fns';
 import { StatCard } from '@components/ui';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
-import { formatMoney, approxUSD } from '@/utils/money';
+import { formatMoney, formatUSD, approxUSD } from '@/utils/money';
 import { formatDate, initials, avatarColor } from '@/utils/format';
 import { downloadCsv, printAsPdf } from '@/utils/csv';
 import type { Invoice, InvoiceStatus, InvoiceType } from '@/types';
@@ -46,11 +46,13 @@ const COMPANY_NAME = 'Qhub';
 const invStatusLabel: Record<string, string> = {
   paid: 'مدفوعة',
   failed: 'فشلت',
+  scheduled: 'مجدولة',
 };
 
-const invStatusVariant: Record<string, 'success' | 'destructive'> = {
+const invStatusVariant: Record<string, 'success' | 'destructive' | 'warning'> = {
   paid: 'success',
   failed: 'destructive',
+  scheduled: 'warning',
 };
 
 const invTypeLabel: Record<InvoiceType, string> = {
@@ -90,8 +92,11 @@ export default function AdminFinance(): JSX.Element {
     });
   }, [invoices, dateRange]);
 
+  // a scheduled invoice is not issued yet, so it stays out of the totals
   const totalInvoices = useMemo(
-    () => dateFiltered.reduce((acc, inv) => acc + approxUSD(inv.total, inv.currency), 0),
+    () => dateFiltered
+      .filter((inv) => inv.status !== 'scheduled')
+      .reduce((acc, inv) => acc + approxUSD(inv.total, inv.currency), 0),
     [dateFiltered]
   );
 
@@ -130,10 +135,9 @@ export default function AdminFinance(): JSX.Element {
           'رقم الفاتورة': inv.number,
           'العميل': client?.companyName ?? '—',
           'النوع': invTypeLabel[inv.invoiceType],
-          'المبلغ': inv.amount,
-          'الضريبة': inv.tax,
-          'الإجمالي': inv.total,
-          'العملة': inv.currency,
+          'المبلغ (USD)': Math.round(approxUSD(inv.amount, inv.currency) * 100) / 100,
+          'الضريبة (USD)': Math.round(approxUSD(inv.tax, inv.currency) * 100) / 100,
+          'الإجمالي (USD)': Math.round(approxUSD(inv.total, inv.currency) * 100) / 100,
           'الحالة': invStatusLabel[inv.status],
           'تاريخ الاستحقاق': formatDate(inv.dueDate),
           'تاريخ الدفع': inv.paidAt ? formatDate(inv.paidAt) : '—',
@@ -201,6 +205,7 @@ export default function AdminFinance(): JSX.Element {
               <SelectItem value="all">كل الحالات</SelectItem>
               <SelectItem value="paid">مدفوعة</SelectItem>
               <SelectItem value="failed">فشلت</SelectItem>
+              <SelectItem value="scheduled">مجدولة</SelectItem>
             </SelectContent>
           </Select>
           <Select value={typeFilter} onValueChange={(v) => setTypeFilter(v as 'all' | InvoiceType)}>
@@ -223,11 +228,11 @@ export default function AdminFinance(): JSX.Element {
               <h1>تقرير الفواتير</h1>
               <p class="muted">${new Date().toLocaleDateString('ar-u-nu-latn')}</p>
               <table>
-                <thead><tr><th>رقم الفاتورة</th><th>العميل</th><th>النوع</th><th class="right">الإجمالي</th><th>الحالة</th><th>تاريخ الاستحقاق</th></tr></thead>
+                <thead><tr><th>رقم الفاتورة</th><th>العميل</th><th>النوع</th><th class="right">الإجمالي (USD)</th><th>الحالة</th><th>تاريخ الاستحقاق</th></tr></thead>
                 <tbody>
                   ${filteredInvoices.map((inv) => {
                     const client = clients.find((c) => c.id === inv.clientId);
-                    return `<tr><td>${inv.number}</td><td>${client?.companyName ?? '—'}</td><td>${invTypeLabel[inv.invoiceType]}</td><td class="right">${formatMoney(inv.total, inv.currency)}</td><td>${invStatusLabel[inv.status]}</td><td>${formatDate(inv.dueDate)}</td></tr>`;
+                    return `<tr><td>${inv.number}</td><td>${client?.companyName ?? '—'}</td><td>${invTypeLabel[inv.invoiceType]}</td><td class="right">${formatUSD(inv.total, inv.currency)}</td><td>${invStatusLabel[inv.status]}</td><td>${formatDate(inv.dueDate)}</td></tr>`;
                   }).join('')}
                 </tbody>
               </table>
@@ -247,7 +252,7 @@ export default function AdminFinance(): JSX.Element {
                   <TableHead className="text-start">رقم الفاتورة</TableHead>
                   <TableHead className="text-start">العميل</TableHead>
                   <TableHead className="text-start">النوع</TableHead>
-                  <TableHead className="text-start">الإجمالي</TableHead>
+                  <TableHead className="text-start">الإجمالي (USD)</TableHead>
                   <TableHead className="text-start hidden lg:table-cell">تاريخ الاستحقاق</TableHead>
                   <TableHead className="text-start">الحالة</TableHead>
                   <TableHead className="text-start w-1">إجراءات</TableHead>
@@ -273,7 +278,7 @@ export default function AdminFinance(): JSX.Element {
                           {invTypeLabel[inv.invoiceType]}
                         </Badge>
                       </TableCell>
-                      <TableCell className="font-semibold">{formatMoney(inv.total, inv.currency)}</TableCell>
+                      <TableCell className="font-semibold">{formatUSD(inv.total, inv.currency)}</TableCell>
                       <TableCell className="hidden lg:table-cell text-sm text-muted-foreground">{formatDate(inv.dueDate)}</TableCell>
                       <TableCell>
                         <Badge variant={invStatusVariant[inv.status]}>

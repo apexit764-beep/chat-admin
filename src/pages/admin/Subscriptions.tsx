@@ -22,8 +22,9 @@ import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
 import { useNotificationStore } from '@/store/useNotificationStore';
 import { ClientFormDialog } from '@/components/admin/ClientFormDialog';
-import { formatMoney, approxUSD } from '@/utils/money';
+import { formatMoney, formatUSD, approxUSD } from '@/utils/money';
 import { formatDate, initials, avatarColor } from '@/utils/format';
+import { tierRank } from '@/utils/plans';
 import { startOfMonth, endOfMonth } from 'date-fns';
 import { cn } from '@/lib/utils';
 import type { Client, Plan, SubscriptionStatus } from '@/types';
@@ -131,9 +132,6 @@ const cycleLabel: Record<'monthly' | 'yearly', string> = {
   yearly: 'سنوي',
 };
 
-/** plan tiers from cheapest to richest, used to label a switch as upgrade or downgrade */
-const TIER_RANK: Record<string, number> = { starter: 1, pro: 2, business: 3, enterprise: 4 };
-
 function daysUntil(iso: string): number {
   return Math.ceil((new Date(iso).getTime() - Date.now()) / (24 * 60 * 60 * 1000));
 }
@@ -149,6 +147,7 @@ export default function AdminSubscriptions(): JSX.Element {
   const createSubscription = useAdminStore((s) => s.createSubscription);
   const markSubscriptionPaid = useAdminStore((s) => s.markSubscriptionPaid);
   const switchSubscriptionPlan = useAdminStore((s) => s.switchSubscriptionPlan);
+  const cancelScheduledPlanSwitch = useAdminStore((s) => s.cancelScheduledPlanSwitch);
   const addNotification = useNotificationStore((s) => s.addNotification);
   const showToast = useUIStore((s) => s.showToast);
   const { confirm } = useConfirm();
@@ -197,7 +196,7 @@ export default function AdminSubscriptions(): JSX.Element {
     ? 'none'
     : !createPlan || createPlan.id === createCurrentPlan.id
       ? (createPlan ? 'same' : 'none')
-      : (TIER_RANK[createPlan.tier] ?? 0) > (TIER_RANK[createCurrentPlan.tier] ?? 0)
+      : tierRank(createPlan.tier) > tierRank(createCurrentPlan.tier)
         ? 'upgrade'
         : 'downgrade';
 
@@ -442,7 +441,7 @@ export default function AdminSubscriptions(): JSX.Element {
                 <TableHead>الباقة</TableHead>
                 <TableHead>الحالة</TableHead>
                 <TableHead className="hidden md:table-cell">الدورة</TableHead>
-                <TableHead>المبلغ</TableHead>
+                <TableHead>المبلغ (USD)</TableHead>
                 <TableHead className="hidden md:table-cell">تاريخ البداية</TableHead>
                 <TableHead className="hidden lg:table-cell">تاريخ انتهاء الاشتراك</TableHead>
                 <TableHead className="w-[60px]" />
@@ -510,7 +509,7 @@ export default function AdminSubscriptions(): JSX.Element {
                         <Badge variant="secondary" className="text-[11px]">{cycleLabel[sub.billingCycle]}</Badge>
                       </TableCell>
                       <TableCell>
-                        <span className="text-sm font-semibold">{formatMoney(sub.amount, sub.currency)}</span>
+                        <span className="text-sm font-semibold">{formatUSD(sub.amount, sub.currency)}</span>
                       </TableCell>
                       <TableCell className="hidden md:table-cell text-sm text-muted-foreground">
                         {sub.pendingStart ? (
@@ -572,6 +571,17 @@ export default function AdminSubscriptions(): JSX.Element {
                               <DropdownMenuItem onClick={() => { setSwitchMode('now'); setSwitchModal({ subId: sub.id, clientId: sub.clientId, currentPlanId: sub.planId, companyName: client?.companyName ?? 'العميل' }); }}>
                                 <ArrowRightLeft className="h-4 w-4 ml-2" />
                                 تبديل الباقة
+                              </DropdownMenuItem>
+                            )}
+                            {sub.scheduledPlanId && (
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  cancelScheduledPlanSwitch(sub.id);
+                                  showToast(`تم إلغاء التبديل المجدول لاشتراك ${client?.companyName ?? 'العميل'}`, 'success');
+                                }}
+                              >
+                                <XCircle className="h-4 w-4 ml-2" />
+                                إلغاء الجدولة
                               </DropdownMenuItem>
                             )}
                             {sub.status !== 'cancelled' && (

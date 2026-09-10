@@ -129,6 +129,8 @@ interface AdminState {
   createSubscription: (clientId: string, planId: string, billingCycle: 'monthly' | 'yearly') => Subscription;
   markSubscriptionPaid: (id: string) => void;
   switchSubscriptionPlan: (id: string, newPlanId: string, mode: 'now' | 'end_of_period') => void;
+  /** drops a scheduled switch and the invoice held for it */
+  cancelScheduledPlanSwitch: (id: string) => void;
   updateSubscription: (id: string, patch: Partial<Subscription>) => void;
   cancelSubscription: (id: string, mode: 'now' | 'end_of_period') => void;
   extendSubscription: (id: string, days: number) => void;
@@ -662,8 +664,33 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     if (!sub || !client || !plan) return;
 
     if (mode === 'end_of_period') {
+      const scheduledPrice = plan.pricesPerCountry[client.country];
+      const scheduledAmount = sub.billingCycle === 'yearly' ? scheduledPrice.yearly : scheduledPrice.monthly;
+      const scheduledTax = Math.round(scheduledAmount * 0.05);
+      /** the next period's invoice, held as «مجدولة» until the switch lands or the schedule is cancelled */
+      const scheduledInvoice: Invoice = {
+        id: newId('inv'),
+        number: `INV-2026-${String(get().invoices.length + 1).padStart(5, '0')}`,
+        clientId: sub.clientId,
+        subscriptionId: sub.id,
+        invoiceType: 'renewal',
+        amount: scheduledAmount,
+        tax: scheduledTax,
+        total: scheduledAmount + scheduledTax,
+        currency: sub.currency,
+        status: 'scheduled',
+        dueDate: sub.currentPeriodEnd,
+        items: [{
+          description: `تبديل إلى ${plan.nameAr} — ${sub.billingCycle === 'yearly' ? 'سنوي' : 'شهري'}`,
+          quantity: 1,
+          unitPrice: scheduledAmount,
+          total: scheduledAmount,
+        }],
+        createdAt: new Date().toISOString(),
+      };
       set((s) => ({
         subscriptions: s.subscriptions.map((x) => (x.id === id ? { ...x, scheduledPlanId: newPlanId } : x)),
+        invoices: [scheduledInvoice, ...s.invoices.filter((inv) => !(inv.subscriptionId === id && inv.status === 'scheduled'))],
       }));
       return;
     }
@@ -674,6 +701,8 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       subscriptions: s.subscriptions.map((x) =>
         x.id === id ? { ...x, planId: newPlanId, amount, scheduledPlanId: undefined } : x
       ),
+      // an immediate switch supersedes any schedule, so its held invoice goes with it
+      invoices: s.invoices.filter((inv) => !(inv.subscriptionId === id && inv.status === 'scheduled')),
       clients: s.clients.map((c) =>
         c.id === sub.clientId
           ? {
@@ -685,6 +714,12 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       ),
     }));
   },
+
+  cancelScheduledPlanSwitch: (id) =>
+    set((s) => ({
+      subscriptions: s.subscriptions.map((x) => (x.id === id ? { ...x, scheduledPlanId: undefined } : x)),
+      invoices: s.invoices.filter((inv) => !(inv.subscriptionId === id && inv.status === 'scheduled')),
+    })),
 
   updateSubscription: (id, patch) =>
     set((s) => ({

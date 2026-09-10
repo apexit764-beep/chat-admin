@@ -15,6 +15,16 @@ function symbolFor(currency: string): string {
   return country?.symbol ?? currency;
 }
 
+/**
+ * Format an amount as USD, converting from its own currency first.
+ * The admin portal reports money in USD only; local currency stays for
+ * client-facing documents such as the printed invoice.
+ */
+export function formatUSD(amount: number, currency: string): string {
+  const usd = approxUSD(amount, currency);
+  return `$${usd.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+}
+
 /** Convert a USD reference to local currency (rough estimate) */
 export function usdToLocal(usd: number, currency: string): number {
   const countries = useAdminStore.getState().countries;

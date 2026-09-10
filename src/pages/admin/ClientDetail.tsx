@@ -36,7 +36,7 @@ import {
 } from 'lucide-react';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
-import { formatMoney } from '@/utils/money';
+import { formatMoney, formatUSD } from '@/utils/money';
 import { formatDate, timeAgo, initials, avatarColor } from '@/utils/format';
 import { cn } from '@/lib/utils';
 import { useConfirm } from '@components/ui';
@@ -457,7 +457,7 @@ export default function ClientDetail(): JSX.Element {
                         <p className="text-xs text-muted-foreground">{formatDate(inv.dueDate)}</p>
                       </div>
                       <div className="flex flex-col items-end gap-1">
-                        <span className="font-bold text-sm">{formatMoney(inv.total, inv.currency)}</span>
+                        <span className="font-bold text-sm">{formatUSD(inv.total, inv.currency)}</span>
                         <InvoiceStatusBadge status={inv.status} />
                       </div>
                     </div>
@@ -476,9 +476,9 @@ export default function ClientDetail(): JSX.Element {
                     <TableHead className="text-right w-12">#</TableHead>
                     <TableHead className="text-right">رقم الفاتورة</TableHead>
                     <TableHead className="text-right">التاريخ</TableHead>
-                    <TableHead className="text-right">المبلغ</TableHead>
-                    <TableHead className="text-right">الضريبة</TableHead>
-                    <TableHead className="text-right">الإجمالي</TableHead>
+                    <TableHead className="text-right">المبلغ (USD)</TableHead>
+                    <TableHead className="text-right">الضريبة (USD)</TableHead>
+                    <TableHead className="text-right">الإجمالي (USD)</TableHead>
                     <TableHead className="text-right">الحالة</TableHead>
                     <TableHead className="text-right w-[100px]"></TableHead>
                   </TableRow>
@@ -494,9 +494,9 @@ export default function ClientDetail(): JSX.Element {
                         <TableCell className="text-xs text-muted-foreground font-mono">{idx + 1}</TableCell>
                         <TableCell className="font-mono font-medium">{inv.number}</TableCell>
                         <TableCell className="text-muted-foreground">{formatDate(inv.dueDate)}</TableCell>
-                        <TableCell>{formatMoney(inv.amount, inv.currency)}</TableCell>
-                        <TableCell className="text-muted-foreground">{formatMoney(inv.tax, inv.currency)}</TableCell>
-                        <TableCell className="font-semibold">{formatMoney(inv.total, inv.currency)}</TableCell>
+                        <TableCell>{formatUSD(inv.amount, inv.currency)}</TableCell>
+                        <TableCell className="text-muted-foreground">{formatUSD(inv.tax, inv.currency)}</TableCell>
+                        <TableCell className="font-semibold">{formatUSD(inv.total, inv.currency)}</TableCell>
                         <TableCell><InvoiceStatusBadge status={inv.status} /></TableCell>
                         <TableCell>
                           <Button variant="ghost" size="sm" className="h-7 gap-1.5 text-xs" onClick={() => setViewInvoice(inv)}>
@@ -522,7 +522,7 @@ export default function ClientDetail(): JSX.Element {
                       <TableHead className="text-right w-12">#</TableHead>
                       <TableHead className="text-right">المعرّف</TableHead>
                       <TableHead className="text-right">التاريخ</TableHead>
-                      <TableHead className="text-right">المبلغ</TableHead>
+                      <TableHead className="text-right">المبلغ (USD)</TableHead>
                       <TableHead className="text-right">الطريقة</TableHead>
                       <TableHead className="text-right">الحالة</TableHead>
                     </TableRow>
@@ -533,7 +533,7 @@ export default function ClientDetail(): JSX.Element {
                         <TableCell className="text-xs text-muted-foreground font-mono">{idx + 1}</TableCell>
                         <TableCell className="font-mono text-xs">{txn.id.slice(0, 12)}...</TableCell>
                         <TableCell className="text-muted-foreground">{formatDate(txn.createdAt)}</TableCell>
-                        <TableCell className="font-semibold">{formatMoney(txn.amount, txn.currency)}</TableCell>
+                        <TableCell className="font-semibold">{formatUSD(txn.amount, txn.currency)}</TableCell>
                         <TableCell>
                           <span className="inline-flex items-center gap-1 text-xs">
                             <CreditCard className="h-3.5 w-3.5" />
@@ -1184,8 +1184,9 @@ function InvoiceStatusBadge({ status }: { status: string }) {
     <Badge className={cn('text-[10px] font-semibold border-transparent',
       status === 'paid' && 'bg-success/15 text-success',
       status === 'failed' && 'bg-danger/15 text-danger',
+      status === 'scheduled' && 'bg-warning/15 text-warning',
     )}>
-      {status === 'paid' ? 'مدفوعة' : 'فاشلة'}
+      {status === 'paid' ? 'مدفوعة' : status === 'scheduled' ? 'مجدولة' : 'فاشلة'}
     </Badge>
   );
 }
