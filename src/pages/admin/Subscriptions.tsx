@@ -153,7 +153,7 @@ export default function AdminSubscriptions(): JSX.Element {
   const { confirm } = useConfirm();
 
   /* ── Create subscription flow (US-136) ── */
-  const [createStep, setCreateStep] = useState<'form' | 'replace' | 'switch' | 'confirm' | null>(null);
+  const [createStep, setCreateStep] = useState<'form' | 'confirm' | null>(null);
   const [createClientId, setCreateClientId] = useState('');
   const [clientQuery, setClientQuery] = useState('');
   const [createPlanId, setCreatePlanId] = useState('');
@@ -214,7 +214,6 @@ export default function AdminSubscriptions(): JSX.Element {
     setClientQuery('');
     setCreatePlanId('');
     setCreateCycle('monthly');
-    setSwitchMode('now');
     setCreateStep('form');
   };
 
@@ -222,7 +221,7 @@ export default function AdminSubscriptions(): JSX.Element {
     if (!createClientId) { showToast('اختر العميل أولاً', 'error'); return; }
     if (!createPlanId) { showToast('اختر الباقة أولاً', 'error'); return; }
     if (switchScenario === 'same') { showToast('العميل مشترك في هذه الباقة بالفعل — اختر باقة مختلفة', 'error'); return; }
-    setCreateStep(activeSubOf(createClientId) ? 'replace' : 'confirm');
+    setCreateStep('confirm');
   };
 
   const confirmCreate = (): void => {
@@ -237,14 +236,17 @@ export default function AdminSubscriptions(): JSX.Element {
     setCreateStep(null);
   };
 
+  /** a downgrade waits for the current period to end; anything else applies at once */
+  const createSwitchMode: SwitchMode = switchScenario === 'downgrade' ? 'end_of_period' : 'now';
+
   const confirmSwitch = (): void => {
     const current = createClientId ? activeSubOf(createClientId) : undefined;
     if (!current || !createPlan) return;
-    switchSubscriptionPlan(current.id, createPlan.id, switchMode);
+    switchSubscriptionPlan(current.id, createPlan.id, createSwitchMode);
     showToast(
-      switchMode === 'now'
+      createSwitchMode === 'now'
         ? `تم تبديل الباقة إلى ${createPlan.nameAr}`
-        : `سيتم التبديل إلى ${createPlan.nameAr} عند انتهاء الباقة الحالية`,
+        : `سيتم التخفيض إلى ${createPlan.nameAr} عند انتهاء الاشتراك الحالي`,
       'success'
     );
     setCreateStep(null);
@@ -771,10 +773,19 @@ export default function AdminSubscriptions(): JSX.Element {
                   <span className="font-semibold">{createCurrentPlan.nameAr}</span>
                   {switchScenario === 'none' && ' — اختر الباقة الجديدة للمتابعة.'}
                   {switchScenario === 'same' && ' — اختر باقة مختلفة للترقية أو التخفيض.'}
-                  {(switchScenario === 'upgrade' || switchScenario === 'downgrade') && (
+                  {switchScenario === 'upgrade' && (
                     <>
-                      . هل تريد استبدالها بباقة{' '}
-                      <span className="font-semibold">{createPlan?.nameAr}</span>؟
+                      . سيتم استبدالها بباقة{' '}
+                      <span className="font-semibold">{createPlan?.nameAr}</span>{' '}
+                      فوراً مع احتساب فرق السعر (Proration).
+                    </>
+                  )}
+                  {switchScenario === 'downgrade' && (
+                    <>
+                      . سيتم التخفيض إلى باقة{' '}
+                      <span className="font-semibold">{createPlan?.nameAr}</span>{' '}
+                      <span className="font-semibold">عند انتهاء الاشتراك الحالي</span> — تبقى الباقة
+                      الحالية شغالة حتى ذلك الحين.
                     </>
                   )}
                 </p>
@@ -798,68 +809,23 @@ export default function AdminSubscriptions(): JSX.Element {
         onSaved={(c) => { setCreateClientId(c.id); setClientQuery(''); }}
       />
 
-      {/* ── Create subscription — step 2a: client already subscribed ── */}
-      <Dialog open={createStep === 'replace'} onOpenChange={(o) => { if (!o) setCreateStep(null); }}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>
-              {switchScenario === 'upgrade' ? 'ترقية باقة العميل'
-                : switchScenario === 'downgrade' ? 'تخفيض باقة العميل'
-                : 'العميل مشترك حالياً'}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-3.5">
-            <div className="flex items-center gap-2 mb-1.5">
-              <AlertTriangle className="h-4 w-4 text-destructive" />
-              <p className="text-sm font-semibold text-destructive">
-                {switchScenario === 'upgrade' ? 'ترقية من باقة أقل إلى أعلى'
-                  : switchScenario === 'downgrade' ? 'تخفيض من باقة أعلى إلى أقل'
-                  : 'العميل مشترك حالياً'}
-              </p>
-            </div>
-            <p className="text-sm">
-              العميل «{createClient?.companyName}» مشترك في باقة{' '}
-              <span className="font-semibold">
-                {planOf(activeSubOf(createClientId)?.planId ?? '')?.nameAr ?? '—'}
-              </span>{' '}
-              حالياً. هل تريد استبدال الباقة بـ <span className="font-semibold">{createPlan?.nameAr}</span>؟
-            </p>
-          </div>
-          <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setCreateStep('form')}>إلغاء</Button>
-            <Button onClick={() => setCreateStep('switch')}>نعم، استبدال الباقة</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* ── Create subscription — step 2b: same تبديل الباقة flow as the row action ── */}
-      <Dialog open={createStep === 'switch'} onOpenChange={(o) => { if (!o) setCreateStep(null); }}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>تبديل الباقة إلى {createPlan?.nameAr}</DialogTitle>
-          </DialogHeader>
-          <PlanSwitchOptions value={switchMode} onChange={setSwitchMode} />
-          <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setCreateStep('replace')}>رجوع</Button>
-            <Button onClick={confirmSwitch}>تأكيد التبديل</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* ── Create subscription — step 3: final confirmation ── */}
+      {/* ── Create subscription — step 2: final confirmation ── */}
       <Dialog open={createStep === 'confirm'} onOpenChange={(o) => { if (!o) setCreateStep(null); }}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>تأكيد إنشاء الاشتراك</DialogTitle>
+            <DialogTitle>{createCurrentPlan ? 'تأكيد تبديل الباقة' : 'تأكيد إنشاء الاشتراك'}</DialogTitle>
           </DialogHeader>
 
           <div className="rounded-xl border p-4 space-y-2.5">
             <p className="text-xs text-muted-foreground">ملخص الاشتراك</p>
             {[
               ['العميل', createClient?.companyName ?? '—'],
-              ['الباقة', createPlan?.nameAr ?? '—'],
+              ...(createCurrentPlan ? [['الباقة الحالية', createCurrentPlan.nameAr]] : []),
+              [createCurrentPlan ? 'الباقة الجديدة' : 'الباقة', createPlan?.nameAr ?? '—'],
               ['المدة', createCycle === 'monthly' ? 'شهري' : 'سنوي'],
-              ['تاريخ البدء', 'يتحدد عند نجاح الدفع'],
+              createCurrentPlan
+                ? ['موعد التنفيذ', createSwitchMode === 'now' ? 'فوراً' : 'عند انتهاء الاشتراك الحالي']
+                : ['تاريخ البدء', 'يتحدد عند نجاح الدفع'],
             ].map(([label, value]) => (
               <div key={label} className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">{label}</span>
@@ -879,16 +845,24 @@ export default function AdminSubscriptions(): JSX.Element {
           <div className="rounded-xl border border-dashed p-3.5">
             <div className="flex items-center gap-2 mb-1">
               <Info className="h-4 w-4 text-muted-foreground" />
-              <p className="text-sm font-semibold">حالة الاشتراك بعد الإنشاء</p>
+              <p className="text-sm font-semibold">
+                {createCurrentPlan ? 'ما الذي سيحدث؟' : 'حالة الاشتراك بعد الإنشاء'}
+              </p>
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              الاشتراك هيتسجل بحالة متأخر الدفع ومش هيتحول لـ نشط إلا بعد ما العميل يدفع بنجاح.
+              {!createCurrentPlan
+                ? 'الاشتراك هيتسجل بحالة متأخر الدفع ومش هيتحول لـ نشط إلا بعد ما العميل يدفع بنجاح.'
+                : createSwitchMode === 'now'
+                  ? 'الباقة هتتبدل فوراً، وهيتحسب فرق السعر (Proration) وتتولد فاتورة أو رصيد.'
+                  : 'الباقة الحالية هتفضل شغالة لحد ما تخلص، وبعدين الباقة الأقل هتتفعل تلقائياً. هتتولد فاتورة بحالة «مجدولة» للفترة الجاية، وتقدر تلغيها من إجراء «إلغاء الجدولة».'}
             </p>
           </div>
 
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => setCreateStep('form')}>رجوع</Button>
-            <Button onClick={confirmCreate}>تأكيد إنشاء الاشتراك</Button>
+            <Button onClick={createCurrentPlan ? confirmSwitch : confirmCreate}>
+              {createCurrentPlan ? 'تأكيد التبديل' : 'تأكيد إنشاء الاشتراك'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
