@@ -5,6 +5,7 @@ import {
   Edit2,
   Trash2,
   Mail,
+  Phone,
   Search,
   Shield,
   ShieldCheck,
@@ -369,8 +370,8 @@ export default function AdminTeam(): JSX.Element {
   const [userErrors, setUserErrors] = useState<Record<string, string>>({});
   const [roleErrors, setRoleErrors] = useState<Record<string, string>>({});
   const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
-  const [userForm, setUserForm] = useState<{ name: string; email: string; role: AdminRole; active: boolean }>({
-    name: '', email: '', role: 'admin', active: true,
+  const [userForm, setUserForm] = useState<{ name: string; email: string; phone: string; role: AdminRole; active: boolean }>({
+    name: '', email: '', phone: '', role: 'admin', active: true,
   });
 
   const [roles, setRoles] = useState<RoleConfig[]>(initialRoles);
@@ -394,14 +395,14 @@ export default function AdminTeam(): JSX.Element {
 
   const openAddUser = (): void => {
     setEditingUser(null);
-    setUserForm({ name: '', email: '', role: 'admin', active: true });
+    setUserForm({ name: '', email: '', phone: '', role: 'admin', active: true });
     setUserErrors({});
     setUserModal(true);
   };
 
   const openEditUser = (u: AdminUser): void => {
     setEditingUser(u);
-    setUserForm({ name: u.name, email: u.email, role: u.role, active: u.active });
+    setUserForm({ name: u.name, email: u.email, phone: u.phone ?? '', role: u.role, active: u.active });
     setUserErrors({});
     setUserModal(true);
   };
@@ -413,6 +414,9 @@ export default function AdminTeam(): JSX.Element {
       errs.email = 'البريد الإلكتروني مطلوب';
     } else if (!/^[\w.+-]+@[\w-]+\.[\w.-]+$/.test(userForm.email.trim())) {
       errs.email = 'صيغة البريد الإلكتروني غير صحيحة';
+    }
+    if (userForm.phone.trim() && !/^[\d\s+()-]{6,}$/.test(userForm.phone.trim())) {
+      errs.phone = 'صيغة رقم الهاتف غير صحيحة';
     }
     if (Object.keys(errs).length > 0) {
       setUserErrors(errs);
@@ -1035,6 +1039,24 @@ export default function AdminTeam(): JSX.Element {
                 <Mail className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               </div>
               {userErrors.email && <p className="text-xs text-destructive mt-1">{userErrors.email}</p>}
+            </div>
+            <div className="space-y-2">
+              <Label>
+                رقم الهاتف
+                <span className="text-muted-foreground text-[10px] ms-1">(اختياري)</span>
+              </Label>
+              <div className="relative">
+                <Input
+                  type="tel"
+                  dir="ltr"
+                  value={userForm.phone}
+                  onChange={(e) => setUserForm({ ...userForm, phone: e.target.value })}
+                  className="pe-10 text-start"
+                  placeholder="+968 9xxx xxxx"
+                />
+                <Phone className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              </div>
+              {userErrors.phone && <p className="text-xs text-destructive mt-1">{userErrors.phone}</p>}
             </div>
             <div className="space-y-2">
               <Label>الدور<span className="text-destructive ms-0.5">*</span></Label>

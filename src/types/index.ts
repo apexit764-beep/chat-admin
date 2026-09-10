@@ -329,6 +329,8 @@ export interface AdminUser {
   id: string;
   name: string;
   email: string;
+  /** optional — staff are invited by email, the phone is only a contact detail */
+  phone?: string;
   role: AdminRole;
   active: boolean;
   lastActive: string;
