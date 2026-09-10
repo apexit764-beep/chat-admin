@@ -806,6 +806,7 @@ export default function AdminSubscriptions(): JSX.Element {
       <ClientFormDialog
         open={quickAddClient}
         onOpenChange={setQuickAddClient}
+        onBack={() => setQuickAddClient(false)}
         onSaved={(c) => { setCreateClientId(c.id); setClientQuery(''); }}
       />
 

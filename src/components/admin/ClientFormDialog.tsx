@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Mail, Lock, RefreshCw, Copy, EyeOff, Eye as EyeIcon, MessageSquare } from 'lucide-react';
+import { Mail, Lock, RefreshCw, Copy, EyeOff, Eye as EyeIcon, MessageSquare, ArrowRight } from 'lucide-react';
 import { useAdminStore, TRIAL_DAYS } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
 import { Button } from '@/components/ui/button';
@@ -66,13 +66,15 @@ interface ClientFormDialogProps {
   client?: Client | null;
   /** receives the created or updated client after a successful save */
   onSaved?: (client: Client) => void;
+  /** when the form is opened from another flow, shows a back button that returns to it */
+  onBack?: () => void;
 }
 
 /**
  * Add / edit client form. Shared by the clients page and the create-subscription
  * flow so both use the same fields, validation and side effects.
  */
-export function ClientFormDialog({ open, onOpenChange, client, onSaved }: ClientFormDialogProps): JSX.Element {
+export function ClientFormDialog({ open, onOpenChange, client, onSaved, onBack }: ClientFormDialogProps): JSX.Element {
   const countries = useAdminStore((s) => s.countries);
   const industries = useAdminStore((s) => s.industries);
   const addClient = useAdminStore((s) => s.addClient);
@@ -166,7 +168,22 @@ export function ClientFormDialog({ open, onOpenChange, client, onSaved }: Client
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>{editing ? `تعديل ${editing.companyName}` : 'إضافة عميل جديد'}</DialogTitle>
+          <div className="flex items-center gap-2">
+            {onBack && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 shrink-0 -me-1"
+                onClick={onBack}
+                title="رجوع"
+                aria-label="رجوع"
+              >
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            )}
+            <DialogTitle>{editing ? `تعديل ${editing.companyName}` : 'إضافة عميل جديد'}</DialogTitle>
+          </div>
         </DialogHeader>
         <div className="space-y-4 py-4 max-h-[70vh] overflow-y-auto">
           {/* معلومات الشركة */}
