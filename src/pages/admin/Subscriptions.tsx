@@ -163,7 +163,8 @@ export default function AdminSubscriptions(): JSX.Element {
   const [clientPickerOpen, setClientPickerOpen] = useState(false);
 
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<SubscriptionStatus | 'all'>('all');
+  /** «scheduled» is not a stored status — it selects subscriptions holding a pending plan switch */
+  const [statusFilter, setStatusFilter] = useState<SubscriptionStatus | 'all' | 'scheduled'>('all');
   const [planFilter, setPlanFilter] = useState<string>('all');
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date } | undefined>({
     from: startOfMonth(new Date()),
@@ -259,7 +260,8 @@ export default function AdminSubscriptions(): JSX.Element {
 
   const filtered = useMemo(() => {
     let list = rows;
-    if (statusFilter !== 'all') list = list.filter((r) => r.sub.status === statusFilter);
+    if (statusFilter === 'scheduled') list = list.filter((r) => Boolean(r.sub.scheduledPlanId));
+    else if (statusFilter !== 'all') list = list.filter((r) => r.sub.status === statusFilter);
     if (planFilter !== 'all') list = list.filter((r) => r.sub.planId === planFilter);
     if (search.trim()) {
       const q = search.trim().toLowerCase();
@@ -406,7 +408,7 @@ export default function AdminSubscriptions(): JSX.Element {
                 className="ps-9"
               />
             </div>
-            <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as SubscriptionStatus | 'all')}>
+            <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as SubscriptionStatus | 'all' | 'scheduled')}>
               <SelectTrigger className="w-full sm:w-[160px]">
                 <SelectValue placeholder="كل الحالات" />
               </SelectTrigger>
@@ -416,6 +418,7 @@ export default function AdminSubscriptions(): JSX.Element {
                 <SelectItem value="trial">تجريبي</SelectItem>
                 <SelectItem value="past_due">متأخر الدفع</SelectItem>
                 <SelectItem value="cancelled">ملغى</SelectItem>
+                <SelectItem value="scheduled">مجدولة</SelectItem>
               </SelectContent>
             </Select>
             <Select value={planFilter} onValueChange={setPlanFilter}>
@@ -483,13 +486,25 @@ export default function AdminSubscriptions(): JSX.Element {
                         <span className="text-sm font-medium">{plan?.nameAr ?? '—'}</span>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={statusVariant[sub.status]} className="gap-1">
-                          {sub.status === 'active' && <CheckCircle2 className="h-3 w-3" />}
-                          {sub.status === 'past_due' && <AlertTriangle className="h-3 w-3" />}
-                          {sub.status === 'trial' && <Clock className="h-3 w-3" />}
-                          {sub.status === 'cancelled' && <XCircle className="h-3 w-3" />}
-                          {statusLabel[sub.status]}
-                        </Badge>
+                        <div className="flex flex-wrap items-center gap-1">
+                          <Badge variant={statusVariant[sub.status]} className="gap-1">
+                            {sub.status === 'active' && <CheckCircle2 className="h-3 w-3" />}
+                            {sub.status === 'past_due' && <AlertTriangle className="h-3 w-3" />}
+                            {sub.status === 'trial' && <Clock className="h-3 w-3" />}
+                            {sub.status === 'cancelled' && <XCircle className="h-3 w-3" />}
+                            {statusLabel[sub.status]}
+                          </Badge>
+                          {sub.scheduledPlanId && (
+                            <Badge
+                              variant="warning"
+                              className="gap-1"
+                              title={`تبديل إلى ${planOf(sub.scheduledPlanId)?.nameAr ?? 'باقة أخرى'} عند التجديد`}
+                            >
+                              <CalendarClock className="h-3 w-3" />
+                              مجدولة
+                            </Badge>
+                          )}
+                        </div>
                         {sub.status === 'past_due' && (() => {
                           const daysPastDue = Math.ceil((Date.now() - new Date(sub.currentPeriodEnd).getTime()) / (24 * 60 * 60 * 1000));
                           const graceDays = 7;
