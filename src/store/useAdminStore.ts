@@ -666,7 +666,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     if (mode === 'end_of_period') {
       const scheduledPrice = plan.pricesPerCountry[client.country];
       const scheduledAmount = sub.billingCycle === 'yearly' ? scheduledPrice.yearly : scheduledPrice.monthly;
-      const scheduledTax = Math.round(scheduledAmount * 0.05);
+      const scheduledTax = Math.round(scheduledAmount * 0.05 * 100) / 100;
       /** the next period's invoice, held as «مجدولة» until the switch lands or the schedule is cancelled */
       const scheduledInvoice: Invoice = {
         id: newId('inv'),
@@ -754,7 +754,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     const plan = get().plans.find((p) => p.id === planId);
     if (!client || !plan) throw new Error('client or plan not found');
     const number = `INV-2026-${String(get().invoices.length + 1).padStart(5, '0')}`;
-    const tax = Math.round(amount * 0.05);
+    const tax = Math.round(amount * 0.05 * 100) / 100;
     const total = amount + tax;
     const invoice: Invoice = {
       id: newId('inv'),

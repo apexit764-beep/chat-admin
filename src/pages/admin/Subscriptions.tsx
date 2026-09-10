@@ -111,6 +111,27 @@ function PlanSwitchOptions({ value, onChange }: { value: SwitchMode; onChange: (
   );
 }
 
+/** 5% VAT, kept to two decimals so small amounts don't round away to zero */
+const taxOf = (amount: number): number => Math.round(amount * 0.05 * 100) / 100;
+
+/** one line of the cost breakdown in the confirmation dialog */
+function CostRow({ label, value, tone }: { label: string; value: string; tone?: 'up' | 'down' }): JSX.Element {
+  return (
+    <div className="flex items-start justify-between gap-3 text-sm">
+      <span className="text-muted-foreground">{label}</span>
+      <span
+        className={cn(
+          'font-medium text-end',
+          tone === 'up' && 'text-warning',
+          tone === 'down' && 'text-success'
+        )}
+      >
+        {value}
+      </span>
+    </div>
+  );
+}
+
 type View = 'subscriptions' | 'requests';
 
 const statusLabel: Record<SubscriptionStatus, string> = {
@@ -238,6 +259,43 @@ export default function AdminSubscriptions(): JSX.Element {
 
   /** a downgrade waits for the current period to end; anything else applies at once */
   const createSwitchMode: SwitchMode = switchScenario === 'downgrade' ? 'end_of_period' : 'now';
+
+  /**
+   * Proration for an immediate switch, on the price difference:
+   *   monthly → (new − current) × remaining days ÷ cycle days
+   *   yearly  → (new − current) × remaining months ÷ cycle months
+   */
+  const proration = useMemo(() => {
+    if (!createCurrentSub || createPrice === undefined) return null;
+    const start = new Date(createCurrentSub.currentPeriodStart).getTime();
+    const end = new Date(createCurrentSub.currentPeriodEnd).getTime();
+    const day = 86400000;
+    const cycleDays = Math.max(1, Math.round((end - start) / day));
+    const remainingDays = Math.min(cycleDays, Math.max(0, Math.ceil((end - Date.now()) / day)));
+
+    const yearly = createCycle === 'yearly';
+    const cycleUnits = yearly ? 12 : cycleDays;
+    const remainingUnits = yearly ? Math.min(12, Math.ceil(remainingDays / 30.44)) : remainingDays;
+    const ratio = cycleUnits === 0 ? 0 : remainingUnits / cycleUnits;
+
+    const currentAmount = createCurrentSub.amount;
+    const difference = createPrice - currentAmount;
+    const due = Math.round(difference * ratio * 100) / 100;
+    const tax = Math.round(Math.max(0, due) * 0.05 * 100) / 100;
+
+    return {
+      unitLabel: yearly ? 'شهر' : 'يوم',
+      cycleUnits,
+      remainingUnits,
+      currentAmount,
+      newAmount: createPrice,
+      difference,
+      due,
+      tax,
+      total: Math.round((due + tax) * 100) / 100,
+      periodEnd: createCurrentSub.currentPeriodEnd,
+    };
+  }, [createCurrentSub, createPrice, createCycle]);
 
   const confirmSwitch = (): void => {
     const current = createClientId ? activeSubOf(createClientId) : undefined;
@@ -817,46 +875,143 @@ export default function AdminSubscriptions(): JSX.Element {
             <DialogTitle>{createCurrentPlan ? 'تأكيد تبديل الباقة' : 'تأكيد إنشاء الاشتراك'}</DialogTitle>
           </DialogHeader>
 
-          <div className="rounded-xl border p-4 space-y-2.5">
-            <p className="text-xs text-muted-foreground">ملخص الاشتراك</p>
-            {[
-              ['العميل', createClient?.companyName ?? '—'],
-              ...(createCurrentPlan ? [['الباقة الحالية', createCurrentPlan.nameAr]] : []),
-              [createCurrentPlan ? 'الباقة الجديدة' : 'الباقة', createPlan?.nameAr ?? '—'],
-              ['المدة', createCycle === 'monthly' ? 'شهري' : 'سنوي'],
-              createCurrentPlan
-                ? ['موعد التنفيذ', createSwitchMode === 'now' ? 'فوراً' : 'عند انتهاء الاشتراك الحالي']
-                : ['تاريخ البدء', 'يتحدد عند نجاح الدفع'],
-            ].map(([label, value]) => (
-              <div key={label} className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">{label}</span>
-                <span className="font-medium">{value}</span>
-              </div>
-            ))}
-            <div className="border-t border-dashed pt-2.5 flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">السعر</span>
-              <span className="font-bold">
-                {createPrice !== undefined && createClient
-                  ? `${formatMoney(createPrice, createClient.currency)} / ${createCycle === 'monthly' ? 'شهرياً' : 'سنوياً'}`
-                  : '—'}
-              </span>
+          <div className="space-y-3">
+            {/* تفاصيل الاشتراك */}
+            <div className="rounded-xl border p-4 space-y-2.5">
+              <p className="text-xs font-semibold text-muted-foreground">تفاصيل الاشتراك</p>
+              {[
+                ['العميل', createClient?.companyName ?? '—'],
+                ...(createCurrentPlan ? [['الباقة الحالية', createCurrentPlan.nameAr]] : []),
+                [createCurrentPlan ? 'الباقة الجديدة' : 'الباقة', createPlan?.nameAr ?? '—'],
+                ['المدة', createCycle === 'monthly' ? 'شهري' : 'سنوي'],
+                createCurrentPlan
+                  ? ['موعد التنفيذ', createSwitchMode === 'now' ? 'فوراً' : 'عند انتهاء الاشتراك الحالي']
+                  : ['تاريخ البدء', 'يتحدد عند نجاح الدفع'],
+              ].map(([label, value]) => (
+                <div key={label} className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">{label}</span>
+                  <span className="font-medium">{value}</span>
+                </div>
+              ))}
             </div>
-          </div>
 
-          <div className="rounded-xl border border-dashed p-3.5">
-            <div className="flex items-center gap-2 mb-1">
-              <Info className="h-4 w-4 text-muted-foreground" />
-              <p className="text-sm font-semibold">
-                {createCurrentPlan ? 'ما الذي سيحدث؟' : 'حالة الاشتراك بعد الإنشاء'}
+            {/* ملخص التكلفة */}
+            <div className="rounded-xl border p-4 space-y-2.5">
+              <p className="text-xs font-semibold text-muted-foreground">ملخص التكلفة</p>
+
+              {createCurrentPlan && createClient && proration ? (
+                createSwitchMode === 'now' ? (
+                  <>
+                    <CostRow
+                      label={`سعر الباقة الحالية (${createCurrentPlan.nameAr})`}
+                      value={formatMoney(proration.currentAmount, createClient.currency)}
+                    />
+                    <CostRow
+                      label={`سعر الباقة الجديدة (${createPlan?.nameAr ?? ''})`}
+                      value={formatMoney(proration.newAmount, createClient.currency)}
+                    />
+                    <CostRow
+                      label="فرق السعر"
+                      value={`${proration.difference >= 0 ? '+' : '−'} ${formatMoney(Math.abs(proration.difference), createClient.currency)}`}
+                      tone={proration.difference >= 0 ? 'up' : 'down'}
+                    />
+                    <div className="border-t border-dashed pt-2.5 space-y-2.5">
+                      <CostRow
+                        label="المتبقي من الدورة"
+                        value={`${proration.remainingUnits} من ${proration.cycleUnits} ${proration.unitLabel}`}
+                      />
+                      <CostRow
+                        label="المقاصة (Proration)"
+                        value={`${formatMoney(Math.abs(proration.difference), createClient.currency)} × ${proration.remainingUnits}/${proration.cycleUnits}`}
+                      />
+                      <CostRow
+                        label={proration.due >= 0 ? 'الفرق المستحق' : 'رصيد لصالح العميل'}
+                        value={formatMoney(Math.abs(proration.due), createClient.currency)}
+                      />
+                      {proration.tax > 0 && (
+                        <CostRow label="ضريبة 5%" value={formatMoney(proration.tax, createClient.currency)} />
+                      )}
+                    </div>
+                    <div className="border-t pt-2.5 flex items-center justify-between">
+                      <span className="text-sm font-semibold">
+                        {proration.due >= 0 ? 'الإجمالي المستحق الآن' : 'رصيد يُضاف للعميل'}
+                      </span>
+                      <span className="text-base font-bold">
+                        {formatMoney(Math.abs(proration.total), createClient.currency)}
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <CostRow
+                      label={`سعر الباقة الحالية (${createCurrentPlan.nameAr})`}
+                      value={`${formatMoney(proration.currentAmount, createClient.currency)} — سارية حتى ${formatDate(proration.periodEnd)}`}
+                    />
+                    <CostRow
+                      label={`سعر الباقة الجديدة (${createPlan?.nameAr ?? ''})`}
+                      value={formatMoney(proration.newAmount, createClient.currency)}
+                    />
+                    <CostRow
+                      label="المقاصة (Proration)"
+                      value="لا تنطبق — التبديل عند نهاية الدورة"
+                    />
+                    <div className="border-t border-dashed pt-2.5 space-y-2.5">
+                      <CostRow label="المستحق الآن" value={formatMoney(0, createClient.currency)} />
+                      <CostRow
+                        label="فاتورة الفترة القادمة"
+                        value={formatMoney(proration.newAmount, createClient.currency)}
+                      />
+                      <CostRow
+                        label="ضريبة 5%"
+                        value={formatMoney(taxOf(proration.newAmount), createClient.currency)}
+                      />
+                    </div>
+                    <div className="border-t pt-2.5 flex items-center justify-between">
+                      <span className="text-sm font-semibold">إجمالي الفاتورة المجدولة</span>
+                      <span className="text-base font-bold">
+                        {formatMoney(proration.newAmount + taxOf(proration.newAmount), createClient.currency)}
+                      </span>
+                    </div>
+                  </>
+                )
+              ) : (
+                <>
+                  <CostRow
+                    label={`سعر الباقة (${createCycle === 'monthly' ? 'شهرياً' : 'سنوياً'})`}
+                    value={createPrice !== undefined && createClient ? formatMoney(createPrice, createClient.currency) : '—'}
+                  />
+                  <CostRow
+                    label="ضريبة 5%"
+                    value={createPrice !== undefined && createClient ? formatMoney(taxOf(createPrice), createClient.currency) : '—'}
+                  />
+                  <div className="border-t pt-2.5 flex items-center justify-between">
+                    <span className="text-sm font-semibold">الإجمالي المستحق</span>
+                    <span className="text-base font-bold">
+                      {createPrice !== undefined && createClient
+                        ? formatMoney(createPrice + taxOf(createPrice), createClient.currency)
+                        : '—'}
+                    </span>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* ما الذي سيحدث */}
+            <div className="rounded-xl border border-dashed p-3.5">
+              <div className="flex items-center gap-2 mb-1">
+                <Info className="h-4 w-4 text-muted-foreground" />
+                <p className="text-sm font-semibold">
+                  {createCurrentPlan ? 'ما الذي سيحدث؟' : 'حالة الاشتراك بعد الإنشاء'}
+                </p>
+              </div>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {!createCurrentPlan
+                  ? 'يُسجَّل الاشتراك بحالة متأخر الدفع، ولا يتحوّل إلى نشط إلا بعد أن يُتمّ العميل الدفع بنجاح.'
+                  : createSwitchMode === 'now'
+                    ? 'تُبدَّل الباقة فوراً، ويُحتسب فرق السعر عن المدة المتبقية من الدورة فتُولَّد فاتورة بالفرق أو رصيد لصالح العميل.'
+                    : 'تبقى الباقة الحالية سارية حتى انتهائها، ثم تُفعَّل الباقة الأقل تلقائياً. وتُولَّد فاتورة بحالة «مجدولة» للفترة القادمة، يمكن إلغاؤها من إجراء «إلغاء الجدولة».'}
               </p>
             </div>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              {!createCurrentPlan
-                ? 'يُسجَّل الاشتراك بحالة متأخر الدفع، ولا يتحوّل إلى نشط إلا بعد أن يُتمّ العميل الدفع بنجاح.'
-                : createSwitchMode === 'now'
-                  ? 'تُبدَّل الباقة فوراً، ويُحتسب فرق السعر (Proration) فتُولَّد فاتورة أو رصيد.'
-                  : 'تبقى الباقة الحالية سارية حتى انتهائها، ثم تُفعَّل الباقة الأقل تلقائياً. وتُولَّد فاتورة بحالة «مجدولة» للفترة القادمة، يمكن إلغاؤها من إجراء «إلغاء الجدولة».'}
-            </p>
           </div>
 
           <DialogFooter className="gap-2">
