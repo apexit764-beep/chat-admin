@@ -144,18 +144,25 @@ export default function AdminDashboard(): JSX.Element {
 
   /* ══════════════════════ Alerts ══════════════════════ */
 
-  const expiringTrials = useMemo(() => {
+  /** every client currently on a trial — soonest to expire first */
+  const trialClients = useMemo(() => {
     const now = Date.now();
     return allClients
-      .filter((c) => c.status === 'trial' && c.trialEndsAt)
+      .filter((c) => c.status === 'trial')
       .map((c) => ({
         client: c,
-        daysLeft: Math.ceil((new Date(c.trialEndsAt!).getTime() - now) / 86400000),
+        daysLeft: c.trialEndsAt
+          ? Math.ceil((new Date(c.trialEndsAt).getTime() - now) / 86400000)
+          : null,
       }))
-      .filter((x) => x.daysLeft >= 0 && x.daysLeft <= 7)
-      .sort((a, b) => a.daysLeft - b.daysLeft)
+      .sort((a, b) => (a.daysLeft ?? Infinity) - (b.daysLeft ?? Infinity))
       .slice(0, 5);
   }, [allClients]);
+
+  const trialClientsTotal = useMemo(
+    () => allClients.filter((c) => c.status === 'trial').length,
+    [allClients]
+  );
 
   const pastDueClients = useMemo(() => {
     return allClients
@@ -359,15 +366,15 @@ export default function AdminDashboard(): JSX.Element {
 
       {/* ══════════ Section 3: Alerts side by side ══════════ */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Expiring trials */}
+        {/* Clients on trial */}
         <Card className="min-h-80">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <CardTitle className="text-sm">فترات تجريبية تنتهي قريباً</CardTitle>
-                <Badge variant="default" className="text-[10px]">{expiringTrials.length}</Badge>
+                <CardTitle className="text-sm">عملاء في الفترة التجريبية</CardTitle>
+                <Badge variant="default" className="text-[10px]">{trialClientsTotal}</Badge>
               </div>
-              {expiringTrials.length > 0 && (
+              {trialClientsTotal > 0 && (
                 <Button variant="link" size="sm" asChild>
                   <Link to="/clients?filter=trial" className="text-xs flex items-center gap-1">عرض الكل <ArrowUpRight className="h-3 w-3" /></Link>
                 </Button>
@@ -375,8 +382,8 @@ export default function AdminDashboard(): JSX.Element {
             </div>
           </CardHeader>
           <CardContent className="p-0">
-            {expiringTrials.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-8 text-center">لا توجد فترات تجريبية قاربت على الانتهاء</p>
+            {trialClients.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-8 text-center">لا يوجد عملاء في الفترة التجريبية</p>
             ) : (
               <Table>
                 <TableHeader>
@@ -386,7 +393,7 @@ export default function AdminDashboard(): JSX.Element {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {expiringTrials.map(({ client, daysLeft }) => (
+                  {trialClients.map(({ client, daysLeft }) => (
                     <TableRow key={client.id}>
                       <TableCell className="py-2.5">
                         <Link to={`/clients/${client.id}`} className="flex items-center gap-2 min-w-0 hover:underline">
@@ -397,9 +404,22 @@ export default function AdminDashboard(): JSX.Element {
                         </Link>
                       </TableCell>
                       <TableCell className="py-2.5">
-                        <Badge variant={daysLeft <= 2 ? 'destructive' : daysLeft <= 5 ? 'warning' : 'secondary'} className="text-[10px]">
-                          {daysLeft === 0 ? 'اليوم' : daysLeft === 1 ? 'غداً' : `${daysLeft} أيام`}
-                        </Badge>
+                        {daysLeft === null ? (
+                          <span className="text-xs text-muted-foreground">—</span>
+                        ) : (
+                          <Badge
+                            variant={daysLeft < 0 ? 'destructive' : daysLeft <= 2 ? 'destructive' : daysLeft <= 5 ? 'warning' : 'secondary'}
+                            className="text-[10px]"
+                          >
+                            {daysLeft < 0
+                              ? 'منتهية'
+                              : daysLeft === 0
+                                ? 'اليوم'
+                                : daysLeft === 1
+                                  ? 'غداً'
+                                  : `${daysLeft} أيام`}
+                          </Badge>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))}
