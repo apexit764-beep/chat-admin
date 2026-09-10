@@ -83,16 +83,6 @@ export const defaultPlatforms: Platform[] = [
   { id: 'p14', name: 'WooCommerce', slug: 'woocommerce', category: 'ecommerce', enabled: true, logo: '', countries: ['SA', 'EG'], connectionMethods: [] },
 ];
 
-export const emptyForm: Omit<Platform, 'id'> = {
-  name: '',
-  slug: '',
-  category: 'communication',
-  enabled: true,
-  logo: '',
-  countries: [],
-  connectionMethods: [],
-};
-
 /** Swatch + badge classes for every colour a platform type can use */
 export const PLATFORM_TYPE_COLORS: Array<{
   value: PlatformType['color'];

@@ -62,6 +62,7 @@ interface AdminState {
   /** seeded from the backend — the panel only reads them */
   platformTypes: PlatformType[];
   platforms: Platform[];
+  /** seeded too — the panel only flips `enabled` */
   setPlatforms: (updater: (prev: Platform[]) => Platform[]) => void;
 
   // Plan Request actions
