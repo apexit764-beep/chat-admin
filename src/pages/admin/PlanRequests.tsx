@@ -40,8 +40,11 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import type { PlanRequest, PlanRequestStatus, Plan, Country } from '@/types';
 
@@ -64,6 +67,9 @@ function timeAgo(dateStr: string): string {
   return `منذ ${days} يوم`;
 }
 
+/** statuses that must carry a reason before they are applied */
+const NOTE_REQUIRED: PlanRequestStatus[] = ['rejected', 'cancelled'];
+
 export default function AdminPlanRequests({ embedded }: { embedded?: boolean }): JSX.Element {
   const planRequests = useAdminStore((s) => s.planRequests);
   const plans = useAdminStore((s) => s.plans);
@@ -76,6 +82,10 @@ export default function AdminPlanRequests({ embedded }: { embedded?: boolean }):
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<PlanRequestStatus | 'all'>('all');
   const [viewing, setViewing] = useState<PlanRequest | null>(null);
+  /** a status change waiting on its note */
+  const [statusChange, setStatusChange] = useState<{ request: PlanRequest; status: PlanRequestStatus } | null>(null);
+  const [statusNote, setStatusNote] = useState('');
+  const [statusNoteError, setStatusNoteError] = useState('');
 
   const filtered = useMemo(() => {
     let list = [...planRequests];
@@ -98,8 +108,21 @@ export default function AdminPlanRequests({ embedded }: { embedded?: boolean }):
   const getPlan = (id: string) => plans.find((p) => p.id === id);
   const getCountry = (code: string) => countries.find((c) => c.code === code);
 
-  const handleStatusChange = (id: string, status: PlanRequestStatus) => {
-    updateStatus(id, status);
+  const openStatusChange = (request: PlanRequest, status: PlanRequestStatus) => {
+    setStatusChange({ request, status });
+    setStatusNote('');
+    setStatusNoteError('');
+  };
+
+  const confirmStatusChange = () => {
+    if (!statusChange) return;
+    const { request, status } = statusChange;
+    if (NOTE_REQUIRED.includes(status) && !statusNote.trim()) {
+      setStatusNoteError(status === 'rejected' ? 'سبب الرفض مطلوب' : 'سبب الإلغاء مطلوب');
+      return;
+    }
+    updateStatus(request.id, status, statusNote);
+    setStatusChange(null);
     showToast('تم تحديث الحالة', 'success');
   };
 
@@ -242,7 +265,7 @@ export default function AdminPlanRequests({ embedded }: { embedded?: boolean }):
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="start">
                           {(Object.keys(STATUS_MAP) as PlanRequestStatus[]).map((s) => (
-                            <DropdownMenuItem key={s} onClick={() => handleStatusChange(r.id, s)} disabled={r.status === s}>
+                            <DropdownMenuItem key={s} onClick={() => openStatusChange(r, s)} disabled={r.status === s}>
                               {STATUS_MAP[s].label}
                             </DropdownMenuItem>
                           ))}
@@ -274,6 +297,49 @@ export default function AdminPlanRequests({ embedded }: { embedded?: boolean }):
           </Table>
         </CardContent>
       </Card>
+
+      {/* Status change — reason required for rejected / cancelled */}
+      <Dialog open={!!statusChange} onOpenChange={(o) => !o && setStatusChange(null)}>
+        {statusChange && (
+          <DialogContent className="max-w-md" dir="rtl">
+            <DialogHeader>
+              <DialogTitle>تغيير الحالة إلى «{STATUS_MAP[statusChange.status].label}»</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-3">
+              <p className="text-sm text-muted-foreground">
+                طلب «{statusChange.request.contactName}» — الحالة الحالية {STATUS_MAP[statusChange.request.status].label}.
+              </p>
+              <div className="space-y-2">
+                <Label>
+                  {NOTE_REQUIRED.includes(statusChange.status) ? (
+                    <>السبب<span className="text-destructive ms-0.5">*</span></>
+                  ) : (
+                    <>
+                      ملاحظة
+                      <span className="text-muted-foreground text-[10px] ms-1">(اختياري)</span>
+                    </>
+                  )}
+                </Label>
+                <Textarea
+                  rows={3}
+                  value={statusNote}
+                  onChange={(e) => { setStatusNote(e.target.value); setStatusNoteError(''); }}
+                  placeholder={
+                    NOTE_REQUIRED.includes(statusChange.status)
+                      ? 'اكتب سبب الرفض أو الإلغاء…'
+                      : 'نتيجة التواصل، موعد المتابعة…'
+                  }
+                />
+                {statusNoteError && <p className="text-xs text-destructive">{statusNoteError}</p>}
+              </div>
+            </div>
+            <DialogFooter className="gap-2">
+              <Button variant="outline" onClick={() => setStatusChange(null)}>إلغاء</Button>
+              <Button onClick={confirmStatusChange}>تأكيد</Button>
+            </DialogFooter>
+          </DialogContent>
+        )}
+      </Dialog>
 
       {/* Detail Dialog */}
       <Dialog open={!!viewing} onOpenChange={(o) => !o && setViewing(null)}>
@@ -342,8 +408,30 @@ function RequestDetail({
 
       {r.notes && (
         <div>
-          <p className="text-xs font-medium text-muted-foreground mb-1">ملاحظات</p>
+          <p className="text-xs font-medium text-muted-foreground mb-1">ملاحظة العميل</p>
           <p className="text-sm bg-muted rounded-lg p-3">{r.notes}</p>
+        </div>
+      )}
+
+      {(r.statusHistory?.length ?? 0) > 0 && (
+        <div>
+          <p className="text-xs font-medium text-muted-foreground mb-2">سجل الحالات</p>
+          <ol className="space-y-2.5 border-s ps-4">
+            {[...(r.statusHistory ?? [])].reverse().map((entry, i) => (
+              <li key={i} className="relative">
+                <span className="absolute -start-[21px] top-1.5 h-2 w-2 rounded-full bg-border" />
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className={cn('inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium', STATUS_MAP[entry.status].color)}>
+                    {STATUS_MAP[entry.status].label}
+                  </span>
+                  <span className="text-[11px] text-muted-foreground">
+                    {entry.by} · {timeAgo(entry.at)}
+                  </span>
+                </div>
+                {entry.note && <p className="text-sm mt-1 leading-relaxed">{entry.note}</p>}
+              </li>
+            ))}
+          </ol>
         </div>
       )}
 

@@ -66,7 +66,7 @@ interface AdminState {
   setPlatforms: (updater: (prev: Platform[]) => Platform[]) => void;
 
   // Plan Request actions
-  updatePlanRequestStatus: (id: string, status: PlanRequestStatus) => void;
+  updatePlanRequestStatus: (id: string, status: PlanRequestStatus, note?: string, by?: string) => void;
   deletePlanRequest: (id: string) => void;
 
   // Knowledge Base actions
@@ -206,8 +206,26 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       }),
     })),
 
-  updatePlanRequestStatus: (id, status) =>
-    set((s) => ({ planRequests: s.planRequests.map((r) => (r.id === id ? { ...r, status } : r)) })),
+  updatePlanRequestStatus: (id, status, note, by) =>
+    set((s) => ({
+      planRequests: s.planRequests.map((r) =>
+        r.id === id
+          ? {
+              ...r,
+              status,
+              statusHistory: [
+                ...(r.statusHistory ?? []),
+                {
+                  status,
+                  note: note?.trim() ? note.trim() : undefined,
+                  by: by ?? s.adminUsers[0]?.name ?? 'الأدمن',
+                  at: new Date().toISOString(),
+                },
+              ],
+            }
+          : r
+      ),
+    })),
 
   deletePlanRequest: (id) =>
     set((s) => ({ planRequests: s.planRequests.filter((r) => r.id !== id) })),

@@ -309,6 +309,15 @@ export type PlanRequestStatus = 'new' | 'contacted' | 'converted' | 'rejected' |
 export type OrderVolume = '1-5000' | '5000-20000' | '20000-50000' | '50000-100000' | '100000-200000' | '200000+';
 export type BusinessType = 'fixed' | 'seasonal';
 
+/** one status change on a plan request, with the reason behind it */
+export interface PlanRequestStatusEntry {
+  status: PlanRequestStatus;
+  /** required when rejecting or cancelling, optional otherwise */
+  note?: string;
+  by: string;
+  at: string;
+}
+
 export interface PlanRequest {
   id: string;
   planId: string;
@@ -320,8 +329,11 @@ export interface PlanRequest {
   companyName?: string;
   orderVolume: OrderVolume;
   businessType: BusinessType;
+  /** the note the client wrote when submitting — never overwritten by the admin */
   notes?: string;
   status: PlanRequestStatus;
+  /** every status change since the request arrived, oldest first */
+  statusHistory?: PlanRequestStatusEntry[];
   createdAt: string;
 }
 
