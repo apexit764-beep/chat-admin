@@ -6,6 +6,7 @@ import {
   Trash2,
   Check,
   Star,
+  Lock,
   Users,
   MessageSquare,
   Database,
@@ -278,6 +279,12 @@ export default function AdminPlans(): JSX.Element {
                               <p className={cn('font-bold', style.text)}>{p.nameAr}</p>
                               <p className="text-xs text-muted-foreground line-clamp-1">{p.tagline}</p>
                             </div>
+                            {p.adminOnly && (
+                              <Badge variant="secondary" className="text-[10px] shrink-0 gap-1">
+                                <Lock className="h-3 w-3" />
+                                للأدمن فقط
+                              </Badge>
+                            )}
                             {p.requiresContact && (
                               <Badge variant="outline" className="text-[10px] shrink-0">يتطلب تواصل</Badge>
                             )}

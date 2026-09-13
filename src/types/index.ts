@@ -183,6 +183,8 @@ export interface Plan {
   popular?: boolean;
   isTrial?: boolean;
   requiresContact?: boolean;
+  /** internal plan: shown only in the admin panel, never in the client portal */
+  adminOnly?: boolean;
   active: boolean;
   createdAt: string;
 }

@@ -2,10 +2,6 @@ import { useState, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowRight,
-  MessageCircle,
-  Bot,
-  Zap,
-  Shield,
   Users,
   MessageSquare,
   Database,
@@ -36,60 +32,7 @@ import {
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-
-type FeatureGroup = { label: string; icon: React.ComponentType<{ className?: string }>; items: string[] };
-
-const FEATURE_CATALOG: FeatureGroup[] = [
-  {
-    label: 'قنوات التواصل',
-    icon: MessageCircle,
-    items: [
-      'تكامل واتساب',
-      'تكامل ماسنجر',
-      'تكامل انستقرام',
-      'تكامل تلقرام',
-      'Live Chat Widget',
-      'دعم عبر البريد',
-    ],
-  },
-  {
-    label: 'الذكاء والأتمتة',
-    icon: Bot,
-    items: [
-      'ردود جاهزة',
-      'ردود ذكية بالـ AI',
-      'قوالب رسائل',
-      'الحملات (Outreach)',
-      'التوجيه التلقائي',
-      'ساعات العمل',
-    ],
-  },
-  {
-    label: 'التقارير والتكامل',
-    icon: Zap,
-    items: [
-      'تقارير أساسية',
-      'تقارير متقدمة',
-      'تصدير CSV',
-      'API access',
-      'Webhooks',
-      'تكامل Zapier',
-    ],
-  },
-  {
-    label: 'الدعم والمؤسسات',
-    icon: Shield,
-    items: [
-      'دعم فني قياسي',
-      'دعم فني ٢٤/٧',
-      'SLA مضمون ٩٩.٩٪',
-      'مدير حساب مخصص',
-      'تدريب مجاني للفريق',
-      'Whitelabel',
-      'SSO',
-    ],
-  },
-];
+import { FEATURE_CATALOG } from '@/data/planFeatures';
 
 interface FormState {
   tier: PlanTier;
@@ -103,6 +46,7 @@ interface FormState {
   limitContacts: number;
   pricesPerCountry: Record<string, { monthly: number; yearly: number }>;
   popular: boolean;
+  adminOnly: boolean;
   isTrial: boolean;
   requiresContact: boolean;
   active: boolean;
@@ -142,6 +86,7 @@ export default function PlanForm(): JSX.Element {
         limitContacts: editing.limits.contacts,
         pricesPerCountry: { ...editing.pricesPerCountry },
         popular: editing.popular ?? false,
+        adminOnly: editing.adminOnly ?? false,
         isTrial: editing.isTrial ?? false,
         requiresContact: editing.requiresContact ?? false,
         active: editing.active,
@@ -159,6 +104,7 @@ export default function PlanForm(): JSX.Element {
       limitContacts: 1000,
       pricesPerCountry: defaultPrices,
       popular: false,
+      adminOnly: false,
       isTrial: false,
       requiresContact: false,
       active: true,
@@ -288,6 +234,7 @@ export default function PlanForm(): JSX.Element {
     },
     pricesPerCountry: form.pricesPerCountry,
     popular: form.popular,
+    adminOnly: form.adminOnly,
     isTrial: form.isTrial,
     requiresContact: form.requiresContact,
     active: form.active,
@@ -518,6 +465,13 @@ export default function PlanForm(): JSX.Element {
                     <p className="text-xs text-muted-foreground">تمييز خاص</p>
                   </div>
                   <Switch checked={form.popular} onCheckedChange={(checked) => setForm({ ...form, popular: checked })} />
+                </div>
+                <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
+                  <div>
+                    <p className="text-sm font-medium">للأدمن فقط</p>
+                    <p className="text-xs text-muted-foreground">لا تظهر للعملاء</p>
+                  </div>
+                  <Switch checked={form.adminOnly} onCheckedChange={(checked) => setForm({ ...form, adminOnly: checked })} />
                 </div>
                 <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
                   <div>

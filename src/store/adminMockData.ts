@@ -13,6 +13,7 @@ import type {
   Subscription,
   Transaction,
 } from '@/types';
+import { ALL_FEATURES } from '@/data/planFeatures';
 
 const nowMinus = (min: number): string =>
   new Date(Date.now() - min * 60 * 1000).toISOString();
@@ -168,6 +169,37 @@ export const plans: Plan[] = [
     requiresContact: true,
     active: true,
     createdAt: nowMinus(60 * 24 * 150),
+  },
+  /**
+   * Internal enterprise plans. They exist only for the admin to attach when
+   * creating a subscription by hand, and carry every feature in the catalogue —
+   * prices start at zero and are meant to be set per deal from the plans page.
+   */
+  ...(['1', '2', '3'] as const).map((n, i) => ({
+    id: `plan_enterprise_custom_${n}`,
+    tier: 'enterprise' as const,
+    name: `Enterprise ${n}`,
+    nameAr: `مؤسسات${n}`,
+    tagline: 'باقة مؤسسات مخصصة — تُسند يدوياً من لوحة الأدمن',
+    features: [...ALL_FEATURES],
+    limits: { agents: -1, channels: -1, conversations: -1, contacts: -1 },
+    pricesPerCountry: pricesFromUSD(0),
+    adminOnly: true,
+    active: true,
+    createdAt: nowMinus(60 * 24 * (140 - i)),
+  })),
+  {
+    id: 'plan_subscription_ended',
+    tier: 'enterprise' as const,
+    name: 'Subscription Ended',
+    nameAr: 'انتهاء الاشتراك',
+    tagline: 'تُسند للعميل بعد انتهاء اشتراكه — بلا رسوم',
+    features: [...ALL_FEATURES],
+    limits: { agents: -1, channels: -1, conversations: -1, contacts: -1 },
+    pricesPerCountry: pricesFromUSD(0),
+    adminOnly: true,
+    active: true,
+    createdAt: nowMinus(60 * 24 * 136),
   },
 ];
 
