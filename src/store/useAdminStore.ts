@@ -106,6 +106,11 @@ interface AdminState {
   deleteClient: (id: string) => void;
   suspendClient: (id: string) => void;
   reactivateClient: (id: string) => void;
+  /**
+   * Settles what a backend job would: expires finished trials and completes
+   * cancellations whose date has passed, then re-derives the affected clients.
+   */
+  refreshLifecycle: () => void;
 
   // Plan actions
   addPlan: (p: Omit<Plan, 'id' | 'createdAt'>) => Plan;
@@ -172,6 +177,41 @@ const hydratedArticles: KnowledgeArticle[] = (initialKnowledgeArticles as Array<
   metaTitle: a.metaTitle ?? a.title,
   metaDescription: a.metaDescription ?? a.content.slice(0, 155),
 }));
+
+/**
+ * A client's status and revenue follow their subscription — this derives both
+ * so every action that touches a subscription leaves the client consistent.
+ * A suspended client keeps that status: suspension is an admin override.
+ */
+function deriveClient(client: Client, sub: Subscription | undefined): Client {
+  if (client.status === 'suspended') return { ...client, mrr: 0 };
+
+  if (!sub || sub.status === 'cancelled') {
+    const hadSubscription = Boolean(sub);
+    return {
+      ...client,
+      status: hadSubscription
+        ? 'cancelled'
+        : client.trialEndsAt && Date.parse(client.trialEndsAt) < Date.now()
+          ? 'trial_ended'
+          : client.status === 'trial'
+            ? 'trial'
+            : 'new',
+      mrr: 0,
+    };
+  }
+
+  if (sub.status === 'active') {
+    return {
+      ...client,
+      status: 'active',
+      mrr: sub.billingCycle === 'monthly' ? sub.amount : sub.amount / 12,
+    };
+  }
+
+  // trial or past_due — live, but earning nothing yet
+  return { ...client, status: sub.status, mrr: 0 };
+}
 
 export const useAdminStore = create<AdminState>((set, get) => ({
   countries: initialCountries,
@@ -524,10 +564,38 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     })),
 
   suspendClient: (id) =>
-    set((s) => ({ clients: s.clients.map((c) => (c.id === id ? { ...c, status: 'suspended' } : c)) })),
+    // the subscription is left intact so reactivation can restore it
+    set((s) => ({
+      clients: s.clients.map((c) => (c.id === id ? { ...c, status: 'suspended', mrr: 0 } : c)),
+    })),
 
   reactivateClient: (id) =>
-    set((s) => ({ clients: s.clients.map((c) => (c.id === id ? { ...c, status: 'active' } : c)) })),
+    set((s) => ({
+      clients: s.clients.map((c) =>
+        c.id === id
+          ? deriveClient({ ...c, status: 'new' }, s.subscriptions.find((x) => x.id === c.subscriptionId))
+          : c
+      ),
+    })),
+
+  refreshLifecycle: () =>
+    set((s) => {
+      const now = Date.now();
+      // a cancellation scheduled for the end of the period lands once that date passes
+      const subscriptions = s.subscriptions.map((sub) =>
+        sub.status !== 'cancelled' && sub.cancelAt && Date.parse(sub.cancelAt) <= now
+          ? { ...sub, status: 'cancelled' as const }
+          : sub
+      );
+      const clients = s.clients.map((c) => {
+        const expiredTrial =
+          c.status === 'trial' && c.trialEndsAt && Date.parse(c.trialEndsAt) < now;
+        const base = expiredTrial ? { ...c, status: 'trial_ended' as const, mrr: 0 } : c;
+        const sub = subscriptions.find((x) => x.id === base.subscriptionId);
+        return sub ? deriveClient(base, sub) : base;
+      });
+      return { subscriptions, clients };
+    }),
 
   addPlan: (p) => {
     const plan: Plan = { ...p, id: newId('plan'), createdAt: new Date().toISOString() };
@@ -747,25 +815,40 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     })),
 
   cancelSubscription: (id, mode) =>
-    set((s) => ({
-      subscriptions: s.subscriptions.map((sub) => {
+    set((s) => {
+      const subscriptions = s.subscriptions.map((sub) => {
         if (sub.id !== id) return sub;
         if (mode === 'now') {
           return { ...sub, status: 'cancelled' as const, cancelAt: new Date().toISOString() };
         }
+        // scheduled cancellation — the subscription runs to the end of the period
         return { ...sub, cancelAt: sub.currentPeriodEnd };
-      }),
-    })),
+      });
+      const cancelled = subscriptions.find((sub) => sub.id === id);
+      return {
+        subscriptions,
+        clients: s.clients.map((c) =>
+          cancelled && c.id === cancelled.clientId ? deriveClient(c, cancelled) : c
+        ),
+      };
+    }),
 
   extendSubscription: (id, days) =>
-    set((s) => ({
-      subscriptions: s.subscriptions.map((sub) => {
+    set((s) => {
+      const subscriptions = s.subscriptions.map((sub) => {
         if (sub.id !== id) return sub;
         const end = new Date(sub.currentPeriodEnd);
         const newEnd = new Date(end.getTime() + days * 24 * 60 * 60 * 1000);
         return { ...sub, currentPeriodEnd: newEnd.toISOString(), status: 'active' as const };
-      }),
-    })),
+      });
+      const extended = subscriptions.find((sub) => sub.id === id);
+      return {
+        subscriptions,
+        clients: s.clients.map((c) =>
+          extended && c.id === extended.clientId ? deriveClient(c, extended) : c
+        ),
+      };
+    }),
 
   recordPayment: (clientId, planId, amount, currency, last4) => {
     const client = get().clients.find((c) => c.id === clientId);

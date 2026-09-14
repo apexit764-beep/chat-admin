@@ -198,7 +198,17 @@ export interface Industry {
   active: boolean;
 }
 
-export type ClientStatus = 'inactive' | 'trial' | 'active' | 'past_due' | 'suspended' | 'cancelled';
+export type ClientStatus =
+  /** registered, never started a trial or a subscription */
+  | 'new'
+  /** inside the free trial */
+  | 'trial'
+  /** the trial ran out without converting */
+  | 'trial_ended'
+  | 'active'
+  | 'past_due'
+  | 'suspended'
+  | 'cancelled';
 
 export interface Client {
   id: string;

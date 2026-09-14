@@ -150,7 +150,7 @@ export function ClientFormDialog({ open, onOpenChange, client, onSaved, onBack }
       const created = addClient({
         companyName: form.companyName, contactName: form.contactName, email: form.email,
         phone: fullPhone, country: form.country, industry: form.industry,
-        status: form.startWithTrial ? 'trial' : 'inactive',
+        status: form.startWithTrial ? 'trial' : 'new',
         planId: null, currency: country.currency,
         username: form.email, password: form.password,
         ...(form.startWithTrial
@@ -336,7 +336,7 @@ export function ClientFormDialog({ open, onOpenChange, client, onSaved, onBack }
                       <p className="text-xs text-muted-foreground mt-0.5">
                         {form.startWithTrial
                           ? `يبدأ العميل بفترة تجريبية ${TRIAL_DAYS} يوماً — وهي متاحة مرة واحدة فقط له`
-                          : 'يُسجَّل العميل بحالة غير مفعّل، وتبقى تجربته متاحة لاستخدامها لاحقاً'}
+                          : 'يُسجَّل العميل بحالة جديد، وتبقى تجربته متاحة لاستخدامها لاحقاً'}
                       </p>
                     </div>
                     <Switch

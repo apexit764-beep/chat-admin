@@ -7,6 +7,8 @@ import {
   Edit2,
   Trash2,
   PauseCircle,
+  XCircle,
+  Sparkles,
   PlayCircle,
   Phone,
   Globe,
@@ -53,8 +55,9 @@ import type { Client, ClientStatus } from '@/types';
 
 
 const statusLabel: Record<ClientStatus, string> = {
-  inactive: 'غير مفعّل',
+  new: 'جديد',
   trial: 'فترة تجريبية',
+  trial_ended: 'انتهت التجربة',
   active: 'نشط',
   past_due: 'متأخر',
   suspended: 'موقوف',
@@ -62,8 +65,9 @@ const statusLabel: Record<ClientStatus, string> = {
 };
 
 const statusBadgeClass: Record<ClientStatus, string> = {
-  inactive: 'bg-muted text-muted-foreground border-transparent',
+  new: 'bg-muted text-muted-foreground border-transparent',
   trial: 'bg-info/15 text-info border-transparent',
+  trial_ended: 'bg-warning/15 text-warning border-transparent',
   active: 'bg-success/15 text-success border-transparent',
   past_due: 'bg-warning/15 text-warning border-transparent',
   suspended: 'bg-danger/15 text-danger border-transparent',
@@ -120,12 +124,16 @@ export default function AdminClients(): JSX.Element {
     });
   }, [clients, statusFilter, countryFilter, planFilter]);
 
-  const stats = useMemo(() => ({
-    total: clients.length,
-    active: clients.filter((c) => c.status === 'active').length,
-    trial: clients.filter((c) => c.status === 'trial').length,
-    pastDue: clients.filter((c) => c.status === 'past_due').length,
-  }), [clients]);
+  /** one tile per status so every client is accounted for, plus the total */
+  const statusTiles = useMemo(() => ([
+    { status: 'active' as const, label: 'نشطون', icon: <PlayCircle className="h-5 w-5" />, bg: 'bg-success/15', color: 'text-success' },
+    { status: 'trial' as const, label: 'فترة تجريبية', icon: <Clock className="h-5 w-5" />, bg: 'bg-info/15', color: 'text-info' },
+    { status: 'trial_ended' as const, label: 'انتهت التجربة', icon: <Clock className="h-5 w-5" />, bg: 'bg-warning/15', color: 'text-warning' },
+    { status: 'past_due' as const, label: 'متأخر دفع', icon: <AlertCircle className="h-5 w-5" />, bg: 'bg-warning/15', color: 'text-warning' },
+    { status: 'new' as const, label: 'جديد', icon: <Sparkles className="h-5 w-5" />, bg: 'bg-muted', color: 'text-muted-foreground' },
+    { status: 'suspended' as const, label: 'موقوف', icon: <PauseCircle className="h-5 w-5" />, bg: 'bg-danger/15', color: 'text-danger' },
+    { status: 'cancelled' as const, label: 'ملغي', icon: <XCircle className="h-5 w-5" />, bg: 'bg-muted', color: 'text-muted-foreground' },
+  ].map((t) => ({ ...t, value: clients.filter((c) => c.status === t.status).length }))), [clients]);
 
   const activeFilterCount =
     (statusFilter !== 'all' ? 1 : 0) +
@@ -344,10 +352,23 @@ export default function AdminClients(): JSX.Element {
         </Button>
       </div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="إجمالي العملاء" value={stats.total} icon={<Globe className="h-5 w-5" />} iconBg="bg-primary/15" iconColor="text-primary" />
-        <StatCard label="نشطون" value={stats.active} icon={<PlayCircle className="h-5 w-5" />} iconBg="bg-success/15" iconColor="text-success" />
-        <StatCard label="فترة تجريبية" value={stats.trial} icon={<Clock className="h-5 w-5" />} iconBg="bg-info/15" iconColor="text-info" />
-        <StatCard label="متأخر دفع" value={stats.pastDue} icon={<AlertCircle className="h-5 w-5" />} iconBg="bg-warning/15" iconColor="text-warning" />
+        <button
+          type="button"
+          onClick={() => setStatusFilter('all')}
+          className={cn('text-start rounded-xl transition-shadow', statusFilter === 'all' && 'ring-2 ring-primary')}
+        >
+          <StatCard label="إجمالي العملاء" value={clients.length} icon={<Globe className="h-5 w-5" />} iconBg="bg-primary/15" iconColor="text-primary" />
+        </button>
+        {statusTiles.map((t) => (
+          <button
+            key={t.status}
+            type="button"
+            onClick={() => setStatusFilter(statusFilter === t.status ? 'all' : t.status)}
+            className={cn('text-start rounded-xl transition-shadow', statusFilter === t.status && 'ring-2 ring-primary')}
+          >
+            <StatCard label={t.label} value={t.value} icon={t.icon} iconBg={t.bg} iconColor={t.color} />
+          </button>
+        ))}
       </div>
 
       <DataTable
@@ -413,8 +434,9 @@ export default function AdminClients(): JSX.Element {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">كل الحالات</SelectItem>
-                <SelectItem value="inactive">غير مفعّل</SelectItem>
+                <SelectItem value="new">جديد</SelectItem>
                 <SelectItem value="trial">تجريبي</SelectItem>
+                <SelectItem value="trial_ended">انتهت التجربة</SelectItem>
                 <SelectItem value="active">نشط</SelectItem>
                 <SelectItem value="past_due">متأخر</SelectItem>
                 <SelectItem value="suspended">موقوف</SelectItem>
