@@ -104,6 +104,8 @@ interface AdminState {
   addClient: (c: Omit<Client, 'id' | 'joinedAt' | 'lastActiveAt' | 'subscriptionId' | 'mrr' | 'agentCount' | 'channelCount' | 'conversationCount'>) => Client;
   updateClient: (id: string, patch: Partial<Client>) => void;
   deleteClient: (id: string) => void;
+  /** grants the one-time free trial to a client who has not used it yet */
+  startTrial: (id: string) => void;
   suspendClient: (id: string) => void;
   reactivateClient: (id: string) => void;
   /**
@@ -561,6 +563,21 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       subscriptions: s.subscriptions.filter((sub) => sub.clientId !== id),
       invoices: s.invoices.filter((inv) => inv.clientId !== id),
       transactions: s.transactions.filter((t) => t.clientId !== id),
+    })),
+
+  startTrial: (id) =>
+    set((s) => ({
+      clients: s.clients.map((c) =>
+        // the trial is once per client, and only before any subscription
+        c.id === id && !c.trialEndsAt && !c.subscriptionId
+          ? {
+              ...c,
+              status: 'trial' as const,
+              trialEndsAt: new Date(Date.now() + TRIAL_DAYS * 86400000).toISOString(),
+              mrr: 0,
+            }
+          : c
+      ),
     })),
 
   suspendClient: (id) =>

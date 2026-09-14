@@ -34,7 +34,7 @@ import {
   Send,
   Upload,
 } from 'lucide-react';
-import { useAdminStore } from '@/store/useAdminStore';
+import { useAdminStore, TRIAL_DAYS } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
 import { formatMoney, formatUSD } from '@/utils/money';
 import { formatDate, timeAgo, initials, avatarColor } from '@/utils/format';
@@ -151,6 +151,7 @@ export default function ClientDetail(): JSX.Element {
   const activityLog = useAdminStore((s) => s.activityLog);
   const suspendClient = useAdminStore((s) => s.suspendClient);
   const reactivateClient = useAdminStore((s) => s.reactivateClient);
+  const startTrial = useAdminStore((s) => s.startTrial);
   const deleteClient = useAdminStore((s) => s.deleteClient);
   const cancelSubscription = useAdminStore((s) => s.cancelSubscription);
 
@@ -182,6 +183,21 @@ export default function ClientDetail(): JSX.Element {
       </div>
     );
   }
+
+  /** the free trial is once per client, and only before they take a subscription */
+  const canStartTrial = !client.trialEndsAt && !client.subscriptionId;
+
+  const handleStartTrial = async () => {
+    const ok = await confirm({
+      title: `بدء الفترة التجريبية لـ ${client.companyName}؟`,
+      message: `يحصل العميل على ${TRIAL_DAYS} يوماً مجاناً — وهي متاحة مرة واحدة فقط له.`,
+      confirmText: 'بدء التجربة',
+    });
+    if (ok) {
+      startTrial(client.id);
+      showToast('تم بدء الفترة التجريبية', 'success');
+    }
+  };
 
   const handleSuspend = async () => {
     const ok = await confirm({
@@ -341,6 +357,11 @@ export default function ClientDetail(): JSX.Element {
                 <DropdownMenuItem onClick={() => navigate(`/clients`, { state: { editClientId: client.id } })}>
                   <Edit2 className="h-4 w-4 me-2" /> تعديل البيانات
                 </DropdownMenuItem>
+                {canStartTrial && (
+                  <DropdownMenuItem onClick={handleStartTrial}>
+                    <Clock className="h-4 w-4 me-2" /> بدء الفترة التجريبية
+                  </DropdownMenuItem>
+                )}
                 {client.status === 'suspended' ? (
                   <DropdownMenuItem onClick={handleReactivate}>
                     <PlayCircle className="h-4 w-4 me-2" /> إعادة تفعيل
