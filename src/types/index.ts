@@ -178,7 +178,6 @@ export interface Plan {
     /** accounts allowed on each channel; absent falls back to the overall channel limit */
     accountsPerChannel?: number;
     conversations: number;
-    contacts: number;
   };
   /** keyed by country code; price in local currency (monthly) */
   pricesPerCountry: Record<string, { monthly: number; yearly: number }>;

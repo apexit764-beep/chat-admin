@@ -10,7 +10,6 @@ import {
   Users,
   MessageSquare,
   Database,
-  ContactRound,
   Infinity as InfinityIcon,
   Globe2,
   Copy,
@@ -303,7 +302,6 @@ export default function AdminPlans(): JSX.Element {
                               detail={[`حسابات لكل قناة: ${(p.limits.accountsPerChannel ?? p.limits.channels) === -1 ? 'غير محدود' : (p.limits.accountsPerChannel ?? p.limits.channels)}`]}
                             />
                             <LimitPill icon={<Database className="h-3 w-3" />} value={p.limits.conversations === -1 ? '∞' : (p.limits.conversations / 1000) + 'K'} label="المحادثات" />
-                            <LimitPill icon={<ContactRound className="h-3 w-3" />} value={p.limits.contacts === -1 ? '∞' : (p.limits.contacts / 1000) + 'K'} label="جهات الاتصال" />
                           </div>
                         </TableCell>
                         <TableCell className="text-center">

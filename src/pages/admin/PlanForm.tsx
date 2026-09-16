@@ -45,7 +45,6 @@ interface FormState {
   limitChannels: number;
   limitAccountsPerChannel: number;
   limitConversations: number;
-  limitContacts: number;
   pricesPerCountry: Record<string, { monthly: number; yearly: number }>;
   popular: boolean;
   adminOnly: boolean;
@@ -86,7 +85,6 @@ export default function PlanForm(): JSX.Element {
         limitChannels: editing.limits.channels,
         limitAccountsPerChannel: editing.limits.accountsPerChannel ?? editing.limits.channels,
         limitConversations: editing.limits.conversations,
-        limitContacts: editing.limits.contacts,
         pricesPerCountry: { ...editing.pricesPerCountry },
         popular: editing.popular ?? false,
         adminOnly: editing.adminOnly ?? false,
@@ -105,7 +103,6 @@ export default function PlanForm(): JSX.Element {
       limitChannels: 2,
       limitAccountsPerChannel: 1,
       limitConversations: 5000,
-      limitContacts: 1000,
       pricesPerCountry: defaultPrices,
       popular: false,
       adminOnly: false,
@@ -197,13 +194,12 @@ export default function PlanForm(): JSX.Element {
     else if (anyDown) impact.priceDirection = 'down';
 
     const limitLabels: Record<string, string> = {
-      agents: 'الموظفين', channels: 'القنوات', conversations: 'المحادثات', contacts: 'جهات الاتصال',
+      agents: 'الموظفين', channels: 'القنوات', conversations: 'المحادثات',
     };
     const limitMap: Record<string, [number, number]> = {
       agents: [editing.limits.agents, form.limitAgents],
       channels: [editing.limits.channels, form.limitChannels],
       conversations: [editing.limits.conversations, form.limitConversations],
-      contacts: [editing.limits.contacts, form.limitContacts],
     };
     for (const [key, [oldVal, newVal]] of Object.entries(limitMap)) {
       if (newVal < oldVal && newVal !== -1) {
@@ -242,7 +238,6 @@ export default function PlanForm(): JSX.Element {
       channels: form.limitChannels,
       accountsPerChannel: form.limitAccountsPerChannel,
       conversations: form.limitConversations,
-      contacts: form.limitContacts,
     },
     pricesPerCountry: form.pricesPerCountry,
     popular: form.popular,
@@ -289,7 +284,7 @@ export default function PlanForm(): JSX.Element {
     if (!form.name.trim()) {
       newErrors.name = 'الاسم بالإنجليزية مطلوب';
     }
-    if (form.limitAgents === 0 || form.limitChannels === 0 || form.limitConversations === 0 || form.limitContacts === 0) {
+    if (form.limitAgents === 0 || form.limitChannels === 0 || form.limitConversations === 0) {
       newErrors.limits = 'يجب تحديد جميع الحدود (استخدم -1 لغير محدود)';
     }
     if (form.features.length === 0) {
@@ -377,11 +372,6 @@ export default function PlanForm(): JSX.Element {
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <Label className="flex items-center gap-1.5"><Users className="h-3.5 w-3.5 text-muted-foreground" /> حد الموظفين<span className="text-destructive ms-0.5">*</span></Label>
-                  <Input type="number" min={-1} value={form.limitAgents} onChange={(e) => { setForm({ ...form, limitAgents: Number(e.target.value) || 0 }); if (errors.limits) setErrors((prev) => { const { limits, ...rest } = prev; return rest; }); }} />
-                  <p className="text-[11px] text-muted-foreground">-1 = غير محدود</p>
-                </div>
-                <div className="space-y-2">
                   <Label className="flex items-center gap-1.5"><MessageSquare className="h-3.5 w-3.5 text-muted-foreground" /> حد القنوات<span className="text-destructive ms-0.5">*</span></Label>
                   <Input type="number" min={-1} value={form.limitChannels} onChange={(e) => { setForm({ ...form, limitChannels: Number(e.target.value) || 0 }); if (errors.limits) setErrors((prev) => { const { limits, ...rest } = prev; return rest; }); }} />
                   <p className="text-[11px] text-muted-foreground">-1 = غير محدود</p>
@@ -397,12 +387,11 @@ export default function PlanForm(): JSX.Element {
                   <p className="text-[11px] text-muted-foreground">-1 = غير محدود</p>
                 </div>
                 <div className="space-y-2">
-                  <Label className="flex items-center gap-1.5"><InfinityIcon className="h-3.5 w-3.5 text-muted-foreground" /> جهات اتصال<span className="text-destructive ms-0.5">*</span></Label>
-                  <Input type="number" min={-1} value={form.limitContacts} onChange={(e) => { setForm({ ...form, limitContacts: Number(e.target.value) || 0 }); if (errors.limits) setErrors((prev) => { const { limits, ...rest } = prev; return rest; }); }} />
+                  <Label className="flex items-center gap-1.5"><Users className="h-3.5 w-3.5 text-muted-foreground" /> حد الموظفين<span className="text-destructive ms-0.5">*</span></Label>
+                  <Input type="number" min={-1} value={form.limitAgents} onChange={(e) => { setForm({ ...form, limitAgents: Number(e.target.value) || 0 }); if (errors.limits) setErrors((prev) => { const { limits, ...rest } = prev; return rest; }); }} />
                   <p className="text-[11px] text-muted-foreground">-1 = غير محدود</p>
                 </div>
               </div>
-
             </CardContent>
           </Card>
 
