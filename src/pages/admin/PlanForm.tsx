@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
-import type { PlanTier } from '@/types';
+import type { PlanTier, ChannelType } from '@/types';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
@@ -32,7 +32,7 @@ import {
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { FEATURE_CATALOG } from '@/data/planFeatures';
+import { FEATURE_CATALOG, PLAN_CHANNELS } from '@/data/planFeatures';
 
 interface FormState {
   tier: PlanTier;
@@ -42,6 +42,8 @@ interface FormState {
   features: string[];
   limitAgents: number;
   limitChannels: number;
+  /** per-channel account caps; an absent channel inherits the overall limit */
+  perChannel: Partial<Record<ChannelType, number>>;
   limitConversations: number;
   limitContacts: number;
   pricesPerCountry: Record<string, { monthly: number; yearly: number }>;
@@ -82,6 +84,7 @@ export default function PlanForm(): JSX.Element {
         features: [...editing.features],
         limitAgents: editing.limits.agents,
         limitChannels: editing.limits.channels,
+        perChannel: { ...(editing.limits.perChannel ?? {}) },
         limitConversations: editing.limits.conversations,
         limitContacts: editing.limits.contacts,
         pricesPerCountry: { ...editing.pricesPerCountry },
@@ -100,6 +103,7 @@ export default function PlanForm(): JSX.Element {
       features: [],
       limitAgents: 5,
       limitChannels: 2,
+      perChannel: {},
       limitConversations: 5000,
       limitContacts: 1000,
       pricesPerCountry: defaultPrices,
@@ -208,6 +212,16 @@ export default function PlanForm(): JSX.Element {
       }
     }
 
+    // a tightened per-channel cap is a downgrade too
+    for (const ch of PLAN_CHANNELS) {
+      const oldVal = editing.limits.perChannel?.[ch.key] ?? editing.limits.channels;
+      const newVal = form.perChannel[ch.key] ?? form.limitChannels;
+      if (newVal < oldVal && newVal !== -1) {
+        impact.limitsDecreased = true;
+        impact.decreasedLimits.push(`حسابات ${ch.label}`);
+      }
+    }
+
     const oldFeatures = new Set(editing.features);
     const newFeatures = new Set(form.features);
     impact.featuresRemoved = editing.features.filter((f) => !newFeatures.has(f));
@@ -229,6 +243,7 @@ export default function PlanForm(): JSX.Element {
     limits: {
       agents: form.limitAgents,
       channels: form.limitChannels,
+      perChannel: form.perChannel,
       conversations: form.limitConversations,
       contacts: form.limitContacts,
     },
@@ -384,6 +399,36 @@ export default function PlanForm(): JSX.Element {
                   <Input type="number" min={-1} value={form.limitContacts} onChange={(e) => { setForm({ ...form, limitContacts: Number(e.target.value) || 0 }); if (errors.limits) setErrors((prev) => { const { limits, ...rest } = prev; return rest; }); }} />
                   <p className="text-[11px] text-muted-foreground">-1 = غير محدود</p>
                 </div>
+              </div>
+
+              <div className="mt-5 pt-4 border-t">
+                <div className="flex items-baseline justify-between mb-1">
+                  <p className="text-sm font-semibold">حد الحسابات لكل قناة</p>
+                  <span className="text-[11px] text-muted-foreground">اتركه فارغاً ليتبع حد القنوات العام</span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-3">
+                  {PLAN_CHANNELS.map((ch) => (
+                    <div key={ch.key} className="space-y-1.5">
+                      <Label className="text-xs">{ch.label}</Label>
+                      <Input
+                        type="number"
+                        min={-1}
+                        placeholder="—"
+                        value={form.perChannel[ch.key] ?? ''}
+                        onChange={(e) => {
+                          const raw = e.target.value;
+                          setForm((prev) => {
+                            const next = { ...prev.perChannel };
+                            if (raw === '') delete next[ch.key];
+                            else next[ch.key] = Number(raw);
+                            return { ...prev, perChannel: next };
+                          });
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+                <p className="text-[11px] text-muted-foreground mt-2">-1 = غير محدود · 0 = القناة غير متاحة في هذه الباقة</p>
               </div>
             </CardContent>
           </Card>

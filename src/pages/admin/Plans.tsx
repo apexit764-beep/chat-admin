@@ -25,6 +25,7 @@ import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
 import { formatMoney } from '@/utils/money';
 import { cn } from '@/lib/utils';
+import { PLAN_CHANNELS } from '@/data/planFeatures';
 import type { Plan, PlanTier } from '@/types';
 
 import { Button } from '@/components/ui/button';
@@ -296,7 +297,15 @@ export default function AdminPlans(): JSX.Element {
                         <TableCell className="text-center">
                           <div className="inline-flex flex-wrap items-center gap-1.5 text-xs justify-center">
                             <LimitPill icon={<Users className="h-3 w-3" />} value={p.limits.agents === -1 ? '∞' : p.limits.agents} label="الموظفين" />
-                            <LimitPill icon={<MessageSquare className="h-3 w-3" />} value={p.limits.channels === -1 ? '∞' : p.limits.channels} label="القنوات" />
+                            <LimitPill
+                              icon={<MessageSquare className="h-3 w-3" />}
+                              value={p.limits.channels === -1 ? '∞' : p.limits.channels}
+                              label="القنوات"
+                              detail={PLAN_CHANNELS.map((ch) => {
+                                const v = p.limits.perChannel?.[ch.key] ?? p.limits.channels;
+                                return `${ch.label}: ${v === -1 ? 'غير محدود' : v === 0 ? 'غير متاحة' : v}`;
+                              })}
+                            />
                             <LimitPill icon={<Database className="h-3 w-3" />} value={p.limits.conversations === -1 ? '∞' : (p.limits.conversations / 1000) + 'K'} label="المحادثات" />
                             <LimitPill icon={<ContactRound className="h-3 w-3" />} value={p.limits.contacts === -1 ? '∞' : (p.limits.contacts / 1000) + 'K'} label="جهات الاتصال" />
                           </div>
@@ -596,7 +605,7 @@ export default function AdminPlans(): JSX.Element {
   );
 }
 
-function LimitPill({ icon, value, label }: { icon: React.ReactNode; value: string | number; label?: string }): JSX.Element {
+function LimitPill({ icon, value, label, detail }: { icon: React.ReactNode; value: string | number; label?: string; detail?: string[] }): JSX.Element {
   const isInfinite = value === '∞';
   const pill = (
     <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-muted text-xs">
@@ -608,7 +617,14 @@ function LimitPill({ icon, value, label }: { icon: React.ReactNode; value: strin
   return (
     <Tooltip>
       <TooltipTrigger asChild>{pill}</TooltipTrigger>
-      <TooltipContent>{label}</TooltipContent>
+      <TooltipContent>
+        <p>{label}</p>
+        {detail && detail.length > 0 && (
+          <ul className="mt-1 space-y-0.5 text-[11px] opacity-80">
+            {detail.map((line) => <li key={line}>{line}</li>)}
+          </ul>
+        )}
+      </TooltipContent>
     </Tooltip>
   );
 }
