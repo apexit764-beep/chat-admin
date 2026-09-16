@@ -25,7 +25,6 @@ import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
 import { formatMoney } from '@/utils/money';
 import { cn } from '@/lib/utils';
-import { PLAN_CHANNELS } from '@/data/planFeatures';
 import type { Plan, PlanTier } from '@/types';
 
 import { Button } from '@/components/ui/button';
@@ -301,10 +300,7 @@ export default function AdminPlans(): JSX.Element {
                               icon={<MessageSquare className="h-3 w-3" />}
                               value={p.limits.channels === -1 ? '∞' : p.limits.channels}
                               label="القنوات"
-                              detail={PLAN_CHANNELS.map((ch) => {
-                                const v = p.limits.perChannel?.[ch.key] ?? p.limits.channels;
-                                return `${ch.label}: ${v === -1 ? 'غير محدود' : v === 0 ? 'غير متاحة' : v}`;
-                              })}
+                              detail={[`حسابات لكل قناة: ${(p.limits.accountsPerChannel ?? p.limits.channels) === -1 ? 'غير محدود' : (p.limits.accountsPerChannel ?? p.limits.channels)}`]}
                             />
                             <LimitPill icon={<Database className="h-3 w-3" />} value={p.limits.conversations === -1 ? '∞' : (p.limits.conversations / 1000) + 'K'} label="المحادثات" />
                             <LimitPill icon={<ContactRound className="h-3 w-3" />} value={p.limits.contacts === -1 ? '∞' : (p.limits.contacts / 1000) + 'K'} label="جهات الاتصال" />

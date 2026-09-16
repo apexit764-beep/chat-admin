@@ -175,8 +175,8 @@ export interface Plan {
   limits: {
     agents: number; // -1 = unlimited
     channels: number;
-    /** accounts allowed per channel; a missing channel falls back to the overall limit */
-    perChannel?: Partial<Record<ChannelType, number>>;
+    /** accounts allowed on each channel; absent falls back to the overall channel limit */
+    accountsPerChannel?: number;
     conversations: number;
     contacts: number;
   };
