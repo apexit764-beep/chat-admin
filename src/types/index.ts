@@ -266,8 +266,11 @@ export interface Subscription {
   };
 }
 
-/** `scheduled` marks the invoice of a subscription waiting on a scheduled downgrade */
-export type InvoiceStatus = 'paid' | 'failed' | 'scheduled';
+/**
+ * `scheduled` — held for a subscription waiting on a scheduled downgrade
+ * `unpaid`    — issued and still awaiting payment (a renewal, typically)
+ */
+export type InvoiceStatus = 'paid' | 'unpaid' | 'failed' | 'scheduled';
 export type InvoiceType = 'subscription' | 'renewal' | 'upgrade';
 
 export interface Invoice {

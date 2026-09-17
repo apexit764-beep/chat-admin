@@ -661,7 +661,15 @@ export default function AdminSettings(): JSX.Element {
                               const inUse = clients.some((cl) => cl.country === c.code);
                               if (inUse) { showToast('لا يمكن الحذف — الدولة مرتبطة بعملاء', 'error'); return; }
                               const ok = await confirm({ title: `حذف ${c.nameAr}؟`, variant: 'danger', confirmText: 'حذف' });
-                              if (ok) { deleteCountry(c.code); showToast('تم الحذف', 'success'); }
+                              if (ok) {
+                                const removed = deleteCountry(c.code);
+                                showToast(
+                                  removed
+                                    ? 'تم الحذف'
+                                    : 'لا يمكن حذف دولة لها عملاء — انقل عملاءها أولاً',
+                                  removed ? 'success' : 'error'
+                                );
+                              }
                             }}>
                               <Trash2 className="h-3.5 w-3.5" />
                             </Button>

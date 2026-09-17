@@ -1208,8 +1208,9 @@ function InvoiceStatusBadge({ status }: { status: string }) {
       status === 'paid' && 'bg-success/15 text-success',
       status === 'failed' && 'bg-danger/15 text-danger',
       status === 'scheduled' && 'bg-warning/15 text-warning',
+      status === 'unpaid' && 'bg-muted text-muted-foreground',
     )}>
-      {status === 'paid' ? 'مدفوعة' : status === 'scheduled' ? 'مجدولة' : 'فاشلة'}
+      {status === 'paid' ? 'مدفوعة' : status === 'scheduled' ? 'مجدولة' : status === 'unpaid' ? 'غير مدفوعة' : 'فاشلة'}
     </Badge>
   );
 }

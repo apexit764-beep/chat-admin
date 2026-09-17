@@ -124,7 +124,8 @@ interface AdminState {
   // Country actions
   addCountry: (c: Country) => void;
   updateCountry: (code: string, patch: Partial<Country>) => void;
-  deleteCountry: (code: string) => void;
+  /** refuses when clients still belong to the country; returns false then */
+  deleteCountry: (code: string) => boolean;
 
   // Industry actions
   addIndustry: (name: string, addedBy: string, nameAr?: string) => Industry;
@@ -163,6 +164,9 @@ const taxRateOf = (countryCode: string, countries: Country[]): number =>
 
 /** Length of the one-time free trial, in days */
 export const TRIAL_DAYS = 14;
+
+/** Days a renewal may stay unpaid before the account is suspended */
+export const GRACE_DAYS = 7;
 
 const slugify = (s: string): string =>
   s.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w\-ء-ي]/g, '');
@@ -599,24 +603,93 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       ),
     })),
 
-  refreshLifecycle: () =>
-    set((s) => {
-      const now = Date.now();
+  refreshLifecycle: () => {
+    const now = Date.now();
+    const state = get();
+    const day = 86400000;
+    const newInvoices: Invoice[] = [];
+    let invoiceSeq = state.invoices.length;
+    /** ids of held «مجدولة» invoices that have now come due */
+    const settled = new Set<string>();
+    const suspendedClients = new Set<string>();
+
+    const subscriptions = state.subscriptions.map((sub) => {
       // a cancellation scheduled for the end of the period lands once that date passes
-      const subscriptions = s.subscriptions.map((sub) =>
-        sub.status !== 'cancelled' && sub.cancelAt && Date.parse(sub.cancelAt) <= now
-          ? { ...sub, status: 'cancelled' as const }
-          : sub
-      );
-      const clients = s.clients.map((c) => {
-        const expiredTrial =
-          c.status === 'trial' && c.trialEndsAt && Date.parse(c.trialEndsAt) < now;
-        const base = expiredTrial ? { ...c, status: 'trial_ended' as const, mrr: 0 } : c;
-        const sub = subscriptions.find((x) => x.id === base.subscriptionId);
-        return sub ? deriveClient(base, sub) : base;
+      if (sub.status !== 'cancelled' && sub.cancelAt && Date.parse(sub.cancelAt) <= now) {
+        return { ...sub, status: 'cancelled' as const };
+      }
+      if (sub.status === 'cancelled' || sub.pendingStart) return sub;
+
+      const periodEnd = Date.parse(sub.currentPeriodEnd);
+
+      // the renewal is overdue past its grace period — suspend the account
+      if (sub.status === 'past_due' && now - periodEnd > GRACE_DAYS * day) {
+        suspendedClients.add(sub.clientId);
+        return sub;
+      }
+      if (sub.status !== 'active' || periodEnd > now) return sub;
+
+      // the period ended: apply any scheduled switch, roll the dates, bill the new period
+      const client = state.clients.find((c) => c.id === sub.clientId);
+      const nextPlanId = sub.scheduledPlanId ?? sub.planId;
+      const plan = state.plans.find((p) => p.id === nextPlanId);
+      const price = client && plan ? plan.pricesPerCountry[client.country] : undefined;
+      const amount = price
+        ? (sub.billingCycle === 'yearly' ? price.yearly : price.monthly)
+        : sub.amount;
+      const periodDays = sub.billingCycle === 'yearly' ? 365 : 30;
+
+      const held = state.invoices.find((inv) => inv.subscriptionId === sub.id && inv.status === 'scheduled');
+      if (held) settled.add(held.id);
+      const tax = Math.round(amount * (taxRateOf(client?.country ?? '', state.countries) / 100) * 100) / 100;
+      invoiceSeq += 1;
+      newInvoices.push({
+        id: newId('inv'),
+        number: held?.number ?? `INV-2026-${String(invoiceSeq).padStart(5, '0')}`,
+        clientId: sub.clientId,
+        subscriptionId: sub.id,
+        invoiceType: 'renewal',
+        amount,
+        tax,
+        total: amount + tax,
+        currency: sub.currency,
+        status: 'unpaid',
+        dueDate: sub.currentPeriodEnd,
+        items: [{
+          description: `تجديد ${plan?.nameAr ?? ''} — ${sub.billingCycle === 'yearly' ? 'سنوي' : 'شهري'}`,
+          quantity: 1,
+          unitPrice: amount,
+          total: amount,
+        }],
+        createdAt: sub.currentPeriodEnd,
       });
-      return { subscriptions, clients };
-    }),
+
+      return {
+        ...sub,
+        planId: nextPlanId,
+        scheduledPlanId: undefined,
+        amount,
+        // the renewal waits on payment, exactly like a first subscription
+        status: 'past_due' as const,
+        currentPeriodStart: sub.currentPeriodEnd,
+        currentPeriodEnd: new Date(periodEnd + periodDays * day).toISOString(),
+      };
+    });
+
+    const clients = state.clients.map((c) => {
+      const expiredTrial = c.status === 'trial' && c.trialEndsAt && Date.parse(c.trialEndsAt) < now;
+      let base = expiredTrial ? { ...c, status: 'trial_ended' as const, mrr: 0 } : c;
+      if (suspendedClients.has(c.id)) base = { ...base, status: 'suspended' as const };
+      const sub = subscriptions.find((x) => x.id === base.subscriptionId);
+      return sub ? deriveClient(base, sub) : base;
+    });
+
+    set({
+      subscriptions,
+      clients,
+      invoices: [...newInvoices, ...state.invoices.filter((inv) => !settled.has(inv.id))],
+    });
+  },
 
   addPlan: (p) => {
     const plan: Plan = { ...p, id: newId('plan'), createdAt: new Date().toISOString() };
@@ -628,12 +701,20 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     set((s) => ({ plans: s.plans.map((p) => (p.id === id ? { ...p, ...patch } : p)) })),
 
   deletePlan: (id) =>
-    set((s) => ({
-      plans: s.plans.filter((p) => p.id !== id),
-      subscriptions: s.subscriptions.map((sub) =>
+    set((s) => {
+      const subscriptions = s.subscriptions.map((sub) =>
         sub.planId === id ? { ...sub, status: 'cancelled' as const, cancelAt: new Date().toISOString() } : sub
-      ),
-    })),
+      );
+      return {
+        plans: s.plans.filter((p) => p.id !== id),
+        subscriptions,
+        // their clients follow the cancellation instead of staying «نشط» with revenue
+        clients: s.clients.map((c) => {
+          const sub = subscriptions.find((x) => x.id === c.subscriptionId);
+          return sub && sub.planId === id ? deriveClient(c, sub) : c;
+        }),
+      };
+    }),
 
   getClientsOnPlan: (planId) => {
     return get().clients.filter((c) => c.planId === planId);
@@ -672,8 +753,12 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   updateCountry: (code, patch) =>
     set((s) => ({ countries: s.countries.map((c) => (c.code === code ? { ...c, ...patch } : c)) })),
 
-  deleteCountry: (code) =>
-    set((s) => ({ countries: s.countries.filter((c) => c.code !== code) })),
+  deleteCountry: (code) => {
+    // clients would be left pointing at a missing country — no price, no rate, no tax
+    if (get().clients.some((c) => c.country === code)) return false;
+    set((s) => ({ countries: s.countries.filter((c) => c.code !== code) }));
+    return true;
+  },
 
   addIndustry: (name, addedBy, nameAr) => {
     const ind: Industry = { id: newId('ind'), name, nameAr, addedBy, createdAt: new Date().toISOString(), active: true };
@@ -760,6 +845,12 @@ export const useAdminStore = create<AdminState>((set, get) => ({
               mrr: sub.billingCycle === 'monthly' ? sub.amount : sub.amount / 12,
             }
           : c
+      ),
+      // the payment settles whatever this subscription still owes
+      invoices: s.invoices.map((inv) =>
+        inv.subscriptionId === id && inv.status === 'unpaid'
+          ? { ...inv, status: 'paid' as const, paidAt: new Date().toISOString() }
+          : inv
       ),
     }));
   },

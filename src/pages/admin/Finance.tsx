@@ -13,6 +13,7 @@ import {
 import { startOfMonth, endOfMonth } from 'date-fns';
 import { StatCard } from '@components/ui';
 import { useAdminStore } from '@/store/useAdminStore';
+import { useSettingsStore } from '@/store/useSettingsStore';
 import { useUIStore } from '@/store/useUIStore';
 import { formatMoney, formatUSD, approxUSD, taxRateFor } from '@/utils/money';
 import { formatDate, initials, avatarColor } from '@/utils/format';
@@ -41,16 +42,16 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { DateRangePicker } from '@/components/ui/date-range-picker';
 
-const COMPANY_NAME = 'Qhub';
-
 const invStatusLabel: Record<string, string> = {
   paid: 'مدفوعة',
+  unpaid: 'غير مدفوعة',
   failed: 'فشلت',
   scheduled: 'مجدولة',
 };
 
-const invStatusVariant: Record<string, 'success' | 'destructive' | 'warning'> = {
+const invStatusVariant: Record<string, 'success' | 'destructive' | 'warning' | 'secondary'> = {
   paid: 'success',
+  unpaid: 'secondary',
   failed: 'destructive',
   scheduled: 'warning',
 };
@@ -71,6 +72,7 @@ export default function AdminFinance(): JSX.Element {
   const clients = useAdminStore((s) => s.clients);
   const invoices = useAdminStore((s) => s.invoices);
   const showToast = useUIStore((s) => s.showToast);
+  const company = useSettingsStore((s) => s.company);
 
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | InvoiceStatus>('all');
@@ -152,6 +154,10 @@ export default function AdminFinance(): JSX.Element {
     const html = `
       <h1>فاتورة #${inv.number}</h1>
       <p class="muted">${formatDate(inv.createdAt)}</p>
+      <h3>من: ${company.name}</h3>
+      <p class="muted">${[company.address, company.email, company.phone].filter(Boolean).join(' · ')}</p>
+      ${company.taxId ? `<p class="muted">الرقم الضريبي: ${company.taxId}</p>` : ''}
+      ${company.registrationNumber ? `<p class="muted">السجل التجاري: ${company.registrationNumber}</p>` : ''}
       <h3>إلى: ${client?.companyName ?? ''}</h3>
       <p class="muted">${client?.email ?? ''} · ${client?.phone ?? ''}</p>
       <p>النوع: ${invTypeLabel[inv.invoiceType]}</p>
@@ -167,7 +173,7 @@ export default function AdminFinance(): JSX.Element {
         <tr><td><strong>الإجمالي المستحق</strong></td><td class="right"><strong>${formatMoney(inv.total, inv.currency)}</strong></td></tr>
       </table>
       <p class="muted">الحالة: ${invStatusLabel[inv.status]} ${inv.paidAt ? ` · مدفوعة في ${formatDate(inv.paidAt)}` : ''}</p>
-      <p class="muted">شكراً لتعاملك مع ${COMPANY_NAME}</p>
+      <p class="muted">شكراً لتعاملك مع ${company.name}</p>
     `;
     printAsPdf(`Invoice ${inv.number}`, html);
   };
@@ -204,6 +210,7 @@ export default function AdminFinance(): JSX.Element {
             <SelectContent>
               <SelectItem value="all">كل الحالات</SelectItem>
               <SelectItem value="paid">مدفوعة</SelectItem>
+              <SelectItem value="unpaid">غير مدفوعة</SelectItem>
               <SelectItem value="failed">فشلت</SelectItem>
               <SelectItem value="scheduled">مجدولة</SelectItem>
             </SelectContent>
