@@ -14,7 +14,7 @@ import { startOfMonth, endOfMonth } from 'date-fns';
 import { StatCard } from '@components/ui';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
-import { formatMoney, formatUSD, approxUSD } from '@/utils/money';
+import { formatMoney, formatUSD, approxUSD, taxRateFor } from '@/utils/money';
 import { formatDate, initials, avatarColor } from '@/utils/format';
 import { downloadCsv, printAsPdf } from '@/utils/csv';
 import type { Invoice, InvoiceStatus, InvoiceType } from '@/types';
@@ -163,7 +163,7 @@ export default function AdminFinance(): JSX.Element {
       </table>
       <table>
         <tr><td>المجموع</td><td class="right">${formatMoney(inv.amount, inv.currency)}</td></tr>
-        <tr><td>ضريبة 5%</td><td class="right">${formatMoney(inv.tax, inv.currency)}</td></tr>
+        <tr><td>ضريبة ${client ? taxRateFor(client.country) : 0}%</td><td class="right">${formatMoney(inv.tax, inv.currency)}</td></tr>
         <tr><td><strong>الإجمالي المستحق</strong></td><td class="right"><strong>${formatMoney(inv.total, inv.currency)}</strong></td></tr>
       </table>
       <p class="muted">الحالة: ${invStatusLabel[inv.status]} ${inv.paidAt ? ` · مدفوعة في ${formatDate(inv.paidAt)}` : ''}</p>

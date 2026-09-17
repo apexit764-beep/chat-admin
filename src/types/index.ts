@@ -159,6 +159,8 @@ export interface Country {
   symbol: string;
   /** USD → local rate, for fast display only */
   usdRate: number;
+  /** VAT percentage applied to invoices issued in this country */
+  taxRate: number;
   active: boolean;
 }
 

@@ -114,7 +114,7 @@ export default function AdminSettings(): JSX.Element {
   const removeCurrency = useSettingsStore((s) => s.removeCurrency);
   const { confirm } = useConfirm();
 
-  const [countryModal, setCountryModal] = useState<{ code: string; name: string; nameAr: string; flag: string; dialCode: string; currency: string; symbol: string; usdRate: number; isNew: boolean } | null>(null);
+  const [countryModal, setCountryModal] = useState<{ code: string; name: string; nameAr: string; flag: string; dialCode: string; currency: string; symbol: string; usdRate: number; taxRate: number; isNew: boolean } | null>(null);
   const [currencyModal, setCurrencyModal] = useState<{ code: string; name: string; nameAr: string; symbol: string; usdRate: number; isNew: boolean } | null>(null);
 
   const [profileName, setProfileName] = useState(user?.name ?? '');
@@ -615,7 +615,7 @@ export default function AdminSettings(): JSX.Element {
                   title="إدارة الدول"
                   subtitle="أضف الدول المدعومة وحدّد عملتها"
                   action={
-                    <Button size="sm" onClick={() => { setCountryErrors({}); setCountryModal({ code: '', name: '', nameAr: '', flag: '', dialCode: '', currency: currencies[0]?.code ?? 'USD', symbol: '', usdRate: 1, isNew: true }); }}>
+                    <Button size="sm" onClick={() => { setCountryErrors({}); setCountryModal({ code: '', name: '', nameAr: '', flag: '', dialCode: '', currency: currencies[0]?.code ?? 'USD', symbol: '', usdRate: 1, taxRate: 0, isNew: true }); }}>
                       <Plus className="h-4 w-4 me-2" /> إضافة دولة
                     </Button>
                   }
@@ -628,6 +628,7 @@ export default function AdminSettings(): JSX.Element {
                       <TableHead>الرمز</TableHead>
                       <TableHead>العملة</TableHead>
                       <TableHead>سعر الصرف (USD)</TableHead>
+                      <TableHead>الضريبة</TableHead>
                       <TableHead>الحالة</TableHead>
                       <TableHead className="text-end">إجراءات</TableHead>
                     </TableRow>
@@ -644,6 +645,7 @@ export default function AdminSettings(): JSX.Element {
                         <TableCell className="font-mono text-xs">{c.code}</TableCell>
                         <TableCell>{c.currency} <span className="text-muted-foreground text-xs">({c.symbol})</span></TableCell>
                         <TableCell className="font-mono text-xs">{c.usdRate}</TableCell>
+                        <TableCell className="font-mono text-xs">{c.taxRate ? `${c.taxRate}%` : '—'}</TableCell>
                         <TableCell>
                           <Switch
                             checked={c.active !== false}
@@ -1016,6 +1018,18 @@ export default function AdminSettings(): JSX.Element {
                   onChange={(e) => setCountryModal({ ...countryModal, usdRate: Number(e.target.value) })}
                 />
               </div>
+              <div className="space-y-1.5">
+                <Label>نسبة الضريبة %</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  max={100}
+                  step="0.5"
+                  value={countryModal.taxRate}
+                  onChange={(e) => setCountryModal({ ...countryModal, taxRate: Number(e.target.value) })}
+                />
+                <p className="text-[11px] text-muted-foreground">تُطبَّق على فواتير عملاء هذه الدولة · 0 = بلا ضريبة</p>
+              </div>
             </div>
           )}
           <DialogFooter>
@@ -1032,10 +1046,10 @@ export default function AdminSettings(): JSX.Element {
                 if (Object.keys(errs).length) { showToast('يرجى تعبئة الحقول المطلوبة', 'error'); return; }
                 if (countryModal.isNew) {
                   if (countries.some((c) => c.code === countryModal.code)) { showToast('الرمز موجود مسبقاً', 'error'); return; }
-                  addCountry({ code: countryModal.code, name: countryModal.name, nameAr: countryModal.nameAr, flag: countryModal.flag, dialCode: countryModal.dialCode || '', currency: countryModal.currency, symbol: countryModal.symbol, usdRate: countryModal.usdRate, active: true });
+                  addCountry({ code: countryModal.code, name: countryModal.name, nameAr: countryModal.nameAr, flag: countryModal.flag, dialCode: countryModal.dialCode || '', currency: countryModal.currency, symbol: countryModal.symbol, usdRate: countryModal.usdRate, taxRate: countryModal.taxRate, active: true });
                   showToast('تمت الإضافة', 'success');
                 } else {
-                  updateCountry(countryModal.code, { name: countryModal.name, nameAr: countryModal.nameAr, flag: countryModal.flag, currency: countryModal.currency, symbol: countryModal.symbol, usdRate: countryModal.usdRate });
+                  updateCountry(countryModal.code, { name: countryModal.name, nameAr: countryModal.nameAr, flag: countryModal.flag, currency: countryModal.currency, symbol: countryModal.symbol, usdRate: countryModal.usdRate, taxRate: countryModal.taxRate });
                   showToast('تم الحفظ', 'success');
                 }
                 setCountryModal(null);

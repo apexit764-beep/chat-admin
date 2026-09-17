@@ -25,14 +25,14 @@ const nowPlusDays = (days: number): string =>
 // Countries
 // =====================================================================
 export const countries: Country[] = [
-  { code: 'OM', name: 'Oman', nameAr: 'عُمان', flag: '🇴🇲', dialCode: '+968', currency: 'OMR', symbol: 'ر.ع', usdRate: 0.385, active: true },
-  { code: 'AE', name: 'UAE', nameAr: 'الإمارات', flag: '🇦🇪', dialCode: '+971', currency: 'AED', symbol: 'د.إ', usdRate: 3.67, active: true },
-  { code: 'SA', name: 'Saudi Arabia', nameAr: 'السعودية', flag: '🇸🇦', dialCode: '+966', currency: 'SAR', symbol: 'ر.س', usdRate: 3.75, active: true },
-  { code: 'KW', name: 'Kuwait', nameAr: 'الكويت', flag: '🇰🇼', dialCode: '+965', currency: 'KWD', symbol: 'د.ك', usdRate: 0.31, active: true },
-  { code: 'QA', name: 'Qatar', nameAr: 'قطر', flag: '🇶🇦', dialCode: '+974', currency: 'QAR', symbol: 'ر.ق', usdRate: 3.64, active: true },
-  { code: 'BH', name: 'Bahrain', nameAr: 'البحرين', flag: '🇧🇭', dialCode: '+973', currency: 'BHD', symbol: 'د.ب', usdRate: 0.377, active: true },
-  { code: 'EG', name: 'Egypt', nameAr: 'مصر', flag: '🇪🇬', dialCode: '+20', currency: 'EGP', symbol: 'ج.م', usdRate: 49, active: true },
-  { code: 'JO', name: 'Jordan', nameAr: 'الأردن', flag: '🇯🇴', dialCode: '+962', currency: 'JOD', symbol: 'د.أ', usdRate: 0.71, active: true },
+  { code: 'OM', name: 'Oman', nameAr: 'عُمان', flag: '🇴🇲', dialCode: '+968', currency: 'OMR', symbol: 'ر.ع', usdRate: 0.385, taxRate: 5, active: true },
+  { code: 'AE', name: 'UAE', nameAr: 'الإمارات', flag: '🇦🇪', dialCode: '+971', currency: 'AED', symbol: 'د.إ', usdRate: 3.67, taxRate: 5, active: true },
+  { code: 'SA', name: 'Saudi Arabia', nameAr: 'السعودية', flag: '🇸🇦', dialCode: '+966', currency: 'SAR', symbol: 'ر.س', usdRate: 3.75, taxRate: 15, active: true },
+  { code: 'KW', name: 'Kuwait', nameAr: 'الكويت', flag: '🇰🇼', dialCode: '+965', currency: 'KWD', symbol: 'د.ك', usdRate: 0.31, taxRate: 0, active: true },
+  { code: 'QA', name: 'Qatar', nameAr: 'قطر', flag: '🇶🇦', dialCode: '+974', currency: 'QAR', symbol: 'ر.ق', usdRate: 3.64, taxRate: 0, active: true },
+  { code: 'BH', name: 'Bahrain', nameAr: 'البحرين', flag: '🇧🇭', dialCode: '+973', currency: 'BHD', symbol: 'د.ب', usdRate: 0.377, taxRate: 10, active: true },
+  { code: 'EG', name: 'Egypt', nameAr: 'مصر', flag: '🇪🇬', dialCode: '+20', currency: 'EGP', symbol: 'ج.م', usdRate: 49, taxRate: 14, active: true },
+  { code: 'JO', name: 'Jordan', nameAr: 'الأردن', flag: '🇯🇴', dialCode: '+962', currency: 'JOD', symbol: 'د.أ', usdRate: 0.71, taxRate: 16, active: true },
 ];
 
 // =====================================================================
@@ -639,7 +639,8 @@ export const subscriptions: Subscription[] = clients
 function makeInvoice(client: Client, monthsAgo: number, status: Invoice['status']): Invoice {
   const plan = plans.find((p) => p.id === client.planId);
   const amount = plan?.pricesPerCountry[client.country]?.monthly ?? client.mrr;
-  const tax = Math.round(amount * 0.05);
+  const rate = countries.find((c) => c.code === client.country)?.taxRate ?? 0;
+  const tax = Math.round(amount * (rate / 100) * 100) / 100;
   const dueDate = new Date(Date.now() - (monthsAgo - 1) * 30 * 86400000).toISOString();
   const monthsTotal = Math.min(4, Math.floor((Date.now() - Date.parse(client.joinedAt)) / (30 * 86400000)));
   const invoiceType: Invoice['invoiceType'] = monthsAgo === monthsTotal ? 'subscription' : monthsAgo <= 1 && plan?.tier === 'enterprise' ? 'upgrade' : 'renewal';

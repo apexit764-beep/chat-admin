@@ -40,3 +40,14 @@ export function approxUSD(amount: number, currency: string): number {
   if (!country) return amount;
   return amount / country.usdRate;
 }
+
+/** VAT percentage set for a country, 0 when it has none */
+export function taxRateFor(countryCode: string): number {
+  const countries = useAdminStore.getState().countries;
+  return countries.find((c) => c.code === countryCode)?.taxRate ?? 0;
+}
+
+/** Tax due on an amount at its country's rate, to two decimals */
+export function taxFor(amount: number, countryCode: string): number {
+  return Math.round(amount * (taxRateFor(countryCode) / 100) * 100) / 100;
+}

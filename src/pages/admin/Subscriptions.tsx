@@ -22,7 +22,7 @@ import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
 import { useNotificationStore } from '@/store/useNotificationStore';
 import { ClientFormDialog } from '@/components/admin/ClientFormDialog';
-import { formatMoney, formatUSD, approxUSD } from '@/utils/money';
+import { formatMoney, formatUSD, approxUSD, taxFor, taxRateFor } from '@/utils/money';
 import { formatDate, initials, avatarColor } from '@/utils/format';
 import { tierRank } from '@/utils/plans';
 import { startOfMonth, endOfMonth } from 'date-fns';
@@ -110,9 +110,6 @@ function PlanSwitchOptions({ value, onChange }: { value: SwitchMode; onChange: (
     </div>
   );
 }
-
-/** 5% VAT, kept to two decimals so small amounts don't round away to zero */
-const taxOf = (amount: number): number => Math.round(amount * 0.05 * 100) / 100;
 
 /** one line of the cost breakdown in the confirmation dialog */
 function CostRow({ label, value, tone }: { label: string; value: string; tone?: 'up' | 'down' }): JSX.Element {
@@ -281,7 +278,7 @@ export default function AdminSubscriptions(): JSX.Element {
     const currentAmount = createCurrentSub.amount;
     const difference = createPrice - currentAmount;
     const due = Math.round(difference * ratio * 100) / 100;
-    const tax = Math.round(Math.max(0, due) * 0.05 * 100) / 100;
+    const tax = createClient ? taxFor(Math.max(0, due), createClient.country) : 0;
 
     return {
       unitLabel: yearly ? 'شهر' : 'يوم',
@@ -929,7 +926,7 @@ export default function AdminSubscriptions(): JSX.Element {
                         value={formatMoney(Math.abs(proration.due), createClient.currency)}
                       />
                       {proration.tax > 0 && (
-                        <CostRow label="ضريبة 5%" value={formatMoney(proration.tax, createClient.currency)} />
+                        <CostRow label={`ضريبة ${taxRateFor(createClient.country)}%`} value={formatMoney(proration.tax, createClient.currency)} />
                       )}
                     </div>
                     <div className="border-t pt-2.5 flex items-center justify-between">
@@ -962,14 +959,14 @@ export default function AdminSubscriptions(): JSX.Element {
                         value={formatMoney(proration.newAmount, createClient.currency)}
                       />
                       <CostRow
-                        label="ضريبة 5%"
-                        value={formatMoney(taxOf(proration.newAmount), createClient.currency)}
+                        label={`ضريبة ${taxRateFor(createClient.country)}%`}
+                        value={formatMoney(taxFor(proration.newAmount, createClient.country), createClient.currency)}
                       />
                     </div>
                     <div className="border-t pt-2.5 flex items-center justify-between">
                       <span className="text-sm font-semibold">إجمالي الفاتورة المجدولة</span>
                       <span className="text-base font-bold">
-                        {formatMoney(proration.newAmount + taxOf(proration.newAmount), createClient.currency)}
+                        {formatMoney(proration.newAmount + taxFor(proration.newAmount, createClient.country), createClient.currency)}
                       </span>
                     </div>
                   </>
@@ -981,14 +978,14 @@ export default function AdminSubscriptions(): JSX.Element {
                     value={createPrice !== undefined && createClient ? formatMoney(createPrice, createClient.currency) : '—'}
                   />
                   <CostRow
-                    label="ضريبة 5%"
-                    value={createPrice !== undefined && createClient ? formatMoney(taxOf(createPrice), createClient.currency) : '—'}
+                    label={createClient ? `ضريبة ${taxRateFor(createClient.country)}%` : 'الضريبة'}
+                    value={createPrice !== undefined && createClient ? formatMoney(taxFor(createPrice, createClient.country), createClient.currency) : '—'}
                   />
                   <div className="border-t pt-2.5 flex items-center justify-between">
                     <span className="text-sm font-semibold">الإجمالي المستحق</span>
                     <span className="text-base font-bold">
                       {createPrice !== undefined && createClient
-                        ? formatMoney(createPrice + taxOf(createPrice), createClient.currency)
+                        ? formatMoney(createPrice + taxFor(createPrice, createClient.country), createClient.currency)
                         : '—'}
                     </span>
                   </div>
