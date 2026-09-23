@@ -16,6 +16,7 @@ import {
   ArrowRightLeft,
   ClipboardList,
   ArrowRight,
+  RotateCw,
 } from 'lucide-react';
 import { StatCard, useConfirm } from '@components/ui';
 import { useAdminStore } from '@/store/useAdminStore';
@@ -62,6 +63,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { DateRangePicker } from '@/components/ui/date-range-picker';
@@ -371,15 +373,15 @@ export default function AdminSubscriptions(): JSX.Element {
   };
 
   const [switchModal, setSwitchModal] = useState<{ subId: string; clientId: string; currentPlanId: string; companyName: string; newPlanId?: string } | null>(null);
-  const [extendModal, setExtendModal] = useState<{ subId: string; companyName: string; periodEnd: string; pastDue: boolean } | null>(null);
+  const [extendModal, setExtendModal] = useState<{ subId: string; companyName: string; periodEnd: string; pastDue: boolean; planName: string } | null>(null);
   const [extendDays, setExtendDays] = useState('');
   const [extendError, setExtendError] = useState('');
 
   /** the longest extension the panel allows in one go */
   const MAX_EXTENSION_DAYS = 365;
 
-  const openExtendModal = (subId: string, companyName: string, periodEnd: string, pastDue: boolean): void => {
-    setExtendModal({ subId, companyName, periodEnd, pastDue });
+  const openExtendModal = (subId: string, companyName: string, periodEnd: string, pastDue: boolean, planName: string): void => {
+    setExtendModal({ subId, companyName, periodEnd, pastDue, planName });
     setExtendDays('');
     setExtendError('');
   };
@@ -690,7 +692,7 @@ export default function AdminSubscriptions(): JSX.Element {
                               </DropdownMenuItem>
                             )}
                             {sub.status !== 'cancelled' && (
-                              <DropdownMenuItem onClick={() => openExtendModal(sub.id, client?.companyName ?? 'العميل', sub.currentPeriodEnd, sub.status === 'past_due' || Boolean(sub.graceExtended))}>
+                              <DropdownMenuItem onClick={() => openExtendModal(sub.id, client?.companyName ?? 'العميل', sub.currentPeriodEnd, sub.status === 'past_due' || Boolean(sub.graceExtended), planOf(sub.planId)?.nameAr ?? '—')}>
                                 <CalendarClock className="h-4 w-4 ml-2" />
                                 تمديد
                               </DropdownMenuItem>
@@ -1138,21 +1140,30 @@ export default function AdminSubscriptions(): JSX.Element {
       <Dialog open={!!extendModal} onOpenChange={(o) => { if (!o) closeExtendModal(); }}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>تمديد اشتراك {extendModal?.companyName}</DialogTitle>
+            <div className="flex items-center gap-3">
+              <span className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                <RotateCw className="h-5 w-5" />
+              </span>
+              <DialogTitle>تمديد الباقة</DialogTitle>
+            </div>
+            <DialogDescription>
+              حدد عدد الأيام التي تريد إضافتها لاشتراك هذا العميل
+            </DialogDescription>
           </DialogHeader>
-          <div className="space-y-3">
-            <div className="rounded-lg border bg-muted/40 p-3 text-xs space-y-1">
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">تاريخ الانتهاء الحالي</span>
-                <span className="font-medium">{extendModal && formatDate(extendModal.periodEnd)}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">تاريخ الانتهاء بعد التمديد</span>
-                <span className={cn('font-semibold', extendPreview ? 'text-success' : 'text-muted-foreground')}>
-                  {extendPreview ? formatDate(extendPreview) : '—'}
-                </span>
+          <div className="space-y-4">
+            {/* who is being extended, and on which plan */}
+            <div className="flex items-center gap-3 rounded-xl bg-muted/50 p-3">
+              <Avatar className="h-10 w-10 shrink-0">
+                <AvatarFallback className={avatarColor(extendModal?.companyName ?? '')}>
+                  {initials(extendModal?.companyName ?? '')}
+                </AvatarFallback>
+              </Avatar>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold truncate">{extendModal?.companyName}</p>
+                <p className="text-xs text-muted-foreground truncate">الباقة الحالية: {extendModal?.planName}</p>
               </div>
             </div>
+
             <div className="space-y-1.5">
               <label className="block text-sm font-medium" htmlFor="extend-days">عدد الأيام</label>
               <Input
@@ -1165,22 +1176,37 @@ export default function AdminSubscriptions(): JSX.Element {
                   setExtendError('');
                 }}
                 onKeyDown={(e) => { if (e.key === 'Enter') submitExtend(); }}
-                placeholder="مثال: 30"
+                placeholder="مثال: 7"
                 autoFocus
               />
               {extendError
                 ? <p className="text-xs text-destructive">{extendError}</p>
-                : <p className="text-xs text-muted-foreground">تُضاف الأيام إلى نهاية الاشتراك، ويصبح الاشتراك «نشط» فور التمديد.</p>}
+                : <p className="text-xs text-muted-foreground">حقل رقمي — أرقام فقط</p>}
             </div>
+
+            {/* what the extension actually does to the period */}
+            <div className="rounded-xl border p-3 text-xs space-y-1.5">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-muted-foreground">تاريخ الانتهاء الحالي</span>
+                <span className="font-medium">{extendModal && formatDate(extendModal.periodEnd)}</span>
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-muted-foreground">تاريخ الانتهاء بعد التمديد</span>
+                <span className={cn('font-semibold', extendPreview ? 'text-success' : 'text-muted-foreground')}>
+                  {extendPreview ? formatDate(extendPreview) : '—'}
+                </span>
+              </div>
+            </div>
+
             {extendModal?.pastDue && (
-              <p className="text-xs text-warning">
+              <p className="text-xs text-warning leading-relaxed">
                 الفاتورة المستحقة تبقى غير مدفوعة؛ التمديد يمنح العميل مهلة إضافية فقط، وتعود حالة الاشتراك إلى «متأخرة» عند انتهاء المهلة ما لم يُسدَّد المبلغ.
               </p>
             )}
           </div>
-          <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={closeExtendModal}>إلغاء</Button>
-            <Button disabled={!extendDays} onClick={submitExtend}>تمديد</Button>
+          <DialogFooter className="gap-2 sm:justify-start">
+            <Button className="flex-1" onClick={submitExtend} disabled={!extendDays}>تمديد</Button>
+            <Button variant="outline" className="flex-1" onClick={closeExtendModal}>إلغاء</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
