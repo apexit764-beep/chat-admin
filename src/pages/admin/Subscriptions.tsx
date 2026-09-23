@@ -1179,9 +1179,7 @@ export default function AdminSubscriptions(): JSX.Element {
                 placeholder="مثال: 7"
                 autoFocus
               />
-              {extendError
-                ? <p className="text-xs text-destructive">{extendError}</p>
-                : <p className="text-xs text-muted-foreground">حقل رقمي — أرقام فقط</p>}
+              {extendError && <p className="text-xs text-destructive">{extendError}</p>}
             </div>
 
             {/* what the extension actually does to the period */}
@@ -1199,9 +1197,12 @@ export default function AdminSubscriptions(): JSX.Element {
             </div>
 
             {extendModal?.pastDue && (
-              <p className="text-xs text-warning leading-relaxed">
-                الفاتورة المستحقة تبقى غير مدفوعة؛ التمديد يمنح العميل مهلة إضافية فقط، وتعود حالة الاشتراك إلى «متأخرة» عند انتهاء المهلة ما لم يُسدَّد المبلغ.
-              </p>
+              <div className="flex items-start gap-2.5 rounded-xl border border-warning/30 bg-warning/10 p-3">
+                <AlertTriangle className="h-4 w-4 text-warning shrink-0 mt-0.5" />
+                <p className="text-xs text-warning leading-relaxed">
+                  الفاتورة المستحقة تبقى غير مدفوعة؛ التمديد يمنح العميل مهلة إضافية فقط، وتعود حالة الاشتراك إلى «متأخرة» عند انتهاء المهلة ما لم يُسدَّد المبلغ.
+                </p>
+              </div>
             )}
           </div>
           <DialogFooter className="gap-2 sm:justify-start">
