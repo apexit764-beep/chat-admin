@@ -4,7 +4,16 @@ import { Check, ChevronRight, Circle } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
-const DropdownMenu = DropdownMenuPrimitive.Root
+/**
+ * Radix portals the menu out of the RTL page and defaults it to ltr, which
+ * flips every item: icon on the left, text pushed away from it. Default to rtl.
+ */
+const DropdownMenu = ({
+  dir = 'rtl',
+  ...props
+}: React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Root>): JSX.Element => (
+  <DropdownMenuPrimitive.Root dir={dir} {...props} />
+)
 
 const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger
 
