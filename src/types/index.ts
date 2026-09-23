@@ -258,6 +258,13 @@ export interface Subscription {
   pendingStart?: boolean;
   /** plan this subscription switches to once the current period ends */
   scheduledPlanId?: string;
+  /**
+   * the admin granted extra days on an overdue renewal: the subscription reads
+   * «نشط» until they run out, then it falls back to «متأخرة» without re-billing
+   */
+  graceExtended?: boolean;
+  /** how many days the last manual extension added */
+  extensionDays?: number;
   paymentMethod?: {
     brand: 'visa' | 'mastercard';
     last4: string;

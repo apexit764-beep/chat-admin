@@ -629,6 +629,12 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       }
       if (sub.status !== 'active' || periodEnd > now) return sub;
 
+      // the extra days the admin granted ran out: back to «متأخرة» on the renewal
+      // that was never paid — no second invoice is issued for the same period
+      if (sub.graceExtended) {
+        return { ...sub, status: 'past_due' as const, graceExtended: false };
+      }
+
       // the period ended: apply any scheduled switch, roll the dates, bill the new period
       const client = state.clients.find((c) => c.id === sub.clientId);
       const nextPlanId = sub.scheduledPlanId ?? sub.planId;
@@ -829,6 +835,9 @@ export const useAdminStore = create<AdminState>((set, get) => ({
               ...x,
               status: 'active' as const,
               pendingStart: false,
+              // the payment closes the extension: a fresh period starts from today
+              graceExtended: false,
+              extensionDays: undefined,
               startedAt: now.toISOString(),
               currentPeriodStart: now.toISOString(),
               currentPeriodEnd: new Date(now.getTime() + periodDays * 86400000).toISOString(),
@@ -947,18 +956,30 @@ export const useAdminStore = create<AdminState>((set, get) => ({
 
   extendSubscription: (id, days) =>
     set((s) => {
+      const now = Date.now();
       const subscriptions = s.subscriptions.map((sub) => {
         if (sub.id !== id) return sub;
-        const end = new Date(sub.currentPeriodEnd);
-        const newEnd = new Date(end.getTime() + days * 24 * 60 * 60 * 1000);
-        return { ...sub, currentPeriodEnd: newEnd.toISOString(), status: 'active' as const };
+        // an overdue period ended in the past — the extra days start from today,
+        // otherwise they are added to the end of the period still running
+        const base = Math.max(Date.parse(sub.currentPeriodEnd), now);
+        const newEnd = new Date(base + days * 24 * 60 * 60 * 1000);
+        return {
+          ...sub,
+          currentPeriodEnd: newEnd.toISOString(),
+          status: 'active' as const,
+          // a renewal that was still owed stays owed: the extension only buys time
+          graceExtended: sub.status === 'past_due' ? true : sub.graceExtended,
+          extensionDays: days,
+        };
       });
       const extended = subscriptions.find((sub) => sub.id === id);
       return {
         subscriptions,
-        clients: s.clients.map((c) =>
-          extended && c.id === extended.clientId ? deriveClient(c, extended) : c
-        ),
+        clients: s.clients.map((c) => {
+          if (!extended || c.id !== extended.clientId) return c;
+          // the extension lifts a suspension that the overdue renewal caused
+          return deriveClient(c.status === 'suspended' ? { ...c, status: 'active' } : c, extended);
+        }),
       };
     }),
 

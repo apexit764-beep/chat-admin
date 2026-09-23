@@ -371,8 +371,54 @@ export default function AdminSubscriptions(): JSX.Element {
   };
 
   const [switchModal, setSwitchModal] = useState<{ subId: string; clientId: string; currentPlanId: string; companyName: string; newPlanId?: string } | null>(null);
-  const [extendModal, setExtendModal] = useState<{ subId: string; companyName: string } | null>(null);
+  const [extendModal, setExtendModal] = useState<{ subId: string; companyName: string; periodEnd: string; pastDue: boolean } | null>(null);
   const [extendDays, setExtendDays] = useState('');
+  const [extendError, setExtendError] = useState('');
+
+  /** the longest extension the panel allows in one go */
+  const MAX_EXTENSION_DAYS = 365;
+
+  const openExtendModal = (subId: string, companyName: string, periodEnd: string, pastDue: boolean): void => {
+    setExtendModal({ subId, companyName, periodEnd, pastDue });
+    setExtendDays('');
+    setExtendError('');
+  };
+
+  /** «إلغاء» — ends the operation with no effect whatsoever */
+  const closeExtendModal = (): void => {
+    setExtendModal(null);
+    setExtendDays('');
+    setExtendError('');
+  };
+
+  /** the extra days start from today when the period has already run out */
+  const extendPreview = useMemo(() => {
+    if (!extendModal) return null;
+    const days = Number(extendDays);
+    if (!Number.isInteger(days) || days < 1) return null;
+    const base = Math.max(Date.parse(extendModal.periodEnd), Date.now());
+    return new Date(base + days * 24 * 60 * 60 * 1000).toISOString();
+  }, [extendModal, extendDays]);
+
+  const submitExtend = (): void => {
+    if (!extendModal) return;
+    const days = Number(extendDays);
+    if (!extendDays.trim()) {
+      setExtendError('أدخل عدد الأيام.');
+      return;
+    }
+    if (!Number.isInteger(days) || days < 1) {
+      setExtendError('عدد الأيام يجب أن يكون رقماً صحيحاً أكبر من صفر.');
+      return;
+    }
+    if (days > MAX_EXTENSION_DAYS) {
+      setExtendError(`أقصى مدة تمديد ${MAX_EXTENSION_DAYS} يوماً في المرة الواحدة.`);
+      return;
+    }
+    extendSubscription(extendModal.subId, days);
+    showToast(`تم تمديد اشتراك ${extendModal.companyName} ${days} يوماً، وحالة الاشتراك الآن «نشط»`, 'success');
+    closeExtendModal();
+  };
 
   const [view, setView] = useState<View>('subscriptions');
   const planRequests = useAdminStore((s) => s.planRequests);
@@ -561,6 +607,16 @@ export default function AdminSubscriptions(): JSX.Element {
                               مجدولة
                             </Badge>
                           )}
+                          {sub.graceExtended && (
+                            <Badge
+                              variant="outline"
+                              className="gap-1"
+                              title={`تمديد${sub.extensionDays ? ` ${sub.extensionDays} يوماً` : ''} حتى ${formatDate(sub.currentPeriodEnd)} — الفاتورة المستحقة ما زالت غير مدفوعة`}
+                            >
+                              <CalendarClock className="h-3 w-3" />
+                              ممددة
+                            </Badge>
+                          )}
                         </div>
                         {sub.status === 'past_due' && (() => {
                           const daysPastDue = Math.ceil((Date.now() - new Date(sub.currentPeriodEnd).getTime()) / (24 * 60 * 60 * 1000));
@@ -622,7 +678,7 @@ export default function AdminSubscriptions(): JSX.Element {
                               <ExternalLink className="h-4 w-4 ml-2" />
                               عرض العميل
                             </DropdownMenuItem>
-                            {sub.status === 'past_due' && (
+                            {(sub.status === 'past_due' || sub.graceExtended) && (
                               <DropdownMenuItem
                                 onClick={() => {
                                   markSubscriptionPaid(sub.id);
@@ -634,7 +690,7 @@ export default function AdminSubscriptions(): JSX.Element {
                               </DropdownMenuItem>
                             )}
                             {sub.status !== 'cancelled' && (
-                              <DropdownMenuItem onClick={() => { setExtendModal({ subId: sub.id, companyName: client?.companyName ?? 'العميل' }); setExtendDays(''); }}>
+                              <DropdownMenuItem onClick={() => openExtendModal(sub.id, client?.companyName ?? 'العميل', sub.currentPeriodEnd, sub.status === 'past_due' || Boolean(sub.graceExtended))}>
                                 <CalendarClock className="h-4 w-4 ml-2" />
                                 تمديد
                               </DropdownMenuItem>
@@ -1079,36 +1135,52 @@ export default function AdminSubscriptions(): JSX.Element {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={!!extendModal} onOpenChange={(o) => { if (!o) setExtendModal(null); }}>
+      <Dialog open={!!extendModal} onOpenChange={(o) => { if (!o) closeExtendModal(); }}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>تمديد اشتراك {extendModal?.companyName}</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
-            <label className="block text-sm font-medium">عدد الأيام</label>
-            <Input
-              type="number"
-              min={1}
-              value={extendDays}
-              onChange={(e) => setExtendDays(e.target.value)}
-              placeholder="مثال: 30"
-              autoFocus
-            />
+            <div className="rounded-lg border bg-muted/40 p-3 text-xs space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">تاريخ الانتهاء الحالي</span>
+                <span className="font-medium">{extendModal && formatDate(extendModal.periodEnd)}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">تاريخ الانتهاء بعد التمديد</span>
+                <span className={cn('font-semibold', extendPreview ? 'text-success' : 'text-muted-foreground')}>
+                  {extendPreview ? formatDate(extendPreview) : '—'}
+                </span>
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium" htmlFor="extend-days">عدد الأيام</label>
+              <Input
+                id="extend-days"
+                inputMode="numeric"
+                value={extendDays}
+                // the field accepts digits only — no signs, decimals or letters
+                onChange={(e) => {
+                  setExtendDays(e.target.value.replace(/\D/g, '').replace(/^0+(?=\d)/, ''));
+                  setExtendError('');
+                }}
+                onKeyDown={(e) => { if (e.key === 'Enter') submitExtend(); }}
+                placeholder="مثال: 30"
+                autoFocus
+              />
+              {extendError
+                ? <p className="text-xs text-destructive">{extendError}</p>
+                : <p className="text-xs text-muted-foreground">تُضاف الأيام إلى نهاية الاشتراك، ويصبح الاشتراك «نشط» فور التمديد.</p>}
+            </div>
+            {extendModal?.pastDue && (
+              <p className="text-xs text-warning">
+                الفاتورة المستحقة تبقى غير مدفوعة؛ التمديد يمنح العميل مهلة إضافية فقط، وتعود حالة الاشتراك إلى «متأخرة» عند انتهاء المهلة ما لم يُسدَّد المبلغ.
+              </p>
+            )}
           </div>
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setExtendModal(null)}>إلغاء</Button>
-            <Button
-              disabled={!extendDays || Number(extendDays) < 1}
-              onClick={() => {
-                if (extendModal && Number(extendDays) >= 1) {
-                  extendSubscription(extendModal.subId, Number(extendDays));
-                  showToast(`تم تمديد الاشتراك ${Number(extendDays)} يوم`, 'success');
-                  setExtendModal(null);
-                }
-              }}
-            >
-              تمديد
-            </Button>
+            <Button variant="outline" onClick={closeExtendModal}>إلغاء</Button>
+            <Button disabled={!extendDays} onClick={submitExtend}>تمديد</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

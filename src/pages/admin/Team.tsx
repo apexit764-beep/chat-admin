@@ -197,7 +197,7 @@ const permissionGroups: PermissionGroup[] = [
     label: 'الاشتراكات',
     permissions: [
       { id: 'subscriptions.view', label: 'عرض الاشتراكات' },
-      { id: 'subscriptions.edit', label: 'تعديل اشتراك' },
+      { id: 'subscriptions.edit', label: 'تعديل اشتراك (يشمل تبديل الباقة والتمديد)' },
       { id: 'subscriptions.cancel', label: 'إلغاء اشتراك' },
     ],
   },
