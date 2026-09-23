@@ -1144,7 +1144,7 @@ export default function AdminSubscriptions(): JSX.Element {
               <span className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
                 <RotateCw className="h-5 w-5" />
               </span>
-              <DialogTitle>تمديد الباقة</DialogTitle>
+              <DialogTitle>تمديد الاشتراك</DialogTitle>
             </div>
             <DialogDescription>
               حدد عدد الأيام التي تريد إضافتها لاشتراك هذا العميل
