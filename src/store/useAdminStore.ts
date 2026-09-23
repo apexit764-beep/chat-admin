@@ -589,16 +589,23 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     })),
 
   suspendClient: (id) =>
-    // the subscription is left intact so reactivation can restore it
+    // the subscription is left intact so reactivation can restore it.
+    // `accountDisabled` is the admin's own switch — it is what the clients
+    // module reads as «معطل», separate from a billing suspension.
     set((s) => ({
-      clients: s.clients.map((c) => (c.id === id ? { ...c, status: 'suspended', mrr: 0 } : c)),
+      clients: s.clients.map((c) =>
+        c.id === id ? { ...c, status: 'suspended', accountDisabled: true, mrr: 0 } : c
+      ),
     })),
 
   reactivateClient: (id) =>
     set((s) => ({
       clients: s.clients.map((c) =>
         c.id === id
-          ? deriveClient({ ...c, status: 'new' }, s.subscriptions.find((x) => x.id === c.subscriptionId))
+          ? deriveClient(
+              { ...c, status: 'new', accountDisabled: false },
+              s.subscriptions.find((x) => x.id === c.subscriptionId)
+            )
           : c
       ),
     })),

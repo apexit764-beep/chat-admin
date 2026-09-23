@@ -69,6 +69,12 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import type { ClientStatus, ChannelType, Invoice } from '@/types';
+import {
+  accountStatusOf,
+  accountStatusLabel,
+  accountStatusHint,
+  accountStatusBadgeClass,
+} from '@/utils/clientAccount';
 
 const channelMeta: Record<ChannelType, { name: string; logo: string; color: string }> = {
   whatsapp: { name: 'واتساب', logo: '💬', color: 'bg-green-500/10 text-green-600' },
@@ -186,6 +192,8 @@ export default function ClientDetail(): JSX.Element {
 
   /** the free trial is once per client, and only before they take a subscription */
   const canStartTrial = !client.trialEndsAt && !client.subscriptionId;
+
+  const accountStatus = accountStatusOf(client);
 
   const handleStartTrial = async () => {
     const ok = await confirm({
@@ -330,8 +338,18 @@ export default function ClientDetail(): JSX.Element {
             <div>
               <div className="flex items-center gap-3">
                 <h1 className="text-xl font-bold">{client.companyName}</h1>
-                <Badge className={cn('text-[10px] font-semibold', statusBadgeClass[client.status])}>
-                  {statusLabel[client.status]}
+                <Badge
+                  className={cn('text-[10px] font-semibold', accountStatusBadgeClass[accountStatus])}
+                  title={accountStatusHint[accountStatus]}
+                >
+                  {accountStatusLabel[accountStatus]}
+                </Badge>
+                <Badge
+                  variant="outline"
+                  className="text-[10px] font-semibold"
+                  title="حالة الاشتراك"
+                >
+                  الاشتراك: {statusLabel[client.status]}
                 </Badge>
               </div>
               <p className="text-sm text-muted-foreground mt-1">
@@ -362,13 +380,13 @@ export default function ClientDetail(): JSX.Element {
                     <Clock className="h-4 w-4 me-2" /> بدء الفترة التجريبية
                   </DropdownMenuItem>
                 )}
-                {client.status === 'suspended' ? (
+                {accountStatus === 'disabled' ? (
                   <DropdownMenuItem onClick={handleReactivate}>
                     <PlayCircle className="h-4 w-4 me-2" /> إعادة تفعيل
                   </DropdownMenuItem>
                 ) : (
                   <DropdownMenuItem onClick={handleSuspend}>
-                    <PauseCircle className="h-4 w-4 me-2" /> إيقاف
+                    <PauseCircle className="h-4 w-4 me-2" /> إلغاء تفعيل الحساب
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuSeparator />

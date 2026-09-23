@@ -228,6 +228,7 @@ export const clients: Client[] = [
     dashboardUrl: 'https://chat-client.apexes.click',
     joinedAt: nowMinus(60 * 24 * 90),
     lastActiveAt: nowMinus(5),
+    lastLoginAt: nowMinus(5),
   },
   {
     id: 'client_2',
@@ -250,6 +251,7 @@ export const clients: Client[] = [
     dashboardUrl: 'https://albeit.dashboard.example.com',
     joinedAt: nowMinus(60 * 24 * 60),
     lastActiveAt: nowMinus(30),
+    lastLoginAt: nowMinus(30),
   },
   {
     id: 'client_3',
@@ -272,6 +274,7 @@ export const clients: Client[] = [
     dashboardUrl: 'https://dre.dashboard.example.com',
     joinedAt: nowMinus(60 * 24 * 120),
     lastActiveAt: nowMinus(120),
+    lastLoginAt: nowMinus(120),
   },
   {
     id: 'client_4',
@@ -317,6 +320,7 @@ export const clients: Client[] = [
     dashboardUrl: 'https://hayat.dashboard.example.com',
     joinedAt: nowMinus(60 * 24 * 200),
     lastActiveAt: nowMinus(15),
+    lastLoginAt: nowMinus(15),
   },
   {
     id: 'client_6',
@@ -339,6 +343,7 @@ export const clients: Client[] = [
     dashboardUrl: 'https://techflow.dashboard.example.com',
     joinedAt: nowMinus(60 * 24 * 45),
     lastActiveAt: nowMinus(60 * 24 * 3),
+    lastLoginAt: nowMinus(60 * 24 * 3),
   },
   {
     id: 'client_7',
@@ -361,6 +366,8 @@ export const clients: Client[] = [
     dashboardUrl: 'https://fuj-tourism.dashboard.example.com',
     joinedAt: nowMinus(60 * 24 * 150),
     lastActiveAt: nowMinus(45),
+    lastLoginAt: nowMinus(45),
+    accountDisabled: true,
   },
   {
     id: 'client_8',
@@ -383,6 +390,7 @@ export const clients: Client[] = [
     dashboardUrl: 'https://royalauto.dashboard.example.com',
     joinedAt: nowMinus(60 * 24 * 300),
     lastActiveAt: nowMinus(2),
+    lastLoginAt: nowMinus(2),
   },
   {
     id: 'client_9',
@@ -405,6 +413,7 @@ export const clients: Client[] = [
     dashboardUrl: 'https://maarifa.dashboard.example.com',
     joinedAt: nowMinus(60 * 24 * 30),
     lastActiveAt: nowMinus(60 * 24 * 10),
+    lastLoginAt: nowMinus(60 * 24 * 10),
   },
   {
     id: 'client_10',
@@ -450,6 +459,7 @@ export const clients: Client[] = [
     dashboardUrl: 'https://lamsa.dashboard.example.com',
     joinedAt: nowMinus(60 * 24 * 11),
     lastActiveAt: nowMinus(120),
+    lastLoginAt: nowMinus(120),
   },
   {
     id: 'client_12',
@@ -472,6 +482,7 @@ export const clients: Client[] = [
     dashboardUrl: 'https://baraka.dashboard.example.com',
     joinedAt: nowMinus(60 * 24 * 100),
     lastActiveAt: nowMinus(60 * 24 * 60),
+    lastLoginAt: nowMinus(60 * 24 * 60),
   },
   {
     id: 'client_13',
@@ -495,6 +506,7 @@ export const clients: Client[] = [
     dashboardUrl: 'https://nabd.dashboard.example.com',
     joinedAt: nowMinus(60 * 24 * 9),
     lastActiveAt: nowMinus(30),
+    lastLoginAt: nowMinus(30),
   },
   {
     id: 'client_14',
@@ -518,6 +530,7 @@ export const clients: Client[] = [
     dashboardUrl: 'https://sama.dashboard.example.com',
     joinedAt: nowMinus(60 * 24 * 13),
     lastActiveAt: nowMinus(60 * 3),
+    lastLoginAt: nowMinus(60 * 3),
   },
   {
     id: 'client_15',
@@ -563,6 +576,7 @@ export const clients: Client[] = [
     dashboardUrl: 'https://andalus.dashboard.example.com',
     joinedAt: nowMinus(60 * 24 * 90),
     lastActiveAt: nowMinus(60 * 24 * 5),
+    lastLoginAt: nowMinus(60 * 24 * 5),
   },
   {
     id: 'client_17',
@@ -585,6 +599,7 @@ export const clients: Client[] = [
     dashboardUrl: 'https://shifa.dashboard.example.com',
     joinedAt: nowMinus(60 * 24 * 60),
     lastActiveAt: nowMinus(60 * 24 * 2),
+    lastLoginAt: nowMinus(60 * 24 * 2),
   },
   {
     id: 'client_18',
@@ -607,6 +622,7 @@ export const clients: Client[] = [
     dashboardUrl: 'https://nukhba.dashboard.example.com',
     joinedAt: nowMinus(60 * 24 * 40),
     lastActiveAt: nowMinus(60 * 24 * 4),
+    lastLoginAt: nowMinus(60 * 24 * 4),
   },
 ];
 

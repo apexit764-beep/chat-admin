@@ -7,14 +7,11 @@ import {
   Edit2,
   Trash2,
   PauseCircle,
-  XCircle,
-  Sparkles,
   PlayCircle,
   Phone,
   Globe,
   X,
   Clock,
-  AlertCircle,
   Briefcase,
 } from 'lucide-react';
 
@@ -51,28 +48,15 @@ import {
   SelectContent,
   SelectItem,
 } from '@/components/ui/select';
-import type { Client, ClientStatus } from '@/types';
+import type { Client, ClientAccountStatus } from '@/types';
+import {
+  accountStatusOf,
+  accountStatusLabel,
+  accountStatusHint,
+  accountStatusBadgeClass,
+} from '@/utils/clientAccount';
 
 
-const statusLabel: Record<ClientStatus, string> = {
-  new: 'جديد',
-  trial: 'فترة تجريبية',
-  trial_ended: 'انتهت التجربة',
-  active: 'نشط',
-  past_due: 'متأخر',
-  suspended: 'موقوف',
-  cancelled: 'ملغي',
-};
-
-const statusBadgeClass: Record<ClientStatus, string> = {
-  new: 'bg-muted text-muted-foreground border-transparent',
-  trial: 'bg-info/15 text-info border-transparent',
-  trial_ended: 'bg-warning/15 text-warning border-transparent',
-  active: 'bg-success/15 text-success border-transparent',
-  past_due: 'bg-warning/15 text-warning border-transparent',
-  suspended: 'bg-danger/15 text-danger border-transparent',
-  cancelled: 'bg-muted text-muted-foreground border-transparent',
-};
 
 
 type View = 'clients' | 'industries';
@@ -95,7 +79,7 @@ export default function AdminClients(): JSX.Element {
   const { confirm } = useConfirm();
 
   const [view, setView] = useState<View>('clients');
-  const [statusFilter, setStatusFilter] = useState<'all' | ClientStatus>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | ClientAccountStatus>('all');
   const [countryFilter, setCountryFilter] = useState<'all' | string>('all');
   const [planFilter, setPlanFilter] = useState<'all' | string>('all');
   const [modalOpen, setModalOpen] = useState(false);
@@ -117,23 +101,19 @@ export default function AdminClients(): JSX.Element {
 
   const filtered = useMemo(() => {
     return clients.filter((c) => {
-      if (statusFilter !== 'all' && c.status !== statusFilter) return false;
+      if (statusFilter !== 'all' && accountStatusOf(c) !== statusFilter) return false;
       if (countryFilter !== 'all' && c.country !== countryFilter) return false;
       if (planFilter !== 'all' && c.planId !== planFilter) return false;
       return true;
     });
   }, [clients, statusFilter, countryFilter, planFilter]);
 
-  /** one tile per status so every client is accounted for, plus the total */
+  /** one tile per account state, so every client is accounted for, plus the total */
   const statusTiles = useMemo(() => ([
-    { status: 'active' as const, label: 'نشطون', icon: <PlayCircle className="h-5 w-5" />, bg: 'bg-success/15', color: 'text-success' },
-    { status: 'trial' as const, label: 'فترة تجريبية', icon: <Clock className="h-5 w-5" />, bg: 'bg-info/15', color: 'text-info' },
-    { status: 'trial_ended' as const, label: 'انتهت التجربة', icon: <Clock className="h-5 w-5" />, bg: 'bg-warning/15', color: 'text-warning' },
-    { status: 'past_due' as const, label: 'متأخر دفع', icon: <AlertCircle className="h-5 w-5" />, bg: 'bg-warning/15', color: 'text-warning' },
-    { status: 'new' as const, label: 'جديد', icon: <Sparkles className="h-5 w-5" />, bg: 'bg-muted', color: 'text-muted-foreground' },
-    { status: 'suspended' as const, label: 'موقوف', icon: <PauseCircle className="h-5 w-5" />, bg: 'bg-danger/15', color: 'text-danger' },
-    { status: 'cancelled' as const, label: 'ملغي', icon: <XCircle className="h-5 w-5" />, bg: 'bg-muted', color: 'text-muted-foreground' },
-  ].map((t) => ({ ...t, value: clients.filter((c) => c.status === t.status).length }))), [clients]);
+    { status: 'active' as const, label: 'نشط', icon: <PlayCircle className="h-5 w-5" />, bg: 'bg-success/15', color: 'text-success' },
+    { status: 'pending' as const, label: 'معلق', icon: <Clock className="h-5 w-5" />, bg: 'bg-warning/15', color: 'text-warning' },
+    { status: 'disabled' as const, label: 'معطل', icon: <PauseCircle className="h-5 w-5" />, bg: 'bg-muted', color: 'text-muted-foreground' },
+  ].map((t) => ({ ...t, value: clients.filter((c) => accountStatusOf(c) === t.status).length }))), [clients]);
 
   const activeFilterCount =
     (statusFilter !== 'all' ? 1 : 0) +
@@ -213,7 +193,7 @@ export default function AdminClients(): JSX.Element {
           'الهاتف': c.phone,
           'الدولة': country?.nameAr ?? c.country,
           'مجال العمل': c.industry,
-          'الحالة': statusLabel[c.status],
+          'الحالة': accountStatusLabel[accountStatusOf(c)],
           'الباقة': plan?.nameAr ?? '—',
           'الموظفون': c.agentCount,
           'المحادثات': c.conversationCount,
@@ -263,8 +243,11 @@ export default function AdminClients(): JSX.Element {
     {
       key: 'status', header: 'الحالة', accessor: (r) => r.status,
       cell: (r) => (
-        <Badge className={cn('text-[10px] font-semibold', statusBadgeClass[r.status])}>
-          {statusLabel[r.status]}
+        <Badge
+          className={cn('text-[10px] font-semibold', accountStatusBadgeClass[accountStatusOf(r)])}
+          title={accountStatusHint[accountStatusOf(r)]}
+        >
+          {accountStatusLabel[accountStatusOf(r)]}
         </Badge>
       ),
     },
@@ -428,19 +411,15 @@ export default function AdminClients(): JSX.Element {
         )}
         toolbar={
           <>
-            <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as 'all' | ClientStatus)}>
+            <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as 'all' | ClientAccountStatus)}>
               <SelectTrigger className="h-9 w-[130px] rounded-lg text-sm">
                 <SelectValue placeholder="كل الحالات" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">كل الحالات</SelectItem>
-                <SelectItem value="new">جديد</SelectItem>
-                <SelectItem value="trial">تجريبي</SelectItem>
-                <SelectItem value="trial_ended">انتهت التجربة</SelectItem>
                 <SelectItem value="active">نشط</SelectItem>
-                <SelectItem value="past_due">متأخر</SelectItem>
-                <SelectItem value="suspended">موقوف</SelectItem>
-                <SelectItem value="cancelled">ملغي</SelectItem>
+                <SelectItem value="disabled">معطل</SelectItem>
+                <SelectItem value="pending">معلق</SelectItem>
               </SelectContent>
             </Select>
             <Select value={countryFilter} onValueChange={(v) => setCountryFilter(v)}>

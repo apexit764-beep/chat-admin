@@ -213,6 +213,18 @@ export type ClientStatus =
   | 'suspended'
   | 'cancelled';
 
+/**
+ * The state of the client's *account*, independent of what they pay for.
+ * `status` above tracks the billing lifecycle; this tracks access.
+ */
+export type ClientAccountStatus =
+  /** the account was created and the client has signed in at least once */
+  | 'active'
+  /** the admin switched the account off */
+  | 'disabled'
+  /** the account exists but the client has never signed in */
+  | 'pending';
+
 export interface Client {
   id: string;
   companyName: string;
@@ -238,6 +250,10 @@ export interface Client {
   logo?: string;
   joinedAt: string;
   lastActiveAt: string;
+  /** first/most recent sign-in; absent means the client has never signed in */
+  lastLoginAt?: string;
+  /** the admin switched this account off — it outranks the sign-in state */
+  accountDisabled?: boolean;
 }
 
 export type SubscriptionStatus = 'trial' | 'active' | 'past_due' | 'cancelled';
