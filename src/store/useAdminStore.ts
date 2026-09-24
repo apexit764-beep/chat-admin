@@ -137,6 +137,12 @@ interface AdminState {
   createSubscription: (clientId: string, planId: string, billingCycle: 'monthly' | 'yearly') => Subscription;
   markSubscriptionPaid: (id: string) => void;
   switchSubscriptionPlan: (id: string, newPlanId: string, mode: 'now' | 'end_of_period') => void;
+  /**
+   * Upgrade to a dearer plan: the current plan ends outright — no credit for
+   * what was left of it — and the client owes the new plan's full price before
+   * it runs, so the subscription waits on that payment as «متأخر الدفع».
+   */
+  upgradeSubscriptionPlan: (id: string, newPlanId: string) => void;
   /** drops a scheduled switch and the invoice held for it */
   cancelScheduledPlanSwitch: (id: string) => void;
   updateSubscription: (id: string, patch: Partial<Subscription>) => void;
@@ -927,6 +933,67 @@ export const useAdminStore = create<AdminState>((set, get) => ({
           : c
       ),
     }));
+  },
+
+  upgradeSubscriptionPlan: (id, newPlanId) => {
+    const sub = get().subscriptions.find((s) => s.id === id);
+    const client = sub && get().clients.find((c) => c.id === sub.clientId);
+    const plan = get().plans.find((p) => p.id === newPlanId);
+    if (!sub || !client || !plan) return;
+
+    const price = plan.pricesPerCountry[client.country];
+    const amount = sub.billingCycle === 'yearly' ? price.yearly : price.monthly;
+    const tax = Math.round(amount * (taxRateOf(client.country, get().countries) / 100) * 100) / 100;
+    const now = new Date();
+    const invoice: Invoice = {
+      id: newId('inv'),
+      number: `INV-2026-${String(get().invoices.length + 1).padStart(5, '0')}`,
+      clientId: sub.clientId,
+      subscriptionId: sub.id,
+      invoiceType: 'upgrade',
+      amount,
+      tax,
+      total: amount + tax,
+      currency: sub.currency,
+      status: 'unpaid',
+      dueDate: now.toISOString(),
+      items: [{
+        description: `ترقية إلى ${plan.nameAr} — ${sub.billingCycle === 'yearly' ? 'سنوي' : 'شهري'}`,
+        quantity: 1,
+        unitPrice: amount,
+        total: amount,
+      }],
+      createdAt: now.toISOString(),
+    };
+
+    set((s) => {
+      const subscriptions = s.subscriptions.map((x) =>
+        x.id === id
+          ? {
+              ...x,
+              planId: newPlanId,
+              amount,
+              // the old plan is over: the period closes now and the new one
+              // only starts once the upgrade invoice is paid
+              currentPeriodStart: now.toISOString(),
+              currentPeriodEnd: now.toISOString(),
+              status: 'past_due' as const,
+              scheduledPlanId: undefined,
+              graceExtended: false,
+              extensionDays: undefined,
+            }
+          : x
+      );
+      const upgraded = subscriptions.find((x) => x.id === id);
+      return {
+        subscriptions,
+        // an upgrade supersedes any scheduled switch and the invoice held for it
+        invoices: [invoice, ...s.invoices.filter((inv) => !(inv.subscriptionId === id && inv.status === 'scheduled'))],
+        clients: s.clients.map((c) =>
+          c.id === sub.clientId ? deriveClient({ ...c, planId: newPlanId }, upgraded) : c
+        ),
+      };
+    });
   },
 
   cancelScheduledPlanSwitch: (id) =>

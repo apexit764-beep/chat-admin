@@ -17,6 +17,7 @@ import {
   ClipboardList,
   ArrowRight,
   RotateCw,
+  TrendingUp,
 } from 'lucide-react';
 import { StatCard, useConfirm } from '@components/ui';
 import { useAdminStore } from '@/store/useAdminStore';
@@ -167,6 +168,7 @@ export default function AdminSubscriptions(): JSX.Element {
   const createSubscription = useAdminStore((s) => s.createSubscription);
   const markSubscriptionPaid = useAdminStore((s) => s.markSubscriptionPaid);
   const switchSubscriptionPlan = useAdminStore((s) => s.switchSubscriptionPlan);
+  const upgradeSubscriptionPlan = useAdminStore((s) => s.upgradeSubscriptionPlan);
   const cancelScheduledPlanSwitch = useAdminStore((s) => s.cancelScheduledPlanSwitch);
   const addNotification = useNotificationStore((s) => s.addNotification);
   const showToast = useUIStore((s) => s.showToast);
@@ -246,6 +248,26 @@ export default function AdminSubscriptions(): JSX.Element {
 
   const confirmCreate = (): void => {
     if (!createClient || !createPlan) return;
+
+    // a client who already has a live subscription changes it — a second
+    // subscription would leave the first one running and billing alongside it
+    if (createCurrentSub) {
+      if (switchScenario === 'upgrade') {
+        upgradeSubscriptionPlan(createCurrentSub.id, createPlan.id);
+        addNotification({
+          type: 'subscription',
+          title: 'بانتظار دفع الترقية',
+          body: `تمت ترقية باقة «${createClient.companyName}» إلى ${createPlan.nameAr}، وصدرت فاتورة الترقية بانتظار السداد.`,
+        });
+        showToast(`تمت ترقية الباقة إلى ${createPlan.nameAr} — الاشتراك بانتظار الدفع`, 'success');
+      } else {
+        switchSubscriptionPlan(createCurrentSub.id, createPlan.id, createSwitchMode);
+        showToast(`سيتم التخفيض إلى ${createPlan.nameAr} عند انتهاء الاشتراك الحالي`, 'success');
+      }
+      setCreateStep(null);
+      return;
+    }
+
     createSubscription(createClient.id, createPlan.id, createCycle);
     addNotification({
       type: 'subscription',
@@ -373,6 +395,31 @@ export default function AdminSubscriptions(): JSX.Element {
   };
 
   const [switchModal, setSwitchModal] = useState<{ subId: string; clientId: string; currentPlanId: string; companyName: string; newPlanId?: string } | null>(null);
+  /** an upgrade waits on this confirmation before anything is changed */
+  const [upgradeModal, setUpgradeModal] = useState<{ subId: string; companyName: string; newPlanId: string } | null>(null);
+
+  /** true when the plan picked in the switch modal costs more than the live one */
+  const switchIsUpgrade = useMemo(() => {
+    if (!switchModal?.newPlanId) return false;
+    const current = planOf(switchModal.currentPlanId);
+    const next = planOf(switchModal.newPlanId);
+    return Boolean(current && next && tierRank(next.tier) > tierRank(current.tier));
+  }, [switchModal, plans]);
+
+  /** confirming the upgrade ends the current plan and bills the new one in full */
+  const confirmUpgrade = (): void => {
+    if (!upgradeModal) return;
+    const target = planOf(upgradeModal.newPlanId);
+    upgradeSubscriptionPlan(upgradeModal.subId, upgradeModal.newPlanId);
+    addNotification({
+      type: 'subscription',
+      title: 'بانتظار دفع الترقية',
+      body: `تمت ترقية باقة «${upgradeModal.companyName}» إلى ${target?.nameAr ?? ''}، وصدرت فاتورة الترقية بانتظار السداد.`,
+    });
+    showToast(`تمت ترقية الباقة إلى ${target?.nameAr ?? ''} — الاشتراك بانتظار الدفع`, 'success');
+    setUpgradeModal(null);
+    setSwitchModal(null);
+  };
   const [extendModal, setExtendModal] = useState<{ subId: string; companyName: string; periodEnd: string; pastDue: boolean; planName: string } | null>(null);
   const [extendDays, setExtendDays] = useState('');
   const [extendError, setExtendError] = useState('');
@@ -888,9 +935,9 @@ export default function AdminSubscriptions(): JSX.Element {
                   {switchScenario === 'same' && ' — اختر باقة مختلفة للترقية أو التخفيض.'}
                   {switchScenario === 'upgrade' && (
                     <>
-                      . سيتم استبدالها بباقة{' '}
+                      . سيتم ترقية باقة العميل الحالية إلى{' '}
                       <span className="font-semibold">{createPlan?.nameAr}</span>{' '}
-                      فوراً مع احتساب فرق السعر (Proration).
+                      وإنهاء الباقة الحالية بشكل كامل.
                     </>
                   )}
                   {switchScenario === 'downgrade' && (
@@ -959,40 +1006,33 @@ export default function AdminSubscriptions(): JSX.Element {
                   <>
                     <CostRow
                       label={`سعر الباقة الحالية (${createCurrentPlan.nameAr})`}
-                      value={formatMoney(proration.currentAmount, createClient.currency)}
+                      value={`${formatMoney(proration.currentAmount, createClient.currency)} — تنتهي بالكامل`}
                     />
                     <CostRow
                       label={`سعر الباقة الجديدة (${createPlan?.nameAr ?? ''})`}
                       value={formatMoney(proration.newAmount, createClient.currency)}
                     />
-                    <CostRow
-                      label="فرق السعر"
-                      value={`${proration.difference >= 0 ? '+' : '−'} ${formatMoney(Math.abs(proration.difference), createClient.currency)}`}
-                      tone={proration.difference >= 0 ? 'up' : 'down'}
-                    />
                     <div className="border-t border-dashed pt-2.5 space-y-2.5">
                       <CostRow
-                        label="المتبقي من الدورة"
-                        value={`${proration.remainingUnits} من ${proration.cycleUnits} ${proration.unitLabel}`}
-                      />
-                      <CostRow
                         label="المقاصة (Proration)"
-                        value={`${formatMoney(Math.abs(proration.difference), createClient.currency)} × ${proration.remainingUnits}/${proration.cycleUnits}`}
+                        value="لا تنطبق — الباقة الحالية تنتهي بالكامل"
                       />
                       <CostRow
-                        label={proration.due >= 0 ? 'الفرق المستحق' : 'رصيد لصالح العميل'}
-                        value={formatMoney(Math.abs(proration.due), createClient.currency)}
+                        label="المستحق على العميل"
+                        value={formatMoney(proration.newAmount, createClient.currency)}
+                        tone="up"
                       />
-                      {proration.tax > 0 && (
-                        <CostRow label={`ضريبة ${taxRateFor(createClient.country)}%`} value={formatMoney(proration.tax, createClient.currency)} />
+                      {taxFor(proration.newAmount, createClient.country) > 0 && (
+                        <CostRow
+                          label={`ضريبة ${taxRateFor(createClient.country)}%`}
+                          value={formatMoney(taxFor(proration.newAmount, createClient.country), createClient.currency)}
+                        />
                       )}
                     </div>
                     <div className="border-t pt-2.5 flex items-center justify-between">
-                      <span className="text-sm font-semibold">
-                        {proration.due >= 0 ? 'الإجمالي المستحق الآن' : 'رصيد يُضاف للعميل'}
-                      </span>
+                      <span className="text-sm font-semibold">الإجمالي المستحق</span>
                       <span className="text-base font-bold">
-                        {formatMoney(Math.abs(proration.total), createClient.currency)}
+                        {formatMoney(proration.newAmount + taxFor(proration.newAmount, createClient.country), createClient.currency)}
                       </span>
                     </div>
                   </>
@@ -1107,7 +1147,7 @@ export default function AdminSubscriptions(): JSX.Element {
               ))}
             </div>
 
-            {switchModal?.newPlanId && (
+            {switchModal?.newPlanId && !switchIsUpgrade && (
               <div className="space-y-2 border-t pt-3">
                 <p className="text-sm text-muted-foreground">متى يتم التبديل؟</p>
                 <PlanSwitchOptions value={switchMode} onChange={setSwitchMode} />
@@ -1121,6 +1161,15 @@ export default function AdminSubscriptions(): JSX.Element {
               onClick={() => {
                 if (!switchModal?.newPlanId) return;
                 const target = planOf(switchModal.newPlanId);
+                if (switchIsUpgrade) {
+                  // an upgrade ends the current plan outright, so it is confirmed on its own
+                  setUpgradeModal({
+                    subId: switchModal.subId,
+                    companyName: switchModal.companyName,
+                    newPlanId: switchModal.newPlanId,
+                  });
+                  return;
+                }
                 switchSubscriptionPlan(switchModal.subId, switchModal.newPlanId, switchMode);
                 setSwitchModal(null);
                 showToast(
@@ -1133,6 +1182,34 @@ export default function AdminSubscriptions(): JSX.Element {
             >
               تأكيد التبديل
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!upgradeModal} onOpenChange={(o) => { if (!o) setUpgradeModal(null); }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <div className="flex items-center gap-3">
+              <span className="h-10 w-10 rounded-xl bg-warning/15 text-warning flex items-center justify-center shrink-0">
+                <TrendingUp className="h-5 w-5" />
+              </span>
+              <DialogTitle>ترقية الباقة</DialogTitle>
+            </div>
+          </DialogHeader>
+          <p className="text-sm leading-relaxed">
+            سيتم ترقية باقة العميل الحالية إلى{' '}
+            <span className="font-semibold">{upgradeModal && planOf(upgradeModal.newPlanId)?.nameAr}</span>{' '}
+            وإنهاء الباقة الحالية بشكل كامل.
+          </p>
+          <div className="flex items-start gap-2.5 rounded-xl border border-warning/30 bg-warning/10 p-3">
+            <AlertTriangle className="h-4 w-4 text-warning shrink-0 mt-0.5" />
+            <p className="text-xs text-warning leading-relaxed">
+              يصبح الاشتراك «متأخر الدفع» حتى يسدّد العميل فاتورة الباقة الجديدة بكاملها، وتظهر له في تبويب الطلبات مع زر «ادفع».
+            </p>
+          </div>
+          <DialogFooter className="gap-2 sm:justify-start">
+            <Button className="flex-1" onClick={confirmUpgrade}>تأكيد</Button>
+            <Button variant="outline" className="flex-1" onClick={() => setUpgradeModal(null)}>إلغاء</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
