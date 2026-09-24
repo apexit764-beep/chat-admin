@@ -137,7 +137,7 @@ type View = 'subscriptions' | 'requests';
 const statusLabel: Record<SubscriptionStatus, string> = {
   trial: 'تجريبي',
   active: 'نشط',
-  past_due: 'متأخر الدفع',
+  past_due: 'بانتظار الدفع',
   cancelled: 'ملغى',
 };
 
@@ -538,7 +538,7 @@ export default function AdminSubscriptions(): JSX.Element {
           iconColor="text-warning"
         />
         <StatCard
-          label="متأخرة الدفع"
+          label="بانتظار الدفع"
           value={stats.pastDue}
           icon={<AlertTriangle className="h-5 w-5" />}
           iconBg="bg-danger/15"
@@ -568,7 +568,7 @@ export default function AdminSubscriptions(): JSX.Element {
                 <SelectItem value="all">كل الحالات</SelectItem>
                 <SelectItem value="active">نشط</SelectItem>
                 <SelectItem value="trial">تجريبي</SelectItem>
-                <SelectItem value="past_due">متأخر الدفع</SelectItem>
+                <SelectItem value="past_due">بانتظار الدفع</SelectItem>
                 <SelectItem value="cancelled">ملغى</SelectItem>
                 <SelectItem value="scheduled">مجدولة</SelectItem>
               </SelectContent>
@@ -1101,7 +1101,7 @@ export default function AdminSubscriptions(): JSX.Element {
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 {!createCurrentPlan
-                  ? 'يُسجَّل الاشتراك بحالة متأخر الدفع، ولا يتحوّل إلى نشط إلا بعد أن يُتمّ العميل الدفع بنجاح.'
+                  ? 'يُسجَّل الاشتراك بحالة بانتظار الدفع، ولا يتحوّل إلى نشط إلا بعد أن يُتمّ العميل الدفع بنجاح.'
                   : createSwitchMode === 'now'
                     ? 'تُبدَّل الباقة فوراً، ويُحتسب فرق السعر عن المدة المتبقية من الدورة فتُولَّد فاتورة بالفرق أو رصيد لصالح العميل.'
                     : 'تبقى الباقة الحالية سارية حتى انتهائها، ثم تُفعَّل الباقة الأقل تلقائياً. وتُولَّد فاتورة بحالة «مجدولة» للفترة القادمة، يمكن إلغاؤها من إجراء «إلغاء الجدولة».'}
@@ -1204,7 +1204,7 @@ export default function AdminSubscriptions(): JSX.Element {
           <div className="flex items-start gap-2.5 rounded-xl border border-warning/30 bg-warning/10 p-3">
             <AlertTriangle className="h-4 w-4 text-warning shrink-0 mt-0.5" />
             <p className="text-xs text-warning leading-relaxed">
-              يصبح الاشتراك «متأخر الدفع» حتى يسدّد العميل فاتورة الباقة الجديدة بكاملها، وتظهر له في تبويب الطلبات مع زر «ادفع».
+              يصبح الاشتراك «بانتظار الدفع» حتى يسدّد العميل فاتورة الباقة الجديدة بكاملها، وتظهر له في تبويب الطلبات مع زر «ادفع».
             </p>
           </div>
           <DialogFooter className="gap-2 sm:justify-start">
@@ -1277,7 +1277,7 @@ export default function AdminSubscriptions(): JSX.Element {
               <div className="flex items-start gap-2.5 rounded-xl border border-warning/30 bg-warning/10 p-3">
                 <AlertTriangle className="h-4 w-4 text-warning shrink-0 mt-0.5" />
                 <p className="text-xs text-warning leading-relaxed">
-                  الفاتورة المستحقة تبقى غير مدفوعة؛ التمديد يمنح العميل مهلة إضافية فقط، وتعود حالة الاشتراك إلى «متأخرة» عند انتهاء المهلة ما لم يُسدَّد المبلغ.
+                  الفاتورة المستحقة تبقى غير مدفوعة؛ التمديد يمنح العميل مهلة إضافية فقط، وتعود حالة الاشتراك إلى «بانتظار الدفع» عند انتهاء المهلة ما لم يُسدَّد المبلغ.
                 </p>
               </div>
             )}

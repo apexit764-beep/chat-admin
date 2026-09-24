@@ -644,7 +644,7 @@ export default function LiveChat() {
                 const statusLabel: Record<string, { label: string; class: string }> = {
                   trial: { label: 'فترة تجريبية', class: 'bg-info/15 text-info' },
                   active: { label: 'نشط', class: 'bg-success/15 text-success' },
-                  past_due: { label: 'متأخر', class: 'bg-warning/15 text-warning' },
+                  past_due: { label: 'بانتظار الدفع', class: 'bg-warning/15 text-warning' },
                   suspended: { label: 'موقوف', class: 'bg-danger/15 text-danger' },
                   cancelled: { label: 'ملغي', class: 'bg-muted text-muted-foreground' },
                 };

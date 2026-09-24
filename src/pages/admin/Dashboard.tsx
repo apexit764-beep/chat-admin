@@ -434,7 +434,7 @@ export default function AdminDashboard(): JSX.Element {
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <CardTitle className="text-sm">متأخرون عن الدفع</CardTitle>
+                <CardTitle className="text-sm">بانتظار الدفع</CardTitle>
                 <Badge variant="warning" className="text-[10px]">{pastDueClients.length}</Badge>
               </div>
               {pastDueClients.length > 0 && (
@@ -446,7 +446,7 @@ export default function AdminDashboard(): JSX.Element {
           </CardHeader>
           <CardContent className="p-0">
             {pastDueClients.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-8 text-center">لا يوجد متأخرين — كل الاشتراكات مسدّدة</p>
+              <p className="text-sm text-muted-foreground py-8 text-center">لا يوجد اشتراكات بانتظار الدفع — كلها مسدّدة</p>
             ) : (
               <Table>
                 <TableHeader>
@@ -589,7 +589,7 @@ function StatusPill({ status }: { status: Client['status'] }): JSX.Element {
     trial_ended: { label: 'انتهت التجربة', variant: 'warning' },
     active: { label: 'نشط', variant: 'success' },
     trial: { label: 'تجريبي', variant: 'default' },
-    past_due: { label: 'متأخر', variant: 'warning' },
+    past_due: { label: 'بانتظار الدفع', variant: 'warning' },
     suspended: { label: 'موقوف', variant: 'destructive' },
     cancelled: { label: 'ملغي', variant: 'outline' },
   };

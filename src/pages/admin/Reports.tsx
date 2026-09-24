@@ -98,7 +98,7 @@ export default function AdminReports(): JSX.Element {
   const statusDist = useMemo(() => [
     { label: 'نشط', value: activeClients.length, color: '#10B981' },
     { label: 'تجريبي', value: trialClients.length, color: '#3B82F6' },
-    { label: 'متأخر', value: clients.filter((c) => c.status === 'past_due').length, color: '#F59E0B' },
+    { label: 'بانتظار الدفع', value: clients.filter((c) => c.status === 'past_due').length, color: '#F59E0B' },
     { label: 'موقوف', value: clients.filter((c) => c.status === 'suspended').length, color: '#EF4444' },
     { label: 'ملغي', value: churnCount, color: '#6B7280' },
   ].filter((s) => s.value > 0), [clients, activeClients, trialClients, churnCount]);

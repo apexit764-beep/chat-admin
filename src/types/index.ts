@@ -276,7 +276,7 @@ export interface Subscription {
   scheduledPlanId?: string;
   /**
    * the admin granted extra days on an overdue renewal: the subscription reads
-   * «نشط» until they run out, then it falls back to «متأخرة» without re-billing
+   * «نشط» until they run out, then it falls back to «بانتظار الدفع» without re-billing
    */
   graceExtended?: boolean;
   /** how many days the last manual extension added */

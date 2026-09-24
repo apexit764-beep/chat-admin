@@ -125,7 +125,7 @@ const statusLabel: Record<ClientStatus, string> = {
   trial: 'فترة تجريبية',
   trial_ended: 'انتهت التجربة',
   active: 'نشط',
-  past_due: 'متأخر',
+  past_due: 'بانتظار الدفع',
   suspended: 'موقوف',
   cancelled: 'ملغي',
 };
@@ -611,7 +611,7 @@ export default function ClientDetail(): JSX.Element {
                       sub.status === 'past_due' && 'bg-warning/15 text-warning',
                       sub.status === 'cancelled' && 'bg-muted text-muted-foreground',
                     )}>
-                      {sub.status === 'active' ? 'نشط' : sub.status === 'past_due' ? 'متأخر' : 'ملغي'}
+                      {sub.status === 'active' ? 'نشط' : sub.status === 'past_due' ? 'بانتظار الدفع' : 'ملغي'}
                     </Badge>
                   </div>
 

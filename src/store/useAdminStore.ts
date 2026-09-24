@@ -140,7 +140,7 @@ interface AdminState {
   /**
    * Upgrade to a dearer plan: the current plan ends outright — no credit for
    * what was left of it — and the client owes the new plan's full price before
-   * it runs, so the subscription waits on that payment as «متأخر الدفع».
+   * it runs, so the subscription waits on that payment as «بانتظار الدفع».
    */
   upgradeSubscriptionPlan: (id: string, newPlanId: string) => void;
   /** drops a scheduled switch and the invoice held for it */
@@ -642,7 +642,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       }
       if (sub.status !== 'active' || periodEnd > now) return sub;
 
-      // the extra days the admin granted ran out: back to «متأخرة» on the renewal
+      // the extra days the admin granted ran out: back to «بانتظار الدفع» on the renewal
       // that was never paid — no second invoice is issued for the same period
       if (sub.graceExtended) {
         return { ...sub, status: 'past_due' as const, graceExtended: false };
