@@ -60,7 +60,9 @@ export default function Login(): JSX.Element {
       <div className="w-full max-w-md relative">
         {/* Brand */}
         <div className="flex flex-col items-center mb-8">
-          <img src="/qhub-logo.png" alt="Qhub" className="h-16 w-auto mb-3 drop-shadow-sm" />
+          <img src="/qhub-icon.svg" alt="Qhub" className="h-16 w-auto mb-3 drop-shadow-sm" />
+          {/* the mark carries no wordmark, so the name is set in type beside it */}
+          <span className="text-2xl font-bold tracking-tight mb-1">Qhub</span>
           <p className="text-xs text-muted-light dark:text-muted-dark">لوحة تحكم واتساب CRM</p>
         </div>
 
