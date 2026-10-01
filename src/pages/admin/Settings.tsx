@@ -28,7 +28,9 @@ import { useAdminStore } from '@/store/useAdminStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useUIStore } from '@/store/useUIStore';
 import { useThemeStore } from '@/store/useThemeStore';
-import { useSettingsStore } from '@/store/useSettingsStore';
+import { useSettingsStore, MAIL_TRIGGERS, MAIL_VARIABLES } from '@/store/useSettingsStore';
+import { renderEmail } from '@/utils/emailShell';
+import type { EmailTemplate, EmailButton } from '@/store/useSettingsStore';
 import { initials, avatarColor } from '@/utils/format';
 import { cn } from '@/lib/utils';
 
@@ -76,17 +78,7 @@ const PAYMENT_METHODS = [
   { key: 'bank_transfer', label: 'تحويل بنكي' },
 ] as const;
 
-const TRIGGER_EVENTS = [
-  { key: 'on_client_registered', label: 'عند التسجيل', description: 'يُرسل عند تسجيل عميل جديد في النظام' },
-  { key: 'on_invoice_created', label: 'عند إصدار فاتورة', description: 'يُرسل عند إنشاء فاتورة جديدة للعميل' },
-  { key: 'before_renewal', label: 'قبل التجديد', description: 'تذكير تلقائي قبل تجديد الاشتراك بمدة محددة', hasDuration: true },
-  { key: 'on_renewal', label: 'عند التجديد', description: 'يُرسل عند تجديد الاشتراك بنجاح' },
-  { key: 'on_subscription_expired', label: 'عند انتهاء الاشتراك', description: 'يُرسل عند انتهاء صلاحية اشتراك العميل' },
-  { key: 'on_plan_upgraded', label: 'عند ترقية الباقة', description: 'يُرسل عند ترقية العميل لباقة أعلى' },
-  { key: 'on_plan_downgraded', label: 'عند تخفيض الباقة', description: 'يُرسل عند تخفيض العميل لباقة أقل' },
-  { key: 'on_payment_failed', label: 'عند فشل الدفع', description: 'يُرسل عند فشل عملية الدفع' },
-  { key: 'on_payment_success', label: 'عند نجاح الدفع', description: 'يُرسل بعد تأكيد الدفع بنجاح' },
-] as const;
+const TRIGGER_EVENTS = MAIL_TRIGGERS;
 
 
 export default function AdminSettings(): JSX.Element {
@@ -132,14 +124,10 @@ export default function AdminSettings(): JSX.Element {
   const [otpSentPhone, setOtpSentPhone] = useState(false);
   const [emailOtp, setEmailOtp] = useState(['', '', '', '', '', '']);
   const [phoneOtp, setPhoneOtp] = useState(['', '', '', '', '', '']);
-  // Email templates CRUD
-  type EmailButton = { text: string; url: string; variant: 'primary' | 'outline' | 'link' };
-  type EmailTemplate = { id: string; name: string; subject: string; body: string; trigger: string; triggerDays?: string; buttons?: EmailButton[] };
-  const [emailTemplates, setEmailTemplates] = useState<EmailTemplate[]>([
-    { id: '1', name: 'رسالة الترحيب', subject: 'مرحباً بك في {{product_name}}', body: 'مرحباً {{client_name}}!\n\nشكراً لتسجيلك في {{product_name}}. حسابك جاهز للاستخدام.\n\nفريق الدعم', trigger: 'on_client_registered' },
-    { id: '2', name: 'إشعار فاتورة', subject: 'فاتورة جديدة #{{invoice_number}}', body: 'مرحباً {{client_name}},\n\nتم إصدار فاتورة جديدة بمبلغ {{amount}} {{currency}}.\nرقم الفاتورة: {{invoice_number}}\n\nشكراً لثقتكم.', trigger: 'on_invoice_created' },
-    { id: '3', name: 'تذكير تجديد', subject: 'تجديد اشتراكك في {{plan_name}}', body: 'مرحباً {{client_name}},\n\nاشتراكك في باقة {{plan_name}} سيتجدد خلال 3 أيام.\nالمبلغ: {{amount}} {{currency}}\n\nللتعديل أو الإلغاء تواصل معنا.', trigger: 'before_renewal', triggerDays: '3' },
-  ]);
+  // Email templates live in the settings store so edits survive a reload
+  const emailTemplates = useSettingsStore((s) => s.emailTemplates);
+  const saveEmailTemplate = useSettingsStore((s) => s.saveEmailTemplate);
+  const deleteEmailTemplate = useSettingsStore((s) => s.deleteEmailTemplate);
   const [emailModal, setEmailModal] = useState<(EmailTemplate & { isNew: boolean }) | null>(null);
   const [emailPreview, setEmailPreview] = useState(false);
   const [previewTemplate, setPreviewTemplate] = useState<EmailTemplate | null>(null);
@@ -785,7 +773,7 @@ export default function AdminSettings(): JSX.Element {
                             </Button>
                             <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={async () => {
                               const ok = await confirm({ title: `حذف "${t.name}"؟`, variant: 'danger', confirmText: 'حذف' });
-                              if (ok) { setEmailTemplates((prev) => prev.filter((x) => x.id !== t.id)); showToast('تم الحذف', 'success'); }
+                              if (ok) { deleteEmailTemplate(t.id); showToast('تم الحذف', 'success'); }
                             }}>
                               <Trash2 className="h-3.5 w-3.5" />
                             </Button>
@@ -1155,7 +1143,7 @@ export default function AdminSettings(): JSX.Element {
 
       {/* Email Template Modal */}
       <Dialog open={!!emailModal} onOpenChange={(o) => { if (!o) { setEmailModal(null); setEmailPreview(false); } }}>
-        <DialogContent className="max-w-lg border max-h-[85vh] flex flex-col">
+        <DialogContent className="max-w-2xl border max-h-[88vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>{emailPreview ? 'معاينة القالب' : emailModal?.isNew ? 'إضافة قالب بريد' : 'تعديل قالب بريد'}</DialogTitle>
           </DialogHeader>
@@ -1180,11 +1168,16 @@ export default function AdminSettings(): JSX.Element {
                         <SelectValue placeholder="اختر الحدث المشغّل" />
                       </SelectTrigger>
                       <SelectContent dir="rtl">
-                        {TRIGGER_EVENTS.map((ev) => (
-                          <SelectItem key={ev.key} value={ev.key}>
-                            {ev.label}
-                          </SelectItem>
-                        ))}
+                        {TRIGGER_EVENTS.map((ev) => {
+                          // an event already covered by another template cannot be picked twice
+                          const takenBy = emailTemplates.find((x) => x.trigger === ev.key && x.id !== emailModal.id);
+                          return (
+                            <SelectItem key={ev.key} value={ev.key} disabled={Boolean(takenBy)}>
+                              {ev.label}
+                              {takenBy && <span className="text-[10px] text-muted-foreground"> — مستخدم في «{takenBy.name}»</span>}
+                            </SelectItem>
+                          );
+                        })}
                       </SelectContent>
                     </Select>
                   </div>
@@ -1234,7 +1227,7 @@ export default function AdminSettings(): JSX.Element {
                   onBlur={(e) => setEmailModal({ ...emailModal, body: e.currentTarget.innerHTML })}
                 />
                 <p className="text-[11px] text-muted-foreground">
-                  المتغيرات: {'{{client_name}}'}, {'{{product_name}}'}, {'{{amount}}'}, {'{{currency}}'}, {'{{invoice_number}}'}, {'{{plan_name}}'}
+                  المتغيرات: {MAIL_VARIABLES.map((v) => `{{${v}}}`).join('، ')}
                 </p>
                 {emailErrors.body && <p className="text-xs text-destructive mt-1">{emailErrors.body}</p>}
               </div>
@@ -1332,40 +1325,28 @@ export default function AdminSettings(): JSX.Element {
             </div>
           )}
           {emailModal && emailPreview && (
-            <div className="flex-1 overflow-y-auto">
-              <div className="border rounded-lg overflow-hidden">
-                <div className="bg-primary px-6 py-4">
-                  <p className="text-primary-foreground font-semibold text-center">{company.name || 'Qhub'}</p>
-                </div>
-                <div className="px-6 py-5 space-y-3 bg-card">
-                  <p className="text-xs text-muted-foreground">الموضوع: <span className="text-foreground font-medium">{emailModal.subject || '—'}</span></p>
-                  <Separator />
-                  <div dir="rtl" className="prose prose-sm max-w-none text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: emailModal.body || '<p class="text-muted-foreground">لا يوجد محتوى</p>' }} />
-                  {emailModal.buttons && emailModal.buttons.length > 0 && (
-                    <>
-                      <Separator />
-                      <div className="flex gap-2 justify-center py-2">
-                        {emailModal.buttons.map((btn, idx) => (
-                          <span
-                            key={idx}
-                            className={cn(
-                              'inline-block px-5 py-2 rounded-md text-sm font-medium',
-                              btn.variant === 'primary' && 'bg-primary text-primary-foreground',
-                              btn.variant === 'outline' && 'border border-primary text-primary bg-transparent',
-                              btn.variant === 'link' && 'text-primary underline bg-transparent',
-                            )}
-                          >
-                            {btn.text || 'زر'}
-                          </span>
-                        ))}
-                      </div>
-                    </>
-                  )}
-                </div>
-                <div className="bg-muted/50 px-6 py-3 text-center">
-                  <p className="text-[11px] text-muted-foreground">{company.name || 'Qhub'} &copy; {new Date().getFullYear()}</p>
-                </div>
-              </div>
+            <div className="flex-1 overflow-y-auto space-y-2">
+              <p className="text-xs text-muted-foreground">
+                الموضوع: <span className="text-foreground font-medium">{emailModal.subject || '—'}</span>
+              </p>
+              <iframe
+                title="معاينة البريد"
+                className="w-full h-[420px] rounded-lg border bg-white"
+                srcDoc={renderEmail({
+                  subject: emailModal.subject,
+                  bodyHtml: emailModal.body,
+                  buttons: emailModal.buttons,
+                  company: {
+                    name: company.name || 'Qhub',
+                    address: company.address,
+                    email: company.email,
+                    phone: company.phone,
+                    website: company.website,
+                  },
+                  logoUrl: `${window.location.origin}/qhub-icon.svg`,
+                  social,
+                })}
+              />
             </div>
           )}
           <DialogFooter>
@@ -1392,13 +1373,13 @@ export default function AdminSettings(): JSX.Element {
                   setEmailErrors(errs);
                   if (Object.keys(errs).length) { showToast('يرجى تعبئة الحقول المطلوبة', 'error'); return; }
                   const tpl: EmailTemplate = { id: emailModal.id, name: emailModal.name, subject: emailModal.subject, body: emailModal.body, trigger: emailModal.trigger, triggerDays: emailModal.triggerDays, buttons: emailModal.buttons?.length ? emailModal.buttons : undefined };
-                  if (emailModal.isNew) {
-                    setEmailTemplates((prev) => [...prev, tpl]);
-                    showToast('تمت الإضافة', 'success');
-                  } else {
-                    setEmailTemplates((prev) => prev.map((t) => t.id === tpl.id ? tpl : t));
-                    showToast('تم الحفظ', 'success');
+                  if (!saveEmailTemplate(tpl)) {
+                    const taken = TRIGGER_EVENTS.find((e) => e.key === tpl.trigger)?.label ?? tpl.trigger;
+                    setEmailErrors({ trigger: `يوجد قالب آخر على حدث «${taken}» — لكل حدث قالب واحد` });
+                    showToast('هذا الحدث مرتبط بقالب آخر', 'error');
+                    return;
                   }
+                  showToast(emailModal.isNew ? 'تمت الإضافة' : 'تم الحفظ', 'success');
                   setEmailModal(null);
                   setEmailPreview(false);
                 }}>حفظ</Button>
@@ -1418,42 +1399,33 @@ export default function AdminSettings(): JSX.Element {
       {/* Email Preview-only Dialog */}
       <Dialog open={!!previewTemplate} onOpenChange={(o) => { if (!o) setPreviewTemplate(null); }}>
         {previewTemplate && (
-          <DialogContent className="max-w-lg border">
+          <DialogContent className="max-w-2xl border">
             <DialogHeader>
               <DialogTitle>معاينة: {previewTemplate.name}</DialogTitle>
             </DialogHeader>
-            <div className="border rounded-lg overflow-hidden">
-              <div className="bg-primary px-6 py-4">
-                <p className="text-primary-foreground font-semibold text-center">{company.name || 'Qhub'}</p>
-              </div>
-              <div className="px-6 py-5 space-y-3 bg-card">
-                <p className="text-xs text-muted-foreground">الموضوع: <span className="text-foreground font-medium">{previewTemplate.subject || '—'}</span></p>
-                <Separator />
-                <div dir="rtl" className="prose prose-sm max-w-none text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: previewTemplate.body || '<p class="text-muted-foreground">لا يوجد محتوى</p>' }} />
-                {previewTemplate.buttons && previewTemplate.buttons.length > 0 && (
-                  <>
-                    <Separator />
-                    <div className="flex gap-2 justify-center py-2">
-                      {previewTemplate.buttons.map((btn, idx) => (
-                        <span
-                          key={idx}
-                          className={cn(
-                            'inline-block px-5 py-2 rounded-md text-sm font-medium',
-                            btn.variant === 'primary' && 'bg-primary text-primary-foreground',
-                            btn.variant === 'outline' && 'border border-primary text-primary bg-transparent',
-                            btn.variant === 'link' && 'text-primary underline bg-transparent',
-                          )}
-                        >
-                          {btn.text || 'زر'}
-                        </span>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
-              <div className="bg-muted/50 px-6 py-3 text-center">
-                <p className="text-[11px] text-muted-foreground">{company.name || 'Qhub'} &copy; {new Date().getFullYear()}</p>
-              </div>
+            <div className="space-y-2">
+              <p className="text-xs text-muted-foreground">
+                الموضوع: <span className="text-foreground font-medium">{previewTemplate.subject || '—'}</span>
+              </p>
+              {/* an iframe so the mail is shown in its own styles, not the panel's */}
+              <iframe
+                title="معاينة البريد"
+                className="w-full h-[560px] rounded-lg border bg-white"
+                srcDoc={renderEmail({
+                  subject: previewTemplate.subject,
+                  bodyHtml: previewTemplate.body,
+                  buttons: previewTemplate.buttons,
+                  company: {
+                    name: company.name || 'Qhub',
+                    address: company.address,
+                    email: company.email,
+                    phone: company.phone,
+                    website: company.website,
+                  },
+                  logoUrl: `${window.location.origin}/qhub-icon.svg`,
+                  social,
+                })}
+              />
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setPreviewTemplate(null)}>إغلاق</Button>
