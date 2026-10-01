@@ -97,6 +97,7 @@ export default function AdminSettings(): JSX.Element {
   const theme = useThemeStore((s) => s.theme);
   const setTheme = useThemeStore((s) => s.setTheme);
   const company = useSettingsStore((s) => s.company);
+  const general = useSettingsStore((s) => s.general);
   const setCompany = useSettingsStore((s) => s.setCompany);
   const social = useSettingsStore((s) => s.social);
   const setSocial = useSettingsStore((s) => s.setSocial);
@@ -1336,12 +1337,17 @@ export default function AdminSettings(): JSX.Element {
                   subject: emailModal.subject,
                   bodyHtml: emailModal.body,
                   buttons: emailModal.buttons,
-                  company: {
-                    name: company.name || 'Qhub',
+                  product: {
+                    name: general.siteName || 'Qhub',
+                    siteUrl: general.siteUrl,
+                    supportEmail: general.supportEmail,
+                    supportPhone: general.supportPhone,
+                  },
+                  legal: {
+                    name: company.name,
                     address: company.address,
-                    email: company.email,
-                    phone: company.phone,
-                    website: company.website,
+                    taxId: company.taxId,
+                    registrationNumber: company.registrationNumber,
                   },
                   logoUrl: `${window.location.origin}/qhub-icon.svg`,
                   social,
@@ -1415,12 +1421,17 @@ export default function AdminSettings(): JSX.Element {
                   subject: previewTemplate.subject,
                   bodyHtml: previewTemplate.body,
                   buttons: previewTemplate.buttons,
-                  company: {
-                    name: company.name || 'Qhub',
+                  product: {
+                    name: general.siteName || 'Qhub',
+                    siteUrl: general.siteUrl,
+                    supportEmail: general.supportEmail,
+                    supportPhone: general.supportPhone,
+                  },
+                  legal: {
+                    name: company.name,
                     address: company.address,
-                    email: company.email,
-                    phone: company.phone,
-                    website: company.website,
+                    taxId: company.taxId,
+                    registrationNumber: company.registrationNumber,
                   },
                   logoUrl: `${window.location.origin}/qhub-icon.svg`,
                   social,

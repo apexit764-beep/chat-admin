@@ -15,12 +15,23 @@ export interface EmailShellInput {
   /** the template body, already HTML */
   bodyHtml: string;
   buttons?: EmailButton[];
-  company: {
+  /**
+   * The brand the client actually subscribed to — this is what goes at the top.
+   * It is NOT the operating company: a client signs up for the product and may
+   * never have heard the legal entity's name.
+   */
+  product: {
     name: string;
+    siteUrl?: string;
+    supportEmail?: string;
+    supportPhone?: string;
+  };
+  /** The entity behind the product. Belongs in the footer, where it is also the legally useful place. */
+  legal?: {
+    name?: string;
     address?: string;
-    email?: string;
-    phone?: string;
-    website?: string;
+    taxId?: string;
+    registrationNumber?: string;
   };
   /** absolute URL — mail clients cannot resolve a relative path */
   logoUrl?: string;
@@ -69,9 +80,9 @@ function styleBody(html: string): string {
 }
 
 export function renderEmail(input: EmailShellInput): string {
-  const { subject, bodyHtml, buttons = [], company, logoUrl, social = {} } = input;
+  const { subject, bodyHtml, buttons = [], product, legal = {}, logoUrl, social = {} } = input;
   const year = input.year ?? new Date().getFullYear();
-  const name = esc(company.name || 'Qhub');
+  const name = esc(product.name || 'Qhub');
 
   const header = logoUrl
     ? `<img src="${esc(logoUrl)}" width="52" height="52" alt="${name}" style="display:block;margin:0 auto 10px;border:0;" />`
@@ -83,15 +94,24 @@ export function renderEmail(input: EmailShellInput): string {
        </td></tr>`
     : '';
 
+  // how the client reaches support — not the company's switchboard
   const contact = [
-    company.email ? `<a href="mailto:${esc(company.email)}" style="color:${MUTED};text-decoration:none;">${esc(company.email)}</a>` : '',
-    company.phone ? esc(company.phone) : '',
-    company.website ? `<a href="${esc(company.website)}" style="color:${MUTED};text-decoration:none;">${esc(company.website)}</a>` : '',
+    product.supportEmail ? `<a href="mailto:${esc(product.supportEmail)}" style="color:${MUTED};text-decoration:none;">${esc(product.supportEmail)}</a>` : '',
+    product.supportPhone ? esc(product.supportPhone) : '',
+    product.siteUrl ? `<a href="${esc(product.siteUrl)}" style="color:${MUTED};text-decoration:none;">${esc(product.siteUrl.replace(/^https?:\/\//, ''))}</a>` : '',
   ].filter(Boolean).join(' &nbsp;·&nbsp; ');
 
   const links = Object.entries(social).filter(([, v]) => v)
     .map(([k, v]) => `<a href="${esc(v as string)}" style="color:${MUTED};text-decoration:none;font-size:12px;">${k}</a>`)
     .join(' &nbsp;·&nbsp; ');
+
+  // the operating entity, shown once, at the bottom
+  const legalLine = [
+    legal.name ? esc(legal.name) : '',
+    legal.address ? esc(legal.address) : '',
+    legal.registrationNumber ? `س.ت ${esc(legal.registrationNumber)}` : '',
+    legal.taxId ? `ر.ض ${esc(legal.taxId)}` : '',
+  ].filter(Boolean).join(' &nbsp;·&nbsp; ');
 
   return `<!doctype html>
 <html lang="ar" dir="rtl"><head>
@@ -124,9 +144,9 @@ export function renderEmail(input: EmailShellInput): string {
     </td></tr>
 
     <tr><td align="center" style="padding:0 32px 28px;">
-      ${company.address ? `<div style="font-family:${FONT};font-size:12px;line-height:1.7;color:${MUTED};margin-bottom:4px;">${esc(company.address)}</div>` : ''}
       ${contact ? `<div style="font-family:${FONT};font-size:12px;line-height:1.7;color:${MUTED};margin-bottom:6px;">${contact}</div>` : ''}
-      ${links ? `<div style="font-family:${FONT};line-height:1.7;margin-bottom:6px;">${links}</div>` : ''}
+      ${links ? `<div style="font-family:${FONT};line-height:1.7;margin-bottom:8px;">${links}</div>` : ''}
+      ${legalLine ? `<div style="font-family:${FONT};font-size:11px;line-height:1.7;color:${MUTED};margin-bottom:4px;">${legalLine}</div>` : ''}
       <div style="font-family:${FONT};font-size:11px;color:${MUTED};">&copy; ${year} ${name}. جميع الحقوق محفوظة.</div>
     </td></tr>
 
