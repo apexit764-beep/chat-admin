@@ -39,11 +39,18 @@ export interface EmailShellInput {
   year?: number;
 }
 
-const BRAND = '#1F5AE0';
+const BRAND = '#2563EB';
 const INK = '#0F172A';
-const MUTED = '#64748B';
-const LINE = '#E2E8F0';
-const CANVAS = '#F1F5F9';
+const BODY_INK = '#475569';
+const MUTED = '#8494AC';
+const LINE = '#E6EBF4';
+/** deep enough that the white card's edge stays visible against it */
+const CANVAS = '#E8EDF6';
+
+/** the logo's own gradient, so the top bar reads as an extension of the mark */
+const BAR_GRADIENT = 'linear-gradient(90deg,#73C0FB 0%,#2E8BF5 38%,#1F5AE0 72%,#1433B8 100%)';
+/** Outlook paints with Word and ignores gradients — it gets this flat mid-tone instead */
+const BAR_FALLBACK = '#2E7BEE';
 const FONT = "'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, Arial, sans-serif";
 
 const esc = (s: string): string =>
@@ -72,9 +79,11 @@ function renderButton(btn: EmailButton): string {
 function styleBody(html: string): string {
   return html
     .replace(/ class="[^"]*"/g, '')
-    .replace(/<p>/g, `<p style="margin:0 0 16px;font-family:${FONT};font-size:15px;line-height:1.9;color:${INK};">`)
+    .replace(/<p>/g, `<p style="margin:0 0 16px;font-family:${FONT};font-size:15px;line-height:1.9;color:${BODY_INK};">`)
     .replace(/<h2>/g, `<h2 style="margin:0 0 12px;font-family:${FONT};font-size:19px;line-height:1.5;color:${INK};font-weight:700;">`)
-    .replace(/<(ul|ol)>/g, `<$1 style="margin:0 0 16px;padding-inline-start:22px;font-family:${FONT};font-size:15px;line-height:1.9;color:${INK};">`)
+    .replace(/<(ul|ol)>/g, `<$1 style="margin:0 0 16px;padding-inline-start:22px;font-family:${FONT};font-size:15px;line-height:1.9;color:${BODY_INK};">`)
+    .replace(/<b>/g, `<b style="color:${INK};">`)
+    .replace(/<strong>/g, `<strong style="color:${INK};">`)
     .replace(/<li>/g, '<li style="margin:0 0 6px;">')
     .replace(/<a /g, `<a style="color:${BRAND};text-decoration:underline;" `);
 }
@@ -85,7 +94,7 @@ export function renderEmail(input: EmailShellInput): string {
   const name = esc(product.name || 'Qhub');
 
   const header = logoUrl
-    ? `<img src="${esc(logoUrl)}" width="52" height="52" alt="${name}" style="display:block;margin:0 auto 10px;border:0;" />`
+    ? `<img src="${esc(logoUrl)}" width="54" height="54" alt="${name}" style="display:block;margin:0 auto 10px;border:0;" />`
     : '';
 
   const buttonsRow = buttons.length
@@ -123,17 +132,19 @@ export function renderEmail(input: EmailShellInput): string {
 <body style="margin:0;padding:0;background:${CANVAS};">
 <!-- the line shown next to the subject in the inbox, never on the page itself -->
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;">${esc(subject)}</div>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${CANVAS};padding:28px 12px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${CANVAS};padding:34px 12px;">
 <tr><td align="center">
 
-  <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:100%;background:#FFFFFF;border:1px solid ${LINE};border-radius:14px;overflow:hidden;">
+  <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:100%;background:#FFFFFF;border:1px solid ${LINE};border-radius:16px;overflow:hidden;">
 
-    <tr><td align="center" style="padding:28px 32px 20px;border-bottom:1px solid ${LINE};">
+    <tr><td bgcolor="${BAR_FALLBACK}" style="background:${BAR_FALLBACK};background-image:${BAR_GRADIENT};height:7px;line-height:7px;font-size:0;">&nbsp;</td></tr>
+
+    <tr><td align="center" style="padding:32px 32px 22px;border-bottom:1px solid ${LINE};">
       ${header}
       <div style="font-family:${FONT};font-size:17px;font-weight:700;color:${INK};letter-spacing:-0.2px;">${name}</div>
     </td></tr>
 
-    <tr><td style="padding:28px 32px 4px;" dir="rtl">
+    <tr><td style="padding:30px 34px 6px;" dir="rtl">
       ${styleBody(bodyHtml || `<p style="color:${MUTED};">لا يوجد محتوى</p>`)}
     </td></tr>
 
