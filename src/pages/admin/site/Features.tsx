@@ -15,8 +15,8 @@ export const SITE_URL = 'https://qhub-lp.apexes.click';
  * تُرتَّب وتُحرَّر. ترتيبها هنا هو ترتيبها في النافبار والفوتر وسكشن المزايا.
  */
 export default function SiteFeatures(): JSX.Element {
-  const cards = useSiteContentStore((s) => s.draft.cards);
-  const pages = useSiteContentStore((s) => s.draft.pages);
+  const cards = useSiteContentStore((s) => s.draft.features.cards);
+  const pages = useSiteContentStore((s) => s.draft.features.pages);
   const history = useSiteContentStore((s) => s.history);
   const moveCard = useSiteContentStore((s) => s.moveCard);
   const resetToSite = useSiteContentStore((s) => s.resetToSite);
@@ -89,13 +89,13 @@ export default function SiteFeatures(): JSX.Element {
         </Card>
       </div>
 
-      <PublishBar />
+      <PublishBar scope="features" />
     </div>
   );
 }
 
 function FeatureRow({ slug, index, total, onMove, entity }: { slug: string; index: number; total: number; onMove: (from: number, to: number) => void; entity: { card: FeatureCard; page: unknown } }): JSX.Element {
-  const unpublished = useUnpublished(slug);
+  const unpublished = useUnpublished('features', slug);
   const { card } = entity;
 
   return (

@@ -1,3903 +1,11872 @@
 /**
- * محتوى صفحات المزايا كما هو على الموقع — مولَّد، لا تعدّله يدوياً.
- * المصدر: qhub-site (2026-10-12T09:14:49.609Z)
+ * محتوى الموقع التعريفي كما هو على الموقع — مولَّد، لا تعدّله يدوياً.
+ * المصدر: qhub-site (2026-10-12T10:17:20.399Z)
  * إعادة التوليد: node scripts/import-site-content.mjs <content-seed.json>
  */
-import type { FeatureCard, FeaturePage } from '@/types/siteContent';
+import type { SiteContent } from '@/types/siteContent';
 
-export const featureCardsSeed: FeatureCard[] = [
-  {
-    "slug": "unified-inbox",
-    "title": {
-      "ar": "المحادثات الموحدة",
-      "en": "Unified Inbox"
-    },
-    "blurb": {
-      "ar": "كل محادثات عملائك في Inbox واحد",
-      "en": "Every channel in one place"
-    },
-    "icon": {
-      "type": "library",
-      "set": "qhub",
-      "name": "inbox"
-    }
-  },
-  {
-    "slug": "ai-assistant",
-    "title": {
-      "ar": "مساعد الذكاء الاصطناعي",
-      "en": "AI Assistant"
-    },
-    "blurb": {
-      "ar": "ردود فورية، مع فهم للسياق وطريقة كلام العميل",
-      "en": "Instant replies that read the context"
-    },
-    "icon": {
-      "type": "library",
-      "set": "qhub",
-      "name": "sparkles"
-    }
-  },
-  {
-    "slug": "campaigns",
-    "title": {
-      "ar": "الحملات التسويقية",
-      "en": "Campaigns"
-    },
-    "blurb": {
-      "ar": "إنشاء وإرسال وإدارة الحملات من مكان واحد",
-      "en": "WhatsApp and email campaigns in one place"
-    },
-    "icon": {
-      "type": "library",
-      "set": "qhub",
-      "name": "megaphone"
-    }
-  },
-  {
-    "slug": "team",
-    "title": {
-      "ar": "إدارة الفريق والصلاحيات",
-      "en": "Team & Permissions"
-    },
-    "blurb": {
-      "ar": "تنظيم المحادثات وتوزيعها على الفريق",
-      "en": "Roles, departments and working hours"
-    },
-    "icon": {
-      "type": "library",
-      "set": "qhub",
-      "name": "users"
-    }
-  },
-  {
-    "slug": "analytics",
-    "title": {
-      "ar": "التقارير والتحليلات",
-      "en": "Reports & Analytics"
-    },
-    "blurb": {
-      "ar": "بيانات واضحة لمتابعة أداء فريقك",
-      "en": "Reply time and team performance"
-    },
-    "icon": {
-      "type": "library",
-      "set": "qhub",
-      "name": "chart"
-    }
-  },
-  {
-    "slug": "chat-widget",
-    "title": {
-      "ar": "التواصل المباشر (Chat Widget)",
-      "en": "Chat Widget"
-    },
-    "blurb": {
-      "ar": "تواصل مباشر مع زوار موقعك",
-      "en": "A live chat widget on the website"
-    },
-    "icon": {
-      "type": "library",
-      "set": "qhub",
-      "name": "widget"
-    }
-  },
-  {
-    "slug": "integrations",
-    "title": {
-      "ar": "القنوات والربط",
-      "en": "Channels & Integrations"
-    },
-    "blurb": {
-      "ar": "قنوات التواصل ومتجرك في مكان واحد",
-      "en": "Your channels and your store in one place"
-    },
-    "icon": {
-      "type": "library",
-      "set": "qhub",
-      "name": "plug"
-    }
-  }
-];
-
-export const featurePagesSeed: Record<string, FeaturePage> = {
-  "unified-inbox": {
-    "eyebrow": {
-      "ar": "المحادثات الموحدة",
-      "en": "Unified Inbox"
-    },
-    "h1": {
-      "ar": "كل محادثات عملائك في مكان واحد",
-      "en": "Every customer conversation in one place"
-    },
-    "highlight": {
-      "ar": [
-        "محادثات",
-        "عملائك"
-      ],
-      "en": [
-        "conversation"
-      ]
-    },
-    "lede": {
-      "ar": "بدل التنقّل بين أكثر من منصّة، يجمع Qhub محادثات عملائك في صندوق واحد، لتكون كل محادثة واضحة لفريقك وسهلة المتابعة.",
-      "en": "Instead of moving between several platforms, Qhub gathers your customers' conversations into one inbox, so every conversation is clear to your team and easy to follow."
-    },
-    "heroShot": "inbox",
-    "heroRoute": "inbox",
-    "heroScene": "merge",
-    "bullets": {
-      "ar": [
-        "كل القنوات في صندوق واحد، بلا تنقّل بين المنصّات",
-        "كل محادثة مرتبطة بالموظف المسؤول عنها",
-        "معلومات العميل وسياق المحادثة في المكان نفسه"
-      ],
-      "en": [
-        "Every channel in one inbox, with no platform switching",
-        "Every conversation tied to the agent who owns it",
-        "Customer details and conversation context in the same place"
-      ]
-    },
-    "compare": {
-      "eyebrow": {
-        "ar": "الفرق",
-        "en": "The difference"
-      },
-      "title": {
-        "ar": "محادثاتك مرتّبة، وفريقك على الصفحة نفسها",
-        "en": "Your conversations in order, your team on the same page"
-      },
-      "withoutLabel": {
-        "ar": "بدون Qhub",
-        "en": "Without Qhub"
-      },
-      "withLabel": {
-        "ar": "مع Qhub",
-        "en": "With Qhub"
-      },
-      "rows": [
-        {
-          "without": {
-            "ar": "محادثات موزّعة بين أكثر من مكان",
-            "en": "Conversations spread across more than one place"
+export const siteSeed: SiteContent = {
+  "home": {
+    "sections": [
+      {
+        "key": "hero",
+        "enabled": true,
+        "data": {
+          "previews": {
+            "ar": [
+              "وصلني الطلب، شكراً لكم 🙏",
+              "كم سعر الباقة الجديدة؟",
+              "أبغى أعدّل عنوان التوصيل",
+              "متى يفتح المحل اليوم؟",
+              "تم إرسال الحملة الإعلانية بنجاح",
+              "فريقكم سريع 👏"
+            ],
+            "en": [
+              "The order arrived, thank you 🙏",
+              "How much is the new plan?",
+              "Can I change the delivery address?",
+              "What time do you open today?",
+              "Requesting a wholesale quote",
+              "Your team is quick 👏"
+            ]
           },
-          "with": {
-            "ar": "كل المحادثات في صندوق واحد",
-            "en": "Every conversation in a single inbox"
-          }
-        },
-        {
-          "without": {
-            "ar": "رسائل قد تضيع وسط الزحام",
-            "en": "Messages that get lost in the noise"
+          "sectionLabel": {
+            "ar": "نظرة عامة على Qhub",
+            "en": "An overview of Qhub"
           },
-          "with": {
-            "ar": "حالة كل محادثة واضحة للفريق",
-            "en": "The status of every conversation is clear to the team"
-          }
-        },
-        {
-          "without": {
-            "ar": "صعوبة معرفة من يتابع كل محادثة",
-            "en": "Hard to tell who is following each conversation"
+          "badge": {
+            "ar": "منصة موحّدة لإدارة محادثات العملاء",
+            "en": "One platform for every customer conversation"
           },
-          "with": {
-            "ar": "كل محادثة مرتبطة بالموظف المسؤول عنها",
-            "en": "Every conversation tied to the agent who owns it"
-          }
-        },
-        {
-          "without": {
-            "ar": "تكرار الأسئلة وضياع سياق العميل",
-            "en": "Questions repeated and customer context lost"
+          "headline": {
+            "ar": [
+              "كل",
+              "محادثات",
+              "عملائك",
+              "في",
+              "مكان",
+              "واحد"
+            ],
+            "en": [
+              "Every",
+              "customer",
+              "conversation",
+              "in",
+              "one",
+              "place"
+            ]
           },
-          "with": {
-            "ar": "معلومات العميل وسياق المحادثة في المكان نفسه",
-            "en": "Customer details and conversation context in the same place"
-          }
-        },
-        {
-          "without": {
-            "ar": "متابعة المحادثات تحتاج أكثر من أداة",
-            "en": "Following conversations takes more than one tool"
+          "lede": {
+            "ar": "يجمع Qhub كل محادثات عملائك في مكان واحد، ويساعدك على الرد بشكل أسرع وإدارة محادثاتك بكل سهولة.",
+            "en": "Qhub gathers all your customer conversations in one place, helping you reply faster and manage every conversation with ease."
           },
-          "with": {
-            "ar": "متابعة سهلة من أول رسالة حتى إغلاق المحادثة",
-            "en": "Easy follow-up from the first message to closing the conversation"
-          }
+          "start": {
+            "ar": "ابدأ مجاناً",
+            "en": "Start free"
+          },
+          "watchDemo": {
+            "ar": "شاهد العرض التوضيحي",
+            "en": "Watch the demo"
+          },
+          "inboxTitle": {
+            "ar": "الوارد",
+            "en": "Inbox"
+          },
+          "channels": [
+            "whatsapp",
+            "instagram",
+            "telegram",
+            "messenger",
+            "email",
+            "x"
+          ],
+          "video": {
+            "type": "media",
+            "url": "https://qhub-lp.apexes.click/videos/demo-v2.mp4",
+            "name": "demo-v2.mp4",
+            "kind": "video"
+          },
+          "poster": null
         }
-      ]
-    },
-    "journey": {
-      "eyebrow": {
-        "ar": "داخل الشاشة",
-        "en": "Inside the screen"
       },
-      "title": {
-        "ar": "كل محادثة تمرّ بسلاسة",
-        "en": "Every conversation moves smoothly"
-      },
-      "lede": {
-        "ar": "أربع لحظات على شاشة الوارد نفسها. اضغط أي خطوة لتنتقل إليها.",
-        "en": "Four moments on the same inbox screen. Tap any step to jump to it."
-      },
-      "steps": [
-        {
-          "title": {
-            "ar": "تصل الرسالة",
-            "en": "The message arrives"
+      {
+        "key": "how_it_works",
+        "enabled": true,
+        "data": {
+          "eyebrow": {
+            "ar": "كيف يعمل",
+            "en": "How it works"
           },
-          "body": {
-            "ar": "تظهر المحادثة مباشرة في صندوق الوارد مع تفاصيلها.",
-            "en": "The conversation appears in the inbox right away, with its details."
+          "title": {
+            "ar": "من أول رسالة إلى عميل راضٍ",
+            "en": "From the first message to a satisfied customer"
+          },
+          "highlight": {
+            "ar": [
+              "إلى",
+              "عميل",
+              "راضٍ"
+            ],
+            "en": [
+              "a",
+              "satisfied",
+              "customer"
+            ]
+          },
+          "lede": {
+            "ar": "كل ما تحتاجه لإدارة محادثات عملائك في 4 خطوات بسيطة.",
+            "en": "Everything you need to manage your customer conversations, in 4 simple steps."
+          },
+          "eyebrowIcon": {
+            "type": "library",
+            "set": "qhub",
+            "name": "bolt"
+          },
+          "steps": [
+            {
+              "n": "01",
+              "title": {
+                "ar": "ربط القنوات",
+                "en": "Connecting the channels"
+              },
+              "body": {
+                "ar": "اربط قنوات التواصل التي يستخدمها عملاؤك وابدأ خلال دقائق، دون تعقيد تقني.",
+                "en": "Connect the channels your customers use and start within minutes, with no technical complexity."
+              },
+              "icon": {
+                "type": "library",
+                "set": "qhub",
+                "name": "plug"
+              }
+            },
+            {
+              "n": "02",
+              "title": {
+                "ar": "تجميع المحادثات",
+                "en": "Conversations gathered"
+              },
+              "body": {
+                "ar": "كل الرسائل تصل إلى صندوق وارد واحد، حتى لا تضيع أي محادثة أو فرصة.",
+                "en": "Every message reaches a single inbox, so no conversation and no opportunity is lost."
+              },
+              "icon": {
+                "type": "library",
+                "set": "qhub",
+                "name": "inbox"
+              }
+            },
+            {
+              "n": "03",
+              "title": {
+                "ar": "ردّ المساعد الذكي",
+                "en": "The assistant replies"
+              },
+              "body": {
+                "ar": "يرد المساعد فوراً بلهجة العميل، استناداً إلى قاعدة معرفة نشاطك.",
+                "en": "The assistant replies instantly in the customer's own language, drawing on your business information."
+              },
+              "icon": {
+                "type": "library",
+                "set": "qhub",
+                "name": "sparkles"
+              }
+            },
+            {
+              "n": "04",
+              "title": {
+                "ar": "متابعة الفريق عند الحاجة",
+                "en": "The team takes over"
+              },
+              "body": {
+                "ar": "يتم تلخيص المحادثة وإرسالها إلى الموظف المناسب للمتابعة مع العميل.",
+                "en": "Automatic handoff to the right agent, with the conversation already summarised."
+              },
+              "icon": {
+                "type": "library",
+                "set": "qhub",
+                "name": "users"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "key": "features_overview",
+        "enabled": true,
+        "data": {
+          "eyebrow": {
+            "ar": "المزايا",
+            "en": "Features"
+          },
+          "title": {
+            "ar": "كل الأدوات التي يحتاجها فريقك في مكان واحد",
+            "en": "Every tool your team needs in one place"
+          },
+          "highlight": {
+            "ar": [
+              "فريقك",
+              "في",
+              "مكان",
+              "واحد"
+            ],
+            "en": [
+              "one",
+              "place"
+            ]
+          },
+          "lede": {
+            "ar": "بدلاً من التنقل بين عدة تطبيقات وأنظمة، يعطي Qhub فريقك كل ما يحتاجه لإدارة العملاء من منصة واحدة.",
+            "en": "Instead of moving between several apps and systems, Qhub gives your team everything it needs to manage customers from a single platform."
+          },
+          "more": {
+            "ar": "تفاصيل الميزة",
+            "en": "Feature details"
+          },
+          "eyebrowIcon": {
+            "type": "library",
+            "set": "qhub",
+            "name": "sparkles"
           },
           "art": {
-            "kind": "rows",
-            "active": 0,
-            "items": [
+            "inbox": [
               {
-                "label": {
+                "n": {
                   "ar": "نورة العامري",
                   "en": "Noura Al-Amri"
                 },
-                "sub": {
+                "m": {
                   "ar": "وصلني الطلب، شكراً لكم",
-                  "en": "The order arrived, thank you"
-                },
-                "ch": "whatsapp",
-                "badge": {
-                  "ar": "2",
-                  "en": "2"
+                  "en": "Got the order, thank you!"
                 }
               },
               {
-                "label": {
+                "n": {
                   "ar": "متجر لمسة",
                   "en": "Lamsa Store"
                 },
-                "sub": {
-                  "ar": "كم سعر الباقة الجديدة؟",
-                  "en": "How much is the new plan?"
-                },
-                "ch": "instagram",
-                "badge": {
-                  "ar": "1",
-                  "en": "1"
+                "m": {
+                  "ar": "كم سعر الباقة؟",
+                  "en": "How much is the plan?"
                 }
               },
               {
-                "label": {
+                "n": {
                   "ar": "خالد الحارثي",
                   "en": "Khalid Al-Harthi"
                 },
-                "sub": {
-                  "ar": "متى يفتح المحل اليوم؟",
-                  "en": "What time do you open today?"
-                },
-                "ch": "messenger"
+                "m": {
+                  "ar": "متى يفتح المحل؟",
+                  "en": "When do you open?"
+                }
               }
-            ]
-          }
-        },
-        {
-          "title": {
-            "ar": "تصل للموظف المناسب",
-            "en": "It reaches the right agent"
-          },
-          "body": {
-            "ar": "تُوزَّع المحادثة على الموظف المناسب حسب إعدادات فريقك.",
-            "en": "The conversation is routed to the right agent according to your team settings."
-          },
-          "art": {
-            "kind": "flow",
-            "from": {
-              "ar": "محادثة واردة",
-              "en": "Incoming chat"
+            ],
+            "ask": {
+              "ar": "عندكم العرض لسا متاح؟",
+              "en": "Is the offer still on?"
             },
-            "to": {
+            "answer": {
+              "ar": "نعم، ما زال متاحاً: خصم ‎25% حتى منتصف ليلة الغد.",
+              "en": "It is — ‎25% off until noon tomorrow."
+            },
+            "speed": {
+              "ar": "ردّ خلال ثانيتين",
+              "en": "Answered in two seconds"
+            },
+            "campaign": {
+              "ar": "حملة عرض الجمعة",
+              "en": "Friday offer campaign"
+            },
+            "channel": {
+              "ar": "واتساب",
+              "en": "WhatsApp"
+            },
+            "bars": {
               "ar": [
-                "المبيعات",
-                "الدعم",
-                "الشحن"
+                "وصلت",
+                "انفتحت",
+                "ردّوا"
               ],
               "en": [
-                "Sales",
-                "Support",
-                "Shipping"
+                "Delivered",
+                "Opened",
+                "Replied"
               ]
-            }
-          }
-        },
-        {
-          "title": {
-            "ar": "يبدأ الفريق بالرد",
-            "en": "The team starts replying"
-          },
-          "body": {
-            "ar": "كل تفاصيل العميل وسياق المحادثة واضحة أمام الموظف.",
-            "en": "Every customer detail and the conversation context sit in front of the agent."
-          },
-          "art": {
-            "kind": "card",
-            "title": {
-              "ar": "يوسف البوسعيدي",
-              "en": "Yousef Al-Busaidi"
             },
-            "badge": {
-              "ar": "عميل دائم",
-              "en": "Returning"
-            },
-            "rows": [
+            "team": [
               {
-                "k": {
-                  "ar": "آخر طلب",
-                  "en": "Last order"
+                "n": {
+                  "ar": "منال",
+                  "en": "Manal"
                 },
-                "v": {
-                  "ar": "#4821 — وصل",
-                  "en": "#4821 — delivered"
-                }
-              },
-              {
-                "k": {
-                  "ar": "القناة",
-                  "en": "Channel"
-                },
-                "v": {
-                  "ar": "واتساب",
-                  "en": "WhatsApp"
-                }
-              },
-              {
-                "k": {
-                  "ar": "الوسم",
-                  "en": "Tag"
-                },
-                "v": {
-                  "ar": "شحن",
-                  "en": "Shipping"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "title": {
-            "ar": "تبقى كل التفاصيل محفوظة",
-            "en": "Every detail stays saved"
-          },
-          "body": {
-            "ar": "الحالة والملاحظات والتحويلات وسجلّ المحادثة تبقى مرتبطة بها.",
-            "en": "Status, notes, transfers and the conversation history stay attached to it."
-          },
-          "art": {
-            "kind": "fields",
-            "items": [
-              {
-                "label": {
-                  "ar": "الحالة",
-                  "en": "Status"
-                },
-                "value": {
-                  "ar": "مغلقة",
-                  "en": "Closed"
-                },
-                "on": true
-              },
-              {
-                "label": {
-                  "ar": "الوسوم",
-                  "en": "Tags"
-                },
-                "value": {
-                  "ar": "شحن · استبدال",
-                  "en": "Shipping · Exchange"
-                },
-                "on": true
-              },
-              {
-                "label": {
-                  "ar": "السجلّ",
-                  "en": "Audit log"
-                },
-                "value": {
-                  "ar": "3 إجراءات",
-                  "en": "3 actions"
-                },
-                "on": true
-              }
-            ]
-          }
-        }
-      ]
-    },
-    "extras": {
-      "eyebrow": {
-        "ar": "تفاصيل إضافية",
-        "en": "More details"
-      },
-      "title": {
-        "ar": "أدوات تساعد فريقك كل يوم",
-        "en": "Tools that help your team every day"
-      }
-    },
-    "benefits": [
-      {
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "inbox"
-        },
-        "title": {
-          "ar": "حالات واضحة",
-          "en": "Clear statuses"
-        },
-        "body": {
-          "ar": "معرفة حالة كل محادثة في لمحة.",
-          "en": "See the status of every conversation at a glance."
-        }
-      },
-      {
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "bolt"
-        },
-        "title": {
-          "ar": "تنبيهات التأخير",
-          "en": "Overdue alerts"
-        },
-        "body": {
-          "ar": "ظهور المحادثات التي تحتاج إلى متابعة في الوقت المناسب.",
-          "en": "Conversations that need following up surface at the right time."
-        }
-      },
-      {
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "sparkles"
-        },
-        "title": {
-          "ar": "ردود محفوظة",
-          "en": "Saved replies"
-        },
-        "body": {
-          "ar": "الوصول السريع إلى الردود المتكرّرة.",
-          "en": "Quick access to the answers you repeat most."
-        }
-      },
-      {
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "chart"
-        },
-        "title": {
-          "ar": "وسوم وتصنيفات",
-          "en": "Tags and categories"
-        },
-        "body": {
-          "ar": "تنظيم المحادثات والوصول إليها بسهولة.",
-          "en": "Organise conversations and find them again easily."
-        }
-      },
-      {
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "shield"
-        },
-        "title": {
-          "ar": "سجلّ كامل",
-          "en": "A complete record"
-        },
-        "body": {
-          "ar": "كل تفاصيل المحادثة والتحويلات محفوظة في مكان واحد.",
-          "en": "Every conversation detail and transfer is kept in one place."
-        }
-      },
-      {
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "users"
-        },
-        "title": {
-          "ar": "تطبيق للموظفين",
-          "en": "Mobile app for agents"
-        },
-        "body": {
-          "ar": "إدارة المحادثات ومتابعتها من الجوال.",
-          "en": "Manage and follow conversations from a phone."
-        }
-      }
-    ],
-    "details": [
-      {
-        "title": {
-          "ar": "صندوق واحد لكل محادثاتك",
-          "en": "One inbox for all your conversations"
-        },
-        "shot": "inbox",
-        "scene": "channel-list",
-        "body": {
-          "ar": "واجهة واضحة تجمع محادثات فريقك في مكان واحد، مع الوصول إلى تفاصيل العميل ومتابعة حالة كل محادثة بسهولة.",
-          "en": "A clear screen that gathers your team's conversations in one place, with access to customer details and easy follow-up on the status of every conversation."
-        },
-        "points": {
-          "ar": [
-            "أيقونة القناة على صورة كل عميل",
-            "بحث شامل في المحادثات والعملاء",
-            "فلاتر جاهزة: المسندة لي، غير المقروءة، المتأخرة",
-            "أرشفة تلقائية للمحادثات المغلقة"
-          ],
-          "en": [
-            "The channel logo on each customer's avatar",
-            "Search across conversations and customers at once",
-            "Ready-made filters: assigned to me, unread, overdue",
-            "Automatic archiving for closed conversations"
-          ]
-        }
-      },
-      {
-        "title": {
-          "ar": "تعاون أسهل بين أفراد الفريق",
-          "en": "Easier collaboration across the team"
-        },
-        "shot": "contacts",
-        "scene": "team-note",
-        "body": {
-          "ar": "تنتقل المحادثة بين أعضاء الفريق بسياقها كاملاً، وتبقى الملاحظات الداخلية والتفاصيل المهمّة واضحة لمن يحتاجها.",
-          "en": "A conversation moves between team members with its full context, and internal notes and important details stay visible to whoever needs them."
-        },
-        "points": {
-          "ar": [
-            "ملاحظة داخلية بجانب تبويب الرسالة",
-            "إشارة إلى زميل داخل المحادثة",
-            "تنبيه الكتابة المتزامنة",
-            "نقل المحادثة بكل سياقها إلى موظف آخر"
-          ],
-          "en": [
-            "An internal note tab beside the message tab",
-            "Mention a colleague inside the conversation",
-            "Simultaneous-typing warning",
-            "Move a conversation to another agent with all its context"
-          ]
-        }
-      }
-    ],
-    "liveTitle": {
-      "ar": "صندوق وارد يعمل بقنواته الخمس",
-      "en": "A working inbox with its five channels"
-    },
-    "liveHighlight": {
-      "ar": [
-        "بقنواته",
-        "الخمس"
-      ],
-      "en": [
-        "five",
-        "channels"
-      ]
-    },
-    "faq": [
-      {
-        "q": {
-          "ar": "هل يمكن إدارة أكثر من حساب من الصندوق نفسه؟",
-          "en": "Can more than one account be managed from the same inbox?"
-        },
-        "a": {
-          "ar": "نعم، يمكن إدارة الحسابات المرتبطة من صندوق واحد مع وضوح مصدر كل محادثة.",
-          "en": "Yes. Connected accounts are managed from a single inbox, with the source of each conversation clearly shown."
-        }
-      },
-      {
-        "q": {
-          "ar": "هل تظهر المحادثات السابقة؟",
-          "en": "Do earlier conversations appear?"
-        },
-        "a": {
-          "ar": "تظهر المحادثات التي تصل بعد الربط، بينما تبقى المحادثات السابقة في منصّاتها الأصلية.",
-          "en": "Conversations that arrive after connecting appear in Qhub, while earlier ones stay on their original platforms."
-        }
-      },
-      {
-        "q": {
-          "ar": "هل يستطيع كل موظف رؤية جميع المحادثات؟",
-          "en": "Can every agent see all conversations?"
-        },
-        "a": {
-          "ar": "لا، يمكن تحديد المحادثات والأقسام التي يصل إليها كل موظف.",
-          "en": "No. You decide which conversations and departments each agent can reach."
-        }
-      },
-      {
-        "q": {
-          "ar": "كيف يتم توزيع المحادثات على الفريق؟",
-          "en": "How are conversations distributed across the team?"
-        },
-        "a": {
-          "ar": "يمكن تحديد قواعد التوزيع حسب الأقسام وأوقات العمل وحجم المحادثات لكل موظف. ويمكن إعادة الإسناد يدوياً في أي وقت.",
-          "en": "Distribution rules can follow departments, working hours and how many conversations each agent is handling. Reassignment is possible manually at any time."
-        }
-      },
-      {
-        "q": {
-          "ar": "ماذا يحدث خارج ساعات العمل؟",
-          "en": "What happens outside working hours?"
-        },
-        "a": {
-          "ar": "يمكن للعميل الحصول على رد تلقائي، وتبقى المحادثة بانتظار الفريق حتى يبدأ وقت العمل.",
-          "en": "The customer can receive an automatic reply, and the conversation waits for the team until working hours start."
-        }
-      },
-      {
-        "q": {
-          "ar": "هل يمكن الوصول إلى المحادثات المغلقة؟",
-          "en": "Can closed conversations be reached?"
-        },
-        "a": {
-          "ar": "نعم، تبقى المحادثات محفوظة ويمكن الوصول إليها من خلال البحث وسجلّ العميل.",
-          "en": "Yes. Conversations stay saved and can be reached through search and the customer's history."
-        }
-      }
-    ]
-  },
-  "ai-assistant": {
-    "eyebrow": {
-      "ar": "مساعد الذكاء الاصطناعي",
-      "en": "AI Assistant"
-    },
-    "h1": {
-      "ar": "مساعد ذكي يفهم عملاءك ويرد عليهم تلقائياً",
-      "en": "An AI assistant that understands your customers and replies automatically"
-    },
-    "highlight": {
-      "ar": [
-        "يفهم",
-        "عملاءك"
-      ],
-      "en": [
-        "understands",
-        "customers"
-      ]
-    },
-    "lede": {
-      "ar": "مساعد يفهم لغات متعدّدة، ويعتمد على معلومات نشاطك لتقديم ردود مناسبة للعملاء، مع تحويل المحادثة لفريقك عند الحاجة.",
-      "en": "An assistant that understands several languages and draws on your business information to give customers suitable answers, handing the conversation to your team when needed."
-    },
-    "heroShot": "ai-settings",
-    "heroRoute": "ai-settings",
-    "heroScene": "knowledge",
-    "bullets": {
-      "ar": [
-        "إجابات مبنية على معلومات نشاطك",
-        "فهم لغات متعدّدة وطريقة كلام العميل",
-        "تحويل المحادثة لفريقك عند الحاجة"
-      ],
-      "en": [
-        "Answers built on your business information",
-        "Understands several languages and how the customer writes",
-        "Hands the conversation to your team when needed"
-      ]
-    },
-    "compare": {
-      "eyebrow": {
-        "ar": "الفرق",
-        "en": "The difference"
-      },
-      "title": {
-        "ar": "ردود تفهم العميل، لا مجرّد ردود جاهزة",
-        "en": "Replies that understand the customer, not just canned answers"
-      },
-      "withoutLabel": {
-        "ar": "بدون مساعد ذكي",
-        "en": "Without an assistant"
-      },
-      "withLabel": {
-        "ar": "مع مساعد Qhub",
-        "en": "With the Qhub assistant"
-      },
-      "rows": [
-        {
-          "without": {
-            "ar": "العميل ينتظر حتى يتوفّر أحد من الفريق",
-            "en": "The customer waits until someone on the team is free"
-          },
-          "with": {
-            "ar": "ردود سريعة على الأسئلة المتكرّرة",
-            "en": "Quick replies to the questions asked most"
-          }
-        },
-        {
-          "without": {
-            "ar": "تكرار الإجابات نفسها طوال اليوم",
-            "en": "The same answers repeated all day long"
-          },
-          "with": {
-            "ar": "إجابات مبنية على معلومات نشاطك",
-            "en": "Answers built on your business information"
-          }
-        },
-        {
-          "without": {
-            "ar": "اختلاف الردود من موظف لآخر",
-            "en": "Answers differ from one agent to another"
-          },
-          "with": {
-            "ar": "تجربة متناسقة مع كل عميل",
-            "en": "A consistent experience for every customer"
-          }
-        },
-        {
-          "without": {
-            "ar": "صعوبة التعامل مع اختلاف اللغات وطريقة الكلام",
-            "en": "Different languages and writing styles are hard to handle"
-          },
-          "with": {
-            "ar": "فهم لغات متعدّدة وطريقة كلام العميل",
-            "en": "Understands several languages and how the customer writes"
-          }
-        },
-        {
-          "without": {
-            "ar": "المحادثات التي تحتاج قراراً بشرياً تبقى معلّقة",
-            "en": "Conversations that need a human decision stay pending"
-          },
-          "with": {
-            "ar": "تحويل المحادثة لفريقك عند الحاجة",
-            "en": "The conversation is handed to your team when needed"
-          }
-        }
-      ]
-    },
-    "journey": {
-      "eyebrow": {
-        "ar": "داخل الشاشة",
-        "en": "Inside the screen"
-      },
-      "title": {
-        "ar": "من سؤال العميل إلى ردّ موثوق",
-        "en": "From the customer's question to a reliable answer"
-      },
-      "lede": {
-        "ar": "أربع لحظات على شاشة إعدادات المساعد. اضغط أي خطوة لتنتقل إليها.",
-        "en": "Four moments on the assistant settings screen. Tap any step to jump to it."
-      },
-      "steps": [
-        {
-          "title": {
-            "ar": "معلومات نشاطك",
-            "en": "Your business information"
-          },
-          "body": {
-            "ar": "يستند إلى معلومات نشاطك، مثل المنتجات والأسعار والسياسات، لتقديم ردود مناسبة ودقيقة.",
-            "en": "It draws on your business information — products, prices and policies — to give accurate, relevant replies."
-          },
-          "art": {
-            "kind": "flow",
-            "merge": true,
-            "from": {
-              "ar": "قاعدة المعرفة",
-              "en": "Knowledge base"
-            },
-            "to": {
-              "ar": [
-                "المنتجات",
-                "السياسات",
-                "الأسعار"
-              ],
-              "en": [
-                "Products",
-                "Policies",
-                "Pricing"
-              ]
-            }
-          }
-        },
-        {
-          "title": {
-            "ar": "أسلوب يناسب علامتك",
-            "en": "A style that suits your brand"
-          },
-          "body": {
-            "ar": "نبرة المساعد قابلة للتخصيص لتتناسب مع أسلوب التواصل الخاص بنشاطك.",
-            "en": "The assistant's tone can be customised to match how your business talks to customers."
-          },
-          "art": {
-            "kind": "fields",
-            "items": [
-              {
-                "label": {
-                  "ar": "النبرة",
-                  "en": "Tone"
-                },
-                "value": {
-                  "ar": "ودّية",
-                  "en": "Friendly"
-                },
-                "on": true
-              },
-              {
-                "label": {
-                  "ar": "اللهجة",
-                  "en": "Dialect"
-                },
-                "value": {
-                  "ar": "تلقائية",
-                  "en": "Automatic"
-                },
-                "on": true
-              },
-              {
-                "label": {
-                  "ar": "مواضيع ممنوعة",
-                  "en": "Blocked topics"
-                },
-                "value": {
-                  "ar": "الاسترداد",
-                  "en": "Refunds"
-                },
-                "on": true
-              }
-            ]
-          }
-        },
-        {
-          "title": {
-            "ar": "ردود تلقائية",
-            "en": "Automatic replies"
-          },
-          "body": {
-            "ar": "الأسئلة المتكرّرة تحصل على إجابات سريعة، حتى خارج أوقات العمل.",
-            "en": "The questions asked most get quick answers, even outside working hours."
-          },
-          "art": {
-            "kind": "chat",
-            "turns": [
-              {
-                "from": "customer",
-                "text": {
-                  "ar": "عندكم العرض لسا متاح؟",
-                  "en": "Is the offer still on?"
-                }
-              },
-              {
-                "from": "ai",
-                "text": {
-                  "ar": "نعم، خصم ‎25% حتى منتصف ليلة الغد.",
-                  "en": "Yes — ‎25% off until midnight tomorrow."
-                }
-              }
-            ]
-          }
-        },
-        {
-          "title": {
-            "ar": "تحويل ذكي إلى الموظف",
-            "en": "A smart handoff to an agent"
-          },
-          "body": {
-            "ar": "عند الحاجة لتدخّل بشري، تنتقل المحادثة للموظف المناسب مع كامل سياقها.",
-            "en": "When human help is needed, the conversation moves to the right agent with its full context."
-          },
-          "art": {
-            "kind": "chat",
-            "turns": [
-              {
-                "from": "customer",
-                "text": {
-                  "ar": "أبغى أستبدل قطعة وصلت مكسورة",
-                  "en": "I need to exchange a piece that arrived broken"
-                }
-              },
-              {
-                "from": "note",
-                "text": {
-                  "ar": "تجاوز الحدّ — تحويل إلى منال مع ملخّص",
-                  "en": "Beyond its limit — handed to Manal with a summary"
-                }
-              },
-              {
-                "from": "agent",
-                "text": {
-                  "ar": "أهلاً، أنا منال. راجعت طلبك وسنرسل البديل اليوم.",
-                  "en": "Hi, this is Manal. I checked your order and we will send the replacement today."
-                }
-              }
-            ]
-          }
-        }
-      ]
-    },
-    "extras": {
-      "eyebrow": {
-        "ar": "تفاصيل إضافية",
-        "en": "More details"
-      },
-      "title": {
-        "ar": "ضبط المساعد والتحكّم في ردوده",
-        "en": "Tuning the assistant and its replies"
-      }
-    },
-    "benefits": [
-      {
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "sparkles"
-        },
-        "title": {
-          "ar": "ردود فورية على مدار الساعة",
-          "en": "Instant replies, around the clock"
-        },
-        "body": {
-          "ar": "إجابات سريعة للعملاء، حتى خارج ساعات العمل.",
-          "en": "Quick answers for customers, even outside working hours."
-        }
-      },
-      {
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "inbox"
-        },
-        "title": {
-          "ar": "قاعدة معرفة من معلومات نشاطك",
-          "en": "A knowledge base from your own information"
-        },
-        "body": {
-          "ar": "ردود مبنية على منتجاتك وخدماتك وسياساتك، بدلاً من الاعتماد على معلومات عامة.",
-          "en": "Replies built on your products, services and policies rather than on generic information."
-        }
-      },
-      {
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "users"
-        },
-        "title": {
-          "ar": "تحويل تلقائي إلى موظف",
-          "en": "Automatic handoff to an agent"
-        },
-        "body": {
-          "ar": "عند الحاجة إلى تدخّل بشري، تنتقل المحادثة للموظف المناسب مع كامل سياقها.",
-          "en": "When human help is needed, the conversation moves to the right agent with its full context."
-        }
-      },
-      {
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "megaphone"
-        },
-        "title": {
-          "ar": "نبرة ردّ قابلة للتخصيص",
-          "en": "Adjustable reply tone"
-        },
-        "body": {
-          "ar": "أسلوب ردّ يتناسب مع طبيعة علامتك وطريقة تواصلك مع العملاء.",
-          "en": "A reply style that matches your brand and how you talk to customers."
-        }
-      },
-      {
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "chart"
-        },
-        "title": {
-          "ar": "تفريغ الرسائل الصوتية",
-          "en": "Voice message transcription"
-        },
-        "body": {
-          "ar": "تحويل الرسائل الصوتية إلى نص لتسهيل قراءتها والتعامل معها.",
-          "en": "Voice messages are turned into text, easier to read and act on."
-        }
-      },
-      {
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "plug"
-        },
-        "title": {
-          "ar": "تحسين الردود",
-          "en": "Replies that keep improving"
-        },
-        "body": {
-          "ar": "الاستفادة من المحادثات السابقة لتحسين جودة الردود مع الوقت.",
-          "en": "Past conversations help improve the quality of replies over time."
-        }
-      }
-    ],
-    "details": [
-      {
-        "title": {
-          "ar": "يفهم عملاءك مهما اختلفت طريقة كلامهم",
-          "en": "It understands your customers however they write"
-        },
-        "shot": "inbox",
-        "scene": "dialects",
-        "body": {
-          "ar": "يتعامل مع لغات متعدّدة واختلاف أسلوب الكتابة، بما في ذلك اللغة العامية والاختصارات والأخطاء الإملائية، مع الحفاظ على سياق المحادثة.",
-          "en": "It handles several languages and different writing styles — including slang, abbreviations and typos — while keeping the context of the conversation."
-        },
-        "points": {
-          "ar": [
-            "يفهم الاختصارات والكتابة العامية",
-            "يرد بنفس لهجة العميل",
-            "يتعامل مع الأخطاء الإملائية",
-            "يدعم العربي والإنجليزي في نفس المحادثة"
-          ],
-          "en": [
-            "Understands abbreviations and colloquial spelling",
-            "Replies in the customer's own dialect",
-            "Copes with typos",
-            "Handles Arabic and English in the same conversation"
-          ]
-        }
-      },
-      {
-        "title": {
-          "ar": "حدود واضحة لعمل المساعد",
-          "en": "Clear limits on what the assistant handles"
-        },
-        "shot": "ai-settings",
-        "scene": "rules",
-        "body": {
-          "ar": "يمكن تحديد طريقة تعامل المساعد مع المحادثات، والمواضيع التي يتعامل معها، ومتى تنتقل المحادثة إلى الفريق.",
-          "en": "You can set how the assistant handles conversations, which topics it covers, and when a conversation moves to the team."
-        },
-        "points": {
-          "ar": [
-            "وضع الرد التلقائي الكامل",
-            "وضع الاقتراح: الموظف يراجع ثم يرسل",
-            "استثناء مواضيع حسّاسة",
-            "تحويل فوري عند ذكر كلمة بعينها"
-          ],
-          "en": [
-            "Full auto-reply mode",
-            "Suggestion mode — an agent reviews and sends",
-            "Exclude sensitive topics",
-            "Instant handoff when a customer mentions a specific word"
-          ]
-        }
-      }
-    ],
-    "liveTitle": {
-      "ar": "المساعد وهو يردّ ثم يحوّل",
-      "en": "The assistant answering, then handing over"
-    },
-    "liveHighlight": {
-      "ar": [
-        "يردّ",
-        "يحوّل"
-      ],
-      "en": [
-        "answering"
-      ]
-    },
-    "faq": [
-      {
-        "q": {
-          "ar": "هل المساعد يرد بناءً على معلومات نشاطي؟",
-          "en": "Does the assistant reply based on my business information?"
-        },
-        "a": {
-          "ar": "نعم، يعتمد على المعلومات التي توفّرها عن منتجاتك وخدماتك وسياساتك عند التعامل مع أسئلة العملاء.",
-          "en": "Yes. It relies on the information you provide about your products, services and policies when handling customer questions."
-        }
-      },
-      {
-        "q": {
-          "ar": "هل يدعم أكثر من لغة؟",
-          "en": "Does it support more than one language?"
-        },
-        "a": {
-          "ar": "نعم، يدعم لغات متعدّدة ويمكنه التعامل مع أكثر من لغة ضمن المحادثة نفسها.",
-          "en": "Yes. It supports several languages and can handle more than one language within the same conversation."
-        }
-      },
-      {
-        "q": {
-          "ar": "ماذا يحدث عندما لا يعرف المساعد الإجابة؟",
-          "en": "What happens when the assistant does not know the answer?"
-        },
-        "a": {
-          "ar": "عندما لا تكون الإجابة واضحة، تُحوَّل المحادثة إلى الموظف المناسب بدل تقديم إجابة غير مؤكّدة.",
-          "en": "When the answer is not clear, the conversation is handed to the right agent instead of offering an uncertain reply."
-        }
-      },
-      {
-        "q": {
-          "ar": "كيف يمكن تخصيص المساعد؟",
-          "en": "How can the assistant be customised?"
-        },
-        "a": {
-          "ar": "يمكن تحديد معلومات النشاط، وأسلوب الرد، والمواضيع التي يتعامل معها المساعد.",
-          "en": "You can set your business information, the reply style, and the topics the assistant handles."
-        }
-      },
-      {
-        "q": {
-          "ar": "هل يمكن مراجعة الردود قبل إرسالها؟",
-          "en": "Can replies be reviewed before they are sent?"
-        },
-        "a": {
-          "ar": "نعم، يمكن للمساعد اقتراح الرد ليراجعه الموظف ويعتمده قبل الإرسال.",
-          "en": "Yes. The assistant can suggest the reply for an agent to review and approve before it is sent."
-        }
-      },
-      {
-        "q": {
-          "ar": "هل يعمل خارج ساعات العمل؟",
-          "en": "Does it work outside working hours?"
-        },
-        "a": {
-          "ar": "نعم، يتعامل مع الأسئلة المتكرّرة خارج ساعات العمل، وتنتقل الحالات التي تحتاج فريقك إليه عند توفّره.",
-          "en": "Yes. It handles the questions asked most outside working hours, and cases that need your team reach them once they are available."
-        }
-      },
-      {
-        "q": {
-          "ar": "هل يمكنه التعامل مع الرسائل الصوتية؟",
-          "en": "Can it handle voice messages?"
-        },
-        "a": {
-          "ar": "نعم، تُحوَّل الرسائل الصوتية إلى نص لتسهيل قراءتها والتعامل معها.",
-          "en": "Yes. Voice messages are turned into text, easier to read and act on."
-        }
-      },
-      {
-        "q": {
-          "ar": "هل يمكن للمساعد تحويل المحادثة إلى موظف؟",
-          "en": "Can the assistant hand a conversation to an agent?"
-        },
-        "a": {
-          "ar": "نعم، عند الحاجة إلى تدخّل بشري تنتقل المحادثة للموظف المناسب مع الحفاظ على كامل سياقها.",
-          "en": "Yes. When human help is needed, the conversation moves to the right agent while keeping its full context."
-        }
-      }
-    ]
-  },
-  "campaigns": {
-    "eyebrow": {
-      "ar": "الحملات التسويقية",
-      "en": "Campaigns"
-    },
-    "h1": {
-      "ar": "حملاتك التسويقية، من مكان واحد",
-      "en": "Your marketing campaigns, from one place"
-    },
-    "highlight": {
-      "ar": [
-        "مكان",
-        "واحد"
-      ],
-      "en": [
-        "one",
-        "place"
-      ]
-    },
-    "lede": {
-      "ar": "إنشاء وإرسال وإدارة الحملات بسهولة، مع أدوات تساعدك على الوصول للجمهور المناسب ومتابعة نتائج كل حملة.",
-      "en": "Create, send and manage campaigns easily, with tools that help you reach the right audience and follow the results of every campaign."
-    },
-    "heroShot": "campaigns",
-    "heroRoute": "campaigns",
-    "heroScene": "funnel-stats",
-    "bullets": {
-      "ar": [
-        "قوائم جمهور منظّمة ومستهدفة",
-        "متابعة التسليم والفتح والردود",
-        "معرفة الحملة التي جاء منها كل رد"
-      ],
-      "en": [
-        "Organised, targeted audience lists",
-        "Follow delivery, opens and replies",
-        "See which campaign each reply came from"
-      ]
-    },
-    "compare": {
-      "eyebrow": {
-        "ar": "الفرق",
-        "en": "The difference"
-      },
-      "title": {
-        "ar": "إرسال منظّم، ونتائج أوضح",
-        "en": "Structured sending, clearer results"
-      },
-      "withoutLabel": {
-        "ar": "بدون Qhub",
-        "en": "Without Qhub"
-      },
-      "withLabel": {
-        "ar": "مع Qhub",
-        "en": "With Qhub"
-      },
-      "rows": [
-        {
-          "without": {
-            "ar": "إرسال الحملات بشكل يدوي",
-            "en": "Campaigns sent by hand"
-          },
-          "with": {
-            "ar": "قوائم جمهور منظّمة ومستهدفة",
-            "en": "Organised, targeted audience lists"
-          }
-        },
-        {
-          "without": {
-            "ar": "صعوبة الوصول للجمهور المناسب",
-            "en": "Hard to reach the right audience"
-          },
-          "with": {
-            "ar": "إرسال الحملات بطريقة أكثر تنظيماً",
-            "en": "Campaigns sent in a more organised way"
-          }
-        },
-        {
-          "without": {
-            "ar": "عدم وضوح نتائج الحملة",
-            "en": "Campaign results are unclear"
-          },
-          "with": {
-            "ar": "متابعة التسليم والفتح والردود",
-            "en": "Follow delivery, opens and replies"
-          }
-        },
-        {
-          "without": {
-            "ar": "صعوبة متابعة من تفاعل مع الحملة",
-            "en": "Hard to tell who engaged with the campaign"
-          },
-          "with": {
-            "ar": "معرفة الحملة التي جاء منها كل رد",
-            "en": "See which campaign each reply came from"
-          }
-        },
-        {
-          "without": {
-            "ar": "ردود العملاء تضيع بين المحادثات",
-            "en": "Customer replies get lost among the conversations"
-          },
-          "with": {
-            "ar": "استكمال المحادثة من المكان نفسه",
-            "en": "Carry on the conversation in the same place"
-          }
-        }
-      ]
-    },
-    "journey": {
-      "eyebrow": {
-        "ar": "داخل الشاشة",
-        "en": "Inside the screen"
-      },
-      "title": {
-        "ar": "أربع خطوات لحملة متكاملة",
-        "en": "Four steps to a complete campaign"
-      },
-      "lede": {
-        "ar": "من اختيار الجمهور إلى متابعة النتائج، كل تفاصيل الحملة في مكان واحد. اضغط أي خطوة لتنتقل إليها.",
-        "en": "From choosing the audience to following the results, every campaign detail in one place. Tap any step to jump to it."
-      },
-      "steps": [
-        {
-          "title": {
-            "ar": "اختيار الجمهور",
-            "en": "Choosing the audience"
-          },
-          "body": {
-            "ar": "تحديد الجمهور المناسب بناءً على البيانات والتفاعل السابق.",
-            "en": "Pick the right audience based on your data and their earlier engagement."
-          },
-          "art": {
-            "kind": "rules",
-            "pairs": [
-              {
-                "when": {
-                  "ar": "وسم «سلّة متروكة»",
-                  "en": "Tagged “abandoned cart”"
-                },
-                "then": {
-                  "ar": "640",
-                  "en": "640"
-                }
-              },
-              {
-                "when": {
-                  "ar": "اشترى آخر 30 يوماً",
-                  "en": "Bought in last 30 days"
-                },
-                "then": {
-                  "ar": "2,140",
-                  "en": "2,140"
-                }
-              },
-              {
-                "when": {
-                  "ar": "كل العملاء",
-                  "en": "All customers"
-                },
-                "then": {
-                  "ar": "8,420",
-                  "en": "8,420"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "title": {
-            "ar": "تجهيز الرسالة",
-            "en": "Preparing the message"
-          },
-          "body": {
-            "ar": "إنشاء الرسالة واختيار القالب المناسب مع معاينة المحتوى قبل الإرسال.",
-            "en": "Write the message and choose a suitable template, with a preview of the content before sending."
-          },
-          "art": {
-            "kind": "chat",
-            "turns": [
-              {
-                "from": "agent",
-                "text": {
-                  "ar": "أهلاً {اسم العميل} 🎉 خصم ‎25% على كل الطلبات حتى نهاية الأسبوع.",
-                  "en": "Hi {customer name} 🎉 ‎25% off every order until the end of the week."
-                }
-              },
-              {
-                "from": "note",
-                "text": {
-                  "ar": "معاينة كما ستصل العميل",
-                  "en": "Preview as the customer will see it"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "title": {
-            "ar": "الجدولة والإرسال",
-            "en": "Scheduling and sending"
-          },
-          "body": {
-            "ar": "تحديد موعد الإرسال وإدارة الحملة وفق الجدول المحدّد.",
-            "en": "Set the send time and run the campaign on the schedule you chose."
-          },
-          "art": {
-            "kind": "fields",
-            "items": [
-              {
-                "label": {
-                  "ar": "يوم الإرسال",
-                  "en": "Send day"
-                },
-                "value": {
-                  "ar": "الجمعة",
-                  "en": "Friday"
-                },
-                "on": true
-              },
-              {
-                "label": {
-                  "ar": "الساعة",
-                  "en": "Hour"
-                },
-                "value": {
-                  "ar": "07:00 م",
-                  "en": "07:00 pm"
-                },
-                "on": true
-              },
-              {
-                "label": {
-                  "ar": "إرسال تدريجي",
-                  "en": "Gradual sending"
-                },
-                "value": {
-                  "ar": "مفعّل",
-                  "en": "On"
-                },
-                "on": true
-              }
-            ]
-          }
-        },
-        {
-          "title": {
-            "ar": "متابعة النتائج",
-            "en": "Following the results"
-          },
-          "body": {
-            "ar": "بيانات واضحة عن الإرسال والتسليم والتفاعل مع الحملة.",
-            "en": "Clear data on sending, delivery and engagement with the campaign."
-          },
-          "art": {
-            "kind": "stats",
-            "items": [
-              {
-                "label": {
-                  "ar": "وصلت",
-                  "en": "Delivered"
-                },
-                "value": {
-                  "ar": "2,076",
-                  "en": "2,076"
-                },
-                "pct": 97
-              },
-              {
-                "label": {
-                  "ar": "فُتحت",
-                  "en": "Opened"
-                },
-                "value": {
-                  "ar": "1,327",
-                  "en": "1,327"
-                },
-                "pct": 62
-              },
-              {
-                "label": {
-                  "ar": "ردّوا",
-                  "en": "Replied"
-                },
-                "value": {
-                  "ar": "385",
-                  "en": "385"
-                },
-                "pct": 18
-              }
-            ]
-          }
-        }
-      ]
-    },
-    "extras": {
-      "eyebrow": {
-        "ar": "تفاصيل إضافية",
-        "en": "More details"
-      },
-      "title": {
-        "ar": "أدوات تساعدك على إدارة حملاتك",
-        "en": "Tools that help you run your campaigns"
-      }
-    },
-    "benefits": [
-      {
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "megaphone"
-        },
-        "title": {
-          "ar": "حملات الرسائل",
-          "en": "Message campaigns"
-        },
-        "body": {
-          "ar": "إرسال الحملات إلى قوائم مستهدفة باستخدام قوالب مناسبة.",
-          "en": "Send campaigns to targeted lists using suitable templates."
-        }
-      },
-      {
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "inbox"
-        },
-        "title": {
-          "ar": "حملات البريد الإلكتروني",
-          "en": "Email campaigns"
-        },
-        "body": {
-          "ar": "إنشاء وإرسال رسائل بريدية بتصميم واضح ومتوافق مع مختلف الأجهزة.",
-          "en": "Create and send emails with a clear design that reads well on any device."
-        }
-      },
-      {
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "users"
-        },
-        "title": {
-          "ar": "تقسيم الجمهور",
-          "en": "Audience segmentation"
-        },
-        "body": {
-          "ar": "استهداف شرائح مختلفة بناءً على الوسوم والتفاعل والبيانات المتاحة.",
-          "en": "Target different segments based on tags, engagement and the data you have."
-        }
-      },
-      {
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "chart"
-        },
-        "title": {
-          "ar": "تقارير الحملة",
-          "en": "Campaign reports"
-        },
-        "body": {
-          "ar": "بيانات واضحة عن الإرسال والتسليم والفتح والردود.",
-          "en": "Clear data on sending, delivery, opens and replies."
-        }
-      },
-      {
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "shield"
-        },
-        "title": {
-          "ar": "قوائم الاستبعاد",
-          "en": "Exclusion lists"
-        },
-        "body": {
-          "ar": "استبعاد العملاء الذين لا يرغبون في استقبال الحملات القادمة.",
-          "en": "Exclude customers who do not want to receive future campaigns."
-        }
-      },
-      {
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "clock"
-        },
-        "title": {
-          "ar": "الإرسال التجريبي",
-          "en": "Test sending"
-        },
-        "body": {
-          "ar": "اختبار الحملة على مجموعة صغيرة قبل إرسالها إلى كامل الجمهور.",
-          "en": "Try the campaign on a small group before sending it to the whole audience."
-        }
-      }
-    ],
-    "details": [
-      {
-        "title": {
-          "ar": "ردود الحملات تبقى مرتبطة بالمحادثة",
-          "en": "Campaign replies stay tied to the conversation"
-        },
-        "shot": "inbox",
-        "scene": "broadcast-reply",
-        "body": {
-          "ar": "عندما يتفاعل العميل مع الحملة، يظهر الرد داخل صندوق الوارد مع معرفة الحملة التي جاء منها، لتبقى الصورة واضحة لفريقك.",
-          "en": "When a customer engages with a campaign, the reply appears in the inbox along with the campaign it came from, so the picture stays clear for your team."
-        },
-        "points": {
-          "ar": [
-            "ردود الحملة تدخل الصندوق الموحّد",
-            "معرفة الحملة التي جاء منها العميل",
-            "إمكانية إرسال حملة متابعة لمن لم يردّ",
-            "استبعاد من طلب إيقاف الرسائل"
-          ],
-          "en": [
-            "Campaign replies enter the unified inbox",
-            "See which campaign brought the customer in",
-            "Send a follow-up campaign to those who did not reply",
-            "Anyone who opted out is excluded"
-          ]
-        }
-      },
-      {
-        "title": {
-          "ar": "إرسال في الوقت المناسب",
-          "en": "Sending at the right time"
-        },
-        "shot": "campaigns",
-        "scene": "schedule",
-        "body": {
-          "ar": "إمكانية جدولة الحملات مسبقاً وتحديد موعد الإرسال بما يناسب جمهورك، مع إرسال تدريجي وإمكانية الإيقاف عند الحاجة.",
-          "en": "Campaigns can be scheduled in advance and sent at a time that suits your audience, with gradual sending and the option to stop when needed."
-        },
-        "points": {
-          "ar": [
-            "جدولة مسبقة بالتاريخ والساعة",
-            "إرسال تدريجي يحمي الرقم",
-            "اختبار على مجموعة صغيرة أولاً",
-            "إيقاف الحملة في أي لحظة"
-          ],
-          "en": [
-            "Schedule by date and time",
-            "Gradual sending that protects the number",
-            "Test on a small group first",
-            "Stop a campaign at any moment"
-          ]
-        }
-      }
-    ],
-    "liveTitle": {
-      "ar": "حملة تُبنى وتُرسَل خطوة بخطوة",
-      "en": "A campaign built and sent, step by step"
-    },
-    "liveHighlight": {
-      "ar": [
-        "خطوة",
-        "بخطوة"
-      ],
-      "en": [
-        "step",
-        "by",
-        "step"
-      ]
-    },
-    "faq": [
-      {
-        "q": {
-          "ar": "هل يمكن جدولة الحملات مسبقاً؟",
-          "en": "Can campaigns be scheduled in advance?"
-        },
-        "a": {
-          "ar": "نعم، يمكن تحديد تاريخ ووقت الإرسال مسبقاً وإدارة الحملة وفق الجدول المحدّد.",
-          "en": "Yes. You can set the date and time in advance and run the campaign on that schedule."
-        }
-      },
-      {
-        "q": {
-          "ar": "كيف يتم تحديد الجمهور المستهدف؟",
-          "en": "How is the target audience chosen?"
-        },
-        "a": {
-          "ar": "يمكن تقسيم الجمهور بناءً على الوسوم والتفاعل السابق والبيانات المتاحة عن العملاء.",
-          "en": "You can segment the audience by tags, earlier engagement and the customer data you have."
-        }
-      },
-      {
-        "q": {
-          "ar": "هل يمكن متابعة نتائج الحملة؟",
-          "en": "Can campaign results be followed?"
-        },
-        "a": {
-          "ar": "نعم، تظهر بيانات الحملة بشكل واضح لمتابعة الإرسال والتسليم والفتح والردود.",
-          "en": "Yes. Campaign data is shown clearly, so you can follow sending, delivery, opens and replies."
-        }
-      },
-      {
-        "q": {
-          "ar": "أين تظهر ردود العملاء على الحملة؟",
-          "en": "Where do customer replies to a campaign appear?"
-        },
-        "a": {
-          "ar": "تظهر الردود داخل صندوق الوارد، مع معرفة الحملة التي جاء منها الرد.",
-          "en": "Replies appear in the inbox, along with the campaign they came from."
-        }
-      },
-      {
-        "q": {
-          "ar": "هل يمكن استبعاد بعض العملاء من الحملات؟",
-          "en": "Can some customers be excluded from campaigns?"
-        },
-        "a": {
-          "ar": "نعم، يمكن إنشاء قوائم استبعاد لمن لا يرغبون في استقبال الحملات القادمة.",
-          "en": "Yes. You can build exclusion lists for anyone who does not want to receive future campaigns."
-        }
-      },
-      {
-        "q": {
-          "ar": "هل يمكن تجربة الحملة قبل إرسالها؟",
-          "en": "Can a campaign be tested before it is sent?"
-        },
-        "a": {
-          "ar": "نعم، يمكن إرسال الحملة إلى مجموعة صغيرة أولاً قبل إطلاقها على كامل الجمهور.",
-          "en": "Yes. You can send the campaign to a small group first, before releasing it to the whole audience."
-        }
-      },
-      {
-        "q": {
-          "ar": "هل يمكن إيقاف الحملة بعد بدء الإرسال؟",
-          "en": "Can a campaign be stopped after sending starts?"
-        },
-        "a": {
-          "ar": "نعم، يمكن إيقاف الحملة أثناء الإرسال عند الحاجة.",
-          "en": "Yes. A campaign can be stopped mid-send whenever you need to."
-        }
-      }
-    ]
-  },
-  "team": {
-    "eyebrow": {
-      "ar": "إدارة الفريق والصلاحيات",
-      "en": "Team & Permissions"
-    },
-    "h1": {
-      "ar": "فريقك منظّم، وكل محادثة تصل للموظف المناسب",
-      "en": "Your team organised, and every conversation reaches the right agent"
-    },
-    "highlight": {
-      "ar": [
-        "تصل",
-        "للموظف",
-        "المناسب"
-      ],
-      "en": [
-        "right"
-      ]
-    },
-    "lede": {
-      "ar": "نظّم فريقك حسب الأدوار والأقسام وساعات العمل، وليتم توزيع المحادثات بشكل واضح ومتوازن.",
-      "en": "Organise your team by roles, departments and working hours, so conversations are distributed clearly and evenly."
-    },
-    "heroShot": "contacts",
-    "heroRoute": "contacts",
-    "heroScene": "routing-tree",
-    "bullets": {
-      "ar": [
-        "توزيع المحادثات حسب القسم وحالة الموظف",
-        "صلاحيات مختلفة لكل دور وموظف",
-        "معرفة المسؤول عن كل محادثة وتفاصيل ما تمّ عليها"
-      ],
-      "en": [
-        "Conversations routed by department and agent availability",
-        "Different permissions for each role and each agent",
-        "See who owns each conversation and what has happened on it"
-      ]
-    },
-    "compare": {
-      "eyebrow": {
-        "ar": "الفرق",
-        "en": "The difference"
-      },
-      "title": {
-        "ar": "توزيع منظّم بدل التوزيع اليدوي",
-        "en": "Organised routing instead of handing conversations out by hand"
-      },
-      "withoutLabel": {
-        "ar": "بدون Qhub",
-        "en": "Without Qhub"
-      },
-      "withLabel": {
-        "ar": "مع Qhub",
-        "en": "With Qhub"
-      },
-      "rows": [
-        {
-          "without": {
-            "ar": "توزيع المحادثات يدوياً طوال اليوم",
-            "en": "Handing conversations out manually all day"
-          },
-          "with": {
-            "ar": "توزيع المحادثات حسب قواعد محدّدة",
-            "en": "Conversations routed by rules you define"
-          }
-        },
-        {
-          "without": {
-            "ar": "تكدّس المحادثات عند بعض الموظفين",
-            "en": "Conversations piling up on some agents"
-          },
-          "with": {
-            "ar": "توزيع أكثر توازناً بين أفراد الفريق",
-            "en": "A more balanced spread across the team"
-          }
-        },
-        {
-          "without": {
-            "ar": "مشاركة الحساب بين أفراد الفريق",
-            "en": "One account shared between the team"
-          },
-          "with": {
-            "ar": "حساب وصلاحيات خاصة لكل موظف",
-            "en": "A separate account and permissions for each agent"
-          }
-        },
-        {
-          "without": {
-            "ar": "صعوبة معرفة الموظف المسؤول عن كل محادثة",
-            "en": "Hard to tell which agent owns each conversation"
-          },
-          "with": {
-            "ar": "تحويل المحادثة مع كامل سياقها",
-            "en": "Transfers that carry the full context"
-          }
-        },
-        {
-          "without": {
-            "ar": "صعوبة متابعة ما تمّ على كل محادثة",
-            "en": "Hard to follow what happened on each conversation"
-          },
-          "with": {
-            "ar": "سجلّ واضح لكل إجراء تمّ على المحادثة",
-            "en": "A clear log of every action taken on a conversation"
-          }
-        }
-      ]
-    },
-    "journey": {
-      "eyebrow": {
-        "ar": "داخل الشاشة",
-        "en": "Inside the screen"
-      },
-      "title": {
-        "ar": "كيف تصل المحادثة إلى الموظف المناسب",
-        "en": "How a conversation reaches the right agent"
-      },
-      "lede": {
-        "ar": "تصل كل محادثة إلى المكان المناسب حسب القواعد المحدّدة، دون متابعة التوزيع يدوياً. اضغط أي خطوة لتنتقل إليها.",
-        "en": "Every conversation lands in the right place according to the rules you set, with no manual routing. Tap any step to jump to it."
-      },
-      "steps": [
-        {
-          "title": {
-            "ar": "تحديد الأقسام",
-            "en": "Defining the departments"
-          },
-          "body": {
-            "ar": "تنظيم الفريق إلى أقسام مختلفة، مع تحديد الموظفين وساعات العمل لكل قسم.",
-            "en": "Organise the team into departments, setting the agents and working hours for each one."
-          },
-          "art": {
-            "kind": "flow",
-            "from": {
-              "ar": "محادثة واردة",
-              "en": "Incoming chat"
-            },
-            "to": {
-              "ar": [
-                "المبيعات",
-                "الدعم",
-                "الشحن"
-              ],
-              "en": [
-                "Sales",
-                "Support",
-                "Shipping"
-              ]
-            }
-          }
-        },
-        {
-          "title": {
-            "ar": "تحديد قواعد التوزيع",
-            "en": "Setting the routing rules"
-          },
-          "body": {
-            "ar": "توزيع المحادثات بناءً على القسم ونوع المحادثة والبيانات المتاحة.",
-            "en": "Conversations are routed based on the department, the type of conversation and the data available."
-          },
-          "art": {
-            "kind": "rules",
-            "pairs": [
-              {
-                "when": {
-                  "ar": "كلمة «سعر»",
-                  "en": "The word “price”"
-                },
-                "then": {
-                  "ar": "المبيعات",
-                  "en": "Sales"
-                }
-              },
-              {
-                "when": {
-                  "ar": "شكوى أو عطل",
-                  "en": "A complaint or fault"
-                },
-                "then": {
-                  "ar": "الدعم",
-                  "en": "Support"
-                }
-              },
-              {
-                "when": {
-                  "ar": "سؤال عن طلب",
-                  "en": "An order question"
-                },
-                "then": {
+                "r": {
                   "ar": "الشحن",
                   "en": "Shipping"
+                },
+                "s": {
+                  "ar": "متاحة",
+                  "en": "Available"
                 }
-              }
-            ]
-          }
-        },
-        {
-          "title": {
-            "ar": "اختيار الموظف المتاح",
-            "en": "Choosing the available agent"
-          },
-          "body": {
-            "ar": "تصل المحادثة إلى الموظف المناسب والمتاح، مع مراعاة حجم المحادثات لديه.",
-            "en": "The conversation reaches the right agent who is available, taking into account how many conversations they already have."
-          },
-          "art": {
-            "kind": "rows",
-            "active": 2,
-            "items": [
+              },
               {
-                "label": {
+                "n": {
                   "ar": "سالم",
                   "en": "Salem"
                 },
-                "sub": {
-                  "ar": "بلغ سقفه — 7 محادثات",
-                  "en": "At capacity — 7 chats"
+                "r": {
+                  "ar": "المبيعات",
+                  "en": "Sales"
                 },
-                "initial": {
-                  "ar": "س",
-                  "en": "S"
-                },
-                "badge": {
+                "s": {
                   "ar": "مشغول",
                   "en": "Busy"
                 }
               },
               {
-                "label": {
-                  "ar": "أحمد",
-                  "en": "Ahmed"
+                "n": {
+                  "ar": "نورة",
+                  "en": "Noura"
                 },
-                "sub": {
-                  "ar": "انتهى دوامه",
-                  "en": "Off shift"
+                "r": {
+                  "ar": "الدعم",
+                  "en": "Support"
                 },
-                "initial": {
-                  "ar": "أ",
-                  "en": "A"
+                "s": {
+                  "ar": "متاحة",
+                  "en": "Available"
+                }
+              }
+            ],
+            "chartLabel": {
+              "ar": "المحادثات · 7 أيام",
+              "en": "Conversations · 7 days"
+            },
+            "metrics": [
+              {
+                "u": {
+                  "ar": "ث",
+                  "en": "s"
                 },
-                "badge": {
-                  "ar": "خارج",
-                  "en": "Away"
+                "l": {
+                  "ar": "أول رد",
+                  "en": "First reply"
                 }
               },
               {
-                "label": {
-                  "ar": "منال",
-                  "en": "Manal"
-                },
-                "sub": {
-                  "ar": "متاحة — 3 محادثات",
-                  "en": "Available — 3 chats"
-                },
-                "initial": {
-                  "ar": "م",
-                  "en": "M"
-                },
-                "badge": {
-                  "ar": "استلمت",
-                  "en": "Assigned"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "title": {
-            "ar": "تسجيل كل التفاصيل",
-            "en": "Everything is recorded"
-          },
-          "body": {
-            "ar": "كل إسناد وتحويل وإغلاق يبقى مسجّلاً، مع معرفة الموظف المسؤول ووقت الإجراء.",
-            "en": "Every assignment, transfer and closure stays logged, with the agent responsible and the time of the action."
-          },
-          "art": {
-            "kind": "fields",
-            "items": [
-              {
-                "label": {
-                  "ar": "أُسندت إلى",
-                  "en": "Assigned to"
-                },
-                "value": {
-                  "ar": "منال · 09:12",
-                  "en": "Manal · 09:12"
-                },
-                "on": true
-              },
-              {
-                "label": {
-                  "ar": "حُوّلت من",
-                  "en": "Transferred from"
-                },
-                "value": {
-                  "ar": "سالم · 09:40",
-                  "en": "Salem · 09:40"
-                },
-                "on": true
-              },
-              {
-                "label": {
-                  "ar": "أُغلقت",
-                  "en": "Closed by"
-                },
-                "value": {
-                  "ar": "منال · 10:05",
-                  "en": "Manal · 10:05"
-                },
-                "on": true
-              }
-            ]
-          }
-        }
-      ]
-    },
-    "extras": {
-      "eyebrow": {
-        "ar": "تفاصيل إضافية",
-        "en": "More details"
-      },
-      "title": {
-        "ar": "تنظيم الفريق وضبط صلاحياته",
-        "en": "Organising your team and its permissions"
-      }
-    },
-    "benefits": [
-      {
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "users"
-        },
-        "title": {
-          "ar": "أدوار وصلاحيات جاهزة",
-          "en": "Ready-made roles and permissions"
-        },
-        "body": {
-          "ar": "أدوار مختلفة مثل المدير والمشرف والموظف، مع إمكانية تخصيص الصلاحيات حسب احتياج فريقك.",
-          "en": "Roles such as admin, supervisor and agent, with permissions you can tailor to your team."
-        }
-      },
-      {
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "inbox"
-        },
-        "title": {
-          "ar": "تقسيم الفريق إلى أقسام",
-          "en": "Splitting the team into departments"
-        },
-        "body": {
-          "ar": "تنظيم الموظفين ضمن أقسام واضحة، بحيث تكون المحادثات والمهام موزّعة بشكل أفضل.",
-          "en": "Organise agents into clear departments, so conversations and work are better distributed."
-        }
-      },
-      {
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "chart"
-        },
-        "title": {
-          "ar": "ساعات عمل لكل موظف",
-          "en": "Working hours per agent"
-        },
-        "body": {
-          "ar": "تحديد ساعات عمل الموظفين حتى تُوزَّع المحادثات على المتاحين منهم.",
-          "en": "Set each agent's working hours so conversations go to whoever is available."
-        }
-      },
-      {
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "sparkles"
-        },
-        "title": {
-          "ar": "توزيع متوازن للمحادثات",
-          "en": "Balanced conversation distribution"
-        },
-        "body": {
-          "ar": "توزيع المحادثات بشكل يساعد على تقليل التكدّس وتحقيق توازن أفضل بين أعضاء الفريق.",
-          "en": "Conversations spread in a way that reduces pile-ups and keeps the team balanced."
-        }
-      },
-      {
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "shield"
-        },
-        "title": {
-          "ar": "سجلّ الإجراءات",
-          "en": "Action log"
-        },
-        "body": {
-          "ar": "كل إسناد أو تحويل أو إغلاق يبقى مسجّلاً مع تفاصيل الإجراء.",
-          "en": "Every assignment, transfer or closure stays logged with the details of the action."
-        }
-      },
-      {
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "clock"
-        },
-        "title": {
-          "ar": "الإجازات وأيام العطل",
-          "en": "Leave and days off"
-        },
-        "body": {
-          "ar": "الموظف غير المتاح يُتجاوَز تلقائياً عند توزيع المحادثات.",
-          "en": "An agent who is not available is skipped automatically when conversations are routed."
-        }
-      }
-    ],
-    "details": [
-      {
-        "title": {
-          "ar": "صلاحيات واضحة لكل عضو في الفريق",
-          "en": "Clear permissions for every team member"
-        },
-        "shot": "contacts",
-        "scene": "permissions",
-        "body": {
-          "ar": "لكل موظف مستوى وصول مناسب لدوره، مع إمكانية التحكّم في ما يمكنه رؤيته أو إدارته داخل النظام.",
-          "en": "Each agent gets an access level suited to their role, with control over what they can see or manage inside the system."
-        },
-        "points": {
-          "ar": [
-            "صلاحيات على مستوى القناة والقسم",
-            "منع التصدير أو الحذف",
-            "سجلّ يبيّن من فعل ماذا",
-            "تعطيل حساب موظف فوراً"
-          ],
-          "en": [
-            "Permissions at channel and department level",
-            "Block export or deletion",
-            "An audit log showing who did what",
-            "Disable an agent's account instantly"
-          ]
-        }
-      },
-      {
-        "title": {
-          "ar": "الفريق يواصل العمل حتى خارج ساعات الدوام",
-          "en": "The team keeps working even outside office hours"
-        },
-        "shot": "overview",
-        "scene": "off-hours",
-        "body": {
-          "ar": "عندما يكون الفريق خارج أوقات العمل، تبقى المحادثات محفوظة ومنظّمة إلى أن يصبح الموظف المناسب متاحاً.",
-          "en": "When the team is outside working hours, conversations stay saved and organised until the right agent is available."
-        },
-        "points": {
-          "ar": [
-            "رد تلقائي خارج ساعات العمل",
-            "طابور انتظار مرتّب حسب الأقدمية",
-            "تنبيه للمشرف عند تأخّر الردّ",
-            "إجازات وأيام عطل"
-          ],
-          "en": [
-            "Automatic reply outside working hours",
-            "A queue ordered by waiting time",
-            "Supervisor alert when a reply is overdue",
-            "Holidays and days off"
-          ]
-        }
-      }
-    ],
-    "liveTitle": {
-      "ar": "قواعد التوزيع وهي تشتغل",
-      "en": "Routing rules in action"
-    },
-    "liveHighlight": {
-      "ar": [
-        "قواعد",
-        "التوزيع"
-      ],
-      "en": [
-        "Routing",
-        "rules"
-      ]
-    },
-    "faq": [
-      {
-        "q": {
-          "ar": "كم موظفاً يمكنني إضافته؟",
-          "en": "How many agents can I add?"
-        },
-        "a": {
-          "ar": "يعتمد عدد الموظفين على الباقة، ويمكن اختيار الباقة المناسبة لحجم فريقك.",
-          "en": "It depends on the plan; you can pick the plan that fits the size of your team."
-        }
-      },
-      {
-        "q": {
-          "ar": "هل يمكن للموظف العمل من الجوال؟",
-          "en": "Can agents work from their phone?"
-        },
-        "a": {
-          "ar": "نعم، يمكن لفريقك متابعة المحادثات وإدارتها من الجوال والكمبيوتر.",
-          "en": "Yes. Your team can follow and manage conversations from phone and computer."
-        }
-      },
-      {
-        "q": {
-          "ar": "هل يمكنني متابعة أداء كل موظف؟",
-          "en": "Can I follow each agent's performance?"
-        },
-        "a": {
-          "ar": "نعم، يمكن متابعة أداء الموظفين من خلال بيانات المحادثات وأوقات الرد والتقييمات.",
-          "en": "Yes. You can follow agent performance through conversation data, reply times and ratings."
-        }
-      },
-      {
-        "q": {
-          "ar": "هل يمكن منع موظف من رؤية قسم أو محادثات معيّنة؟",
-          "en": "Can an agent be stopped from seeing a department or certain conversations?"
-        },
-        "a": {
-          "ar": "نعم، يمكن تحديد صلاحيات الوصول حسب الدور والقسم.",
-          "en": "Yes. Access permissions can be set by role and by department."
-        }
-      },
-      {
-        "q": {
-          "ar": "ماذا يحدث إذا لم يكن هناك موظف متاح؟",
-          "en": "What happens if no agent is available?"
-        },
-        "a": {
-          "ar": "تبقى المحادثة محفوظة في قائمة الانتظار حتى يصبح الموظف المناسب متاحاً.",
-          "en": "The conversation stays in the queue until the right agent becomes available."
-        }
-      },
-      {
-        "q": {
-          "ar": "هل يمكن إعادة إسناد المحادثة يدوياً؟",
-          "en": "Can a conversation be reassigned manually?"
-        },
-        "a": {
-          "ar": "نعم، يمكن إعادة إسناد المحادثة في أي وقت مع الحفاظ على كامل سياقها وملاحظاتها.",
-          "en": "Yes, at any time, keeping its full context and its notes."
-        }
-      }
-    ]
-  },
-  "analytics": {
-    "eyebrow": {
-      "ar": "التقارير والتحليلات",
-      "en": "Reports & Analytics"
-    },
-    "h1": {
-      "ar": "صورة واضحة عن أداء فريقك",
-      "en": "A clear picture of how your team is doing"
-    },
-    "highlight": {
-      "ar": [
-        "أداء",
-        "فريقك"
-      ],
-      "en": [
-        "clear",
-        "picture"
-      ]
-    },
-    "lede": {
-      "ar": "تابع المحادثات وأوقات الرد ورضا العملاء وأداء الموظفين من لوحة واحدة تساعدك على فهم ما يحدث واتخاذ قرارات أفضل.",
-      "en": "Follow conversations, reply times, customer satisfaction and agent performance from one dashboard that helps you understand what is happening and make better decisions."
-    },
-    "heroShot": "reports",
-    "heroRoute": "reports",
-    "heroScene": "kpi-drill",
-    "bullets": {
-      "ar": [
-        "متابعة زمن الرد ونسبة حل المحادثات",
-        "قياس أداء كل موظف وقسم",
-        "معرفة أوقات الضغط وأكثر الفترات ازدحاماً"
-      ],
-      "en": [
-        "Follow reply time and the share of conversations resolved",
-        "Measure how each agent and each department is doing",
-        "See when the pressure peaks and which periods are busiest"
-      ]
-    },
-    "compare": {
-      "eyebrow": {
-        "ar": "الفرق",
-        "en": "The difference"
-      },
-      "title": {
-        "ar": "رقم واضح بدل التخمين",
-        "en": "A clear number instead of guesswork"
-      },
-      "withoutLabel": {
-        "ar": "بدون تقارير",
-        "en": "Without reports"
-      },
-      "withLabel": {
-        "ar": "مع تقارير Qhub",
-        "en": "With Qhub reports"
-      },
-      "rows": [
-        {
-          "without": {
-            "ar": "صعوبة معرفة سبب ارتفاع وقت الرد",
-            "en": "Hard to tell why reply time went up"
-          },
-          "with": {
-            "ar": "أرقام واضحة عن أداء الفريق",
-            "en": "Clear numbers on how the team is doing"
-          }
-        },
-        {
-          "without": {
-            "ar": "متابعة أداء الموظفين بشكل يدوي",
-            "en": "Following agent performance by hand"
-          },
-          "with": {
-            "ar": "متابعة زمن الرد وحل المحادثات",
-            "en": "Follow reply time and conversations resolved"
-          }
-        },
-        {
-          "without": {
-            "ar": "صعوبة معرفة أوقات الضغط",
-            "en": "Hard to know when the pressure peaks"
-          },
-          "with": {
-            "ar": "معرفة أوقات الذروة وحجم المحادثات",
-            "en": "See peak hours and conversation volume"
-          }
-        },
-        {
-          "without": {
-            "ar": "تجميع البيانات في جداول بشكل مستمر",
-            "en": "Constantly assembling data into spreadsheets"
-          },
-          "with": {
-            "ar": "مقارنة الأداء بين الفترات",
-            "en": "Compare performance between periods"
-          }
-        },
-        {
-          "without": {
-            "ar": "اتخاذ القرارات بناءً على الانطباع",
-            "en": "Decisions made on impressions"
-          },
-          "with": {
-            "ar": "الوصول إلى المحادثات التي تقف خلف كل رقم",
-            "en": "Reach the conversations behind every number"
-          }
-        }
-      ]
-    },
-    "journey": {
-      "eyebrow": {
-        "ar": "داخل الشاشة",
-        "en": "Inside the screen"
-      },
-      "title": {
-        "ar": "من الأرقام إلى الصورة الكاملة",
-        "en": "From the numbers to the whole picture"
-      },
-      "lede": {
-        "ar": "تظهر أهم مؤشّرات الأداء في لوحة واحدة، مع تغيير الفترة الزمنية ومتابعة التغيّر في الأرقام. اضغط أي خطوة لتنتقل إليها.",
-        "en": "The key performance metrics appear on one dashboard, where you can change the period and follow how the numbers move. Tap any step to jump to it."
-      },
-      "steps": [
-        {
-          "title": {
-            "ar": "ملخّص الأداء",
-            "en": "The performance summary"
-          },
-          "body": {
-            "ar": "عرض أهم مؤشّرات الأداء في مكان واحد، مثل عدد المحادثات وزمن الرد ونسبة الحل ورضا العملاء.",
-            "en": "The key metrics in one place: conversation count, reply time, resolution rate and customer satisfaction."
-          },
-          "art": {
-            "kind": "stats",
-            "items": [
-              {
-                "label": {
-                  "ar": "المحادثات",
-                  "en": "Conversations"
-                },
-                "value": {
-                  "ar": "1,428",
-                  "en": "1,428"
-                },
-                "pct": 80
-              },
-              {
-                "label": {
-                  "ar": "متوسط أول ردّ",
-                  "en": "Avg. first reply"
-                },
-                "value": {
-                  "ar": "2.1",
-                  "en": "2.1"
-                },
-                "unit": {
-                  "ar": "د",
-                  "en": "m"
-                },
-                "pct": 64
-              },
-              {
-                "label": {
-                  "ar": "نسبة الحل",
-                  "en": "Resolution rate"
-                },
-                "value": {
-                  "ar": "96",
-                  "en": "96"
-                },
-                "unit": {
+                "u": {
                   "ar": "%",
                   "en": "%"
                 },
-                "pct": 96
-              }
-            ]
-          }
-        },
-        {
-          "title": {
-            "ar": "مقارنة الفترات",
-            "en": "Comparing periods"
-          },
-          "body": {
-            "ar": "مقارنة أداء أسبوع بأسبوع أو شهر بشهر لمعرفة التغيّر في النتائج.",
-            "en": "Compare week with week or month with month to see how the results changed."
-          },
-          "art": {
-            "kind": "rules",
-            "pairs": [
-              {
-                "when": {
-                  "ar": "هذا الشهر",
-                  "en": "This month"
-                },
-                "then": {
-                  "ar": "2.1 د",
-                  "en": "2.1 m"
-                }
-              },
-              {
-                "when": {
-                  "ar": "الشهر الماضي",
-                  "en": "Last month"
-                },
-                "then": {
-                  "ar": "2.8 د",
-                  "en": "2.8 m"
-                }
-              },
-              {
-                "when": {
-                  "ar": "الفرق",
-                  "en": "Difference"
-                },
-                "then": {
-                  "ar": "‎−25%",
-                  "en": "‎−25%"
+                "l": {
+                  "ar": "رضا",
+                  "en": "Satisfaction"
                 }
               }
-            ]
-          }
-        },
-        {
-          "title": {
-            "ar": "الوصول إلى التفاصيل",
-            "en": "Reaching the detail"
-          },
-          "body": {
-            "ar": "تصفية البيانات حسب القسم أو الموظف أو الفترة للوصول إلى التفاصيل التي تحتاجها.",
-            "en": "Filter the data by department, agent or period to reach the details you need."
-          },
-          "art": {
-            "kind": "rows",
-            "active": 2,
-            "items": [
-              {
-                "label": {
-                  "ar": "واتساب",
-                  "en": "WhatsApp"
-                },
-                "sub": {
-                  "ar": "متوسط الردّ 1.8 د",
-                  "en": "Avg. reply 1.8 m"
-                },
-                "ch": "whatsapp",
-                "badge": {
-                  "ar": "سريع",
-                  "en": "Fast"
-                }
-              },
-              {
-                "label": {
-                  "ar": "إنستغرام",
-                  "en": "Instagram"
-                },
-                "sub": {
-                  "ar": "متوسط الردّ 2.6 د",
-                  "en": "Avg. reply 2.6 m"
-                },
-                "ch": "instagram"
-              },
-              {
-                "label": {
-                  "ar": "إكس",
-                  "en": "X"
-                },
-                "sub": {
-                  "ar": "متوسط الردّ 4.1 د",
-                  "en": "Avg. reply 4.1 m"
-                },
-                "ch": "x",
-                "badge": {
-                  "ar": "بطيء",
-                  "en": "Slow"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "title": {
-            "ar": "التصدير والجدولة",
-            "en": "Exporting and scheduling"
-          },
-          "body": {
-            "ar": "تصدير التقارير ومشاركة البيانات، مع وصول التقارير بشكل دوري إلى البريد الإلكتروني.",
-            "en": "Export reports and share the data, with reports arriving by email on a regular schedule."
-          },
-          "art": {
-            "kind": "fields",
-            "items": [
-              {
-                "label": {
-                  "ar": "تقرير أسبوعي",
-                  "en": "Weekly report"
-                },
-                "value": {
-                  "ar": "كل أحد",
-                  "en": "Every Sunday"
-                },
-                "on": true
-              },
-              {
-                "label": {
-                  "ar": "يصل إلى",
-                  "en": "Sent to"
-                },
-                "value": {
-                  "ar": "المدير",
-                  "en": "Manager"
-                },
-                "on": true
-              },
-              {
-                "label": {
-                  "ar": "تنبيه التجاوز",
-                  "en": "Threshold alert"
-                },
-                "value": {
-                  "ar": "فوق 5 د",
-                  "en": "Above 5 m"
-                },
-                "on": true
-              }
-            ]
+            ],
+            "domain": {
+              "ar": "متجرك.com",
+              "en": "yourstore.com"
+            },
+            "widget": {
+              "ar": "كيف نساعدك؟",
+              "en": "How can we help?"
+            }
           }
         }
-      ]
-    },
-    "extras": {
-      "eyebrow": {
-        "ar": "تفاصيل إضافية",
-        "en": "More details"
       },
-      "title": {
-        "ar": "مؤشّرات تساعدك على فهم أداء فريقك",
-        "en": "Metrics that help you understand how your team is doing"
-      }
-    },
-    "benefits": [
       {
+        "key": "ai_features",
+        "enabled": true,
+        "data": {
+          "eyebrow": {
+            "ar": "الذكاء الاصطناعي",
+            "en": "Artificial intelligence"
+          },
+          "title": {
+            "ar": "مساعد ذكي يفهم احتياجات عملائك",
+            "en": "An AI assistant that understands what your customers need"
+          },
+          "highlight": {
+            "ar": [
+              "يفهم",
+              "احتياجات",
+              "عملائك"
+            ],
+            "en": [
+              "understands",
+              "what",
+              "your",
+              "customers",
+              "need"
+            ]
+          },
+          "lede": {
+            "ar": "ذكاء اصطناعي مرتبط بقاعدة معرفة نشاطك، يرد بدقة ويحوّل المحادثة إلى الموظف عند الحاجة.",
+            "en": "An assistant connected to your business knowledge base: it answers accurately, and hands the conversation to an agent when one is needed."
+          },
+          "eyebrowIcon": {
+            "type": "library",
+            "set": "qhub",
+            "name": "sparkles"
+          },
+          "cards": [
+            {
+              "title": {
+                "ar": "يفهم اللغات واللهجات",
+                "en": "Understands languages and dialects"
+              },
+              "body": {
+                "ar": "مهما كانت اللهجة، يقرأ نيّة العميل لا كلماته وحدها، ويرد بالنبرة نفسها.",
+                "en": "Whatever the dialect, it reads intent, not words alone."
+              },
+              "icon": {
+                "type": "library",
+                "set": "qhub",
+                "name": "globe"
+              }
+            },
+            {
+              "title": {
+                "ar": "يتكلم بصوت علامتك",
+                "en": "Speaks in your brand's voice"
+              },
+              "body": {
+                "ar": "حدّد أسلوب الرد: رسمي، أو ودود، أو مختصر، أو أي أسلوب يناسبك.",
+                "en": "Set the reply style: formal, friendly or brief."
+              },
+              "icon": {
+                "type": "library",
+                "set": "qhub",
+                "name": "heart"
+              }
+            },
+            {
+              "title": {
+                "ar": "قاعدة معرفة مخصّصة",
+                "en": "Your own knowledge base"
+              },
+              "body": {
+                "ar": "يمكنك تزويده بمعلوماتك وأسعارك وسياساتك ليستخدمها في ردوده.",
+                "en": "Give it your information, prices and policies to answer from."
+              },
+              "icon": {
+                "type": "library",
+                "set": "qhub",
+                "name": "inbox"
+              }
+            },
+            {
+              "title": {
+                "ar": "تحويل تلقائي إلى موظف",
+                "en": "Automatic handoff to an agent"
+              },
+              "body": {
+                "ar": "يقوم بتحويل المحادثة إلى الموظف المناسب عند الحاجة.",
+                "en": "It routes the conversation to the right agent when needed."
+              },
+              "icon": {
+                "type": "library",
+                "set": "qhub",
+                "name": "bolt"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "key": "chat_story",
+        "enabled": true,
+        "data": {
+          "sectionLabel": {
+            "ar": "ديمو تفاعلي لمحادثة داخل Qhub",
+            "en": "An interactive demo of a conversation inside Qhub"
+          },
+          "eyebrow": {
+            "ar": "عرض حيّ",
+            "en": "Live demo"
+          },
+          "headA": {
+            "ar": "مسار محادثة من أول رسالة إلى",
+            "en": "The path of a conversation, from the first message to a"
+          },
+          "headStretch": {
+            "ar": "عميل",
+            "en": "reassured"
+          },
+          "headB": {
+            "ar": "مطمئن",
+            "en": "customer"
+          },
+          "lede": {
+            "ar": "شاهد كيف يبدأ المساعد المحادثة ويسلّمها لفريقك عند الحاجة، بدون أن يعيد عميلك كلامه من جديد.",
+            "en": "See how the assistant starts the conversation and hands it to your team when needed, without your customer having to repeat a word."
+          },
+          "script": {
+            "ar": [
+              "السلام عليكم، عندكم العرض لسا متاح؟",
+              "وعليكم السلام ورحمة الله. نعم، العرض ما زال متاحاً: خصم ‎25% على كل الطلبات فوق 50 ريال، وينتهي غداً الساعة 12 منتصف الليل.",
+              "حلو 👌 بس أنا طلبت قبل أسبوعين وطلبي وصل ناقص قطعة، أبغى أعرف إذا أقدر أستبدلها وأستخدم الخصم على الطلب الجديد؟",
+              "الطلب يحتاج مراجعة بشرية · تم التحويل إلى منال (خدمة العملاء) مع ملخّص المحادثة",
+              "أهلين أبو خالد، أنا منال 👋 شفت طلبك رقم ‎#4821 — بنرسل لك القطعة الناقصة اليوم بدون رسوم، والخصم بينطبق على طلبك الجديد.",
+              "الله يعطيك العافية، خدمة سريعة 🙏"
+            ],
+            "en": [
+              "Hi, is the offer still available?",
+              "Hello. It is: ‎25% off every order over 50 SAR, ending tomorrow at midnight.",
+              "Nice 👌 But I ordered two weeks ago and a piece was missing. Can I exchange it and still use the discount on a new order?",
+              "This case needs a human · handed to Manal (Customer service) with a summary of the conversation",
+              "Hi Abu Khalid, I'm Manal 👋 I found order ‎#4821 — we're sending the missing piece today at no charge, and the discount applies to your new order.",
+              "That's great, thank you for the quick service 🙏"
+            ]
+          },
+          "beats": [
+            {
+              "title": {
+                "ar": "العميل يبدأ",
+                "en": "The customer starts"
+              },
+              "body": {
+                "ar": "تصل رسالته إلى صندوق وارد واحد، أياً كانت القناة التي يفضّلها.",
+                "en": "A message arrives from WhatsApp straight into the unified inbox."
+              }
+            },
+            {
+              "title": {
+                "ar": "الذكاء الاصطناعي يرد",
+                "en": "AI answers"
+              },
+              "body": {
+                "ar": "ردّ فوري بلغة عميلك، مبنيّ على معلومات نشاطك لا على التخمين.",
+                "en": "An instant reply in the right tone, grounded in your store's knowledge base."
+              }
+            },
+            {
+              "title": {
+                "ar": "سؤال يحتاج قرار",
+                "en": "A question needing judgement"
+              },
+              "body": {
+                "ar": "حالة خارج صلاحيات الرد التلقائي، فيتوقّف المساعد بدل أن يجيب بما لا يعرف.",
+                "en": "An exchange plus a discount — beyond what auto-reply is allowed to decide."
+              }
+            },
+            {
+              "title": {
+                "ar": "تحويل ذكي",
+                "en": "Smart handoff"
+              },
+              "body": {
+                "ar": "يحوّلها Qhub إلى الموظف المناسب ومعها ملخّص جاهز، فيبدأ من حيث انتهى المساعد.",
+                "en": "Qhub routes it to the right agent with a ready-made summary."
+              }
+            },
+            {
+              "title": {
+                "ar": "الموظف يكمّل",
+                "en": "The agent finishes"
+              },
+              "body": {
+                "ar": "يكمل موظفك بالسياق كاملاً، فيشعر عميلك أنه يتحدّث إلى جهة واحدة طوال الوقت.",
+                "en": "Manal continues with the same context — the customer repeats nothing."
+              }
+            }
+          ],
+          "contact": {
+            "ar": "أبو خالد",
+            "en": "Abu Khalid"
+          },
+          "channelLine": {
+            "ar": "واتساب · نشط الآن",
+            "en": "WhatsApp · active now"
+          },
+          "now": {
+            "ar": "الآن",
+            "en": "now"
+          },
+          "tryPlaceholder": {
+            "ar": "اكتب رسالة لتجرّب…",
+            "en": "Try writing a message…"
+          },
+          "waitPlaceholder": {
+            "ar": "انتظر انتهاء المحادثة لتجرّب بنفسك",
+            "en": "Wait for the conversation to finish, then try it yourself"
+          },
+          "tryLabel": {
+            "ar": "جرّب رسالة",
+            "en": "Try a message"
+          },
+          "sendLabel": {
+            "ar": "إرسال",
+            "en": "Send"
+          },
+          "aiName": {
+            "ar": "مساعد Qhub",
+            "en": "Qhub assistant"
+          },
+          "agentInitial": {
+            "ar": "م",
+            "en": "M"
+          },
+          "agentName": {
+            "ar": "منال · خدمة العملاء",
+            "en": "Manal · Customer service"
+          },
+          "replies": [
+            {
+              "match": {
+                "pattern": {
+                  "ar": "سعر|كم|تكلف|بكم|فلوس|ريال",
+                  "en": "price|cost|how much|pricing|plan"
+                },
+                "flags": {
+                  "ar": "",
+                  "en": "i"
+                }
+              },
+              "reply": {
+                "ar": "تبدأ باقاتنا من 19$ شهرياً وتشمل قناتين وموظفَين. هل أرسل لك مقارنة كاملة بين الباقات؟",
+                "en": "Our plans start at $19 a month and include two channels and two agents. Would you like a full comparison?"
+              }
+            },
+            {
+              "match": {
+                "pattern": {
+                  "ar": "توصيل|شحن|وصل|طلب|متى",
+                  "en": "deliver|shipping|ship|order|when"
+                },
+                "flags": {
+                  "ar": "",
+                  "en": "i"
+                }
+              },
+              "reply": {
+                "ar": "يصل طلبك عادةً خلال 2–4 أيام عمل. أعطني رقم الطلب لأتابعه لك حالاً.",
+                "en": "Orders usually arrive within 2–4 working days. Send me the order number and I'll track it right away."
+              }
+            },
+            {
+              "match": {
+                "pattern": {
+                  "ar": "استبدال|ارجاع|إرجاع|مرتجع|عيب|ناقص",
+                  "en": "exchange|return|refund|broken|missing|damaged"
+                },
+                "flags": {
+                  "ar": "",
+                  "en": "i"
+                }
+              },
+              "reply": {
+                "ar": "نعتذر عن الإزعاج. الاستبدال متاح خلال 14 يوماً من الاستلام، وأحوّلك الآن إلى موظف خدمة العملاء ليكمل معك.",
+                "en": "Sorry about that. Exchanges are available within 14 days of delivery, and I'm passing you to a customer service agent now."
+              }
+            },
+            {
+              "match": {
+                "pattern": {
+                  "ar": "سلام|هلا|مرحبا|هاي|صباح|مساء",
+                  "en": "hi|hello|hey|salam|morning|evening"
+                },
+                "flags": {
+                  "ar": "",
+                  "en": "i"
+                }
+              },
+              "reply": {
+                "ar": "أهلاً وسهلاً، معك مساعد Qhub. كيف أستطيع مساعدتك اليوم؟",
+                "en": "Hello. You're speaking to the Qhub assistant. How can I help today?"
+              }
+            },
+            {
+              "match": {
+                "pattern": {
+                  "ar": "شكرا|مشكور|يعطيك|تسلم",
+                  "en": "thank|thanks|appreciate|cheers"
+                },
+                "flags": {
+                  "ar": "",
+                  "en": "i"
+                }
+              },
+              "reply": {
+                "ar": "العفو، نحن في خدمتك دائماً. إن احتجت أي شيء آخر فأنا هنا.",
+                "en": "Any time. I'm right here whenever you need anything."
+              }
+            }
+          ],
+          "fallback": {
+            "ar": "وصلتني رسالتك. هذا عرض تجريبي، لكن في حسابك الحقيقي المساعد يرد من قاعدة معرفة متجرك ويحوّل لفريقك وقت ما يحتاج.",
+            "en": "Got your message. This is a demo, but in your real account the assistant answers from your store's knowledge base and hands over to your team whenever it needs to."
+          },
+          "eyebrowIcon": {
+            "type": "library",
+            "set": "qhub",
+            "name": "play"
+          }
+        }
+      },
+      {
+        "key": "sectors",
+        "enabled": true,
+        "data": {
+          "eyebrow": {
+            "ar": "القطاعات",
+            "en": "Sectors"
+          },
+          "title": {
+            "ar": "مهما كان مجالك، عملاؤك ينتظرون رداً",
+            "en": "Sectors running on Qhub today"
+          },
+          "highlight": {
+            "ar": [
+              "عملاؤك",
+              "ينتظرون",
+              "رداً"
+            ],
+            "en": [
+              "Sectors"
+            ]
+          },
+          "lede": {
+            "ar": "يعمل Qhub مع مختلف الأنشطة، من المقهى الواحد إلى شبكة المتاجر، بالطريقة التي يحتاجها كل مجال.",
+            "en": "Whatever your line of work — from a single coffee shop to a chain of stores."
+          },
+          "sectors": [
+            {
+              "title": {
+                "ar": "التجارة الإلكترونية",
+                "en": "E-commerce"
+              },
+              "body": {
+                "ar": "ردّ في ثوانٍ، يحوّل السؤال إلى طلب.",
+                "en": "Answer in seconds, and turn the question into an order."
+              }
+            },
+            {
+              "title": {
+                "ar": "صنّاع المحتوى",
+                "en": "Creators"
+              },
+              "body": {
+                "ar": "ردّ على آلاف الرسائل، دون فريق.",
+                "en": "Answer thousands of messages, without a team."
+              }
+            },
+            {
+              "title": {
+                "ar": "التجزئة والضيافة",
+                "en": "Retail & hospitality"
+              },
+              "body": {
+                "ar": "ردّ فوري على كل استفسار، قبل أن يسأل غيرك.",
+                "en": "An instant reply to every enquiry, before they ask someone else."
+              }
+            },
+            {
+              "title": {
+                "ar": "الصحة والتعليم",
+                "en": "Health & education"
+              },
+              "body": {
+                "ar": "أسئلة مراجعيك المتكرّرة، يجيب عنها المساعد ليل نهار.",
+                "en": "The repeat questions your patients ask, answered day and night."
+              }
+            },
+            {
+              "title": {
+                "ar": "التجميل والعناية",
+                "en": "Beauty & wellness"
+              },
+              "body": {
+                "ar": "تصلك الرسائل وأنت مع عميل، والمساعد يرد بدلك.",
+                "en": "Messages arrive while you are with a client, and the assistant replies for you."
+              }
+            },
+            {
+              "title": {
+                "ar": "العقارات",
+                "en": "Real estate"
+              },
+              "body": {
+                "ar": "كل مهتمّ بوحدة يصل مندوبه فوراً، بسياق محادثته كاملاً.",
+                "en": "Every enquiry reaches its agent at once, with the full conversation behind it."
+              }
+            },
+            {
+              "title": {
+                "ar": "الخدمات المهنية",
+                "en": "Professional services"
+              },
+              "body": {
+                "ar": "كل استشارة تبدأ برسالة، وسجلّها محفوظ بالكامل.",
+                "en": "Every engagement starts with a message, and the whole record is kept."
+              }
+            }
+          ],
+          "eyebrowIcon": {
+            "type": "library",
+            "set": "qhub",
+            "name": "store"
+          },
+          "cards": [
+            {
+              "icon": {
+                "type": "library",
+                "set": "qhub",
+                "name": "globe"
+              },
+              "video": null,
+              "poster": null,
+              "image": null
+            },
+            {
+              "icon": {
+                "type": "library",
+                "set": "qhub",
+                "name": "camera"
+              },
+              "video": {
+                "type": "media",
+                "url": "https://qhub-lp.apexes.click/videos/creators.mp4",
+                "name": "creators.mp4",
+                "kind": "video"
+              },
+              "poster": {
+                "type": "media",
+                "url": "https://qhub-lp.apexes.click/videos/creators-poster.jpg",
+                "name": "creators-poster.jpg",
+                "kind": "image"
+              },
+              "image": null
+            },
+            {
+              "icon": {
+                "type": "library",
+                "set": "qhub",
+                "name": "store"
+              },
+              "video": null,
+              "poster": null,
+              "image": null
+            },
+            {
+              "icon": {
+                "type": "library",
+                "set": "qhub",
+                "name": "stethoscope"
+              },
+              "video": null,
+              "poster": null,
+              "image": null
+            },
+            {
+              "icon": {
+                "type": "library",
+                "set": "qhub",
+                "name": "heart"
+              },
+              "video": {
+                "type": "media",
+                "url": "https://qhub-lp.apexes.click/videos/beauty.mp4",
+                "name": "beauty.mp4",
+                "kind": "video"
+              },
+              "poster": {
+                "type": "media",
+                "url": "https://qhub-lp.apexes.click/videos/beauty-poster.jpg",
+                "name": "beauty-poster.jpg",
+                "kind": "image"
+              },
+              "image": null
+            },
+            {
+              "icon": {
+                "type": "library",
+                "set": "qhub",
+                "name": "building"
+              },
+              "video": null,
+              "poster": null,
+              "image": null
+            },
+            {
+              "icon": {
+                "type": "library",
+                "set": "qhub",
+                "name": "briefcase"
+              },
+              "video": null,
+              "poster": null,
+              "image": null
+            }
+          ]
+        }
+      },
+      {
+        "key": "integrations",
+        "enabled": true,
+        "data": {
+          "titleLead": {
+            "ar": "القنوات",
+            "en": "Channels"
+          },
+          "titleRest": {
+            "ar": "والربط",
+            "en": "& Integrations"
+          },
+          "lede": {
+            "ar": "اربط القنوات التي يستخدمها عملاؤك ومتجرك بحسابك في Qhub، بدون تعقيد تقني.",
+            "en": "Connect the channels your customers and your store use to your Qhub account, with no technical complexity."
+          },
+          "cta": {
+            "ar": "اطلب عرضاً توضيحياً",
+            "en": "Request a demo"
+          },
+          "arcs": [
+            [
+              "whatsapp",
+              "instagram",
+              "messenger",
+              "telegram",
+              "x",
+              "livechat",
+              "gmail",
+              "outlook"
+            ],
+            [
+              "salla",
+              "zid",
+              "shopify",
+              "woocommerce",
+              "smtp"
+            ]
+          ]
+        }
+      },
+      {
+        "key": "stats",
+        "enabled": true,
+        "data": {
+          "eyebrow": {
+            "ar": "بالأرقام",
+            "en": "By the numbers"
+          },
+          "title": {
+            "ar": "أرقام تهمّك قبل أن تبدأ",
+            "en": "Numbers worth knowing before you start"
+          },
+          "highlight": {
+            "ar": [
+              "تهمّك",
+              "قبل",
+              "أن",
+              "تبدأ"
+            ],
+            "en": [
+              "before",
+              "you",
+              "start"
+            ]
+          },
+          "messages": {
+            "ar": "رسالة يعالجها Qhub شهرياً لفرق في مختلف القطاعات",
+            "en": "messages handled through Qhub every month, for teams across every sector"
+          },
+          "channels": {
+            "ar": "قناة ومنصة تربطها بحسابك، من تطبيقات المحادثة إلى متجرك",
+            "en": "channels and platforms you can connect to your account, from messaging apps to your store"
+          },
+          "accuracy": {
+            "ar": "دقّة في فهم ما يقصده عميلك والرد عليه بلغته",
+            "en": "accuracy in understanding what your customer means and replying in their own language"
+          },
+          "response": {
+            "ar": "متوسط انتظار عميلك لأول رد",
+            "en": "average wait before your customer gets a first reply"
+          },
+          "seconds": {
+            "ar": "ث",
+            "en": "s"
+          },
+          "eyebrowIcon": {
+            "type": "library",
+            "set": "qhub",
+            "name": "chart"
+          },
+          "video": {
+            "type": "media",
+            "url": "https://qhub-lp.apexes.click/videos/dialects.mp4",
+            "name": "dialects.mp4",
+            "kind": "video"
+          },
+          "poster": {
+            "type": "media",
+            "url": "https://qhub-lp.apexes.click/videos/dialects-poster.jpg",
+            "name": "dialects-poster.jpg",
+            "kind": "image"
+          },
+          "chips": [
+            "whatsapp",
+            "instagram",
+            "messenger",
+            "telegram",
+            "gmail",
+            "outlook",
+            "yahoo",
+            "x",
+            "livechat",
+            "salla",
+            "zid",
+            "shopify"
+          ]
+        }
+      },
+      {
+        "key": "testimonials",
+        "enabled": true,
+        "data": {
+          "eyebrow": {
+            "ar": "آراء العملاء",
+            "en": "Customer stories"
+          },
+          "title": {
+            "ar": "ما الذي تغيّر بعد Qhub؟",
+            "en": "What changed after Qhub?"
+          },
+          "highlight": {
+            "ar": [
+              "تغيّر",
+              "بعد",
+              "Qhub؟"
+            ],
+            "en": [
+              "changed",
+              "after",
+              "Qhub?"
+            ]
+          },
+          "dot": {
+            "ar": "الرأي {0}",
+            "en": "Testimonial {0}"
+          },
+          "eyebrowIcon": {
+            "type": "library",
+            "set": "qhub",
+            "name": "heart"
+          }
+        }
+      },
+      {
+        "key": "final_cta",
+        "enabled": true,
+        "data": {
+          "badge": {
+            "ar": "جاهز خلال أقل من 10 دقائق",
+            "en": "Setup takes under 10 minutes"
+          },
+          "title": {
+            "ar": "ابدأ تجربة Qhub المجانية",
+            "en": "Start the free Qhub trial"
+          },
+          "highlight": {
+            "ar": [
+              "تجربة",
+              "Qhub",
+              "المجانية"
+            ],
+            "en": [
+              "free",
+              "Qhub",
+              "trial"
+            ]
+          },
+          "lede": {
+            "ar": "جرّب Qhub مجاناً 7 أيام، وشوف بنفسك كيف تتغيّر سرعة ردودك ورضا عملائك.",
+            "en": "Try Qhub free for 7 days and watch how much faster you reply — and how much happier your customers are."
+          },
+          "primary": {
+            "ar": "ابدأ مجاناً",
+            "en": "Start free"
+          },
+          "secondary": {
+            "ar": "اطلب عرضاً توضيحياً",
+            "en": "Request a demo"
+          },
+          "perks": {
+            "ar": [
+              "بدون بطاقة ائتمان",
+              "إلغاء في أي وقت",
+              "دعم على مدار الساعة"
+            ],
+            "en": [
+              "No credit card",
+              "Cancel any time",
+              "Support 24/7"
+            ]
+          },
+          "channels": [
+            "whatsapp",
+            "instagram",
+            "telegram",
+            "messenger"
+          ]
+        }
+      },
+      {
+        "key": "partners_marquee",
+        "enabled": false,
+        "data": {
+          "label": {
+            "ar": "شركاؤنا وعملاؤنا",
+            "en": "Our partners and customers"
+          }
+        }
+      },
+      {
+        "key": "guided_tour",
+        "enabled": false,
+        "data": {
+          "eyebrow": {
+            "ar": "جولة تفاعلية",
+            "en": "Interactive tour"
+          },
+          "heading": {
+            "ar": "جرّب Qhub بنفسك قبل التسجيل",
+            "en": "Try Qhub yourself before you sign up"
+          },
+          "highlight": {
+            "ar": [
+              "بنفسك"
+            ],
+            "en": [
+              "yourself"
+            ]
+          },
+          "lede": {
+            "ar": "ست خطوات داخل النظام الحقيقي — دون حساب ودون تنزيل.",
+            "en": "Six steps inside the real product — no account, no download."
+          },
+          "startTitle": {
+            "ar": "جولة إرشادية داخل Qhub",
+            "en": "A guided tour inside Qhub"
+          },
+          "startBody": {
+            "ar": "ست خطوات قصيرة على شاشات النظام الحقيقية.",
+            "en": "Six short steps on the real product screens."
+          },
+          "startCta": {
+            "ar": "ابدأ الجولة الآن",
+            "en": "Start the tour"
+          },
+          "stepOf": {
+            "ar": "الخطوة {0} من {1}",
+            "en": "Step {0} of {1}"
+          },
+          "next": {
+            "ar": "التالي",
+            "en": "Next"
+          },
+          "restart": {
+            "ar": "أعد الجولة",
+            "en": "Restart the tour"
+          },
+          "prev": {
+            "ar": "السابق",
+            "en": "Back"
+          },
+          "steps": [
+            {
+              "title": {
+                "ar": "تعرف موقعك من أول نظرة",
+                "en": "See where you stand at a glance"
+              },
+              "body": {
+                "ar": "المحادثات المفتوحة والمغلقة والمستلمة، وكل رقم بجانبه تغيّره عن الأسبوع الماضي.",
+                "en": "Open, closed and assigned conversations — each number next to how it moved since last week."
+              }
+            },
+            {
+              "title": {
+                "ar": "كل القنوات في وارد واحد",
+                "en": "Every channel in one inbox"
+              },
+              "body": {
+                "ar": "واتساب وإنستغرام وماسنجر والبريد — كل محادثة عليها شعار قناتها وحالتها، ويمكنك تصفيتها بضغطة.",
+                "en": "WhatsApp, Instagram, Messenger and email — each conversation carries its channel logo and status, and filters in a click."
+              }
+            },
+            {
+              "title": {
+                "ar": "سياق العميل بجانب المحادثة",
+                "en": "Customer context beside the chat"
+              },
+              "body": {
+                "ar": "بياناته وقسمه ووسومه وسجلّ محادثاته السابقة — كلها ظاهرة وأنت ترد، دون أن تفتح شاشة أخرى.",
+                "en": "Their details, department, tags and past conversations — all visible while you reply, without opening another screen."
+              }
+            },
+            {
+              "title": {
+                "ar": "اضبط المساعد كما تريد",
+                "en": "Tune the assistant to your taste"
+              },
+              "body": {
+                "ar": "نبرة الرد، اللهجة، ومتى يحوّل للموظف — كلها إعدادات تتحكم فيها بنفسك.",
+                "en": "Reply tone, dialect, and when it hands over to an agent — all settings you control yourself."
+              }
+            },
+            {
+              "title": {
+                "ar": "حملات تنطلق بضغطة",
+                "en": "Campaigns that go out in a click"
+              },
+              "body": {
+                "ar": "اختر القالب والجمهور واضغط إرسال — وتابع معدّل الفتح والردود لحظة بلحظة.",
+                "en": "Pick the template and audience, hit send — then watch open and reply rates in real time."
+              }
+            },
+            {
+              "title": {
+                "ar": "أرقام تقرأ أداء فريقك",
+                "en": "Numbers that read your team's performance"
+              },
+              "body": {
+                "ar": "زمن أول رد، نسبة الرضا، وتوزيع المحادثات حسب القناة والموظف — جاهزة للتصدير.",
+                "en": "First reply time, satisfaction rate, and conversation split by channel and agent — ready to export."
+              }
+            }
+          ],
+          "eyebrowIcon": {
+            "type": "library",
+            "set": "qhub",
+            "name": "play"
+          }
+        }
+      },
+      {
+        "key": "system_preview",
+        "enabled": false,
+        "data": {
+          "eyebrowIcon": {
+            "type": "library",
+            "set": "qhub",
+            "name": "widget"
+          },
+          "screens": [
+            {
+              "file": "overview",
+              "title": {
+                "ar": "نظرة عامة",
+                "en": "نظرة عامة"
+              }
+            },
+            {
+              "file": "inbox",
+              "title": {
+                "ar": "المحادثات",
+                "en": "المحادثات"
+              }
+            },
+            {
+              "file": "ai-settings",
+              "title": {
+                "ar": "إعدادات الذكاء الاصطناعي",
+                "en": "إعدادات الذكاء الاصطناعي"
+              }
+            },
+            {
+              "file": "campaigns",
+              "title": {
+                "ar": "الحملات التسويقية",
+                "en": "الحملات التسويقية"
+              }
+            },
+            {
+              "file": "contacts",
+              "title": {
+                "ar": "العملاء",
+                "en": "العملاء"
+              }
+            },
+            {
+              "file": "reports",
+              "title": {
+                "ar": "التقارير",
+                "en": "التقارير"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "key": "pricing_teaser",
+        "enabled": false,
+        "data": {
+          "eyebrow": {
+            "ar": "الأسعار",
+            "en": "Pricing"
+          },
+          "title": {
+            "ar": "باقات واضحة، بدون مفاجآت",
+            "en": "Clear plans, no surprises"
+          },
+          "highlight": {
+            "ar": [
+              "باقات",
+              "واضحة"
+            ],
+            "en": [
+              "Clear",
+              "plans"
+            ]
+          },
+          "lede": {
+            "ar": "ابدأ مجاناً 7 أيام — دون بطاقة ائتمان، ويمكنك تغيير باقتك في أي وقت.",
+            "en": "Start with 7 days free — no credit card, and change your plan whenever you like."
+          },
+          "featured": {
+            "ar": "الأكثر اختياراً",
+            "en": "Most popular"
+          },
+          "perMonth": {
+            "ar": "/ شهرياً",
+            "en": "/ month"
+          },
+          "subscribe": {
+            "ar": "اشترك الآن",
+            "en": "Subscribe now"
+          },
+          "compare": {
+            "ar": "قارن الباقات بالتفصيل",
+            "en": "Compare plans in detail"
+          },
+          "monthly": {
+            "ar": "شهري",
+            "en": "Monthly"
+          },
+          "yearly": {
+            "ar": "سنوي",
+            "en": "Yearly"
+          },
+          "save": {
+            "ar": "وفّر ‎20%",
+            "en": "Save 20%"
+          },
+          "eyebrowIcon": {
+            "type": "library",
+            "set": "qhub",
+            "name": "shield"
+          }
+        }
+      }
+    ]
+  },
+  "features": {
+    "cards": [
+      {
+        "slug": "unified-inbox",
+        "title": {
+          "ar": "المحادثات الموحدة",
+          "en": "Unified Inbox"
+        },
+        "blurb": {
+          "ar": "كل محادثات عملائك في Inbox واحد",
+          "en": "Every channel in one place"
+        },
         "icon": {
           "type": "library",
           "set": "qhub",
-          "name": "chart"
-        },
-        "title": {
-          "ar": "متوسّط زمن الرد",
-          "en": "Average reply time"
-        },
-        "body": {
-          "ar": "متابعة متوسط أول رد ومتوسط إغلاق المحادثات حسب الفترة والموظف.",
-          "en": "Follow the average first reply and the average time to close, by period and by agent."
+          "name": "inbox"
         }
       },
       {
+        "slug": "ai-assistant",
+        "title": {
+          "ar": "مساعد الذكاء الاصطناعي",
+          "en": "AI Assistant"
+        },
+        "blurb": {
+          "ar": "ردود فورية، مع فهم للسياق وطريقة كلام العميل",
+          "en": "Instant replies that read the context"
+        },
+        "icon": {
+          "type": "library",
+          "set": "qhub",
+          "name": "sparkles"
+        }
+      },
+      {
+        "slug": "campaigns",
+        "title": {
+          "ar": "الحملات التسويقية",
+          "en": "Campaigns"
+        },
+        "blurb": {
+          "ar": "إنشاء وإرسال وإدارة الحملات من مكان واحد",
+          "en": "WhatsApp and email campaigns in one place"
+        },
+        "icon": {
+          "type": "library",
+          "set": "qhub",
+          "name": "megaphone"
+        }
+      },
+      {
+        "slug": "team",
+        "title": {
+          "ar": "إدارة الفريق والصلاحيات",
+          "en": "Team & Permissions"
+        },
+        "blurb": {
+          "ar": "تنظيم المحادثات وتوزيعها على الفريق",
+          "en": "Roles, departments and working hours"
+        },
         "icon": {
           "type": "library",
           "set": "qhub",
           "name": "users"
-        },
-        "title": {
-          "ar": "أداء كل موظف",
-          "en": "Per-agent performance"
-        },
-        "body": {
-          "ar": "مقارنة أداء الموظفين ومعرفة حجم المحادثات التي تمّت متابعتها وإنجازها.",
-          "en": "Compare agents and see how many conversations each one followed and completed."
         }
       },
       {
+        "slug": "analytics",
+        "title": {
+          "ar": "التقارير والتحليلات",
+          "en": "Reports & Analytics"
+        },
+        "blurb": {
+          "ar": "بيانات واضحة لمتابعة أداء فريقك",
+          "en": "Reply time and team performance"
+        },
+        "icon": {
+          "type": "library",
+          "set": "qhub",
+          "name": "chart"
+        }
+      },
+      {
+        "slug": "chat-widget",
+        "title": {
+          "ar": "التواصل المباشر (Chat Widget)",
+          "en": "Chat Widget"
+        },
+        "blurb": {
+          "ar": "تواصل مباشر مع زوار موقعك",
+          "en": "A live chat widget on the website"
+        },
+        "icon": {
+          "type": "library",
+          "set": "qhub",
+          "name": "widget"
+        }
+      },
+      {
+        "slug": "integrations",
+        "title": {
+          "ar": "القنوات والربط",
+          "en": "Channels & Integrations"
+        },
+        "blurb": {
+          "ar": "قنوات التواصل ومتجرك في مكان واحد",
+          "en": "Your channels and your store in one place"
+        },
+        "icon": {
+          "type": "library",
+          "set": "qhub",
+          "name": "plug"
+        }
+      }
+    ],
+    "pages": {
+      "unified-inbox": {
+        "eyebrow": {
+          "ar": "المحادثات الموحدة",
+          "en": "Unified Inbox"
+        },
+        "h1": {
+          "ar": "كل محادثات عملائك في مكان واحد",
+          "en": "Every customer conversation in one place"
+        },
+        "highlight": {
+          "ar": [
+            "محادثات",
+            "عملائك"
+          ],
+          "en": [
+            "conversation"
+          ]
+        },
+        "lede": {
+          "ar": "بدل التنقّل بين أكثر من منصّة، يجمع Qhub محادثات عملائك في صندوق واحد، لتكون كل محادثة واضحة لفريقك وسهلة المتابعة.",
+          "en": "Instead of moving between several platforms, Qhub gathers your customers' conversations into one inbox, so every conversation is clear to your team and easy to follow."
+        },
+        "heroShot": "inbox",
+        "heroRoute": "inbox",
+        "heroScene": "merge",
+        "bullets": {
+          "ar": [
+            "كل القنوات في صندوق واحد، بلا تنقّل بين المنصّات",
+            "كل محادثة مرتبطة بالموظف المسؤول عنها",
+            "معلومات العميل وسياق المحادثة في المكان نفسه"
+          ],
+          "en": [
+            "Every channel in one inbox, with no platform switching",
+            "Every conversation tied to the agent who owns it",
+            "Customer details and conversation context in the same place"
+          ]
+        },
+        "compare": {
+          "eyebrow": {
+            "ar": "الفرق",
+            "en": "The difference"
+          },
+          "title": {
+            "ar": "محادثاتك مرتّبة، وفريقك على الصفحة نفسها",
+            "en": "Your conversations in order, your team on the same page"
+          },
+          "withoutLabel": {
+            "ar": "بدون Qhub",
+            "en": "Without Qhub"
+          },
+          "withLabel": {
+            "ar": "مع Qhub",
+            "en": "With Qhub"
+          },
+          "rows": [
+            {
+              "without": {
+                "ar": "محادثات موزّعة بين أكثر من مكان",
+                "en": "Conversations spread across more than one place"
+              },
+              "with": {
+                "ar": "كل المحادثات في صندوق واحد",
+                "en": "Every conversation in a single inbox"
+              }
+            },
+            {
+              "without": {
+                "ar": "رسائل قد تضيع وسط الزحام",
+                "en": "Messages that get lost in the noise"
+              },
+              "with": {
+                "ar": "حالة كل محادثة واضحة للفريق",
+                "en": "The status of every conversation is clear to the team"
+              }
+            },
+            {
+              "without": {
+                "ar": "صعوبة معرفة من يتابع كل محادثة",
+                "en": "Hard to tell who is following each conversation"
+              },
+              "with": {
+                "ar": "كل محادثة مرتبطة بالموظف المسؤول عنها",
+                "en": "Every conversation tied to the agent who owns it"
+              }
+            },
+            {
+              "without": {
+                "ar": "تكرار الأسئلة وضياع سياق العميل",
+                "en": "Questions repeated and customer context lost"
+              },
+              "with": {
+                "ar": "معلومات العميل وسياق المحادثة في المكان نفسه",
+                "en": "Customer details and conversation context in the same place"
+              }
+            },
+            {
+              "without": {
+                "ar": "متابعة المحادثات تحتاج أكثر من أداة",
+                "en": "Following conversations takes more than one tool"
+              },
+              "with": {
+                "ar": "متابعة سهلة من أول رسالة حتى إغلاق المحادثة",
+                "en": "Easy follow-up from the first message to closing the conversation"
+              }
+            }
+          ]
+        },
+        "journey": {
+          "eyebrow": {
+            "ar": "داخل الشاشة",
+            "en": "Inside the screen"
+          },
+          "title": {
+            "ar": "كل محادثة تمرّ بسلاسة",
+            "en": "Every conversation moves smoothly"
+          },
+          "lede": {
+            "ar": "أربع لحظات على شاشة الوارد نفسها. اضغط أي خطوة لتنتقل إليها.",
+            "en": "Four moments on the same inbox screen. Tap any step to jump to it."
+          },
+          "steps": [
+            {
+              "title": {
+                "ar": "تصل الرسالة",
+                "en": "The message arrives"
+              },
+              "body": {
+                "ar": "تظهر المحادثة مباشرة في صندوق الوارد مع تفاصيلها.",
+                "en": "The conversation appears in the inbox right away, with its details."
+              },
+              "art": {
+                "kind": "rows",
+                "active": 0,
+                "items": [
+                  {
+                    "label": {
+                      "ar": "نورة العامري",
+                      "en": "Noura Al-Amri"
+                    },
+                    "sub": {
+                      "ar": "وصلني الطلب، شكراً لكم",
+                      "en": "The order arrived, thank you"
+                    },
+                    "ch": "whatsapp",
+                    "badge": {
+                      "ar": "2",
+                      "en": "2"
+                    }
+                  },
+                  {
+                    "label": {
+                      "ar": "متجر لمسة",
+                      "en": "Lamsa Store"
+                    },
+                    "sub": {
+                      "ar": "كم سعر الباقة الجديدة؟",
+                      "en": "How much is the new plan?"
+                    },
+                    "ch": "instagram",
+                    "badge": {
+                      "ar": "1",
+                      "en": "1"
+                    }
+                  },
+                  {
+                    "label": {
+                      "ar": "خالد الحارثي",
+                      "en": "Khalid Al-Harthi"
+                    },
+                    "sub": {
+                      "ar": "متى يفتح المحل اليوم؟",
+                      "en": "What time do you open today?"
+                    },
+                    "ch": "messenger"
+                  }
+                ]
+              }
+            },
+            {
+              "title": {
+                "ar": "تصل للموظف المناسب",
+                "en": "It reaches the right agent"
+              },
+              "body": {
+                "ar": "تُوزَّع المحادثة على الموظف المناسب حسب إعدادات فريقك.",
+                "en": "The conversation is routed to the right agent according to your team settings."
+              },
+              "art": {
+                "kind": "flow",
+                "from": {
+                  "ar": "محادثة واردة",
+                  "en": "Incoming chat"
+                },
+                "to": {
+                  "ar": [
+                    "المبيعات",
+                    "الدعم",
+                    "الشحن"
+                  ],
+                  "en": [
+                    "Sales",
+                    "Support",
+                    "Shipping"
+                  ]
+                }
+              }
+            },
+            {
+              "title": {
+                "ar": "يبدأ الفريق بالرد",
+                "en": "The team starts replying"
+              },
+              "body": {
+                "ar": "كل تفاصيل العميل وسياق المحادثة واضحة أمام الموظف.",
+                "en": "Every customer detail and the conversation context sit in front of the agent."
+              },
+              "art": {
+                "kind": "card",
+                "title": {
+                  "ar": "يوسف البوسعيدي",
+                  "en": "Yousef Al-Busaidi"
+                },
+                "badge": {
+                  "ar": "عميل دائم",
+                  "en": "Returning"
+                },
+                "rows": [
+                  {
+                    "k": {
+                      "ar": "آخر طلب",
+                      "en": "Last order"
+                    },
+                    "v": {
+                      "ar": "#4821 — وصل",
+                      "en": "#4821 — delivered"
+                    }
+                  },
+                  {
+                    "k": {
+                      "ar": "القناة",
+                      "en": "Channel"
+                    },
+                    "v": {
+                      "ar": "واتساب",
+                      "en": "WhatsApp"
+                    }
+                  },
+                  {
+                    "k": {
+                      "ar": "الوسم",
+                      "en": "Tag"
+                    },
+                    "v": {
+                      "ar": "شحن",
+                      "en": "Shipping"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "title": {
+                "ar": "تبقى كل التفاصيل محفوظة",
+                "en": "Every detail stays saved"
+              },
+              "body": {
+                "ar": "الحالة والملاحظات والتحويلات وسجلّ المحادثة تبقى مرتبطة بها.",
+                "en": "Status, notes, transfers and the conversation history stay attached to it."
+              },
+              "art": {
+                "kind": "fields",
+                "items": [
+                  {
+                    "label": {
+                      "ar": "الحالة",
+                      "en": "Status"
+                    },
+                    "value": {
+                      "ar": "مغلقة",
+                      "en": "Closed"
+                    },
+                    "on": true
+                  },
+                  {
+                    "label": {
+                      "ar": "الوسوم",
+                      "en": "Tags"
+                    },
+                    "value": {
+                      "ar": "شحن · استبدال",
+                      "en": "Shipping · Exchange"
+                    },
+                    "on": true
+                  },
+                  {
+                    "label": {
+                      "ar": "السجلّ",
+                      "en": "Audit log"
+                    },
+                    "value": {
+                      "ar": "3 إجراءات",
+                      "en": "3 actions"
+                    },
+                    "on": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "extras": {
+          "eyebrow": {
+            "ar": "تفاصيل إضافية",
+            "en": "More details"
+          },
+          "title": {
+            "ar": "أدوات تساعد فريقك كل يوم",
+            "en": "Tools that help your team every day"
+          }
+        },
+        "benefits": [
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "inbox"
+            },
+            "title": {
+              "ar": "حالات واضحة",
+              "en": "Clear statuses"
+            },
+            "body": {
+              "ar": "معرفة حالة كل محادثة في لمحة.",
+              "en": "See the status of every conversation at a glance."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "bolt"
+            },
+            "title": {
+              "ar": "تنبيهات التأخير",
+              "en": "Overdue alerts"
+            },
+            "body": {
+              "ar": "ظهور المحادثات التي تحتاج إلى متابعة في الوقت المناسب.",
+              "en": "Conversations that need following up surface at the right time."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "sparkles"
+            },
+            "title": {
+              "ar": "ردود محفوظة",
+              "en": "Saved replies"
+            },
+            "body": {
+              "ar": "الوصول السريع إلى الردود المتكرّرة.",
+              "en": "Quick access to the answers you repeat most."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "chart"
+            },
+            "title": {
+              "ar": "وسوم وتصنيفات",
+              "en": "Tags and categories"
+            },
+            "body": {
+              "ar": "تنظيم المحادثات والوصول إليها بسهولة.",
+              "en": "Organise conversations and find them again easily."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "shield"
+            },
+            "title": {
+              "ar": "سجلّ كامل",
+              "en": "A complete record"
+            },
+            "body": {
+              "ar": "كل تفاصيل المحادثة والتحويلات محفوظة في مكان واحد.",
+              "en": "Every conversation detail and transfer is kept in one place."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "users"
+            },
+            "title": {
+              "ar": "تطبيق للموظفين",
+              "en": "Mobile app for agents"
+            },
+            "body": {
+              "ar": "إدارة المحادثات ومتابعتها من الجوال.",
+              "en": "Manage and follow conversations from a phone."
+            }
+          }
+        ],
+        "details": [
+          {
+            "title": {
+              "ar": "صندوق واحد لكل محادثاتك",
+              "en": "One inbox for all your conversations"
+            },
+            "shot": "inbox",
+            "scene": "channel-list",
+            "body": {
+              "ar": "واجهة واضحة تجمع محادثات فريقك في مكان واحد، مع الوصول إلى تفاصيل العميل ومتابعة حالة كل محادثة بسهولة.",
+              "en": "A clear screen that gathers your team's conversations in one place, with access to customer details and easy follow-up on the status of every conversation."
+            },
+            "points": {
+              "ar": [
+                "أيقونة القناة على صورة كل عميل",
+                "بحث شامل في المحادثات والعملاء",
+                "فلاتر جاهزة: المسندة لي، غير المقروءة، المتأخرة",
+                "أرشفة تلقائية للمحادثات المغلقة"
+              ],
+              "en": [
+                "The channel logo on each customer's avatar",
+                "Search across conversations and customers at once",
+                "Ready-made filters: assigned to me, unread, overdue",
+                "Automatic archiving for closed conversations"
+              ]
+            }
+          },
+          {
+            "title": {
+              "ar": "تعاون أسهل بين أفراد الفريق",
+              "en": "Easier collaboration across the team"
+            },
+            "shot": "contacts",
+            "scene": "team-note",
+            "body": {
+              "ar": "تنتقل المحادثة بين أعضاء الفريق بسياقها كاملاً، وتبقى الملاحظات الداخلية والتفاصيل المهمّة واضحة لمن يحتاجها.",
+              "en": "A conversation moves between team members with its full context, and internal notes and important details stay visible to whoever needs them."
+            },
+            "points": {
+              "ar": [
+                "ملاحظة داخلية بجانب تبويب الرسالة",
+                "إشارة إلى زميل داخل المحادثة",
+                "تنبيه الكتابة المتزامنة",
+                "نقل المحادثة بكل سياقها إلى موظف آخر"
+              ],
+              "en": [
+                "An internal note tab beside the message tab",
+                "Mention a colleague inside the conversation",
+                "Simultaneous-typing warning",
+                "Move a conversation to another agent with all its context"
+              ]
+            }
+          }
+        ],
+        "liveTitle": {
+          "ar": "صندوق وارد يعمل بقنواته الخمس",
+          "en": "A working inbox with its five channels"
+        },
+        "liveHighlight": {
+          "ar": [
+            "بقنواته",
+            "الخمس"
+          ],
+          "en": [
+            "five",
+            "channels"
+          ]
+        },
+        "faq": [
+          {
+            "q": {
+              "ar": "هل يمكن إدارة أكثر من حساب من الصندوق نفسه؟",
+              "en": "Can more than one account be managed from the same inbox?"
+            },
+            "a": {
+              "ar": "نعم، يمكن إدارة الحسابات المرتبطة من صندوق واحد مع وضوح مصدر كل محادثة.",
+              "en": "Yes. Connected accounts are managed from a single inbox, with the source of each conversation clearly shown."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل تظهر المحادثات السابقة؟",
+              "en": "Do earlier conversations appear?"
+            },
+            "a": {
+              "ar": "تظهر المحادثات التي تصل بعد الربط، بينما تبقى المحادثات السابقة في منصّاتها الأصلية.",
+              "en": "Conversations that arrive after connecting appear in Qhub, while earlier ones stay on their original platforms."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل يستطيع كل موظف رؤية جميع المحادثات؟",
+              "en": "Can every agent see all conversations?"
+            },
+            "a": {
+              "ar": "لا، يمكن تحديد المحادثات والأقسام التي يصل إليها كل موظف.",
+              "en": "No. You decide which conversations and departments each agent can reach."
+            }
+          },
+          {
+            "q": {
+              "ar": "كيف يتم توزيع المحادثات على الفريق؟",
+              "en": "How are conversations distributed across the team?"
+            },
+            "a": {
+              "ar": "يمكن تحديد قواعد التوزيع حسب الأقسام وأوقات العمل وحجم المحادثات لكل موظف. ويمكن إعادة الإسناد يدوياً في أي وقت.",
+              "en": "Distribution rules can follow departments, working hours and how many conversations each agent is handling. Reassignment is possible manually at any time."
+            }
+          },
+          {
+            "q": {
+              "ar": "ماذا يحدث خارج ساعات العمل؟",
+              "en": "What happens outside working hours?"
+            },
+            "a": {
+              "ar": "يمكن للعميل الحصول على رد تلقائي، وتبقى المحادثة بانتظار الفريق حتى يبدأ وقت العمل.",
+              "en": "The customer can receive an automatic reply, and the conversation waits for the team until working hours start."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل يمكن الوصول إلى المحادثات المغلقة؟",
+              "en": "Can closed conversations be reached?"
+            },
+            "a": {
+              "ar": "نعم، تبقى المحادثات محفوظة ويمكن الوصول إليها من خلال البحث وسجلّ العميل.",
+              "en": "Yes. Conversations stay saved and can be reached through search and the customer's history."
+            }
+          }
+        ]
+      },
+      "ai-assistant": {
+        "eyebrow": {
+          "ar": "مساعد الذكاء الاصطناعي",
+          "en": "AI Assistant"
+        },
+        "h1": {
+          "ar": "مساعد ذكي يفهم عملاءك ويرد عليهم تلقائياً",
+          "en": "An AI assistant that understands your customers and replies automatically"
+        },
+        "highlight": {
+          "ar": [
+            "يفهم",
+            "عملاءك"
+          ],
+          "en": [
+            "understands",
+            "customers"
+          ]
+        },
+        "lede": {
+          "ar": "مساعد يفهم لغات متعدّدة، ويعتمد على معلومات نشاطك لتقديم ردود مناسبة للعملاء، مع تحويل المحادثة لفريقك عند الحاجة.",
+          "en": "An assistant that understands several languages and draws on your business information to give customers suitable answers, handing the conversation to your team when needed."
+        },
+        "heroShot": "ai-settings",
+        "heroRoute": "ai-settings",
+        "heroScene": "knowledge",
+        "bullets": {
+          "ar": [
+            "إجابات مبنية على معلومات نشاطك",
+            "فهم لغات متعدّدة وطريقة كلام العميل",
+            "تحويل المحادثة لفريقك عند الحاجة"
+          ],
+          "en": [
+            "Answers built on your business information",
+            "Understands several languages and how the customer writes",
+            "Hands the conversation to your team when needed"
+          ]
+        },
+        "compare": {
+          "eyebrow": {
+            "ar": "الفرق",
+            "en": "The difference"
+          },
+          "title": {
+            "ar": "ردود تفهم العميل، لا مجرّد ردود جاهزة",
+            "en": "Replies that understand the customer, not just canned answers"
+          },
+          "withoutLabel": {
+            "ar": "بدون مساعد ذكي",
+            "en": "Without an assistant"
+          },
+          "withLabel": {
+            "ar": "مع مساعد Qhub",
+            "en": "With the Qhub assistant"
+          },
+          "rows": [
+            {
+              "without": {
+                "ar": "العميل ينتظر حتى يتوفّر أحد من الفريق",
+                "en": "The customer waits until someone on the team is free"
+              },
+              "with": {
+                "ar": "ردود سريعة على الأسئلة المتكرّرة",
+                "en": "Quick replies to the questions asked most"
+              }
+            },
+            {
+              "without": {
+                "ar": "تكرار الإجابات نفسها طوال اليوم",
+                "en": "The same answers repeated all day long"
+              },
+              "with": {
+                "ar": "إجابات مبنية على معلومات نشاطك",
+                "en": "Answers built on your business information"
+              }
+            },
+            {
+              "without": {
+                "ar": "اختلاف الردود من موظف لآخر",
+                "en": "Answers differ from one agent to another"
+              },
+              "with": {
+                "ar": "تجربة متناسقة مع كل عميل",
+                "en": "A consistent experience for every customer"
+              }
+            },
+            {
+              "without": {
+                "ar": "صعوبة التعامل مع اختلاف اللغات وطريقة الكلام",
+                "en": "Different languages and writing styles are hard to handle"
+              },
+              "with": {
+                "ar": "فهم لغات متعدّدة وطريقة كلام العميل",
+                "en": "Understands several languages and how the customer writes"
+              }
+            },
+            {
+              "without": {
+                "ar": "المحادثات التي تحتاج قراراً بشرياً تبقى معلّقة",
+                "en": "Conversations that need a human decision stay pending"
+              },
+              "with": {
+                "ar": "تحويل المحادثة لفريقك عند الحاجة",
+                "en": "The conversation is handed to your team when needed"
+              }
+            }
+          ]
+        },
+        "journey": {
+          "eyebrow": {
+            "ar": "داخل الشاشة",
+            "en": "Inside the screen"
+          },
+          "title": {
+            "ar": "من سؤال العميل إلى ردّ موثوق",
+            "en": "From the customer's question to a reliable answer"
+          },
+          "lede": {
+            "ar": "أربع لحظات على شاشة إعدادات المساعد. اضغط أي خطوة لتنتقل إليها.",
+            "en": "Four moments on the assistant settings screen. Tap any step to jump to it."
+          },
+          "steps": [
+            {
+              "title": {
+                "ar": "معلومات نشاطك",
+                "en": "Your business information"
+              },
+              "body": {
+                "ar": "يستند إلى معلومات نشاطك، مثل المنتجات والأسعار والسياسات، لتقديم ردود مناسبة ودقيقة.",
+                "en": "It draws on your business information — products, prices and policies — to give accurate, relevant replies."
+              },
+              "art": {
+                "kind": "flow",
+                "merge": true,
+                "from": {
+                  "ar": "قاعدة المعرفة",
+                  "en": "Knowledge base"
+                },
+                "to": {
+                  "ar": [
+                    "المنتجات",
+                    "السياسات",
+                    "الأسعار"
+                  ],
+                  "en": [
+                    "Products",
+                    "Policies",
+                    "Pricing"
+                  ]
+                }
+              }
+            },
+            {
+              "title": {
+                "ar": "أسلوب يناسب علامتك",
+                "en": "A style that suits your brand"
+              },
+              "body": {
+                "ar": "نبرة المساعد قابلة للتخصيص لتتناسب مع أسلوب التواصل الخاص بنشاطك.",
+                "en": "The assistant's tone can be customised to match how your business talks to customers."
+              },
+              "art": {
+                "kind": "fields",
+                "items": [
+                  {
+                    "label": {
+                      "ar": "النبرة",
+                      "en": "Tone"
+                    },
+                    "value": {
+                      "ar": "ودّية",
+                      "en": "Friendly"
+                    },
+                    "on": true
+                  },
+                  {
+                    "label": {
+                      "ar": "اللهجة",
+                      "en": "Dialect"
+                    },
+                    "value": {
+                      "ar": "تلقائية",
+                      "en": "Automatic"
+                    },
+                    "on": true
+                  },
+                  {
+                    "label": {
+                      "ar": "مواضيع ممنوعة",
+                      "en": "Blocked topics"
+                    },
+                    "value": {
+                      "ar": "الاسترداد",
+                      "en": "Refunds"
+                    },
+                    "on": true
+                  }
+                ]
+              }
+            },
+            {
+              "title": {
+                "ar": "ردود تلقائية",
+                "en": "Automatic replies"
+              },
+              "body": {
+                "ar": "الأسئلة المتكرّرة تحصل على إجابات سريعة، حتى خارج أوقات العمل.",
+                "en": "The questions asked most get quick answers, even outside working hours."
+              },
+              "art": {
+                "kind": "chat",
+                "turns": [
+                  {
+                    "from": "customer",
+                    "text": {
+                      "ar": "عندكم العرض لسا متاح؟",
+                      "en": "Is the offer still on?"
+                    }
+                  },
+                  {
+                    "from": "ai",
+                    "text": {
+                      "ar": "نعم، خصم ‎25% حتى منتصف ليلة الغد.",
+                      "en": "Yes — ‎25% off until midnight tomorrow."
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "title": {
+                "ar": "تحويل ذكي إلى الموظف",
+                "en": "A smart handoff to an agent"
+              },
+              "body": {
+                "ar": "عند الحاجة لتدخّل بشري، تنتقل المحادثة للموظف المناسب مع كامل سياقها.",
+                "en": "When human help is needed, the conversation moves to the right agent with its full context."
+              },
+              "art": {
+                "kind": "chat",
+                "turns": [
+                  {
+                    "from": "customer",
+                    "text": {
+                      "ar": "أبغى أستبدل قطعة وصلت مكسورة",
+                      "en": "I need to exchange a piece that arrived broken"
+                    }
+                  },
+                  {
+                    "from": "note",
+                    "text": {
+                      "ar": "تجاوز الحدّ — تحويل إلى منال مع ملخّص",
+                      "en": "Beyond its limit — handed to Manal with a summary"
+                    }
+                  },
+                  {
+                    "from": "agent",
+                    "text": {
+                      "ar": "أهلاً، أنا منال. راجعت طلبك وسنرسل البديل اليوم.",
+                      "en": "Hi, this is Manal. I checked your order and we will send the replacement today."
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "extras": {
+          "eyebrow": {
+            "ar": "تفاصيل إضافية",
+            "en": "More details"
+          },
+          "title": {
+            "ar": "ضبط المساعد والتحكّم في ردوده",
+            "en": "Tuning the assistant and its replies"
+          }
+        },
+        "benefits": [
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "sparkles"
+            },
+            "title": {
+              "ar": "ردود فورية على مدار الساعة",
+              "en": "Instant replies, around the clock"
+            },
+            "body": {
+              "ar": "إجابات سريعة للعملاء، حتى خارج ساعات العمل.",
+              "en": "Quick answers for customers, even outside working hours."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "inbox"
+            },
+            "title": {
+              "ar": "قاعدة معرفة من معلومات نشاطك",
+              "en": "A knowledge base from your own information"
+            },
+            "body": {
+              "ar": "ردود مبنية على منتجاتك وخدماتك وسياساتك، بدلاً من الاعتماد على معلومات عامة.",
+              "en": "Replies built on your products, services and policies rather than on generic information."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "users"
+            },
+            "title": {
+              "ar": "تحويل تلقائي إلى موظف",
+              "en": "Automatic handoff to an agent"
+            },
+            "body": {
+              "ar": "عند الحاجة إلى تدخّل بشري، تنتقل المحادثة للموظف المناسب مع كامل سياقها.",
+              "en": "When human help is needed, the conversation moves to the right agent with its full context."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "megaphone"
+            },
+            "title": {
+              "ar": "نبرة ردّ قابلة للتخصيص",
+              "en": "Adjustable reply tone"
+            },
+            "body": {
+              "ar": "أسلوب ردّ يتناسب مع طبيعة علامتك وطريقة تواصلك مع العملاء.",
+              "en": "A reply style that matches your brand and how you talk to customers."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "chart"
+            },
+            "title": {
+              "ar": "تفريغ الرسائل الصوتية",
+              "en": "Voice message transcription"
+            },
+            "body": {
+              "ar": "تحويل الرسائل الصوتية إلى نص لتسهيل قراءتها والتعامل معها.",
+              "en": "Voice messages are turned into text, easier to read and act on."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "plug"
+            },
+            "title": {
+              "ar": "تحسين الردود",
+              "en": "Replies that keep improving"
+            },
+            "body": {
+              "ar": "الاستفادة من المحادثات السابقة لتحسين جودة الردود مع الوقت.",
+              "en": "Past conversations help improve the quality of replies over time."
+            }
+          }
+        ],
+        "details": [
+          {
+            "title": {
+              "ar": "يفهم عملاءك مهما اختلفت طريقة كلامهم",
+              "en": "It understands your customers however they write"
+            },
+            "shot": "inbox",
+            "scene": "dialects",
+            "body": {
+              "ar": "يتعامل مع لغات متعدّدة واختلاف أسلوب الكتابة، بما في ذلك اللغة العامية والاختصارات والأخطاء الإملائية، مع الحفاظ على سياق المحادثة.",
+              "en": "It handles several languages and different writing styles — including slang, abbreviations and typos — while keeping the context of the conversation."
+            },
+            "points": {
+              "ar": [
+                "يفهم الاختصارات والكتابة العامية",
+                "يرد بنفس لهجة العميل",
+                "يتعامل مع الأخطاء الإملائية",
+                "يدعم العربي والإنجليزي في نفس المحادثة"
+              ],
+              "en": [
+                "Understands abbreviations and colloquial spelling",
+                "Replies in the customer's own dialect",
+                "Copes with typos",
+                "Handles Arabic and English in the same conversation"
+              ]
+            }
+          },
+          {
+            "title": {
+              "ar": "حدود واضحة لعمل المساعد",
+              "en": "Clear limits on what the assistant handles"
+            },
+            "shot": "ai-settings",
+            "scene": "rules",
+            "body": {
+              "ar": "يمكن تحديد طريقة تعامل المساعد مع المحادثات، والمواضيع التي يتعامل معها، ومتى تنتقل المحادثة إلى الفريق.",
+              "en": "You can set how the assistant handles conversations, which topics it covers, and when a conversation moves to the team."
+            },
+            "points": {
+              "ar": [
+                "وضع الرد التلقائي الكامل",
+                "وضع الاقتراح: الموظف يراجع ثم يرسل",
+                "استثناء مواضيع حسّاسة",
+                "تحويل فوري عند ذكر كلمة بعينها"
+              ],
+              "en": [
+                "Full auto-reply mode",
+                "Suggestion mode — an agent reviews and sends",
+                "Exclude sensitive topics",
+                "Instant handoff when a customer mentions a specific word"
+              ]
+            }
+          }
+        ],
+        "liveTitle": {
+          "ar": "المساعد وهو يردّ ثم يحوّل",
+          "en": "The assistant answering, then handing over"
+        },
+        "liveHighlight": {
+          "ar": [
+            "يردّ",
+            "يحوّل"
+          ],
+          "en": [
+            "answering"
+          ]
+        },
+        "faq": [
+          {
+            "q": {
+              "ar": "هل المساعد يرد بناءً على معلومات نشاطي؟",
+              "en": "Does the assistant reply based on my business information?"
+            },
+            "a": {
+              "ar": "نعم، يعتمد على المعلومات التي توفّرها عن منتجاتك وخدماتك وسياساتك عند التعامل مع أسئلة العملاء.",
+              "en": "Yes. It relies on the information you provide about your products, services and policies when handling customer questions."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل يدعم أكثر من لغة؟",
+              "en": "Does it support more than one language?"
+            },
+            "a": {
+              "ar": "نعم، يدعم لغات متعدّدة ويمكنه التعامل مع أكثر من لغة ضمن المحادثة نفسها.",
+              "en": "Yes. It supports several languages and can handle more than one language within the same conversation."
+            }
+          },
+          {
+            "q": {
+              "ar": "ماذا يحدث عندما لا يعرف المساعد الإجابة؟",
+              "en": "What happens when the assistant does not know the answer?"
+            },
+            "a": {
+              "ar": "عندما لا تكون الإجابة واضحة، تُحوَّل المحادثة إلى الموظف المناسب بدل تقديم إجابة غير مؤكّدة.",
+              "en": "When the answer is not clear, the conversation is handed to the right agent instead of offering an uncertain reply."
+            }
+          },
+          {
+            "q": {
+              "ar": "كيف يمكن تخصيص المساعد؟",
+              "en": "How can the assistant be customised?"
+            },
+            "a": {
+              "ar": "يمكن تحديد معلومات النشاط، وأسلوب الرد، والمواضيع التي يتعامل معها المساعد.",
+              "en": "You can set your business information, the reply style, and the topics the assistant handles."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل يمكن مراجعة الردود قبل إرسالها؟",
+              "en": "Can replies be reviewed before they are sent?"
+            },
+            "a": {
+              "ar": "نعم، يمكن للمساعد اقتراح الرد ليراجعه الموظف ويعتمده قبل الإرسال.",
+              "en": "Yes. The assistant can suggest the reply for an agent to review and approve before it is sent."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل يعمل خارج ساعات العمل؟",
+              "en": "Does it work outside working hours?"
+            },
+            "a": {
+              "ar": "نعم، يتعامل مع الأسئلة المتكرّرة خارج ساعات العمل، وتنتقل الحالات التي تحتاج فريقك إليه عند توفّره.",
+              "en": "Yes. It handles the questions asked most outside working hours, and cases that need your team reach them once they are available."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل يمكنه التعامل مع الرسائل الصوتية؟",
+              "en": "Can it handle voice messages?"
+            },
+            "a": {
+              "ar": "نعم، تُحوَّل الرسائل الصوتية إلى نص لتسهيل قراءتها والتعامل معها.",
+              "en": "Yes. Voice messages are turned into text, easier to read and act on."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل يمكن للمساعد تحويل المحادثة إلى موظف؟",
+              "en": "Can the assistant hand a conversation to an agent?"
+            },
+            "a": {
+              "ar": "نعم، عند الحاجة إلى تدخّل بشري تنتقل المحادثة للموظف المناسب مع الحفاظ على كامل سياقها.",
+              "en": "Yes. When human help is needed, the conversation moves to the right agent while keeping its full context."
+            }
+          }
+        ]
+      },
+      "campaigns": {
+        "eyebrow": {
+          "ar": "الحملات التسويقية",
+          "en": "Campaigns"
+        },
+        "h1": {
+          "ar": "حملاتك التسويقية، من مكان واحد",
+          "en": "Your marketing campaigns, from one place"
+        },
+        "highlight": {
+          "ar": [
+            "مكان",
+            "واحد"
+          ],
+          "en": [
+            "one",
+            "place"
+          ]
+        },
+        "lede": {
+          "ar": "إنشاء وإرسال وإدارة الحملات بسهولة، مع أدوات تساعدك على الوصول للجمهور المناسب ومتابعة نتائج كل حملة.",
+          "en": "Create, send and manage campaigns easily, with tools that help you reach the right audience and follow the results of every campaign."
+        },
+        "heroShot": "campaigns",
+        "heroRoute": "campaigns",
+        "heroScene": "funnel-stats",
+        "bullets": {
+          "ar": [
+            "قوائم جمهور منظّمة ومستهدفة",
+            "متابعة التسليم والفتح والردود",
+            "معرفة الحملة التي جاء منها كل رد"
+          ],
+          "en": [
+            "Organised, targeted audience lists",
+            "Follow delivery, opens and replies",
+            "See which campaign each reply came from"
+          ]
+        },
+        "compare": {
+          "eyebrow": {
+            "ar": "الفرق",
+            "en": "The difference"
+          },
+          "title": {
+            "ar": "إرسال منظّم، ونتائج أوضح",
+            "en": "Structured sending, clearer results"
+          },
+          "withoutLabel": {
+            "ar": "بدون Qhub",
+            "en": "Without Qhub"
+          },
+          "withLabel": {
+            "ar": "مع Qhub",
+            "en": "With Qhub"
+          },
+          "rows": [
+            {
+              "without": {
+                "ar": "إرسال الحملات بشكل يدوي",
+                "en": "Campaigns sent by hand"
+              },
+              "with": {
+                "ar": "قوائم جمهور منظّمة ومستهدفة",
+                "en": "Organised, targeted audience lists"
+              }
+            },
+            {
+              "without": {
+                "ar": "صعوبة الوصول للجمهور المناسب",
+                "en": "Hard to reach the right audience"
+              },
+              "with": {
+                "ar": "إرسال الحملات بطريقة أكثر تنظيماً",
+                "en": "Campaigns sent in a more organised way"
+              }
+            },
+            {
+              "without": {
+                "ar": "عدم وضوح نتائج الحملة",
+                "en": "Campaign results are unclear"
+              },
+              "with": {
+                "ar": "متابعة التسليم والفتح والردود",
+                "en": "Follow delivery, opens and replies"
+              }
+            },
+            {
+              "without": {
+                "ar": "صعوبة متابعة من تفاعل مع الحملة",
+                "en": "Hard to tell who engaged with the campaign"
+              },
+              "with": {
+                "ar": "معرفة الحملة التي جاء منها كل رد",
+                "en": "See which campaign each reply came from"
+              }
+            },
+            {
+              "without": {
+                "ar": "ردود العملاء تضيع بين المحادثات",
+                "en": "Customer replies get lost among the conversations"
+              },
+              "with": {
+                "ar": "استكمال المحادثة من المكان نفسه",
+                "en": "Carry on the conversation in the same place"
+              }
+            }
+          ]
+        },
+        "journey": {
+          "eyebrow": {
+            "ar": "داخل الشاشة",
+            "en": "Inside the screen"
+          },
+          "title": {
+            "ar": "أربع خطوات لحملة متكاملة",
+            "en": "Four steps to a complete campaign"
+          },
+          "lede": {
+            "ar": "من اختيار الجمهور إلى متابعة النتائج، كل تفاصيل الحملة في مكان واحد. اضغط أي خطوة لتنتقل إليها.",
+            "en": "From choosing the audience to following the results, every campaign detail in one place. Tap any step to jump to it."
+          },
+          "steps": [
+            {
+              "title": {
+                "ar": "اختيار الجمهور",
+                "en": "Choosing the audience"
+              },
+              "body": {
+                "ar": "تحديد الجمهور المناسب بناءً على البيانات والتفاعل السابق.",
+                "en": "Pick the right audience based on your data and their earlier engagement."
+              },
+              "art": {
+                "kind": "rules",
+                "pairs": [
+                  {
+                    "when": {
+                      "ar": "وسم «سلّة متروكة»",
+                      "en": "Tagged “abandoned cart”"
+                    },
+                    "then": {
+                      "ar": "640",
+                      "en": "640"
+                    }
+                  },
+                  {
+                    "when": {
+                      "ar": "اشترى آخر 30 يوماً",
+                      "en": "Bought in last 30 days"
+                    },
+                    "then": {
+                      "ar": "2,140",
+                      "en": "2,140"
+                    }
+                  },
+                  {
+                    "when": {
+                      "ar": "كل العملاء",
+                      "en": "All customers"
+                    },
+                    "then": {
+                      "ar": "8,420",
+                      "en": "8,420"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "title": {
+                "ar": "تجهيز الرسالة",
+                "en": "Preparing the message"
+              },
+              "body": {
+                "ar": "إنشاء الرسالة واختيار القالب المناسب مع معاينة المحتوى قبل الإرسال.",
+                "en": "Write the message and choose a suitable template, with a preview of the content before sending."
+              },
+              "art": {
+                "kind": "chat",
+                "turns": [
+                  {
+                    "from": "agent",
+                    "text": {
+                      "ar": "أهلاً {اسم العميل} 🎉 خصم ‎25% على كل الطلبات حتى نهاية الأسبوع.",
+                      "en": "Hi {customer name} 🎉 ‎25% off every order until the end of the week."
+                    }
+                  },
+                  {
+                    "from": "note",
+                    "text": {
+                      "ar": "معاينة كما ستصل العميل",
+                      "en": "Preview as the customer will see it"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "title": {
+                "ar": "الجدولة والإرسال",
+                "en": "Scheduling and sending"
+              },
+              "body": {
+                "ar": "تحديد موعد الإرسال وإدارة الحملة وفق الجدول المحدّد.",
+                "en": "Set the send time and run the campaign on the schedule you chose."
+              },
+              "art": {
+                "kind": "fields",
+                "items": [
+                  {
+                    "label": {
+                      "ar": "يوم الإرسال",
+                      "en": "Send day"
+                    },
+                    "value": {
+                      "ar": "الجمعة",
+                      "en": "Friday"
+                    },
+                    "on": true
+                  },
+                  {
+                    "label": {
+                      "ar": "الساعة",
+                      "en": "Hour"
+                    },
+                    "value": {
+                      "ar": "07:00 م",
+                      "en": "07:00 pm"
+                    },
+                    "on": true
+                  },
+                  {
+                    "label": {
+                      "ar": "إرسال تدريجي",
+                      "en": "Gradual sending"
+                    },
+                    "value": {
+                      "ar": "مفعّل",
+                      "en": "On"
+                    },
+                    "on": true
+                  }
+                ]
+              }
+            },
+            {
+              "title": {
+                "ar": "متابعة النتائج",
+                "en": "Following the results"
+              },
+              "body": {
+                "ar": "بيانات واضحة عن الإرسال والتسليم والتفاعل مع الحملة.",
+                "en": "Clear data on sending, delivery and engagement with the campaign."
+              },
+              "art": {
+                "kind": "stats",
+                "items": [
+                  {
+                    "label": {
+                      "ar": "وصلت",
+                      "en": "Delivered"
+                    },
+                    "value": {
+                      "ar": "2,076",
+                      "en": "2,076"
+                    },
+                    "pct": 97
+                  },
+                  {
+                    "label": {
+                      "ar": "فُتحت",
+                      "en": "Opened"
+                    },
+                    "value": {
+                      "ar": "1,327",
+                      "en": "1,327"
+                    },
+                    "pct": 62
+                  },
+                  {
+                    "label": {
+                      "ar": "ردّوا",
+                      "en": "Replied"
+                    },
+                    "value": {
+                      "ar": "385",
+                      "en": "385"
+                    },
+                    "pct": 18
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "extras": {
+          "eyebrow": {
+            "ar": "تفاصيل إضافية",
+            "en": "More details"
+          },
+          "title": {
+            "ar": "أدوات تساعدك على إدارة حملاتك",
+            "en": "Tools that help you run your campaigns"
+          }
+        },
+        "benefits": [
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "megaphone"
+            },
+            "title": {
+              "ar": "حملات الرسائل",
+              "en": "Message campaigns"
+            },
+            "body": {
+              "ar": "إرسال الحملات إلى قوائم مستهدفة باستخدام قوالب مناسبة.",
+              "en": "Send campaigns to targeted lists using suitable templates."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "inbox"
+            },
+            "title": {
+              "ar": "حملات البريد الإلكتروني",
+              "en": "Email campaigns"
+            },
+            "body": {
+              "ar": "إنشاء وإرسال رسائل بريدية بتصميم واضح ومتوافق مع مختلف الأجهزة.",
+              "en": "Create and send emails with a clear design that reads well on any device."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "users"
+            },
+            "title": {
+              "ar": "تقسيم الجمهور",
+              "en": "Audience segmentation"
+            },
+            "body": {
+              "ar": "استهداف شرائح مختلفة بناءً على الوسوم والتفاعل والبيانات المتاحة.",
+              "en": "Target different segments based on tags, engagement and the data you have."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "chart"
+            },
+            "title": {
+              "ar": "تقارير الحملة",
+              "en": "Campaign reports"
+            },
+            "body": {
+              "ar": "بيانات واضحة عن الإرسال والتسليم والفتح والردود.",
+              "en": "Clear data on sending, delivery, opens and replies."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "shield"
+            },
+            "title": {
+              "ar": "قوائم الاستبعاد",
+              "en": "Exclusion lists"
+            },
+            "body": {
+              "ar": "استبعاد العملاء الذين لا يرغبون في استقبال الحملات القادمة.",
+              "en": "Exclude customers who do not want to receive future campaigns."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "clock"
+            },
+            "title": {
+              "ar": "الإرسال التجريبي",
+              "en": "Test sending"
+            },
+            "body": {
+              "ar": "اختبار الحملة على مجموعة صغيرة قبل إرسالها إلى كامل الجمهور.",
+              "en": "Try the campaign on a small group before sending it to the whole audience."
+            }
+          }
+        ],
+        "details": [
+          {
+            "title": {
+              "ar": "ردود الحملات تبقى مرتبطة بالمحادثة",
+              "en": "Campaign replies stay tied to the conversation"
+            },
+            "shot": "inbox",
+            "scene": "broadcast-reply",
+            "body": {
+              "ar": "عندما يتفاعل العميل مع الحملة، يظهر الرد داخل صندوق الوارد مع معرفة الحملة التي جاء منها، لتبقى الصورة واضحة لفريقك.",
+              "en": "When a customer engages with a campaign, the reply appears in the inbox along with the campaign it came from, so the picture stays clear for your team."
+            },
+            "points": {
+              "ar": [
+                "ردود الحملة تدخل الصندوق الموحّد",
+                "معرفة الحملة التي جاء منها العميل",
+                "إمكانية إرسال حملة متابعة لمن لم يردّ",
+                "استبعاد من طلب إيقاف الرسائل"
+              ],
+              "en": [
+                "Campaign replies enter the unified inbox",
+                "See which campaign brought the customer in",
+                "Send a follow-up campaign to those who did not reply",
+                "Anyone who opted out is excluded"
+              ]
+            }
+          },
+          {
+            "title": {
+              "ar": "إرسال في الوقت المناسب",
+              "en": "Sending at the right time"
+            },
+            "shot": "campaigns",
+            "scene": "schedule",
+            "body": {
+              "ar": "إمكانية جدولة الحملات مسبقاً وتحديد موعد الإرسال بما يناسب جمهورك، مع إرسال تدريجي وإمكانية الإيقاف عند الحاجة.",
+              "en": "Campaigns can be scheduled in advance and sent at a time that suits your audience, with gradual sending and the option to stop when needed."
+            },
+            "points": {
+              "ar": [
+                "جدولة مسبقة بالتاريخ والساعة",
+                "إرسال تدريجي يحمي الرقم",
+                "اختبار على مجموعة صغيرة أولاً",
+                "إيقاف الحملة في أي لحظة"
+              ],
+              "en": [
+                "Schedule by date and time",
+                "Gradual sending that protects the number",
+                "Test on a small group first",
+                "Stop a campaign at any moment"
+              ]
+            }
+          }
+        ],
+        "liveTitle": {
+          "ar": "حملة تُبنى وتُرسَل خطوة بخطوة",
+          "en": "A campaign built and sent, step by step"
+        },
+        "liveHighlight": {
+          "ar": [
+            "خطوة",
+            "بخطوة"
+          ],
+          "en": [
+            "step",
+            "by",
+            "step"
+          ]
+        },
+        "faq": [
+          {
+            "q": {
+              "ar": "هل يمكن جدولة الحملات مسبقاً؟",
+              "en": "Can campaigns be scheduled in advance?"
+            },
+            "a": {
+              "ar": "نعم، يمكن تحديد تاريخ ووقت الإرسال مسبقاً وإدارة الحملة وفق الجدول المحدّد.",
+              "en": "Yes. You can set the date and time in advance and run the campaign on that schedule."
+            }
+          },
+          {
+            "q": {
+              "ar": "كيف يتم تحديد الجمهور المستهدف؟",
+              "en": "How is the target audience chosen?"
+            },
+            "a": {
+              "ar": "يمكن تقسيم الجمهور بناءً على الوسوم والتفاعل السابق والبيانات المتاحة عن العملاء.",
+              "en": "You can segment the audience by tags, earlier engagement and the customer data you have."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل يمكن متابعة نتائج الحملة؟",
+              "en": "Can campaign results be followed?"
+            },
+            "a": {
+              "ar": "نعم، تظهر بيانات الحملة بشكل واضح لمتابعة الإرسال والتسليم والفتح والردود.",
+              "en": "Yes. Campaign data is shown clearly, so you can follow sending, delivery, opens and replies."
+            }
+          },
+          {
+            "q": {
+              "ar": "أين تظهر ردود العملاء على الحملة؟",
+              "en": "Where do customer replies to a campaign appear?"
+            },
+            "a": {
+              "ar": "تظهر الردود داخل صندوق الوارد، مع معرفة الحملة التي جاء منها الرد.",
+              "en": "Replies appear in the inbox, along with the campaign they came from."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل يمكن استبعاد بعض العملاء من الحملات؟",
+              "en": "Can some customers be excluded from campaigns?"
+            },
+            "a": {
+              "ar": "نعم، يمكن إنشاء قوائم استبعاد لمن لا يرغبون في استقبال الحملات القادمة.",
+              "en": "Yes. You can build exclusion lists for anyone who does not want to receive future campaigns."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل يمكن تجربة الحملة قبل إرسالها؟",
+              "en": "Can a campaign be tested before it is sent?"
+            },
+            "a": {
+              "ar": "نعم، يمكن إرسال الحملة إلى مجموعة صغيرة أولاً قبل إطلاقها على كامل الجمهور.",
+              "en": "Yes. You can send the campaign to a small group first, before releasing it to the whole audience."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل يمكن إيقاف الحملة بعد بدء الإرسال؟",
+              "en": "Can a campaign be stopped after sending starts?"
+            },
+            "a": {
+              "ar": "نعم، يمكن إيقاف الحملة أثناء الإرسال عند الحاجة.",
+              "en": "Yes. A campaign can be stopped mid-send whenever you need to."
+            }
+          }
+        ]
+      },
+      "team": {
+        "eyebrow": {
+          "ar": "إدارة الفريق والصلاحيات",
+          "en": "Team & Permissions"
+        },
+        "h1": {
+          "ar": "فريقك منظّم، وكل محادثة تصل للموظف المناسب",
+          "en": "Your team organised, and every conversation reaches the right agent"
+        },
+        "highlight": {
+          "ar": [
+            "تصل",
+            "للموظف",
+            "المناسب"
+          ],
+          "en": [
+            "right"
+          ]
+        },
+        "lede": {
+          "ar": "نظّم فريقك حسب الأدوار والأقسام وساعات العمل، وليتم توزيع المحادثات بشكل واضح ومتوازن.",
+          "en": "Organise your team by roles, departments and working hours, so conversations are distributed clearly and evenly."
+        },
+        "heroShot": "contacts",
+        "heroRoute": "contacts",
+        "heroScene": "routing-tree",
+        "bullets": {
+          "ar": [
+            "توزيع المحادثات حسب القسم وحالة الموظف",
+            "صلاحيات مختلفة لكل دور وموظف",
+            "معرفة المسؤول عن كل محادثة وتفاصيل ما تمّ عليها"
+          ],
+          "en": [
+            "Conversations routed by department and agent availability",
+            "Different permissions for each role and each agent",
+            "See who owns each conversation and what has happened on it"
+          ]
+        },
+        "compare": {
+          "eyebrow": {
+            "ar": "الفرق",
+            "en": "The difference"
+          },
+          "title": {
+            "ar": "توزيع منظّم بدل التوزيع اليدوي",
+            "en": "Organised routing instead of handing conversations out by hand"
+          },
+          "withoutLabel": {
+            "ar": "بدون Qhub",
+            "en": "Without Qhub"
+          },
+          "withLabel": {
+            "ar": "مع Qhub",
+            "en": "With Qhub"
+          },
+          "rows": [
+            {
+              "without": {
+                "ar": "توزيع المحادثات يدوياً طوال اليوم",
+                "en": "Handing conversations out manually all day"
+              },
+              "with": {
+                "ar": "توزيع المحادثات حسب قواعد محدّدة",
+                "en": "Conversations routed by rules you define"
+              }
+            },
+            {
+              "without": {
+                "ar": "تكدّس المحادثات عند بعض الموظفين",
+                "en": "Conversations piling up on some agents"
+              },
+              "with": {
+                "ar": "توزيع أكثر توازناً بين أفراد الفريق",
+                "en": "A more balanced spread across the team"
+              }
+            },
+            {
+              "without": {
+                "ar": "مشاركة الحساب بين أفراد الفريق",
+                "en": "One account shared between the team"
+              },
+              "with": {
+                "ar": "حساب وصلاحيات خاصة لكل موظف",
+                "en": "A separate account and permissions for each agent"
+              }
+            },
+            {
+              "without": {
+                "ar": "صعوبة معرفة الموظف المسؤول عن كل محادثة",
+                "en": "Hard to tell which agent owns each conversation"
+              },
+              "with": {
+                "ar": "تحويل المحادثة مع كامل سياقها",
+                "en": "Transfers that carry the full context"
+              }
+            },
+            {
+              "without": {
+                "ar": "صعوبة متابعة ما تمّ على كل محادثة",
+                "en": "Hard to follow what happened on each conversation"
+              },
+              "with": {
+                "ar": "سجلّ واضح لكل إجراء تمّ على المحادثة",
+                "en": "A clear log of every action taken on a conversation"
+              }
+            }
+          ]
+        },
+        "journey": {
+          "eyebrow": {
+            "ar": "داخل الشاشة",
+            "en": "Inside the screen"
+          },
+          "title": {
+            "ar": "كيف تصل المحادثة إلى الموظف المناسب",
+            "en": "How a conversation reaches the right agent"
+          },
+          "lede": {
+            "ar": "تصل كل محادثة إلى المكان المناسب حسب القواعد المحدّدة، دون متابعة التوزيع يدوياً. اضغط أي خطوة لتنتقل إليها.",
+            "en": "Every conversation lands in the right place according to the rules you set, with no manual routing. Tap any step to jump to it."
+          },
+          "steps": [
+            {
+              "title": {
+                "ar": "تحديد الأقسام",
+                "en": "Defining the departments"
+              },
+              "body": {
+                "ar": "تنظيم الفريق إلى أقسام مختلفة، مع تحديد الموظفين وساعات العمل لكل قسم.",
+                "en": "Organise the team into departments, setting the agents and working hours for each one."
+              },
+              "art": {
+                "kind": "flow",
+                "from": {
+                  "ar": "محادثة واردة",
+                  "en": "Incoming chat"
+                },
+                "to": {
+                  "ar": [
+                    "المبيعات",
+                    "الدعم",
+                    "الشحن"
+                  ],
+                  "en": [
+                    "Sales",
+                    "Support",
+                    "Shipping"
+                  ]
+                }
+              }
+            },
+            {
+              "title": {
+                "ar": "تحديد قواعد التوزيع",
+                "en": "Setting the routing rules"
+              },
+              "body": {
+                "ar": "توزيع المحادثات بناءً على القسم ونوع المحادثة والبيانات المتاحة.",
+                "en": "Conversations are routed based on the department, the type of conversation and the data available."
+              },
+              "art": {
+                "kind": "rules",
+                "pairs": [
+                  {
+                    "when": {
+                      "ar": "كلمة «سعر»",
+                      "en": "The word “price”"
+                    },
+                    "then": {
+                      "ar": "المبيعات",
+                      "en": "Sales"
+                    }
+                  },
+                  {
+                    "when": {
+                      "ar": "شكوى أو عطل",
+                      "en": "A complaint or fault"
+                    },
+                    "then": {
+                      "ar": "الدعم",
+                      "en": "Support"
+                    }
+                  },
+                  {
+                    "when": {
+                      "ar": "سؤال عن طلب",
+                      "en": "An order question"
+                    },
+                    "then": {
+                      "ar": "الشحن",
+                      "en": "Shipping"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "title": {
+                "ar": "اختيار الموظف المتاح",
+                "en": "Choosing the available agent"
+              },
+              "body": {
+                "ar": "تصل المحادثة إلى الموظف المناسب والمتاح، مع مراعاة حجم المحادثات لديه.",
+                "en": "The conversation reaches the right agent who is available, taking into account how many conversations they already have."
+              },
+              "art": {
+                "kind": "rows",
+                "active": 2,
+                "items": [
+                  {
+                    "label": {
+                      "ar": "سالم",
+                      "en": "Salem"
+                    },
+                    "sub": {
+                      "ar": "بلغ سقفه — 7 محادثات",
+                      "en": "At capacity — 7 chats"
+                    },
+                    "initial": {
+                      "ar": "س",
+                      "en": "S"
+                    },
+                    "badge": {
+                      "ar": "مشغول",
+                      "en": "Busy"
+                    }
+                  },
+                  {
+                    "label": {
+                      "ar": "أحمد",
+                      "en": "Ahmed"
+                    },
+                    "sub": {
+                      "ar": "انتهى دوامه",
+                      "en": "Off shift"
+                    },
+                    "initial": {
+                      "ar": "أ",
+                      "en": "A"
+                    },
+                    "badge": {
+                      "ar": "خارج",
+                      "en": "Away"
+                    }
+                  },
+                  {
+                    "label": {
+                      "ar": "منال",
+                      "en": "Manal"
+                    },
+                    "sub": {
+                      "ar": "متاحة — 3 محادثات",
+                      "en": "Available — 3 chats"
+                    },
+                    "initial": {
+                      "ar": "م",
+                      "en": "M"
+                    },
+                    "badge": {
+                      "ar": "استلمت",
+                      "en": "Assigned"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "title": {
+                "ar": "تسجيل كل التفاصيل",
+                "en": "Everything is recorded"
+              },
+              "body": {
+                "ar": "كل إسناد وتحويل وإغلاق يبقى مسجّلاً، مع معرفة الموظف المسؤول ووقت الإجراء.",
+                "en": "Every assignment, transfer and closure stays logged, with the agent responsible and the time of the action."
+              },
+              "art": {
+                "kind": "fields",
+                "items": [
+                  {
+                    "label": {
+                      "ar": "أُسندت إلى",
+                      "en": "Assigned to"
+                    },
+                    "value": {
+                      "ar": "منال · 09:12",
+                      "en": "Manal · 09:12"
+                    },
+                    "on": true
+                  },
+                  {
+                    "label": {
+                      "ar": "حُوّلت من",
+                      "en": "Transferred from"
+                    },
+                    "value": {
+                      "ar": "سالم · 09:40",
+                      "en": "Salem · 09:40"
+                    },
+                    "on": true
+                  },
+                  {
+                    "label": {
+                      "ar": "أُغلقت",
+                      "en": "Closed by"
+                    },
+                    "value": {
+                      "ar": "منال · 10:05",
+                      "en": "Manal · 10:05"
+                    },
+                    "on": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "extras": {
+          "eyebrow": {
+            "ar": "تفاصيل إضافية",
+            "en": "More details"
+          },
+          "title": {
+            "ar": "تنظيم الفريق وضبط صلاحياته",
+            "en": "Organising your team and its permissions"
+          }
+        },
+        "benefits": [
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "users"
+            },
+            "title": {
+              "ar": "أدوار وصلاحيات جاهزة",
+              "en": "Ready-made roles and permissions"
+            },
+            "body": {
+              "ar": "أدوار مختلفة مثل المدير والمشرف والموظف، مع إمكانية تخصيص الصلاحيات حسب احتياج فريقك.",
+              "en": "Roles such as admin, supervisor and agent, with permissions you can tailor to your team."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "inbox"
+            },
+            "title": {
+              "ar": "تقسيم الفريق إلى أقسام",
+              "en": "Splitting the team into departments"
+            },
+            "body": {
+              "ar": "تنظيم الموظفين ضمن أقسام واضحة، بحيث تكون المحادثات والمهام موزّعة بشكل أفضل.",
+              "en": "Organise agents into clear departments, so conversations and work are better distributed."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "chart"
+            },
+            "title": {
+              "ar": "ساعات عمل لكل موظف",
+              "en": "Working hours per agent"
+            },
+            "body": {
+              "ar": "تحديد ساعات عمل الموظفين حتى تُوزَّع المحادثات على المتاحين منهم.",
+              "en": "Set each agent's working hours so conversations go to whoever is available."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "sparkles"
+            },
+            "title": {
+              "ar": "توزيع متوازن للمحادثات",
+              "en": "Balanced conversation distribution"
+            },
+            "body": {
+              "ar": "توزيع المحادثات بشكل يساعد على تقليل التكدّس وتحقيق توازن أفضل بين أعضاء الفريق.",
+              "en": "Conversations spread in a way that reduces pile-ups and keeps the team balanced."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "shield"
+            },
+            "title": {
+              "ar": "سجلّ الإجراءات",
+              "en": "Action log"
+            },
+            "body": {
+              "ar": "كل إسناد أو تحويل أو إغلاق يبقى مسجّلاً مع تفاصيل الإجراء.",
+              "en": "Every assignment, transfer or closure stays logged with the details of the action."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "clock"
+            },
+            "title": {
+              "ar": "الإجازات وأيام العطل",
+              "en": "Leave and days off"
+            },
+            "body": {
+              "ar": "الموظف غير المتاح يُتجاوَز تلقائياً عند توزيع المحادثات.",
+              "en": "An agent who is not available is skipped automatically when conversations are routed."
+            }
+          }
+        ],
+        "details": [
+          {
+            "title": {
+              "ar": "صلاحيات واضحة لكل عضو في الفريق",
+              "en": "Clear permissions for every team member"
+            },
+            "shot": "contacts",
+            "scene": "permissions",
+            "body": {
+              "ar": "لكل موظف مستوى وصول مناسب لدوره، مع إمكانية التحكّم في ما يمكنه رؤيته أو إدارته داخل النظام.",
+              "en": "Each agent gets an access level suited to their role, with control over what they can see or manage inside the system."
+            },
+            "points": {
+              "ar": [
+                "صلاحيات على مستوى القناة والقسم",
+                "منع التصدير أو الحذف",
+                "سجلّ يبيّن من فعل ماذا",
+                "تعطيل حساب موظف فوراً"
+              ],
+              "en": [
+                "Permissions at channel and department level",
+                "Block export or deletion",
+                "An audit log showing who did what",
+                "Disable an agent's account instantly"
+              ]
+            }
+          },
+          {
+            "title": {
+              "ar": "الفريق يواصل العمل حتى خارج ساعات الدوام",
+              "en": "The team keeps working even outside office hours"
+            },
+            "shot": "overview",
+            "scene": "off-hours",
+            "body": {
+              "ar": "عندما يكون الفريق خارج أوقات العمل، تبقى المحادثات محفوظة ومنظّمة إلى أن يصبح الموظف المناسب متاحاً.",
+              "en": "When the team is outside working hours, conversations stay saved and organised until the right agent is available."
+            },
+            "points": {
+              "ar": [
+                "رد تلقائي خارج ساعات العمل",
+                "طابور انتظار مرتّب حسب الأقدمية",
+                "تنبيه للمشرف عند تأخّر الردّ",
+                "إجازات وأيام عطل"
+              ],
+              "en": [
+                "Automatic reply outside working hours",
+                "A queue ordered by waiting time",
+                "Supervisor alert when a reply is overdue",
+                "Holidays and days off"
+              ]
+            }
+          }
+        ],
+        "liveTitle": {
+          "ar": "قواعد التوزيع وهي تشتغل",
+          "en": "Routing rules in action"
+        },
+        "liveHighlight": {
+          "ar": [
+            "قواعد",
+            "التوزيع"
+          ],
+          "en": [
+            "Routing",
+            "rules"
+          ]
+        },
+        "faq": [
+          {
+            "q": {
+              "ar": "كم موظفاً يمكنني إضافته؟",
+              "en": "How many agents can I add?"
+            },
+            "a": {
+              "ar": "يعتمد عدد الموظفين على الباقة، ويمكن اختيار الباقة المناسبة لحجم فريقك.",
+              "en": "It depends on the plan; you can pick the plan that fits the size of your team."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل يمكن للموظف العمل من الجوال؟",
+              "en": "Can agents work from their phone?"
+            },
+            "a": {
+              "ar": "نعم، يمكن لفريقك متابعة المحادثات وإدارتها من الجوال والكمبيوتر.",
+              "en": "Yes. Your team can follow and manage conversations from phone and computer."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل يمكنني متابعة أداء كل موظف؟",
+              "en": "Can I follow each agent's performance?"
+            },
+            "a": {
+              "ar": "نعم، يمكن متابعة أداء الموظفين من خلال بيانات المحادثات وأوقات الرد والتقييمات.",
+              "en": "Yes. You can follow agent performance through conversation data, reply times and ratings."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل يمكن منع موظف من رؤية قسم أو محادثات معيّنة؟",
+              "en": "Can an agent be stopped from seeing a department or certain conversations?"
+            },
+            "a": {
+              "ar": "نعم، يمكن تحديد صلاحيات الوصول حسب الدور والقسم.",
+              "en": "Yes. Access permissions can be set by role and by department."
+            }
+          },
+          {
+            "q": {
+              "ar": "ماذا يحدث إذا لم يكن هناك موظف متاح؟",
+              "en": "What happens if no agent is available?"
+            },
+            "a": {
+              "ar": "تبقى المحادثة محفوظة في قائمة الانتظار حتى يصبح الموظف المناسب متاحاً.",
+              "en": "The conversation stays in the queue until the right agent becomes available."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل يمكن إعادة إسناد المحادثة يدوياً؟",
+              "en": "Can a conversation be reassigned manually?"
+            },
+            "a": {
+              "ar": "نعم، يمكن إعادة إسناد المحادثة في أي وقت مع الحفاظ على كامل سياقها وملاحظاتها.",
+              "en": "Yes, at any time, keeping its full context and its notes."
+            }
+          }
+        ]
+      },
+      "analytics": {
+        "eyebrow": {
+          "ar": "التقارير والتحليلات",
+          "en": "Reports & Analytics"
+        },
+        "h1": {
+          "ar": "صورة واضحة عن أداء فريقك",
+          "en": "A clear picture of how your team is doing"
+        },
+        "highlight": {
+          "ar": [
+            "أداء",
+            "فريقك"
+          ],
+          "en": [
+            "clear",
+            "picture"
+          ]
+        },
+        "lede": {
+          "ar": "تابع المحادثات وأوقات الرد ورضا العملاء وأداء الموظفين من لوحة واحدة تساعدك على فهم ما يحدث واتخاذ قرارات أفضل.",
+          "en": "Follow conversations, reply times, customer satisfaction and agent performance from one dashboard that helps you understand what is happening and make better decisions."
+        },
+        "heroShot": "reports",
+        "heroRoute": "reports",
+        "heroScene": "kpi-drill",
+        "bullets": {
+          "ar": [
+            "متابعة زمن الرد ونسبة حل المحادثات",
+            "قياس أداء كل موظف وقسم",
+            "معرفة أوقات الضغط وأكثر الفترات ازدحاماً"
+          ],
+          "en": [
+            "Follow reply time and the share of conversations resolved",
+            "Measure how each agent and each department is doing",
+            "See when the pressure peaks and which periods are busiest"
+          ]
+        },
+        "compare": {
+          "eyebrow": {
+            "ar": "الفرق",
+            "en": "The difference"
+          },
+          "title": {
+            "ar": "رقم واضح بدل التخمين",
+            "en": "A clear number instead of guesswork"
+          },
+          "withoutLabel": {
+            "ar": "بدون تقارير",
+            "en": "Without reports"
+          },
+          "withLabel": {
+            "ar": "مع تقارير Qhub",
+            "en": "With Qhub reports"
+          },
+          "rows": [
+            {
+              "without": {
+                "ar": "صعوبة معرفة سبب ارتفاع وقت الرد",
+                "en": "Hard to tell why reply time went up"
+              },
+              "with": {
+                "ar": "أرقام واضحة عن أداء الفريق",
+                "en": "Clear numbers on how the team is doing"
+              }
+            },
+            {
+              "without": {
+                "ar": "متابعة أداء الموظفين بشكل يدوي",
+                "en": "Following agent performance by hand"
+              },
+              "with": {
+                "ar": "متابعة زمن الرد وحل المحادثات",
+                "en": "Follow reply time and conversations resolved"
+              }
+            },
+            {
+              "without": {
+                "ar": "صعوبة معرفة أوقات الضغط",
+                "en": "Hard to know when the pressure peaks"
+              },
+              "with": {
+                "ar": "معرفة أوقات الذروة وحجم المحادثات",
+                "en": "See peak hours and conversation volume"
+              }
+            },
+            {
+              "without": {
+                "ar": "تجميع البيانات في جداول بشكل مستمر",
+                "en": "Constantly assembling data into spreadsheets"
+              },
+              "with": {
+                "ar": "مقارنة الأداء بين الفترات",
+                "en": "Compare performance between periods"
+              }
+            },
+            {
+              "without": {
+                "ar": "اتخاذ القرارات بناءً على الانطباع",
+                "en": "Decisions made on impressions"
+              },
+              "with": {
+                "ar": "الوصول إلى المحادثات التي تقف خلف كل رقم",
+                "en": "Reach the conversations behind every number"
+              }
+            }
+          ]
+        },
+        "journey": {
+          "eyebrow": {
+            "ar": "داخل الشاشة",
+            "en": "Inside the screen"
+          },
+          "title": {
+            "ar": "من الأرقام إلى الصورة الكاملة",
+            "en": "From the numbers to the whole picture"
+          },
+          "lede": {
+            "ar": "تظهر أهم مؤشّرات الأداء في لوحة واحدة، مع تغيير الفترة الزمنية ومتابعة التغيّر في الأرقام. اضغط أي خطوة لتنتقل إليها.",
+            "en": "The key performance metrics appear on one dashboard, where you can change the period and follow how the numbers move. Tap any step to jump to it."
+          },
+          "steps": [
+            {
+              "title": {
+                "ar": "ملخّص الأداء",
+                "en": "The performance summary"
+              },
+              "body": {
+                "ar": "عرض أهم مؤشّرات الأداء في مكان واحد، مثل عدد المحادثات وزمن الرد ونسبة الحل ورضا العملاء.",
+                "en": "The key metrics in one place: conversation count, reply time, resolution rate and customer satisfaction."
+              },
+              "art": {
+                "kind": "stats",
+                "items": [
+                  {
+                    "label": {
+                      "ar": "المحادثات",
+                      "en": "Conversations"
+                    },
+                    "value": {
+                      "ar": "1,428",
+                      "en": "1,428"
+                    },
+                    "pct": 80
+                  },
+                  {
+                    "label": {
+                      "ar": "متوسط أول ردّ",
+                      "en": "Avg. first reply"
+                    },
+                    "value": {
+                      "ar": "2.1",
+                      "en": "2.1"
+                    },
+                    "unit": {
+                      "ar": "د",
+                      "en": "m"
+                    },
+                    "pct": 64
+                  },
+                  {
+                    "label": {
+                      "ar": "نسبة الحل",
+                      "en": "Resolution rate"
+                    },
+                    "value": {
+                      "ar": "96",
+                      "en": "96"
+                    },
+                    "unit": {
+                      "ar": "%",
+                      "en": "%"
+                    },
+                    "pct": 96
+                  }
+                ]
+              }
+            },
+            {
+              "title": {
+                "ar": "مقارنة الفترات",
+                "en": "Comparing periods"
+              },
+              "body": {
+                "ar": "مقارنة أداء أسبوع بأسبوع أو شهر بشهر لمعرفة التغيّر في النتائج.",
+                "en": "Compare week with week or month with month to see how the results changed."
+              },
+              "art": {
+                "kind": "rules",
+                "pairs": [
+                  {
+                    "when": {
+                      "ar": "هذا الشهر",
+                      "en": "This month"
+                    },
+                    "then": {
+                      "ar": "2.1 د",
+                      "en": "2.1 m"
+                    }
+                  },
+                  {
+                    "when": {
+                      "ar": "الشهر الماضي",
+                      "en": "Last month"
+                    },
+                    "then": {
+                      "ar": "2.8 د",
+                      "en": "2.8 m"
+                    }
+                  },
+                  {
+                    "when": {
+                      "ar": "الفرق",
+                      "en": "Difference"
+                    },
+                    "then": {
+                      "ar": "‎−25%",
+                      "en": "‎−25%"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "title": {
+                "ar": "الوصول إلى التفاصيل",
+                "en": "Reaching the detail"
+              },
+              "body": {
+                "ar": "تصفية البيانات حسب القسم أو الموظف أو الفترة للوصول إلى التفاصيل التي تحتاجها.",
+                "en": "Filter the data by department, agent or period to reach the details you need."
+              },
+              "art": {
+                "kind": "rows",
+                "active": 2,
+                "items": [
+                  {
+                    "label": {
+                      "ar": "واتساب",
+                      "en": "WhatsApp"
+                    },
+                    "sub": {
+                      "ar": "متوسط الردّ 1.8 د",
+                      "en": "Avg. reply 1.8 m"
+                    },
+                    "ch": "whatsapp",
+                    "badge": {
+                      "ar": "سريع",
+                      "en": "Fast"
+                    }
+                  },
+                  {
+                    "label": {
+                      "ar": "إنستغرام",
+                      "en": "Instagram"
+                    },
+                    "sub": {
+                      "ar": "متوسط الردّ 2.6 د",
+                      "en": "Avg. reply 2.6 m"
+                    },
+                    "ch": "instagram"
+                  },
+                  {
+                    "label": {
+                      "ar": "إكس",
+                      "en": "X"
+                    },
+                    "sub": {
+                      "ar": "متوسط الردّ 4.1 د",
+                      "en": "Avg. reply 4.1 m"
+                    },
+                    "ch": "x",
+                    "badge": {
+                      "ar": "بطيء",
+                      "en": "Slow"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "title": {
+                "ar": "التصدير والجدولة",
+                "en": "Exporting and scheduling"
+              },
+              "body": {
+                "ar": "تصدير التقارير ومشاركة البيانات، مع وصول التقارير بشكل دوري إلى البريد الإلكتروني.",
+                "en": "Export reports and share the data, with reports arriving by email on a regular schedule."
+              },
+              "art": {
+                "kind": "fields",
+                "items": [
+                  {
+                    "label": {
+                      "ar": "تقرير أسبوعي",
+                      "en": "Weekly report"
+                    },
+                    "value": {
+                      "ar": "كل أحد",
+                      "en": "Every Sunday"
+                    },
+                    "on": true
+                  },
+                  {
+                    "label": {
+                      "ar": "يصل إلى",
+                      "en": "Sent to"
+                    },
+                    "value": {
+                      "ar": "المدير",
+                      "en": "Manager"
+                    },
+                    "on": true
+                  },
+                  {
+                    "label": {
+                      "ar": "تنبيه التجاوز",
+                      "en": "Threshold alert"
+                    },
+                    "value": {
+                      "ar": "فوق 5 د",
+                      "en": "Above 5 m"
+                    },
+                    "on": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "extras": {
+          "eyebrow": {
+            "ar": "تفاصيل إضافية",
+            "en": "More details"
+          },
+          "title": {
+            "ar": "مؤشّرات تساعدك على فهم أداء فريقك",
+            "en": "Metrics that help you understand how your team is doing"
+          }
+        },
+        "benefits": [
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "chart"
+            },
+            "title": {
+              "ar": "متوسّط زمن الرد",
+              "en": "Average reply time"
+            },
+            "body": {
+              "ar": "متابعة متوسط أول رد ومتوسط إغلاق المحادثات حسب الفترة والموظف.",
+              "en": "Follow the average first reply and the average time to close, by period and by agent."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "users"
+            },
+            "title": {
+              "ar": "أداء كل موظف",
+              "en": "Per-agent performance"
+            },
+            "body": {
+              "ar": "مقارنة أداء الموظفين ومعرفة حجم المحادثات التي تمّت متابعتها وإنجازها.",
+              "en": "Compare agents and see how many conversations each one followed and completed."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "sparkles"
+            },
+            "title": {
+              "ar": "رضا العملاء",
+              "en": "Customer satisfaction"
+            },
+            "body": {
+              "ar": "متابعة تقييمات العملاء ومعرفة مستوى رضاهم عن المحادثات.",
+              "en": "Follow customer ratings and see how satisfied they are with the conversations."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "inbox"
+            },
+            "title": {
+              "ar": "حجم المحادثات",
+              "en": "Conversation volume"
+            },
+            "body": {
+              "ar": "معرفة عدد المحادثات خلال اليوم وتحديد الفترات الأكثر ازدحاماً.",
+              "en": "See how many conversations arrive during the day and which periods are busiest."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "clock"
+            },
+            "title": {
+              "ar": "مقارنة الأداء",
+              "en": "Performance comparison"
+            },
+            "body": {
+              "ar": "مقارنة النتائج بين الفترات لمعرفة التحسّن أو التراجع في الأداء.",
+              "en": "Compare results between periods to see whether performance improved or slipped."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "shield"
+            },
+            "title": {
+              "ar": "تنبيهات الأداء",
+              "en": "Performance alerts"
+            },
+            "body": {
+              "ar": "تنبيهات عند تجاوز زمن الرد الحدَّ المحدّد، لمساعدة الفريق على التعامل مع التأخير في الوقت المناسب.",
+              "en": "Alerts when reply time crosses the limit you set, so the team can deal with delays in time."
+            }
+          }
+        ],
+        "details": [
+          {
+            "title": {
+              "ar": "كل رقم له تفاصيله",
+              "en": "Every number has its detail"
+            },
+            "shot": "reports",
+            "scene": "drill-path",
+            "body": {
+              "ar": "لا تتوقّف التقارير عند عرض الأرقام، بل تساعدك على معرفة المحادثات والبيانات التي تقف خلف كل نتيجة.",
+              "en": "Reports do not stop at showing numbers — they help you reach the conversations and the data behind each result."
+            },
+            "points": {
+              "ar": [
+                "تفصيل كل رقم لمحادثاته",
+                "مقارنة بين فترتين",
+                "تصفية حسب القناة أو القسم أو الموظف",
+                "تصدير للإكسل"
+              ],
+              "en": [
+                "Drill from any number into its conversations",
+                "Compare two periods",
+                "Filter by channel, department or agent",
+                "Export to Excel"
+              ]
+            }
+          },
+          {
+            "title": {
+              "ar": "تقارير دورية تصل تلقائياً",
+              "en": "Recurring reports that arrive automatically"
+            },
+            "shot": "overview",
+            "scene": "digest",
+            "body": {
+              "ar": "تصل التقارير إلى البريد الإلكتروني وفق الجدول المحدّد، لتبقى على اطّلاع بأداء الفريق دون الدخول إلى النظام كل مرة.",
+              "en": "Reports arrive by email on the schedule you set, so you stay on top of your team's performance without logging in every time."
+            },
+            "points": {
+              "ar": [
+                "تقرير يومي مختصر",
+                "ملخّص أسبوعي للمدير",
+                "تنبيه لما يتجاوز زمن الرد حدّاً معيّناً",
+                "لوحة مخصّصة لكل دور"
+              ],
+              "en": [
+                "A short daily report",
+                "A weekly summary for managers",
+                "An alert when reply time crosses a threshold",
+                "A custom dashboard per role"
+              ]
+            }
+          }
+        ],
+        "liveTitle": {
+          "ar": "لوحة تتبدّل أرقامها مع الفترة",
+          "en": "A dashboard that moves with the period"
+        },
+        "liveHighlight": {
+          "ar": [
+            "أرقامها"
+          ],
+          "en": [
+            "moves"
+          ]
+        },
+        "faq": [
+          {
+            "q": {
+              "ar": "متى تبدأ البيانات بالظهور في التقارير؟",
+              "en": "When does data start appearing in the reports?"
+            },
+            "a": {
+              "ar": "تبدأ البيانات من لحظة تفعيل الحساب، وتُحتسب المحادثات التي تدخل النظام ضمن التقارير.",
+              "en": "Data starts from the moment the account is activated, and conversations entering the system count towards the reports."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل يمكن تصدير التقارير؟",
+              "en": "Can reports be exported?"
+            },
+            "a": {
+              "ar": "نعم، يمكن تصدير البيانات والتقارير حسب الباقة المتاحة.",
+              "en": "Yes. Data and reports can be exported according to the plan you are on."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل يمكن مقارنة فترتين؟",
+              "en": "Can two periods be compared?"
+            },
+            "a": {
+              "ar": "نعم، يمكن مقارنة الأداء بين أسبوعين أو شهرين لمعرفة التغيّر في النتائج.",
+              "en": "Yes. You can compare performance between two weeks or two months to see how the results changed."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل التقارير تتحدّث بشكل مستمر؟",
+              "en": "Do the reports update continuously?"
+            },
+            "a": {
+              "ar": "نعم، تتحدّث البيانات مع دخول المحادثات وتغيّر مؤشّرات الأداء.",
+              "en": "Yes. The data updates as conversations arrive and the performance metrics change."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل يمكنني معرفة أداء كل موظف؟",
+              "en": "Can I see each agent's performance?"
+            },
+            "a": {
+              "ar": "نعم، يمكن متابعة مؤشّرات الأداء لكل موظف حسب الصلاحيات المتاحة.",
+              "en": "Yes. You can follow performance metrics for each agent, according to the permissions available."
+            }
+          },
+          {
+            "q": {
+              "ar": "من يستطيع رؤية تقارير الفريق؟",
+              "en": "Who can see the team's reports?"
+            },
+            "a": {
+              "ar": "يعتمد ذلك على الصلاحيات، بحيث يمكن تحديد مستوى الوصول للتقارير حسب دور كل موظف.",
+              "en": "That depends on permissions: the level of access to reports can be set according to each agent's role."
+            }
+          }
+        ]
+      },
+      "chat-widget": {
+        "eyebrow": {
+          "ar": "المحادثة المباشرة",
+          "en": "Live Chat"
+        },
+        "h1": {
+          "ar": "تواصل مباشر مع زوار موقعك",
+          "en": "Talk directly with your website visitors"
+        },
+        "highlight": {
+          "ar": [
+            "زوار",
+            "موقعك"
+          ],
+          "en": [
+            "website",
+            "visitors"
+          ]
+        },
+        "lede": {
+          "ar": "وفّر لزوار موقعك طريقة سهلة للتواصل مع فريقك، واجعل المحادثات تصل مباشرة إلى صندوق الوارد لمتابعتها والرد عليها من مكان واحد.",
+          "en": "Give your website visitors an easy way to reach your team, with the conversations landing straight in the inbox so you can follow and answer them from one place."
+        },
+        "heroShot": "inbox",
+        "heroRoute": "inbox",
+        "heroScene": "widget-states",
+        "bullets": {
+          "ar": [
+            "محادثة مباشرة داخل موقعك",
+            "وصول المحادثات إلى صندوق الوارد",
+            "معرفة بيانات الزائر وسياق المحادثة"
+          ],
+          "en": [
+            "Live chat inside your own website",
+            "Conversations arrive in the shared inbox",
+            "Visitor details and the context of the conversation"
+          ]
+        },
+        "compare": {
+          "eyebrow": {
+            "ar": "الفرق",
+            "en": "The difference"
+          },
+          "title": {
+            "ar": "محادثة مباشرة بدل انتظار العميل",
+            "en": "Live chat instead of waiting for the customer"
+          },
+          "withoutLabel": {
+            "ar": "بدون Qhub",
+            "en": "Without Qhub"
+          },
+          "withLabel": {
+            "ar": "مع Qhub",
+            "en": "With Qhub"
+          },
+          "rows": [
+            {
+              "without": {
+                "ar": "مغادرة الزائر للموقع دون التواصل مع الفريق",
+                "en": "Visitors leave the site without reaching your team"
+              },
+              "with": {
+                "ar": "وسيلة تواصل مباشرة داخل موقعك",
+                "en": "A direct way to talk inside your website"
+              }
+            },
+            {
+              "without": {
+                "ar": "صعوبة معرفة استفسارات الزوار",
+                "en": "Hard to know what visitors are asking about"
+              },
+              "with": {
+                "ar": "وصول المحادثات إلى صندوق الوارد",
+                "en": "Conversations arrive in the shared inbox"
+              }
+            },
+            {
+              "without": {
+                "ar": "تشتّت المحادثات عن باقي محادثات العملاء",
+                "en": "Website chats scattered away from other conversations"
+              },
+              "with": {
+                "ar": "ظهور تفاصيل المحادثة أمام الموظف",
+                "en": "The conversation details sit in front of the agent"
+              }
+            },
+            {
+              "without": {
+                "ar": "تأخّر الرد على الأسئلة أثناء تصفّح الموقع",
+                "en": "Slow answers while the visitor is still browsing"
+              },
+              "with": {
+                "ar": "توزيع المحادثة على الموظف المناسب",
+                "en": "The conversation routed to the right agent"
+              }
+            },
+            {
+              "without": {
+                "ar": "فقدان فرصة التواصل مع العميل في الوقت المناسب",
+                "en": "Missing the chance to talk at the right moment"
+              },
+              "with": {
+                "ar": "متابعة المحادثة من أول رسالة حتى إغلاقها",
+                "en": "Follow the conversation from the first message until it closes"
+              }
+            }
+          ]
+        },
+        "journey": {
+          "eyebrow": {
+            "ar": "داخل الشاشة",
+            "en": "Inside the screen"
+          },
+          "title": {
+            "ar": "من زيارة الموقع إلى محادثة مباشرة",
+            "en": "From a website visit to a live conversation"
+          },
+          "lede": {
+            "ar": "تظهر نافذة المحادثة للزائر أثناء تصفّحه، وتصل الرسائل مباشرة إلى فريقك. اضغط أي خطوة لتنتقل إليها.",
+            "en": "The chat window appears to visitors while they browse, and the messages reach your team directly. Tap any step to jump to it."
+          },
+          "steps": [
+            {
+              "title": {
+                "ar": "تظهر للزائر",
+                "en": "It appears to the visitor"
+              },
+              "body": {
+                "ar": "تظهر نافذة المحادثة داخل الموقع بطريقة بسيطة وسهلة الوصول.",
+                "en": "The chat window shows inside the site in a simple, easy-to-reach way."
+              },
+              "art": {
+                "kind": "browser",
+                "url": "yourstore.com",
+                "nav": {
+                  "ar": [
+                    "الرئيسية",
+                    "المنتجات",
+                    "السلة"
+                  ],
+                  "en": [
+                    "Home",
+                    "Products",
+                    "Cart"
+                  ]
+                },
+                "bubble": {
+                  "ar": "محتاج مساعدة؟",
+                  "en": "Need a hand?"
+                }
+              }
+            },
+            {
+              "title": {
+                "ar": "يبدأ المحادثة",
+                "en": "They start the conversation"
+              },
+              "body": {
+                "ar": "يمكن للزائر إرسال سؤاله مباشرة دون مغادرة الموقع.",
+                "en": "The visitor can send their question without leaving the site."
+              },
+              "art": {
+                "kind": "rules",
+                "pairs": [
+                  {
+                    "when": {
+                      "ar": "كم سعر التوصيل؟",
+                      "en": "How much is delivery?"
+                    },
+                    "then": {
+                      "ar": "ردّ فوري",
+                      "en": "Instant reply"
+                    }
+                  },
+                  {
+                    "when": {
+                      "ar": "متى يوصل طلبي؟",
+                      "en": "When will my order arrive?"
+                    },
+                    "then": {
+                      "ar": "ردّ فوري",
+                      "en": "Instant reply"
+                    }
+                  },
+                  {
+                    "when": {
+                      "ar": "أبغى أكلّم موظف",
+                      "en": "I want a human"
+                    },
+                    "then": {
+                      "ar": "تحويل",
+                      "en": "Handover"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "title": {
+                "ar": "تصل إلى الفريق",
+                "en": "It reaches the team"
+              },
+              "body": {
+                "ar": "تظهر المحادثة في صندوق الوارد ليتعامل معها الموظف المناسب.",
+                "en": "The conversation appears in the inbox for the right agent to handle."
+              },
+              "art": {
+                "kind": "rows",
+                "active": 0,
+                "items": [
+                  {
+                    "label": {
+                      "ar": "زائر من صفحة الأسعار",
+                      "en": "Visitor on the pricing page"
+                    },
+                    "sub": {
+                      "ar": "كم سعر الباقة الاحترافية؟",
+                      "en": "How much is the Professional plan?"
+                    },
+                    "ch": "livechat",
+                    "badge": {
+                      "ar": "جديد",
+                      "en": "New"
+                    }
+                  },
+                  {
+                    "label": {
+                      "ar": "نورة العامري",
+                      "en": "Noura Al-Amri"
+                    },
+                    "sub": {
+                      "ar": "وصلني الطلب، شكراً لكم",
+                      "en": "The order arrived, thank you"
+                    },
+                    "ch": "whatsapp"
+                  },
+                  {
+                    "label": {
+                      "ar": "متجر لمسة",
+                      "en": "Lamsa Store"
+                    },
+                    "sub": {
+                      "ar": "كم سعر الباقة الجديدة؟",
+                      "en": "How much is the new plan?"
+                    },
+                    "ch": "instagram"
+                  }
+                ]
+              }
+            },
+            {
+              "title": {
+                "ar": "تستمرّ المحادثة",
+                "en": "The conversation carries on"
+              },
+              "body": {
+                "ar": "يبقى سياق المحادثة محفوظاً حتى يتمكّن الفريق من متابعة العميل بشكل واضح.",
+                "en": "The context of the conversation stays saved, so the team can follow the customer clearly."
+              },
+              "art": {
+                "kind": "card",
+                "title": {
+                  "ar": "متابعة على واتساب",
+                  "en": "Continued on WhatsApp"
+                },
+                "badge": {
+                  "ar": "متّصلة",
+                  "en": "Linked"
+                },
+                "rows": [
+                  {
+                    "k": {
+                      "ar": "بدأت في",
+                      "en": "Started in"
+                    },
+                    "v": {
+                      "ar": "ويدجت الموقع",
+                      "en": "Site widget"
+                    }
+                  },
+                  {
+                    "k": {
+                      "ar": "الصفحة",
+                      "en": "Page"
+                    },
+                    "v": {
+                      "ar": "الأسعار",
+                      "en": "Pricing"
+                    }
+                  },
+                  {
+                    "k": {
+                      "ar": "أُكملت في",
+                      "en": "Finished in"
+                    },
+                    "v": {
+                      "ar": "واتساب",
+                      "en": "WhatsApp"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "extras": {
+          "eyebrow": {
+            "ar": "تفاصيل إضافية",
+            "en": "More details"
+          },
+          "title": {
+            "ar": "أدوات تساعدك على التواصل مع زوار موقعك",
+            "en": "Tools that help you talk with your website visitors"
+          }
+        },
+        "benefits": [
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "widget"
+            },
+            "title": {
+              "ar": "تخصيص شكل المحادثة",
+              "en": "Customise how the chat looks"
+            },
+            "body": {
+              "ar": "تخصيص مظهر نافذة المحادثة بما يتناسب مع هوية نشاطك.",
+              "en": "Adjust the appearance of the chat window to match your brand."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "sparkles"
+            },
+            "title": {
+              "ar": "رسالة ترحيبية",
+              "en": "A welcome message"
+            },
+            "body": {
+              "ar": "عرض رسالة ترحيبية للزائر عند فتح نافذة المحادثة.",
+              "en": "Show the visitor a welcome message when the chat window opens."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "inbox"
+            },
+            "title": {
+              "ar": "بدء المحادثة من صفحات محدّدة",
+              "en": "Start the chat from specific pages"
+            },
+            "body": {
+              "ar": "إظهار المحادثة بطريقة تناسب الصفحات التي يزورها العميل.",
+              "en": "Show the chat in a way that suits the pages your customers visit."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "chart"
+            },
+            "title": {
+              "ar": "معلومات الزائر",
+              "en": "Visitor information"
+            },
+            "body": {
+              "ar": "الحصول على المعلومات المتاحة عن الزائر وسياق تواصله.",
+              "en": "Get the information available about the visitor and the context of their enquiry."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "shield"
+            },
+            "title": {
+              "ar": "تحويل إلى الموظف المناسب",
+              "en": "Transfer to the right agent"
+            },
+            "body": {
+              "ar": "انتقال المحادثة إلى الموظف المناسب حسب إعدادات الفريق.",
+              "en": "The conversation moves to the right agent according to your team settings."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "clock"
+            },
+            "title": {
+              "ar": "متابعة المحادثات",
+              "en": "Follow every conversation"
+            },
+            "body": {
+              "ar": "تبقى جميع المحادثات ضمن صندوق الوارد لمتابعتها والرد عليها.",
+              "en": "All conversations stay in the inbox, ready to be followed and answered."
+            }
+          }
+        ],
+        "details": [
+          {
+            "title": {
+              "ar": "كل تفاصيل المحادثة أمام الموظف",
+              "en": "Every conversation detail in front of the agent"
+            },
+            "shot": "campaigns",
+            "scene": "site-embed",
+            "body": {
+              "ar": "يظهر سياق المحادثة ومعلومات الزائر للموظف، ليسهل فهم السؤال وتقديم الرد المناسب، بما في ذلك الصفحة التي بدأ منها التواصل.",
+              "en": "The context of the conversation and the visitor's information are shown to the agent, making the question easy to understand and answer — including the page the conversation started from."
+            },
+            "points": {
+              "ar": [
+                "رسالة ترحيب تلقائية",
+                "قواعد حسب الصفحة",
+                "أسئلة سريعة جاهزة للنقر",
+                "جمع الإيميل قبل بدء المحادثة"
+              ],
+              "en": [
+                "Automatic welcome message",
+                "Rules per page",
+                "Quick questions ready to tap",
+                "Collect an email before the chat starts"
+              ]
+            }
+          },
+          {
+            "title": {
+              "ar": "تواصل مستمرّ حتى خارج أوقات العمل",
+              "en": "Reachable even outside working hours"
+            },
+            "shot": "ai-settings",
+            "scene": "instant-reply",
+            "body": {
+              "ar": "عندما لا يكون الفريق متاحاً، يمكن للزائر ترك رسالته، وتبقى المحادثة محفوظة حتى يتمكّن الموظف من متابعتها.",
+              "en": "When the team is not available, the visitor can leave their message, and the conversation stays saved until an agent can follow it."
+            },
+            "points": {
+              "ar": [
+                "رد ذكي فوري خارج الدوام",
+                "نموذج بيانات تواصل",
+                "إشعار للزائر عند وصول ردّ",
+                "استكمال المحادثة على واتساب"
+              ],
+              "en": [
+                "Instant smart replies after hours",
+                "Contact details form",
+                "Notify the visitor when a reply arrives",
+                "Continue the conversation on WhatsApp"
+              ]
+            }
+          }
+        ],
+        "liveTitle": {
+          "ar": "الويدجت بألوانه وسلوكه",
+          "en": "The widget, its colours and its behaviour"
+        },
+        "liveHighlight": {
+          "ar": [
+            "بألوانه",
+            "وسلوكه"
+          ],
+          "en": [
+            "colours",
+            "behaviour"
+          ]
+        },
+        "faq": [
+          {
+            "q": {
+              "ar": "هل يمكن إضافة المحادثة إلى موقعي؟",
+              "en": "Can the chat be added to my website?"
+            },
+            "a": {
+              "ar": "نعم، يمكن إضافة نافذة المحادثة إلى موقعك لتكون متاحة للزوار أثناء التصفّح.",
+              "en": "Yes. The chat window can be added to your site so it is available to visitors while they browse."
+            }
+          },
+          {
+            "q": {
+              "ar": "أين تظهر رسائل زوار الموقع؟",
+              "en": "Where do website visitors' messages appear?"
+            },
+            "a": {
+              "ar": "تصل المحادثات مباشرة إلى صندوق الوارد داخل Qhub.",
+              "en": "Conversations arrive straight in the inbox inside Qhub."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل يمكن تخصيص شكل المحادثة؟",
+              "en": "Can the chat's appearance be customised?"
+            },
+            "a": {
+              "ar": "نعم، يمكن تخصيص مظهر المحادثة بما يتناسب مع هوية نشاطك.",
+              "en": "Yes. The chat's look can be adjusted to match your brand."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل يمكن معرفة الصفحة التي بدأ منها الزائر المحادثة؟",
+              "en": "Can I see which page the visitor started the chat from?"
+            },
+            "a": {
+              "ar": "نعم، يمكن معرفة سياق زيارة الزائر والمعلومات المتاحة عنه.",
+              "en": "Yes. You can see the context of the visitor's session and the information available about them."
+            }
+          },
+          {
+            "q": {
+              "ar": "ماذا يحدث إذا لم يكن هناك موظف متاح؟",
+              "en": "What happens if no agent is available?"
+            },
+            "a": {
+              "ar": "يمكن للزائر ترك رسالته، وتبقى المحادثة محفوظة حتى يتمكّن الموظف من متابعتها.",
+              "en": "The visitor can leave their message, and the conversation stays saved until an agent can follow it."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل يمكن تحويل المحادثة إلى موظف معيّن؟",
+              "en": "Can the conversation be transferred to a specific agent?"
+            },
+            "a": {
+              "ar": "نعم، يمكن توزيع المحادثات حسب إعدادات الفريق وتحويلها إلى الموظف المناسب.",
+              "en": "Yes. Conversations can be routed according to your team settings and transferred to the right agent."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل تظهر المحادثات السابقة للموظف؟",
+              "en": "Does the agent see earlier conversations?"
+            },
+            "a": {
+              "ar": "نعم، يظهر سجلّ المحادثة للموظف حتى يتمكّن من متابعة الحوار من النقطة نفسها.",
+              "en": "Yes. The conversation history is shown to the agent, so they can pick up from the same point."
+            }
+          }
+        ]
+      },
+      "integrations": {
+        "eyebrow": {
+          "ar": "القنوات والربط",
+          "en": "Channels & Integrations"
+        },
+        "h1": {
+          "ar": "كل قنوات التواصل في مكان واحد",
+          "en": "Every communication channel in one place"
+        },
+        "highlight": {
+          "ar": [
+            "مكان",
+            "واحد"
+          ],
+          "en": [
+            "one",
+            "place"
+          ]
+        },
+        "lede": {
+          "ar": "اربط قنوات التواصل الخاصة بنشاطك مع Qhub، لتصل جميع المحادثات إلى صندوق وارد واحد يتابعها فريقك بسهولة.",
+          "en": "Connect the channels your business uses to Qhub, so every conversation reaches a single inbox your team can follow easily."
+        },
+        "heroShot": "contacts",
+        "heroRoute": "contacts",
+        "heroScene": "merge",
+        "bullets": {
+          "ar": [
+            "ربط قنوات التواصل من مكان واحد",
+            "جمع المحادثات في صندوق وارد موحّد",
+            "الحفاظ على سياق كل محادثة"
+          ],
+          "en": [
+            "Connect your communication channels from one place",
+            "Gather conversations in a unified inbox",
+            "Keep the context of every conversation"
+          ]
+        },
+        "compare": {
+          "eyebrow": {
+            "ar": "الفرق",
+            "en": "The difference"
+          },
+          "title": {
+            "ar": "قنوات متعدّدة، وتجربة واحدة",
+            "en": "Several channels, one experience"
+          },
+          "withoutLabel": {
+            "ar": "بدون Qhub",
+            "en": "Without Qhub"
+          },
+          "withLabel": {
+            "ar": "مع Qhub",
+            "en": "With Qhub"
+          },
+          "rows": [
+            {
+              "without": {
+                "ar": "المحادثات موزّعة بين أكثر من قناة",
+                "en": "Conversations spread across several channels"
+              },
+              "with": {
+                "ar": "جمع المحادثات في صندوق وارد واحد",
+                "en": "Conversations gathered in a single inbox"
+              }
+            },
+            {
+              "without": {
+                "ar": "التنقّل المستمرّ بين الحسابات والمنصّات",
+                "en": "Constantly switching between accounts and platforms"
+              },
+              "with": {
+                "ar": "الوصول إلى جميع القنوات من مكان واحد",
+                "en": "Reach every channel from one place"
+              }
+            },
+            {
+              "without": {
+                "ar": "صعوبة متابعة جميع المحادثات",
+                "en": "Hard to follow all the conversations"
+              },
+              "with": {
+                "ar": "معرفة مصدر كل محادثة بوضوح",
+                "en": "The source of every conversation is clear"
+              }
+            },
+            {
+              "without": {
+                "ar": "تكرار الرد على العميل نفسه في أكثر من مكان",
+                "en": "Answering the same customer in more than one place"
+              },
+              "with": {
+                "ar": "توزيع المحادثات على الموظفين",
+                "en": "Conversations distributed across the team"
+              }
+            },
+            {
+              "without": {
+                "ar": "صعوبة معرفة مصدر كل محادثة",
+                "en": "Hard to tell which channel a conversation came from"
+              },
+              "with": {
+                "ar": "متابعة العميل مع الحفاظ على كامل سياق المحادثة",
+                "en": "Follow the customer with the full conversation context"
+              }
+            }
+          ]
+        },
+        "journey": {
+          "eyebrow": {
+            "ar": "داخل الشاشة",
+            "en": "Inside the screen"
+          },
+          "title": {
+            "ar": "من الربط إلى إدارة المحادثات",
+            "en": "From connecting to managing conversations"
+          },
+          "lede": {
+            "ar": "بعد ربط القنوات تظهر المحادثات في مكان واحد مع توضيح مصدر كل واحدة. اضغط أي خطوة لتنتقل إليها.",
+            "en": "Once the channels are connected, conversations appear in one place with the source of each one shown. Tap any step to jump to it."
+          },
+          "steps": [
+            {
+              "title": {
+                "ar": "ربط القناة",
+                "en": "Connecting the channel"
+              },
+              "body": {
+                "ar": "إضافة قناة التواصل الخاصة بنشاطك وربطها بحساب Qhub.",
+                "en": "Add the communication channel your business uses and connect it to your Qhub account."
+              },
+              "art": {
+                "kind": "flow",
+                "merge": true,
+                "from": "Qhub",
+                "to": {
+                  "ar": [
+                    "واتساب",
+                    "إنستغرام",
+                    "ويدجت الموقع"
+                  ],
+                  "en": [
+                    "WhatsApp",
+                    "Instagram",
+                    "Site widget"
+                  ]
+                }
+              }
+            },
+            {
+              "title": {
+                "ar": "استقبال المحادثات",
+                "en": "Conversations arrive"
+              },
+              "body": {
+                "ar": "تصل المحادثات الجديدة تلقائياً إلى صندوق الوارد الموحّد.",
+                "en": "New conversations reach the unified inbox automatically."
+              },
+              "art": {
+                "kind": "rules",
+                "pairs": [
+                  {
+                    "when": {
+                      "ar": "رسالة على واتساب",
+                      "en": "A WhatsApp message"
+                    },
+                    "then": {
+                      "ar": "تصل الصندوق",
+                      "en": "Lands in the inbox"
+                    }
+                  },
+                  {
+                    "when": {
+                      "ar": "رسالة على إنستغرام",
+                      "en": "An Instagram message"
+                    },
+                    "then": {
+                      "ar": "تصل الصندوق",
+                      "en": "Lands in the inbox"
+                    }
+                  },
+                  {
+                    "when": {
+                      "ar": "محادثة من موقعك",
+                      "en": "A chat from your site"
+                    },
+                    "then": {
+                      "ar": "تصل الصندوق",
+                      "en": "Lands in the inbox"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "title": {
+                "ar": "توزيع المحادثات",
+                "en": "Routing the conversations"
+              },
+              "body": {
+                "ar": "تُوزَّع المحادثات على الموظفين والأقسام وفق إعدادات الفريق.",
+                "en": "Conversations are routed to agents and departments according to your team settings."
+              },
+              "art": {
+                "kind": "card",
+                "title": {
+                  "ar": "محادثة واردة",
+                  "en": "Incoming conversation"
+                },
+                "badge": {
+                  "ar": "أُسندت",
+                  "en": "Assigned"
+                },
+                "rows": [
+                  {
+                    "k": {
+                      "ar": "القناة",
+                      "en": "Channel"
+                    },
+                    "v": {
+                      "ar": "واتساب",
+                      "en": "WhatsApp"
+                    }
+                  },
+                  {
+                    "k": {
+                      "ar": "القسم",
+                      "en": "Department"
+                    },
+                    "v": {
+                      "ar": "المبيعات",
+                      "en": "Sales"
+                    }
+                  },
+                  {
+                    "k": {
+                      "ar": "الموظف",
+                      "en": "Agent"
+                    },
+                    "v": {
+                      "ar": "منال",
+                      "en": "Manal"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "title": {
+                "ar": "متابعة العميل",
+                "en": "Following the customer"
+              },
+              "body": {
+                "ar": "يتابع الموظف المحادثة ويرد عليها مع ظهور كامل السياق.",
+                "en": "The agent follows the conversation and replies with the full context in view."
+              },
+              "art": {
+                "kind": "chat",
+                "turns": [
+                  {
+                    "from": "customer",
+                    "text": {
+                      "ar": "أبغى أستفسر عن خدماتكم",
+                      "en": "I would like to ask about your services"
+                    }
+                  },
+                  {
+                    "from": "agent",
+                    "text": {
+                      "ar": "أهلاً بك، تفضّل — محادثتك السابقة وتفاصيلها كلها أمامي.",
+                      "en": "Hello — go ahead. Your earlier conversation and all its details are in front of me."
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "extras": {
+          "eyebrow": {
+            "ar": "تفاصيل إضافية",
+            "en": "More details"
+          },
+          "title": {
+            "ar": "أدوات تساعدك على إدارة القنوات",
+            "en": "Tools that help you manage your channels"
+          }
+        },
+        "benefits": [
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "plug"
+            },
+            "title": {
+              "ar": "صندوق وارد موحّد",
+              "en": "A unified inbox"
+            },
+            "body": {
+              "ar": "جمع المحادثات القادمة من القنوات المرتبطة في مكان واحد.",
+              "en": "Conversations from the connected channels gathered in one place."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "widget"
+            },
+            "title": {
+              "ar": "معرفة مصدر المحادثة",
+              "en": "See where a conversation came from"
+            },
+            "body": {
+              "ar": "ظهور القناة التي بدأت منها كل محادثة بشكل واضح.",
+              "en": "The channel each conversation started on is clearly shown."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "inbox"
+            },
+            "title": {
+              "ar": "ربط أكثر من قناة",
+              "en": "Connect more than one channel"
+            },
+            "body": {
+              "ar": "إمكانية ربط أكثر من قناة تواصل ضمن الحساب نفسه.",
+              "en": "More than one communication channel can be connected within the same account."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "sparkles"
+            },
+            "title": {
+              "ar": "توزيع المحادثات",
+              "en": "Conversation routing"
+            },
+            "body": {
+              "ar": "توزيع المحادثات على الموظفين والأقسام حسب إعدادات الفريق.",
+              "en": "Conversations routed to agents and departments according to your team settings."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "shield"
+            },
+            "title": {
+              "ar": "سجلّ موحّد للعميل",
+              "en": "A unified customer record"
+            },
+            "body": {
+              "ar": "الوصول إلى سجلّ المحادثات والمعلومات المرتبطة بالعميل.",
+              "en": "Reach the conversation history and the information tied to the customer."
+            }
+          },
+          {
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "clock"
+            },
+            "title": {
+              "ar": "إدارة القنوات",
+              "en": "Channel management"
+            },
+            "body": {
+              "ar": "إضافة القنوات المرتبطة وإدارة إعداداتها من مكان واحد.",
+              "en": "Add connected channels and manage their settings from one place."
+            }
+          }
+        ],
+        "details": [
+          {
+            "title": {
+              "ar": "سياق العميل يبقى واضحاً",
+              "en": "The customer's context stays clear"
+            },
+            "shot": "inbox",
+            "scene": "channel-list",
+            "body": {
+              "ar": "مهما كانت القناة التي بدأ منها العميل، تبقى تفاصيل المحادثة وسجلّها ومعلوماته واضحة أمام الموظف، ويمكن تحويلها ومتابعتها من النقطة نفسها.",
+              "en": "Whatever channel the customer started on, the conversation details, its history and their information stay clear in front of the agent, and it can be transferred and followed from the same point."
+            },
+            "points": {
+              "ar": [
+                "مصدر كل محادثة ظاهر للموظف",
+                "سجلّ محادثات العميل في مكان واحد",
+                "ملاحظات داخلية على المحادثة",
+                "تحويل المحادثة بكامل سياقها"
+              ],
+              "en": [
+                "The source of every conversation is visible to the agent",
+                "The customer's conversation history in one place",
+                "Internal notes on the conversation",
+                "Transfer a conversation with its full context"
+              ]
+            }
+          },
+          {
+            "title": {
+              "ar": "ربط أسهل وإدارة أوضح",
+              "en": "Easier connecting, clearer management"
+            },
+            "shot": "overview",
+            "scene": "api-hooks",
+            "body": {
+              "ar": "يمكن إدارة القنوات المرتبطة ومتابعة حالتها من مكان واحد، مع إضافة قنوات جديدة أو تعديل إعداداتها أو تعطيلها عند الحاجة.",
+              "en": "Connected channels can be managed and their status followed from one place, adding new channels or changing or disabling their settings when needed."
+            },
+            "points": {
+              "ar": [
+                "إضافة قناة جديدة وإدارتها",
+                "متابعة حالة كل قناة مرتبطة",
+                "واجهة API وويبهوكس للأنظمة الأخرى",
+                "تعطيل القناة أو فصلها عند الحاجة"
+              ],
+              "en": [
+                "Add a new channel and manage it",
+                "Follow the status of every connected channel",
+                "An API and webhooks for other systems",
+                "Disable or disconnect a channel when needed"
+              ]
+            }
+          }
+        ],
+        "liveTitle": {
+          "ar": "خطوات الربط لكل منصّة",
+          "en": "The connection steps for each channel"
+        },
+        "liveHighlight": {
+          "ar": [
+            "خطوات",
+            "الربط"
+          ],
+          "en": [
+            "connection",
+            "steps"
+          ]
+        },
+        "faq": [
+          {
+            "q": {
+              "ar": "ما القنوات التي يمكن ربطها مع Qhub؟",
+              "en": "Which channels can be connected to Qhub?"
+            },
+            "a": {
+              "ar": "يمكن ربط القنوات التي يدعمها Qhub وإدارتها من خلال صندوق الوارد الموحّد.",
+              "en": "The channels Qhub supports can be connected and managed through the unified inbox."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل تظهر جميع المحادثات في مكان واحد؟",
+              "en": "Do all conversations appear in one place?"
+            },
+            "a": {
+              "ar": "نعم، تظهر المحادثات القادمة من القنوات المرتبطة داخل صندوق وارد واحد.",
+              "en": "Yes. Conversations from the connected channels appear in a single inbox."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل يمكن معرفة القناة التي بدأت منها المحادثة؟",
+              "en": "Can I see which channel a conversation started on?"
+            },
+            "a": {
+              "ar": "نعم، يظهر مصدر كل محادثة بشكل واضح داخل صندوق الوارد.",
+              "en": "Yes. The source of each conversation is clearly shown inside the inbox."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل يمكن ربط أكثر من قناة في الحساب نفسه؟",
+              "en": "Can more than one channel be connected to the same account?"
+            },
+            "a": {
+              "ar": "نعم، يمكن ربط القنوات المتاحة ضمن حساب Qhub نفسه.",
+              "en": "Yes. The available channels can be connected within the same Qhub account."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل يمكن توزيع المحادثات على الموظفين؟",
+              "en": "Can conversations be distributed across agents?"
+            },
+            "a": {
+              "ar": "نعم، يمكن توزيع المحادثات حسب الأقسام وإعدادات فريقك.",
+              "en": "Yes. Conversations can be routed by department and by your team's settings."
+            }
+          },
+          {
+            "q": {
+              "ar": "ماذا يحدث عند فصل إحدى القنوات؟",
+              "en": "What happens when a channel is disconnected?"
+            },
+            "a": {
+              "ar": "تتوقّف المحادثات الجديدة القادمة من القناة بعد فصلها، بينما تبقى المحادثات السابقة محفوظة داخل النظام.",
+              "en": "New conversations from that channel stop once it is disconnected, while earlier conversations stay saved in the system."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل يحتفظ Qhub بسجلّ المحادثات؟",
+              "en": "Does Qhub keep a record of conversations?"
+            },
+            "a": {
+              "ar": "نعم، تبقى المحادثات المرتبطة محفوظة ويمكن الرجوع إليها من خلال صندوق الوارد.",
+              "en": "Yes. Connected conversations stay saved and can be revisited through the inbox."
+            }
+          }
+        ]
+      }
+    }
+  },
+  "solutions": {
+    "page": {
+      "eyebrow": {
+        "ar": "الحلول",
+        "en": "Solutions"
+      },
+      "title": {
+        "ar": "إعداد Qhub يختلف حسب القطاع",
+        "en": "Qhub configured per sector"
+      },
+      "highlight": {
+        "ar": [
+          "حسب",
+          "القطاع"
+        ],
+        "en": [
+          "per",
+          "sector"
+        ]
+      },
+      "lede": {
+        "ar": "المنصّة تُهيّأ لتناسب طبيعة كل قطاع، وتساعدك على إدارة المحادثات والطلبات ومتابعة العملاء بطريقة تناسب احتياجات نشاطك.",
+        "en": "The platform adapts to how your sector works, helping you manage conversations and requests and follow up with customers the way your business needs."
+      },
+      "ctaPrimary": {
+        "ar": "ابدأ مجاناً",
+        "en": "Start free"
+      },
+      "ctaSecondary": {
+        "ar": "اطلب عرضاً توضيحياً",
+        "en": "Request a demo"
+      },
+      "eyebrowIcon": {
+        "type": "library",
+        "set": "qhub",
+        "name": "globe"
+      }
+    },
+    "items": [
+      {
+        "icon": {
+          "type": "library",
+          "set": "qhub",
+          "name": "store"
+        },
+        "sector": {
+          "ar": "التجارة الإلكترونية",
+          "en": "E-commerce"
+        },
+        "pain": {
+          "ar": "تواصل أسهل مع العملاء، ومتابعة أفضل للطلبات والاستفسارات من مكان واحد.",
+          "en": "Easier conversations with your customers, and better follow-up on orders and enquiries from one place."
+        },
+        "wins": {
+          "ar": [
+            "استفسارات الطلبات تصل إلى صندوق واحد",
+            "ردود جاهزة لأسئلة الشحن والاسترجاع",
+            "ربط متجرك في سلة أو زد أو شوبيفاي",
+            "الرد على استفسارات العملاء بسرعة"
+          ],
+          "en": [
+            "Order enquiries all land in one inbox",
+            "Saved replies for shipping and returns",
+            "Connect your Salla, Zid or Shopify store",
+            "Answer customer questions quickly"
+          ]
+        }
+      },
+      {
+        "icon": {
+          "type": "library",
+          "set": "qhub",
+          "name": "camera"
+        },
+        "sector": {
+          "ar": "صنّاع المحتوى",
+          "en": "Creators"
+        },
+        "pain": {
+          "ar": "نظّم تواصل جمهورك معك، واجمع الرسائل والاستفسارات في مكان واحد دون متابعة كل قناة بشكل منفصل.",
+          "en": "Organise how your audience reaches you, and gather every message and enquiry in one place instead of watching each channel separately."
+        },
+        "wins": {
+          "ar": [
+            "جمع المحادثات في صندوق وارد واحد",
+            "تنظيم استفسارات الجمهور",
+            "ردود جاهزة للأسئلة المتكرّرة",
+            "متابعة المحادثات والردود بوضوح"
+          ],
+          "en": [
+            "Every conversation in a single inbox",
+            "Audience enquiries kept organised",
+            "Saved replies for repeat questions",
+            "Clear follow-up on chats and replies"
+          ]
+        }
+      },
+      {
+        "icon": {
+          "type": "library",
+          "set": "qhub",
+          "name": "stethoscope"
+        },
+        "sector": {
+          "ar": "العيادات والمراكز الطبية",
+          "en": "Clinics & medical centers"
+        },
+        "pain": {
+          "ar": "تنظيم استفسارات المراجعين وطلباتهم، مع متابعة المحادثات وتسهيل الوصول إلى المعلومات المهمة.",
+          "en": "Keep patient enquiries and requests organised, follow the conversations, and make the information that matters easy to reach."
+        },
+        "wins": {
+          "ar": [
+            "استقبال طلبات المراجعين من كل القنوات",
+            "ردود جاهزة عن الخدمات وأوقات العمل",
+            "تنظيم بيانات العملاء",
+            "توزيع المحادثات على الأقسام والموظفين"
+          ],
+          "en": [
+            "Patient requests arrive from every channel",
+            "Saved replies on services and opening hours",
+            "Customer records kept organised",
+            "Routing to the right department and agent"
+          ]
+        }
+      },
+      {
+        "icon": {
+          "type": "library",
+          "set": "qhub",
+          "name": "building"
+        },
+        "sector": {
+          "ar": "العقار",
+          "en": "Real estate"
+        },
+        "pain": {
+          "ar": "كل عميل يمرّ بمراحل مختلفة من البحث عن العقار وحتى إتمام الصفقة، لذلك يساعدك Qhub على تنظيم المحادثات ومتابعة العملاء في كل مرحلة.",
+          "en": "Every client moves through different stages, from browsing a property to closing the deal — so Qhub helps you organise the conversations and follow each client at every stage."
+        },
+        "wins": {
+          "ar": [
+            "تصنيف العملاء بالوسوم حسب مرحلة المتابعة",
+            "متابعة العملاء والمهتمين بالعقارات",
+            "إرسال معلومات العقارات وصورها من المحادثة",
+            "متابعة المحادثات حتى إتمام الصفقة"
+          ],
+          "en": [
+            "Tag clients by their follow-up stage",
+            "Follow up with leads and interested buyers",
+            "Send listing details and photos from the chat",
+            "Follow the conversation through to the deal"
+          ]
+        }
+      },
+      {
+        "icon": {
+          "type": "library",
+          "set": "qhub",
+          "name": "briefcase"
+        },
+        "sector": {
+          "ar": "الخدمات والاستشارات",
+          "en": "Services & consulting"
+        },
+        "pain": {
+          "ar": "استفسارات العملاء قد تصل في أوقات مختلفة وتحتاج إلى ردّ سريع قبل انتقال العميل إلى جهة أخرى.",
+          "en": "Enquiries arrive at all hours and need a fast reply before the client moves on to someone else."
+        },
+        "wins": {
+          "ar": [
+            "ردود فورية على مدار الساعة",
+            "قوالب ردود جاهزة للطلبات المتكرّرة",
+            "دعم لغات متعدّدة",
+            "متابعة العميل بعد انتهاء الخدمة"
+          ],
+          "en": [
+            "Instant replies around the clock",
+            "Saved-reply templates for common requests",
+            "Support for multiple languages",
+            "Follow up once the work is done"
+          ]
+        }
+      },
+      {
+        "icon": {
+          "type": "library",
+          "set": "qhub",
+          "name": "heart"
+        },
+        "sector": {
+          "ar": "التجميل والعناية",
+          "en": "Beauty & wellness"
+        },
+        "pain": {
+          "ar": "استفسارات العملاء وطلباتهم في مكان واحد، مع متابعة المحادثات قبل الزيارة وبعدها.",
+          "en": "Customer requests and questions in one place, with follow-up before and after the visit."
+        },
+        "wins": {
+          "ar": [
+            "استقبال طلبات العملاء واستفساراتهم",
+            "قائمة الأسعار والخدمات جاهزة للإرسال",
+            "تنظيم بيانات العملاء",
+            "متابعة العملاء بعد الزيارة"
+          ],
+          "en": [
+            "Requests and questions arrive in one inbox",
+            "A price and service list ready to send",
+            "Customer records kept organised",
+            "Follow up with customers after the visit"
+          ]
+        }
+      }
+    ],
+    "faq": [
+      {
+        "q": {
+          "ar": "هل Qhub مناسب لنشاطي؟",
+          "en": "Is Qhub a fit for my business?"
+        },
+        "a": {
+          "ar": "نعم، يمكن إعداد Qhub بما يتناسب مع طبيعة نشاطك وطريقة تواصلك مع العملاء، سواء كنت تعمل في التجارة أو الخدمات أو أي قطاع آخر.",
+          "en": "Yes. Qhub can be set up to match how your business works and how you talk to your customers — retail, services, or any other sector."
+        }
+      },
+      {
+        "q": {
+          "ar": "هل يمكن تخصيص Qhub حسب طبيعة النشاط؟",
+          "en": "Can Qhub be tailored to my line of work?"
+        },
+        "a": {
+          "ar": "نعم، يمكن تخصيص إعدادات الفريق والمحادثات والصلاحيات والمساعد الذكي بما يناسب احتياجات نشاطك.",
+          "en": "Yes. Team settings, conversations, permissions and the AI assistant can all be adjusted to what your business needs."
+        }
+      },
+      {
+        "q": {
+          "ar": "هل يمكن استخدام Qhub لأكثر من قسم؟",
+          "en": "Can we use Qhub across more than one department?"
+        },
+        "a": {
+          "ar": "نعم، يمكن تنظيم الموظفين ضمن أقسام مختلفة وتوزيع المحادثات حسب طبيعة كل قسم.",
+          "en": "Yes. Staff can be organised into separate departments, and conversations routed according to what each department handles."
+        }
+      }
+    ]
+  },
+  "faq": {
+    "page": {
+      "eyebrow": {
+        "ar": "الأسئلة الشائعة",
+        "en": "FAQ"
+      },
+      "title": {
+        "ar": "إجابات عن الباقات والذكاء الاصطناعي والخصوصية",
+        "en": "Answers on plans, AI and privacy"
+      },
+      "highlight": {
+        "ar": [
+          "إجابات"
+        ],
+        "en": [
+          "Answers"
+        ]
+      },
+      "lede": {
+        "ar": "جمعنا هنا أكثر الأسئلة التي تصلنا. لم تجد جوابك؟ تحدّث إلينا ونرد عليك سريعاً.",
+        "en": "We collected the questions we hear most. Didn't find yours? Message us and we'll answer quickly."
+      },
+      "eyebrowIcon": {
+        "type": "library",
+        "set": "qhub",
+        "name": "sparkles"
+      }
+    },
+    "directory": {
+      "sections": {
+        "ar": "الأقسام · {0} سؤال",
+        "en": "Sections · {0} questions"
+      },
+      "navLabel": {
+        "ar": "أقسام الأسئلة",
+        "en": "Question sections"
+      },
+      "helpTitle": {
+        "ar": "لم تجد جوابك؟",
+        "en": "Still stuck?"
+      },
+      "helpBody": {
+        "ar": "تحدّث إلينا، ونرد عليك بالعربية سريعاً.",
+        "en": "Message us and we will get back to you quickly."
+      },
+      "helpCta": {
+        "ar": "تواصل معنا",
+        "en": "Contact us"
+      }
+    },
+    "defaults": {
+      "eyebrow": {
+        "ar": "أسئلة شائعة",
+        "en": "FAQ"
+      },
+      "title": {
+        "ar": "الأسئلة الأكثر تكراراً",
+        "en": "The questions we hear most"
+      },
+      "highlight": {
+        "ar": [
+          "الأسئلة"
+        ],
+        "en": [
+          "questions"
+        ]
+      },
+      "eyebrowIcon": {
+        "type": "library",
+        "set": "qhub",
+        "name": "sparkles"
+      }
+    },
+    "groups": [
+      {
+        "id": "start",
+        "title": {
+          "ar": "البداية والربط",
+          "en": "Getting started"
+        },
+        "icon": {
+          "type": "library",
+          "set": "qhub",
+          "name": "inbox"
+        },
+        "items": [
+          {
+            "q": {
+              "ar": "كم يستغرق إعداد الحساب؟",
+              "en": "How long does setup take?"
+            },
+            "a": {
+              "ar": "أقل من 10 دقائق للربط الأساسي: تسجّل، وتربط قنواتك، وتبدأ استقبال الرسائل فوراً.",
+              "en": "Under 10 minutes for the basic connection. Sign up, link your channels, and messages start arriving right away."
+            }
+          },
+          {
+            "q": {
+              "ar": "أي قنوات تدعمونها؟",
+              "en": "Which channels do you support?"
+            },
+            "a": {
+              "ar": "واتساب، إنستغرام، فيسبوك ماسنجر، تيليجرام، إكس، الإيميل، وويدجت المحادثة على موقعك.",
+              "en": "WhatsApp, Instagram, Facebook Messenger, Telegram, X, email, and the chat widget on your own website."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل أحتاج واتساب بزنس API؟",
+              "en": "Do I need the WhatsApp Business API?"
+            },
+            "a": {
+              "ar": "للاستخدام الاحترافي نعم، ونساعدك في إجراءات التسجيل والتحقق خطوة بخطوة.",
+              "en": "For professional use, yes — and we walk you through registration and verification step by step."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل يمكنني نقل محادثاتي القديمة؟",
+              "en": "Can I bring over my old conversations?"
+            },
+            "a": {
+              "ar": "المحادثات التي تصل بعد الربط تدخل النظام، والسابقة تبقى في تطبيقك الأصلي.",
+              "en": "Conversations that arrive after you connect flow into Qhub. Earlier history stays in the original app."
+            }
+          }
+        ]
+      },
+      {
+        "id": "pricing",
+        "title": {
+          "ar": "الأسعار والاشتراك",
+          "en": "Pricing & billing"
+        },
+        "icon": {
+          "type": "library",
+          "set": "qhub",
+          "name": "shield"
+        },
+        "items": [
+          {
+            "q": {
+              "ar": "هل هناك تجربة مجانية؟",
+              "en": "Is there a free trial?"
+            },
+            "a": {
+              "ar": "نعم، 7 أيام مجاناً بكل المزايا ودون بطاقة ائتمان.",
+              "en": "Yes — 7 days with every feature unlocked, and no credit card required."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل يمكنني تغيير باقتي لاحقاً؟",
+              "en": "Can I change my plan later?"
+            },
+            "a": {
+              "ar": "في أي وقت. الترقية تسري فوراً، والتخفيض يبدأ من دورة الفوترة التالية.",
+              "en": "Any time. Upgrades take effect immediately; downgrades start from the next billing cycle."
+            }
+          },
+          {
+            "q": {
+              "ar": "ماذا يحدث لو تجاوزت حدّ باقتي؟",
+              "en": "What happens if I go over my plan's limit?"
+            },
+            "a": {
+              "ar": "ننبّهك قبل أن تبلغ الحدّ، ولا نوقف خدمتك فجأة. يمكنك الترقية أو انتظار تجديد الدورة.",
+              "en": "We warn you before you reach it, and we never cut off your service abruptly. Upgrade, or wait for the cycle to renew."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل الأسعار تشمل الضريبة؟",
+              "en": "Do prices include tax?"
+            },
+            "a": {
+              "ar": "الأسعار المعروضة قبل الضريبة، وتُحتسب حسب دولتك عند الدفع.",
+              "en": "Listed prices are before tax; it's calculated for your country at checkout."
+            }
+          },
+          {
+            "q": {
+              "ar": "أي طرق دفع تقبلونها؟",
+              "en": "Which payment methods do you accept?"
+            },
+            "a": {
+              "ar": "البطاقات الائتمانية ومدى والتحويل البنكي للباقات السنوية.",
+              "en": "Credit cards, mada, and bank transfer for annual plans."
+            }
+          }
+        ]
+      },
+      {
+        "id": "ai",
+        "title": {
+          "ar": "الذكاء الاصطناعي",
+          "en": "Artificial intelligence"
+        },
         "icon": {
           "type": "library",
           "set": "qhub",
           "name": "sparkles"
         },
-        "title": {
-          "ar": "رضا العملاء",
-          "en": "Customer satisfaction"
-        },
-        "body": {
-          "ar": "متابعة تقييمات العملاء ومعرفة مستوى رضاهم عن المحادثات.",
-          "en": "Follow customer ratings and see how satisfied they are with the conversations."
-        }
+        "items": [
+          {
+            "q": {
+              "ar": "هل المساعد يفهم اللهجات؟",
+              "en": "Does the assistant understand dialects?"
+            },
+            "a": {
+              "ar": "نعم، مدرّب على العربية بلهجاتها: الخليجي والمصري والشامي والمغربي، ويرد باللهجة نفسها.",
+              "en": "Yes. It's trained on Arabic across its dialects — Gulf, Egyptian, Levantine and Maghrebi — and replies in the same dialect."
+            }
+          },
+          {
+            "q": {
+              "ar": "كيف أدرّبه على منتجاتي؟",
+              "en": "How do I train it on my products?"
+            },
+            "a": {
+              "ar": "ترفع ملفات أو تكتب أسئلة وأجوبة في قاعدة المعرفة، ويمكنه أيضاً أن يتعلّم من محادثاتك السابقة.",
+              "en": "Upload files or write question-and-answer pairs into the knowledge base. It can also learn from your past conversations."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل يمكنني إيقافه؟",
+              "en": "What happens when it doesn't know the answer?"
+            },
+            "a": {
+              "ar": "نعم، كلياً أو على قنوات بعينها، أو تجعله يقترح الردّ ويعتمده الموظف.",
+              "en": "It hands the conversation to a human with a summary, instead of guessing."
+            }
+          },
+          {
+            "q": {
+              "ar": "",
+              "en": "Can I turn it off?"
+            },
+            "a": {
+              "ar": "",
+              "en": "Yes — entirely, or on specific channels, or you can have it suggest a reply that an agent approves before sending."
+            }
+          }
+        ]
       },
       {
+        "id": "privacy",
+        "title": {
+          "ar": "الخصوصية والأمان",
+          "en": "Privacy & security"
+        },
+        "icon": {
+          "type": "library",
+          "set": "qhub",
+          "name": "shield"
+        },
+        "items": [
+          {
+            "q": {
+              "ar": "أين تُخزَّن بياناتي؟",
+              "en": "Where is my data stored?"
+            },
+            "a": {
+              "ar": "على خوادم آمنة مع تشفير أثناء النقل والتخزين، ونسخ احتياطي دوري.",
+              "en": "On secure servers, encrypted in transit and at rest, with regular backups."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل تُستخدم بياناتي لتدريب نماذج؟",
+              "en": "Is my data used to train models?"
+            },
+            "a": {
+              "ar": "لا. بيانات حسابك تُستخدم لخدمة حسابك فقط ولا تُشارك مع عملاء آخرين.",
+              "en": "No. Your account data serves your account only, and is never shared with other customers."
+            }
+          },
+          {
+            "q": {
+              "ar": "من في فريقكم يمكنه رؤية محادثاتي؟",
+              "en": "Who on your team can see my conversations?"
+            },
+            "a": {
+              "ar": "لا أحد إلا بطلب دعم منك وبموافقتك، ويُسجَّل كل وصول.",
+              "en": "Nobody, unless you open a support request and grant access — and every access is logged."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل يمكنني حذف بياناتي؟",
+              "en": "Can I delete my data?"
+            },
+            "a": {
+              "ar": "نعم، يمكنك طلب حذف حسابك وبياناتك في أي وقت.",
+              "en": "Yes. You can request deletion of your account and its data at any time."
+            }
+          }
+        ]
+      },
+      {
+        "id": "support",
+        "title": {
+          "ar": "الدعم",
+          "en": "Support"
+        },
+        "icon": {
+          "type": "library",
+          "set": "qhub",
+          "name": "users"
+        },
+        "items": [
+          {
+            "q": {
+              "ar": "هل الدعم بالعربية؟",
+              "en": "Is support available in Arabic?"
+            },
+            "a": {
+              "ar": "نعم، فريق دعم عربي بالكامل عبر المحادثة والبريد.",
+              "en": "Yes — a fully Arabic-speaking support team over chat and email, and English too."
+            }
+          },
+          {
+            "q": {
+              "ar": "كم يستغرق الردّ على تذكرة الدعم؟",
+              "en": "How fast do you answer a support ticket?"
+            },
+            "a": {
+              "ar": "عادة خلال ساعات العمل بأقل من ساعتين، وباقات الأعمال والمؤسسات لها أولوية.",
+              "en": "Usually under two hours during working hours, and Business and Enterprise plans get priority."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل تساعدوننا في التدريب؟",
+              "en": "Do you help with training?"
+            },
+            "a": {
+              "ar": "نعم، جلسة تدريب لفريقك ومكتبة شروحات، ومدير حساب مخصّص في باقة المؤسسات.",
+              "en": "Yes — a training session for your team, a library of walkthroughs, and a dedicated account manager on Enterprise."
+            }
+          }
+        ]
+      }
+    ],
+    "featureSections": [
+      {
+        "slug": "unified-inbox",
+        "id": "inbox",
         "icon": {
           "type": "library",
           "set": "qhub",
           "name": "inbox"
         },
         "title": {
-          "ar": "حجم المحادثات",
-          "en": "Conversation volume"
-        },
-        "body": {
-          "ar": "معرفة عدد المحادثات خلال اليوم وتحديد الفترات الأكثر ازدحاماً.",
-          "en": "See how many conversations arrive during the day and which periods are busiest."
+          "ar": "صندوق الرسائل الموحّد",
+          "en": "Unified inbox"
         }
       },
       {
+        "slug": "ai-assistant",
+        "id": "ai",
         "icon": {
           "type": "library",
           "set": "qhub",
-          "name": "clock"
+          "name": "bot"
+        },
+        "into": {
+          "ar": "ai",
+          "en": "ai"
         },
         "title": {
-          "ar": "مقارنة الأداء",
-          "en": "Performance comparison"
-        },
-        "body": {
-          "ar": "مقارنة النتائج بين الفترات لمعرفة التحسّن أو التراجع في الأداء.",
-          "en": "Compare results between periods to see whether performance improved or slipped."
+          "ar": "",
+          "en": ""
         }
       },
       {
+        "slug": "team",
+        "id": "team",
         "icon": {
           "type": "library",
           "set": "qhub",
-          "name": "shield"
+          "name": "users"
         },
         "title": {
-          "ar": "تنبيهات الأداء",
-          "en": "Performance alerts"
-        },
-        "body": {
-          "ar": "تنبيهات عند تجاوز زمن الرد الحدَّ المحدّد، لمساعدة الفريق على التعامل مع التأخير في الوقت المناسب.",
-          "en": "Alerts when reply time crosses the limit you set, so the team can deal with delays in time."
+          "ar": "إدارة الفريق والصلاحيات",
+          "en": "Team & permissions"
         }
-      }
-    ],
-    "details": [
+      },
       {
+        "slug": "campaigns",
+        "id": "campaigns",
+        "icon": {
+          "type": "library",
+          "set": "qhub",
+          "name": "megaphone"
+        },
         "title": {
-          "ar": "كل رقم له تفاصيله",
-          "en": "Every number has its detail"
-        },
-        "shot": "reports",
-        "scene": "drill-path",
-        "body": {
-          "ar": "لا تتوقّف التقارير عند عرض الأرقام، بل تساعدك على معرفة المحادثات والبيانات التي تقف خلف كل نتيجة.",
-          "en": "Reports do not stop at showing numbers — they help you reach the conversations and the data behind each result."
-        },
-        "points": {
-          "ar": [
-            "تفصيل كل رقم لمحادثاته",
-            "مقارنة بين فترتين",
-            "تصفية حسب القناة أو القسم أو الموظف",
-            "تصدير للإكسل"
-          ],
-          "en": [
-            "Drill from any number into its conversations",
-            "Compare two periods",
-            "Filter by channel, department or agent",
-            "Export to Excel"
-          ]
+          "ar": "الحملات التسويقية",
+          "en": "Marketing campaigns"
         }
       },
       {
+        "slug": "analytics",
+        "id": "analytics",
+        "icon": {
+          "type": "library",
+          "set": "qhub",
+          "name": "chart"
+        },
         "title": {
-          "ar": "تقارير دورية تصل تلقائياً",
-          "en": "Recurring reports that arrive automatically"
-        },
-        "shot": "overview",
-        "scene": "digest",
-        "body": {
-          "ar": "تصل التقارير إلى البريد الإلكتروني وفق الجدول المحدّد، لتبقى على اطّلاع بأداء الفريق دون الدخول إلى النظام كل مرة.",
-          "en": "Reports arrive by email on the schedule you set, so you stay on top of your team's performance without logging in every time."
-        },
-        "points": {
-          "ar": [
-            "تقرير يومي مختصر",
-            "ملخّص أسبوعي للمدير",
-            "تنبيه لما يتجاوز زمن الرد حدّاً معيّناً",
-            "لوحة مخصّصة لكل دور"
-          ],
-          "en": [
-            "A short daily report",
-            "A weekly summary for managers",
-            "An alert when reply time crosses a threshold",
-            "A custom dashboard per role"
-          ]
-        }
-      }
-    ],
-    "liveTitle": {
-      "ar": "لوحة تتبدّل أرقامها مع الفترة",
-      "en": "A dashboard that moves with the period"
-    },
-    "liveHighlight": {
-      "ar": [
-        "أرقامها"
-      ],
-      "en": [
-        "moves"
-      ]
-    },
-    "faq": [
-      {
-        "q": {
-          "ar": "متى تبدأ البيانات بالظهور في التقارير؟",
-          "en": "When does data start appearing in the reports?"
-        },
-        "a": {
-          "ar": "تبدأ البيانات من لحظة تفعيل الحساب، وتُحتسب المحادثات التي تدخل النظام ضمن التقارير.",
-          "en": "Data starts from the moment the account is activated, and conversations entering the system count towards the reports."
+          "ar": "التقارير والتحليلات",
+          "en": "Reports & analytics"
         }
       },
       {
-        "q": {
-          "ar": "هل يمكن تصدير التقارير؟",
-          "en": "Can reports be exported?"
-        },
-        "a": {
-          "ar": "نعم، يمكن تصدير البيانات والتقارير حسب الباقة المتاحة.",
-          "en": "Yes. Data and reports can be exported according to the plan you are on."
-        }
-      },
-      {
-        "q": {
-          "ar": "هل يمكن مقارنة فترتين؟",
-          "en": "Can two periods be compared?"
-        },
-        "a": {
-          "ar": "نعم، يمكن مقارنة الأداء بين أسبوعين أو شهرين لمعرفة التغيّر في النتائج.",
-          "en": "Yes. You can compare performance between two weeks or two months to see how the results changed."
-        }
-      },
-      {
-        "q": {
-          "ar": "هل التقارير تتحدّث بشكل مستمر؟",
-          "en": "Do the reports update continuously?"
-        },
-        "a": {
-          "ar": "نعم، تتحدّث البيانات مع دخول المحادثات وتغيّر مؤشّرات الأداء.",
-          "en": "Yes. The data updates as conversations arrive and the performance metrics change."
-        }
-      },
-      {
-        "q": {
-          "ar": "هل يمكنني معرفة أداء كل موظف؟",
-          "en": "Can I see each agent's performance?"
-        },
-        "a": {
-          "ar": "نعم، يمكن متابعة مؤشّرات الأداء لكل موظف حسب الصلاحيات المتاحة.",
-          "en": "Yes. You can follow performance metrics for each agent, according to the permissions available."
-        }
-      },
-      {
-        "q": {
-          "ar": "من يستطيع رؤية تقارير الفريق؟",
-          "en": "Who can see the team's reports?"
-        },
-        "a": {
-          "ar": "يعتمد ذلك على الصلاحيات، بحيث يمكن تحديد مستوى الوصول للتقارير حسب دور كل موظف.",
-          "en": "That depends on permissions: the level of access to reports can be set according to each agent's role."
-        }
-      }
-    ]
-  },
-  "chat-widget": {
-    "eyebrow": {
-      "ar": "المحادثة المباشرة",
-      "en": "Live Chat"
-    },
-    "h1": {
-      "ar": "تواصل مباشر مع زوار موقعك",
-      "en": "Talk directly with your website visitors"
-    },
-    "highlight": {
-      "ar": [
-        "زوار",
-        "موقعك"
-      ],
-      "en": [
-        "website",
-        "visitors"
-      ]
-    },
-    "lede": {
-      "ar": "وفّر لزوار موقعك طريقة سهلة للتواصل مع فريقك، واجعل المحادثات تصل مباشرة إلى صندوق الوارد لمتابعتها والرد عليها من مكان واحد.",
-      "en": "Give your website visitors an easy way to reach your team, with the conversations landing straight in the inbox so you can follow and answer them from one place."
-    },
-    "heroShot": "inbox",
-    "heroRoute": "inbox",
-    "heroScene": "widget-states",
-    "bullets": {
-      "ar": [
-        "محادثة مباشرة داخل موقعك",
-        "وصول المحادثات إلى صندوق الوارد",
-        "معرفة بيانات الزائر وسياق المحادثة"
-      ],
-      "en": [
-        "Live chat inside your own website",
-        "Conversations arrive in the shared inbox",
-        "Visitor details and the context of the conversation"
-      ]
-    },
-    "compare": {
-      "eyebrow": {
-        "ar": "الفرق",
-        "en": "The difference"
-      },
-      "title": {
-        "ar": "محادثة مباشرة بدل انتظار العميل",
-        "en": "Live chat instead of waiting for the customer"
-      },
-      "withoutLabel": {
-        "ar": "بدون Qhub",
-        "en": "Without Qhub"
-      },
-      "withLabel": {
-        "ar": "مع Qhub",
-        "en": "With Qhub"
-      },
-      "rows": [
-        {
-          "without": {
-            "ar": "مغادرة الزائر للموقع دون التواصل مع الفريق",
-            "en": "Visitors leave the site without reaching your team"
-          },
-          "with": {
-            "ar": "وسيلة تواصل مباشرة داخل موقعك",
-            "en": "A direct way to talk inside your website"
-          }
-        },
-        {
-          "without": {
-            "ar": "صعوبة معرفة استفسارات الزوار",
-            "en": "Hard to know what visitors are asking about"
-          },
-          "with": {
-            "ar": "وصول المحادثات إلى صندوق الوارد",
-            "en": "Conversations arrive in the shared inbox"
-          }
-        },
-        {
-          "without": {
-            "ar": "تشتّت المحادثات عن باقي محادثات العملاء",
-            "en": "Website chats scattered away from other conversations"
-          },
-          "with": {
-            "ar": "ظهور تفاصيل المحادثة أمام الموظف",
-            "en": "The conversation details sit in front of the agent"
-          }
-        },
-        {
-          "without": {
-            "ar": "تأخّر الرد على الأسئلة أثناء تصفّح الموقع",
-            "en": "Slow answers while the visitor is still browsing"
-          },
-          "with": {
-            "ar": "توزيع المحادثة على الموظف المناسب",
-            "en": "The conversation routed to the right agent"
-          }
-        },
-        {
-          "without": {
-            "ar": "فقدان فرصة التواصل مع العميل في الوقت المناسب",
-            "en": "Missing the chance to talk at the right moment"
-          },
-          "with": {
-            "ar": "متابعة المحادثة من أول رسالة حتى إغلاقها",
-            "en": "Follow the conversation from the first message until it closes"
-          }
-        }
-      ]
-    },
-    "journey": {
-      "eyebrow": {
-        "ar": "داخل الشاشة",
-        "en": "Inside the screen"
-      },
-      "title": {
-        "ar": "من زيارة الموقع إلى محادثة مباشرة",
-        "en": "From a website visit to a live conversation"
-      },
-      "lede": {
-        "ar": "تظهر نافذة المحادثة للزائر أثناء تصفّحه، وتصل الرسائل مباشرة إلى فريقك. اضغط أي خطوة لتنتقل إليها.",
-        "en": "The chat window appears to visitors while they browse, and the messages reach your team directly. Tap any step to jump to it."
-      },
-      "steps": [
-        {
-          "title": {
-            "ar": "تظهر للزائر",
-            "en": "It appears to the visitor"
-          },
-          "body": {
-            "ar": "تظهر نافذة المحادثة داخل الموقع بطريقة بسيطة وسهلة الوصول.",
-            "en": "The chat window shows inside the site in a simple, easy-to-reach way."
-          },
-          "art": {
-            "kind": "browser",
-            "url": "yourstore.com",
-            "nav": {
-              "ar": [
-                "الرئيسية",
-                "المنتجات",
-                "السلة"
-              ],
-              "en": [
-                "Home",
-                "Products",
-                "Cart"
-              ]
-            },
-            "bubble": {
-              "ar": "محتاج مساعدة؟",
-              "en": "Need a hand?"
-            }
-          }
-        },
-        {
-          "title": {
-            "ar": "يبدأ المحادثة",
-            "en": "They start the conversation"
-          },
-          "body": {
-            "ar": "يمكن للزائر إرسال سؤاله مباشرة دون مغادرة الموقع.",
-            "en": "The visitor can send their question without leaving the site."
-          },
-          "art": {
-            "kind": "rules",
-            "pairs": [
-              {
-                "when": {
-                  "ar": "كم سعر التوصيل؟",
-                  "en": "How much is delivery?"
-                },
-                "then": {
-                  "ar": "ردّ فوري",
-                  "en": "Instant reply"
-                }
-              },
-              {
-                "when": {
-                  "ar": "متى يوصل طلبي؟",
-                  "en": "When will my order arrive?"
-                },
-                "then": {
-                  "ar": "ردّ فوري",
-                  "en": "Instant reply"
-                }
-              },
-              {
-                "when": {
-                  "ar": "أبغى أكلّم موظف",
-                  "en": "I want a human"
-                },
-                "then": {
-                  "ar": "تحويل",
-                  "en": "Handover"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "title": {
-            "ar": "تصل إلى الفريق",
-            "en": "It reaches the team"
-          },
-          "body": {
-            "ar": "تظهر المحادثة في صندوق الوارد ليتعامل معها الموظف المناسب.",
-            "en": "The conversation appears in the inbox for the right agent to handle."
-          },
-          "art": {
-            "kind": "rows",
-            "active": 0,
-            "items": [
-              {
-                "label": {
-                  "ar": "زائر من صفحة الأسعار",
-                  "en": "Visitor on the pricing page"
-                },
-                "sub": {
-                  "ar": "كم سعر الباقة الاحترافية؟",
-                  "en": "How much is the Professional plan?"
-                },
-                "ch": "livechat",
-                "badge": {
-                  "ar": "جديد",
-                  "en": "New"
-                }
-              },
-              {
-                "label": {
-                  "ar": "نورة العامري",
-                  "en": "Noura Al-Amri"
-                },
-                "sub": {
-                  "ar": "وصلني الطلب، شكراً لكم",
-                  "en": "The order arrived, thank you"
-                },
-                "ch": "whatsapp"
-              },
-              {
-                "label": {
-                  "ar": "متجر لمسة",
-                  "en": "Lamsa Store"
-                },
-                "sub": {
-                  "ar": "كم سعر الباقة الجديدة؟",
-                  "en": "How much is the new plan?"
-                },
-                "ch": "instagram"
-              }
-            ]
-          }
-        },
-        {
-          "title": {
-            "ar": "تستمرّ المحادثة",
-            "en": "The conversation carries on"
-          },
-          "body": {
-            "ar": "يبقى سياق المحادثة محفوظاً حتى يتمكّن الفريق من متابعة العميل بشكل واضح.",
-            "en": "The context of the conversation stays saved, so the team can follow the customer clearly."
-          },
-          "art": {
-            "kind": "card",
-            "title": {
-              "ar": "متابعة على واتساب",
-              "en": "Continued on WhatsApp"
-            },
-            "badge": {
-              "ar": "متّصلة",
-              "en": "Linked"
-            },
-            "rows": [
-              {
-                "k": {
-                  "ar": "بدأت في",
-                  "en": "Started in"
-                },
-                "v": {
-                  "ar": "ويدجت الموقع",
-                  "en": "Site widget"
-                }
-              },
-              {
-                "k": {
-                  "ar": "الصفحة",
-                  "en": "Page"
-                },
-                "v": {
-                  "ar": "الأسعار",
-                  "en": "Pricing"
-                }
-              },
-              {
-                "k": {
-                  "ar": "أُكملت في",
-                  "en": "Finished in"
-                },
-                "v": {
-                  "ar": "واتساب",
-                  "en": "WhatsApp"
-                }
-              }
-            ]
-          }
-        }
-      ]
-    },
-    "extras": {
-      "eyebrow": {
-        "ar": "تفاصيل إضافية",
-        "en": "More details"
-      },
-      "title": {
-        "ar": "أدوات تساعدك على التواصل مع زوار موقعك",
-        "en": "Tools that help you talk with your website visitors"
-      }
-    },
-    "benefits": [
-      {
+        "slug": "chat-widget",
+        "id": "widget",
         "icon": {
           "type": "library",
           "set": "qhub",
           "name": "widget"
         },
         "title": {
-          "ar": "تخصيص شكل المحادثة",
-          "en": "Customise how the chat looks"
-        },
-        "body": {
-          "ar": "تخصيص مظهر نافذة المحادثة بما يتناسب مع هوية نشاطك.",
-          "en": "Adjust the appearance of the chat window to match your brand."
+          "ar": "المحادثة المباشرة",
+          "en": "Live chat"
         }
       },
       {
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "sparkles"
-        },
-        "title": {
-          "ar": "رسالة ترحيبية",
-          "en": "A welcome message"
-        },
-        "body": {
-          "ar": "عرض رسالة ترحيبية للزائر عند فتح نافذة المحادثة.",
-          "en": "Show the visitor a welcome message when the chat window opens."
-        }
-      },
-      {
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "inbox"
-        },
-        "title": {
-          "ar": "بدء المحادثة من صفحات محدّدة",
-          "en": "Start the chat from specific pages"
-        },
-        "body": {
-          "ar": "إظهار المحادثة بطريقة تناسب الصفحات التي يزورها العميل.",
-          "en": "Show the chat in a way that suits the pages your customers visit."
-        }
-      },
-      {
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "chart"
-        },
-        "title": {
-          "ar": "معلومات الزائر",
-          "en": "Visitor information"
-        },
-        "body": {
-          "ar": "الحصول على المعلومات المتاحة عن الزائر وسياق تواصله.",
-          "en": "Get the information available about the visitor and the context of their enquiry."
-        }
-      },
-      {
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "shield"
-        },
-        "title": {
-          "ar": "تحويل إلى الموظف المناسب",
-          "en": "Transfer to the right agent"
-        },
-        "body": {
-          "ar": "انتقال المحادثة إلى الموظف المناسب حسب إعدادات الفريق.",
-          "en": "The conversation moves to the right agent according to your team settings."
-        }
-      },
-      {
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "clock"
-        },
-        "title": {
-          "ar": "متابعة المحادثات",
-          "en": "Follow every conversation"
-        },
-        "body": {
-          "ar": "تبقى جميع المحادثات ضمن صندوق الوارد لمتابعتها والرد عليها.",
-          "en": "All conversations stay in the inbox, ready to be followed and answered."
-        }
-      }
-    ],
-    "details": [
-      {
-        "title": {
-          "ar": "كل تفاصيل المحادثة أمام الموظف",
-          "en": "Every conversation detail in front of the agent"
-        },
-        "shot": "campaigns",
-        "scene": "site-embed",
-        "body": {
-          "ar": "يظهر سياق المحادثة ومعلومات الزائر للموظف، ليسهل فهم السؤال وتقديم الرد المناسب، بما في ذلك الصفحة التي بدأ منها التواصل.",
-          "en": "The context of the conversation and the visitor's information are shown to the agent, making the question easy to understand and answer — including the page the conversation started from."
-        },
-        "points": {
-          "ar": [
-            "رسالة ترحيب تلقائية",
-            "قواعد حسب الصفحة",
-            "أسئلة سريعة جاهزة للنقر",
-            "جمع الإيميل قبل بدء المحادثة"
-          ],
-          "en": [
-            "Automatic welcome message",
-            "Rules per page",
-            "Quick questions ready to tap",
-            "Collect an email before the chat starts"
-          ]
-        }
-      },
-      {
-        "title": {
-          "ar": "تواصل مستمرّ حتى خارج أوقات العمل",
-          "en": "Reachable even outside working hours"
-        },
-        "shot": "ai-settings",
-        "scene": "instant-reply",
-        "body": {
-          "ar": "عندما لا يكون الفريق متاحاً، يمكن للزائر ترك رسالته، وتبقى المحادثة محفوظة حتى يتمكّن الموظف من متابعتها.",
-          "en": "When the team is not available, the visitor can leave their message, and the conversation stays saved until an agent can follow it."
-        },
-        "points": {
-          "ar": [
-            "رد ذكي فوري خارج الدوام",
-            "نموذج بيانات تواصل",
-            "إشعار للزائر عند وصول ردّ",
-            "استكمال المحادثة على واتساب"
-          ],
-          "en": [
-            "Instant smart replies after hours",
-            "Contact details form",
-            "Notify the visitor when a reply arrives",
-            "Continue the conversation on WhatsApp"
-          ]
-        }
-      }
-    ],
-    "liveTitle": {
-      "ar": "الويدجت بألوانه وسلوكه",
-      "en": "The widget, its colours and its behaviour"
-    },
-    "liveHighlight": {
-      "ar": [
-        "بألوانه",
-        "وسلوكه"
-      ],
-      "en": [
-        "colours",
-        "behaviour"
-      ]
-    },
-    "faq": [
-      {
-        "q": {
-          "ar": "هل يمكن إضافة المحادثة إلى موقعي؟",
-          "en": "Can the chat be added to my website?"
-        },
-        "a": {
-          "ar": "نعم، يمكن إضافة نافذة المحادثة إلى موقعك لتكون متاحة للزوار أثناء التصفّح.",
-          "en": "Yes. The chat window can be added to your site so it is available to visitors while they browse."
-        }
-      },
-      {
-        "q": {
-          "ar": "أين تظهر رسائل زوار الموقع؟",
-          "en": "Where do website visitors' messages appear?"
-        },
-        "a": {
-          "ar": "تصل المحادثات مباشرة إلى صندوق الوارد داخل Qhub.",
-          "en": "Conversations arrive straight in the inbox inside Qhub."
-        }
-      },
-      {
-        "q": {
-          "ar": "هل يمكن تخصيص شكل المحادثة؟",
-          "en": "Can the chat's appearance be customised?"
-        },
-        "a": {
-          "ar": "نعم، يمكن تخصيص مظهر المحادثة بما يتناسب مع هوية نشاطك.",
-          "en": "Yes. The chat's look can be adjusted to match your brand."
-        }
-      },
-      {
-        "q": {
-          "ar": "هل يمكن معرفة الصفحة التي بدأ منها الزائر المحادثة؟",
-          "en": "Can I see which page the visitor started the chat from?"
-        },
-        "a": {
-          "ar": "نعم، يمكن معرفة سياق زيارة الزائر والمعلومات المتاحة عنه.",
-          "en": "Yes. You can see the context of the visitor's session and the information available about them."
-        }
-      },
-      {
-        "q": {
-          "ar": "ماذا يحدث إذا لم يكن هناك موظف متاح؟",
-          "en": "What happens if no agent is available?"
-        },
-        "a": {
-          "ar": "يمكن للزائر ترك رسالته، وتبقى المحادثة محفوظة حتى يتمكّن الموظف من متابعتها.",
-          "en": "The visitor can leave their message, and the conversation stays saved until an agent can follow it."
-        }
-      },
-      {
-        "q": {
-          "ar": "هل يمكن تحويل المحادثة إلى موظف معيّن؟",
-          "en": "Can the conversation be transferred to a specific agent?"
-        },
-        "a": {
-          "ar": "نعم، يمكن توزيع المحادثات حسب إعدادات الفريق وتحويلها إلى الموظف المناسب.",
-          "en": "Yes. Conversations can be routed according to your team settings and transferred to the right agent."
-        }
-      },
-      {
-        "q": {
-          "ar": "هل تظهر المحادثات السابقة للموظف؟",
-          "en": "Does the agent see earlier conversations?"
-        },
-        "a": {
-          "ar": "نعم، يظهر سجلّ المحادثة للموظف حتى يتمكّن من متابعة الحوار من النقطة نفسها.",
-          "en": "Yes. The conversation history is shown to the agent, so they can pick up from the same point."
-        }
-      }
-    ]
-  },
-  "integrations": {
-    "eyebrow": {
-      "ar": "القنوات والربط",
-      "en": "Channels & Integrations"
-    },
-    "h1": {
-      "ar": "كل قنوات التواصل في مكان واحد",
-      "en": "Every communication channel in one place"
-    },
-    "highlight": {
-      "ar": [
-        "مكان",
-        "واحد"
-      ],
-      "en": [
-        "one",
-        "place"
-      ]
-    },
-    "lede": {
-      "ar": "اربط قنوات التواصل الخاصة بنشاطك مع Qhub، لتصل جميع المحادثات إلى صندوق وارد واحد يتابعها فريقك بسهولة.",
-      "en": "Connect the channels your business uses to Qhub, so every conversation reaches a single inbox your team can follow easily."
-    },
-    "heroShot": "contacts",
-    "heroRoute": "contacts",
-    "heroScene": "merge",
-    "bullets": {
-      "ar": [
-        "ربط قنوات التواصل من مكان واحد",
-        "جمع المحادثات في صندوق وارد موحّد",
-        "الحفاظ على سياق كل محادثة"
-      ],
-      "en": [
-        "Connect your communication channels from one place",
-        "Gather conversations in a unified inbox",
-        "Keep the context of every conversation"
-      ]
-    },
-    "compare": {
-      "eyebrow": {
-        "ar": "الفرق",
-        "en": "The difference"
-      },
-      "title": {
-        "ar": "قنوات متعدّدة، وتجربة واحدة",
-        "en": "Several channels, one experience"
-      },
-      "withoutLabel": {
-        "ar": "بدون Qhub",
-        "en": "Without Qhub"
-      },
-      "withLabel": {
-        "ar": "مع Qhub",
-        "en": "With Qhub"
-      },
-      "rows": [
-        {
-          "without": {
-            "ar": "المحادثات موزّعة بين أكثر من قناة",
-            "en": "Conversations spread across several channels"
-          },
-          "with": {
-            "ar": "جمع المحادثات في صندوق وارد واحد",
-            "en": "Conversations gathered in a single inbox"
-          }
-        },
-        {
-          "without": {
-            "ar": "التنقّل المستمرّ بين الحسابات والمنصّات",
-            "en": "Constantly switching between accounts and platforms"
-          },
-          "with": {
-            "ar": "الوصول إلى جميع القنوات من مكان واحد",
-            "en": "Reach every channel from one place"
-          }
-        },
-        {
-          "without": {
-            "ar": "صعوبة متابعة جميع المحادثات",
-            "en": "Hard to follow all the conversations"
-          },
-          "with": {
-            "ar": "معرفة مصدر كل محادثة بوضوح",
-            "en": "The source of every conversation is clear"
-          }
-        },
-        {
-          "without": {
-            "ar": "تكرار الرد على العميل نفسه في أكثر من مكان",
-            "en": "Answering the same customer in more than one place"
-          },
-          "with": {
-            "ar": "توزيع المحادثات على الموظفين",
-            "en": "Conversations distributed across the team"
-          }
-        },
-        {
-          "without": {
-            "ar": "صعوبة معرفة مصدر كل محادثة",
-            "en": "Hard to tell which channel a conversation came from"
-          },
-          "with": {
-            "ar": "متابعة العميل مع الحفاظ على كامل سياق المحادثة",
-            "en": "Follow the customer with the full conversation context"
-          }
-        }
-      ]
-    },
-    "journey": {
-      "eyebrow": {
-        "ar": "داخل الشاشة",
-        "en": "Inside the screen"
-      },
-      "title": {
-        "ar": "من الربط إلى إدارة المحادثات",
-        "en": "From connecting to managing conversations"
-      },
-      "lede": {
-        "ar": "بعد ربط القنوات تظهر المحادثات في مكان واحد مع توضيح مصدر كل واحدة. اضغط أي خطوة لتنتقل إليها.",
-        "en": "Once the channels are connected, conversations appear in one place with the source of each one shown. Tap any step to jump to it."
-      },
-      "steps": [
-        {
-          "title": {
-            "ar": "ربط القناة",
-            "en": "Connecting the channel"
-          },
-          "body": {
-            "ar": "إضافة قناة التواصل الخاصة بنشاطك وربطها بحساب Qhub.",
-            "en": "Add the communication channel your business uses and connect it to your Qhub account."
-          },
-          "art": {
-            "kind": "flow",
-            "merge": true,
-            "from": "Qhub",
-            "to": {
-              "ar": [
-                "واتساب",
-                "إنستغرام",
-                "ويدجت الموقع"
-              ],
-              "en": [
-                "WhatsApp",
-                "Instagram",
-                "Site widget"
-              ]
-            }
-          }
-        },
-        {
-          "title": {
-            "ar": "استقبال المحادثات",
-            "en": "Conversations arrive"
-          },
-          "body": {
-            "ar": "تصل المحادثات الجديدة تلقائياً إلى صندوق الوارد الموحّد.",
-            "en": "New conversations reach the unified inbox automatically."
-          },
-          "art": {
-            "kind": "rules",
-            "pairs": [
-              {
-                "when": {
-                  "ar": "رسالة على واتساب",
-                  "en": "A WhatsApp message"
-                },
-                "then": {
-                  "ar": "تصل الصندوق",
-                  "en": "Lands in the inbox"
-                }
-              },
-              {
-                "when": {
-                  "ar": "رسالة على إنستغرام",
-                  "en": "An Instagram message"
-                },
-                "then": {
-                  "ar": "تصل الصندوق",
-                  "en": "Lands in the inbox"
-                }
-              },
-              {
-                "when": {
-                  "ar": "محادثة من موقعك",
-                  "en": "A chat from your site"
-                },
-                "then": {
-                  "ar": "تصل الصندوق",
-                  "en": "Lands in the inbox"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "title": {
-            "ar": "توزيع المحادثات",
-            "en": "Routing the conversations"
-          },
-          "body": {
-            "ar": "تُوزَّع المحادثات على الموظفين والأقسام وفق إعدادات الفريق.",
-            "en": "Conversations are routed to agents and departments according to your team settings."
-          },
-          "art": {
-            "kind": "card",
-            "title": {
-              "ar": "محادثة واردة",
-              "en": "Incoming conversation"
-            },
-            "badge": {
-              "ar": "أُسندت",
-              "en": "Assigned"
-            },
-            "rows": [
-              {
-                "k": {
-                  "ar": "القناة",
-                  "en": "Channel"
-                },
-                "v": {
-                  "ar": "واتساب",
-                  "en": "WhatsApp"
-                }
-              },
-              {
-                "k": {
-                  "ar": "القسم",
-                  "en": "Department"
-                },
-                "v": {
-                  "ar": "المبيعات",
-                  "en": "Sales"
-                }
-              },
-              {
-                "k": {
-                  "ar": "الموظف",
-                  "en": "Agent"
-                },
-                "v": {
-                  "ar": "منال",
-                  "en": "Manal"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "title": {
-            "ar": "متابعة العميل",
-            "en": "Following the customer"
-          },
-          "body": {
-            "ar": "يتابع الموظف المحادثة ويرد عليها مع ظهور كامل السياق.",
-            "en": "The agent follows the conversation and replies with the full context in view."
-          },
-          "art": {
-            "kind": "chat",
-            "turns": [
-              {
-                "from": "customer",
-                "text": {
-                  "ar": "أبغى أستفسر عن خدماتكم",
-                  "en": "I would like to ask about your services"
-                }
-              },
-              {
-                "from": "agent",
-                "text": {
-                  "ar": "أهلاً بك، تفضّل — محادثتك السابقة وتفاصيلها كلها أمامي.",
-                  "en": "Hello — go ahead. Your earlier conversation and all its details are in front of me."
-                }
-              }
-            ]
-          }
-        }
-      ]
-    },
-    "extras": {
-      "eyebrow": {
-        "ar": "تفاصيل إضافية",
-        "en": "More details"
-      },
-      "title": {
-        "ar": "أدوات تساعدك على إدارة القنوات",
-        "en": "Tools that help you manage your channels"
-      }
-    },
-    "benefits": [
-      {
+        "slug": "integrations",
+        "id": "channels",
         "icon": {
           "type": "library",
           "set": "qhub",
           "name": "plug"
         },
         "title": {
-          "ar": "صندوق وارد موحّد",
-          "en": "A unified inbox"
-        },
-        "body": {
-          "ar": "جمع المحادثات القادمة من القنوات المرتبطة في مكان واحد.",
-          "en": "Conversations from the connected channels gathered in one place."
-        }
-      },
-      {
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "widget"
-        },
-        "title": {
-          "ar": "معرفة مصدر المحادثة",
-          "en": "See where a conversation came from"
-        },
-        "body": {
-          "ar": "ظهور القناة التي بدأت منها كل محادثة بشكل واضح.",
-          "en": "The channel each conversation started on is clearly shown."
-        }
-      },
-      {
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "inbox"
-        },
-        "title": {
-          "ar": "ربط أكثر من قناة",
-          "en": "Connect more than one channel"
-        },
-        "body": {
-          "ar": "إمكانية ربط أكثر من قناة تواصل ضمن الحساب نفسه.",
-          "en": "More than one communication channel can be connected within the same account."
-        }
-      },
-      {
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "sparkles"
-        },
-        "title": {
-          "ar": "توزيع المحادثات",
-          "en": "Conversation routing"
-        },
-        "body": {
-          "ar": "توزيع المحادثات على الموظفين والأقسام حسب إعدادات الفريق.",
-          "en": "Conversations routed to agents and departments according to your team settings."
-        }
-      },
-      {
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "shield"
-        },
-        "title": {
-          "ar": "سجلّ موحّد للعميل",
-          "en": "A unified customer record"
-        },
-        "body": {
-          "ar": "الوصول إلى سجلّ المحادثات والمعلومات المرتبطة بالعميل.",
-          "en": "Reach the conversation history and the information tied to the customer."
-        }
-      },
-      {
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "clock"
-        },
-        "title": {
-          "ar": "إدارة القنوات",
-          "en": "Channel management"
-        },
-        "body": {
-          "ar": "إضافة القنوات المرتبطة وإدارة إعداداتها من مكان واحد.",
-          "en": "Add connected channels and manage their settings from one place."
+          "ar": "القنوات والربط",
+          "en": "Channels & integrations"
         }
       }
     ],
-    "details": [
+    "order": [
+      "start",
+      "inbox",
+      "ai",
+      "team",
+      "campaigns",
+      "analytics",
+      "widget",
+      "channels",
+      "pricing",
+      "privacy",
+      "support"
+    ]
+  },
+  "testimonials": {
+    "items": [
       {
-        "title": {
-          "ar": "سياق العميل يبقى واضحاً",
-          "en": "The customer's context stays clear"
+        "quote": {
+          "ar": "وفّر Qhub علينا وقتاً كبيراً؛ يؤدّي المساعد الذكي عمل ثلاثة موظفين، وجميع المحادثات في شاشة واحدة بدل أربعة تطبيقات.",
+          "en": "Qhub saved us a huge amount of time — the AI assistant now does the work of three agents, and every conversation is on one screen instead of four apps."
         },
-        "shot": "inbox",
-        "scene": "channel-list",
-        "body": {
-          "ar": "مهما كانت القناة التي بدأ منها العميل، تبقى تفاصيل المحادثة وسجلّها ومعلوماته واضحة أمام الموظف، ويمكن تحويلها ومتابعتها من النقطة نفسها.",
-          "en": "Whatever channel the customer started on, the conversation details, its history and their information stay clear in front of the agent, and it can be transferred and followed from the same point."
+        "name": {
+          "ar": "سعيد الرواحي",
+          "en": "Said Al-Rawahi"
         },
-        "points": {
-          "ar": [
-            "مصدر كل محادثة ظاهر للموظف",
-            "سجلّ محادثات العميل في مكان واحد",
-            "ملاحظات داخلية على المحادثة",
-            "تحويل المحادثة بكامل سياقها"
-          ],
-          "en": [
-            "The source of every conversation is visible to the agent",
-            "The customer's conversation history in one place",
-            "Internal notes on the conversation",
-            "Transfer a conversation with its full context"
-          ]
-        }
+        "role": {
+          "ar": "مدير التشغيل",
+          "en": "Operations Manager"
+        },
+        "company": {
+          "ar": "متجر لمسة",
+          "en": "Lamsa Store"
+        },
+        "initials": {
+          "ar": "س ر",
+          "en": "SR"
+        },
+        "tint": "#2563EB"
       },
       {
-        "title": {
-          "ar": "ربط أسهل وإدارة أوضح",
-          "en": "Easier connecting, clearer management"
+        "quote": {
+          "ar": "يرد المساعد على ‎70% من الأسئلة المتكرّرة بلهجتنا، وأصبح فريقي يركّز على الحالات التي تحتاج تدخّلاً بشرياً فعلاً.",
+          "en": "The AI assistant answers ‎70% of repeat questions in our own dialect. My team now focuses on the cases that genuinely need a human."
         },
-        "shot": "overview",
-        "scene": "api-hooks",
-        "body": {
-          "ar": "يمكن إدارة القنوات المرتبطة ومتابعة حالتها من مكان واحد، مع إضافة قنوات جديدة أو تعديل إعداداتها أو تعطيلها عند الحاجة.",
-          "en": "Connected channels can be managed and their status followed from one place, adding new channels or changing or disabling their settings when needed."
+        "name": {
+          "ar": "منى الحبسية",
+          "en": "Muna Al-Habsi"
         },
-        "points": {
-          "ar": [
-            "إضافة قناة جديدة وإدارتها",
-            "متابعة حالة كل قناة مرتبطة",
-            "واجهة API وويبهوكس للأنظمة الأخرى",
-            "تعطيل القناة أو فصلها عند الحاجة"
-          ],
-          "en": [
-            "Add a new channel and manage it",
-            "Follow the status of every connected channel",
-            "An API and webhooks for other systems",
-            "Disable or disconnect a channel when needed"
-          ]
-        }
+        "role": {
+          "ar": "مسؤولة خدمة العملاء",
+          "en": "Customer Service Lead"
+        },
+        "company": {
+          "ar": "عيادات نور",
+          "en": "Noor Clinics"
+        },
+        "initials": {
+          "ar": "م ح",
+          "en": "MH"
+        },
+        "tint": "#047857"
+      },
+      {
+        "quote": {
+          "ar": "ربطنا سلة مع Qhub في اليوم نفسه، وأصبح الموظف يرى تفاصيل الطلب أثناء ردّه على العميل؛ الفرق في السرعة واضح.",
+          "en": "We connected Salla to Qhub the same day. Agents see the order details while they reply — it made a huge difference to our speed."
+        },
+        "name": {
+          "ar": "أحمد البلوشي",
+          "en": "Ahmed Al-Balushi"
+        },
+        "role": {
+          "ar": "مؤسس",
+          "en": "Founder"
+        },
+        "company": {
+          "ar": "دكان",
+          "en": "Dukkan"
+        },
+        "initials": {
+          "ar": "أ ب",
+          "en": "AB"
+        },
+        "tint": "#6D28D9"
+      },
+      {
+        "quote": {
+          "ar": "أظهرت لنا التقارير أوقات الذروة بدقّة فعدّلنا ورديّات الفريق، وارتفعت نسبة رضا العملاء من ‎78% إلى ‎94%.",
+          "en": "The reports showed us exactly when our peaks were, so we reshuffled the shifts. Customer satisfaction went from ‎78% to ‎94%."
+        },
+        "name": {
+          "ar": "ريم الكندية",
+          "en": "Reem Al-Kindi"
+        },
+        "role": {
+          "ar": "مديرة تجربة العملاء",
+          "en": "Customer Experience Director"
+        },
+        "company": {
+          "ar": "مجموعة الواحة",
+          "en": "Al-Waha Group"
+        },
+        "initials": {
+          "ar": "ر ك",
+          "en": "RK"
+        },
+        "tint": "#B45309"
       }
-    ],
-    "liveTitle": {
-      "ar": "خطوات الربط لكل منصّة",
-      "en": "The connection steps for each channel"
-    },
-    "liveHighlight": {
-      "ar": [
-        "خطوات",
-        "الربط"
-      ],
-      "en": [
-        "connection",
-        "steps"
-      ]
-    },
-    "faq": [
+    ]
+  },
+  "channels": {
+    "items": [
       {
-        "q": {
-          "ar": "ما القنوات التي يمكن ربطها مع Qhub؟",
-          "en": "Which channels can be connected to Qhub?"
+        "key": "whatsapp",
+        "name": {
+          "ar": "واتساب",
+          "en": "WhatsApp"
         },
-        "a": {
-          "ar": "يمكن ربط القنوات التي يدعمها Qhub وإدارتها من خلال صندوق الوارد الموحّد.",
-          "en": "The channels Qhub supports can be connected and managed through the unified inbox."
+        "tint": "#25D366",
+        "ring": "rgba(37,211,102,.18)",
+        "logo": {
+          "type": "media",
+          "url": "/site-media/channels/whatsapp.svg",
+          "name": "whatsapp.svg",
+          "kind": "icon"
         }
       },
       {
-        "q": {
-          "ar": "هل تظهر جميع المحادثات في مكان واحد؟",
-          "en": "Do all conversations appear in one place?"
+        "key": "instagram",
+        "name": {
+          "ar": "إنستغرام",
+          "en": "Instagram"
         },
-        "a": {
-          "ar": "نعم، تظهر المحادثات القادمة من القنوات المرتبطة داخل صندوق وارد واحد.",
-          "en": "Yes. Conversations from the connected channels appear in a single inbox."
+        "tint": "#D62976",
+        "ring": "rgba(214,41,118,.16)",
+        "logo": {
+          "type": "media",
+          "url": "/site-media/channels/instagram.svg",
+          "name": "instagram.svg",
+          "kind": "icon"
         }
       },
       {
-        "q": {
-          "ar": "هل يمكن معرفة القناة التي بدأت منها المحادثة؟",
-          "en": "Can I see which channel a conversation started on?"
+        "key": "messenger",
+        "name": {
+          "ar": "ماسنجر",
+          "en": "Messenger"
         },
-        "a": {
-          "ar": "نعم، يظهر مصدر كل محادثة بشكل واضح داخل صندوق الوارد.",
-          "en": "Yes. The source of each conversation is clearly shown inside the inbox."
+        "tint": "#006AFF",
+        "ring": "rgba(0,106,255,.16)",
+        "logo": {
+          "type": "media",
+          "url": "/site-media/channels/messenger.svg",
+          "name": "messenger.svg",
+          "kind": "icon"
         }
       },
       {
-        "q": {
-          "ar": "هل يمكن ربط أكثر من قناة في الحساب نفسه؟",
-          "en": "Can more than one channel be connected to the same account?"
+        "key": "telegram",
+        "name": {
+          "ar": "تيليجرام",
+          "en": "Telegram"
         },
-        "a": {
-          "ar": "نعم، يمكن ربط القنوات المتاحة ضمن حساب Qhub نفسه.",
-          "en": "Yes. The available channels can be connected within the same Qhub account."
+        "tint": "#229ED9",
+        "ring": "rgba(34,158,217,.16)",
+        "logo": {
+          "type": "media",
+          "url": "/site-media/channels/telegram.svg",
+          "name": "telegram.svg",
+          "kind": "icon"
         }
       },
       {
-        "q": {
-          "ar": "هل يمكن توزيع المحادثات على الموظفين؟",
-          "en": "Can conversations be distributed across agents?"
+        "key": "x",
+        "name": {
+          "ar": "منصة X",
+          "en": "X"
         },
-        "a": {
-          "ar": "نعم، يمكن توزيع المحادثات حسب الأقسام وإعدادات فريقك.",
-          "en": "Yes. Conversations can be routed by department and by your team's settings."
+        "tint": "#0F1419",
+        "ring": "rgba(15,20,25,.12)",
+        "logo": {
+          "type": "media",
+          "url": "/site-media/channels/x.svg",
+          "name": "x.svg",
+          "kind": "icon"
         }
       },
       {
-        "q": {
-          "ar": "ماذا يحدث عند فصل إحدى القنوات؟",
-          "en": "What happens when a channel is disconnected?"
+        "key": "email",
+        "name": {
+          "ar": "البريد",
+          "en": "Email"
         },
-        "a": {
-          "ar": "تتوقّف المحادثات الجديدة القادمة من القناة بعد فصلها، بينما تبقى المحادثات السابقة محفوظة داخل النظام.",
-          "en": "New conversations from that channel stop once it is disconnected, while earlier conversations stay saved in the system."
+        "tint": "#64748B",
+        "ring": "rgba(100,116,139,.16)",
+        "logo": {
+          "type": "media",
+          "url": "/site-media/channels/email.svg",
+          "name": "email.svg",
+          "kind": "icon"
         }
       },
       {
-        "q": {
-          "ar": "هل يحتفظ Qhub بسجلّ المحادثات؟",
-          "en": "Does Qhub keep a record of conversations?"
+        "key": "gmail",
+        "name": {
+          "ar": "Gmail",
+          "en": "Gmail"
         },
-        "a": {
-          "ar": "نعم، تبقى المحادثات المرتبطة محفوظة ويمكن الرجوع إليها من خلال صندوق الوارد.",
-          "en": "Yes. Connected conversations stay saved and can be revisited through the inbox."
+        "tint": "#EA4335",
+        "ring": "rgba(234,67,53,.14)",
+        "logo": {
+          "type": "media",
+          "url": "/site-media/channels/gmail.svg",
+          "name": "gmail.svg",
+          "kind": "icon"
+        }
+      },
+      {
+        "key": "outlook",
+        "name": {
+          "ar": "Outlook",
+          "en": "Outlook"
+        },
+        "tint": "#0C63B0",
+        "ring": "rgba(12,99,176,.16)",
+        "logo": {
+          "type": "media",
+          "url": "/site-media/channels/outlook.svg",
+          "name": "outlook.svg",
+          "kind": "icon"
+        }
+      },
+      {
+        "key": "yahoo",
+        "name": {
+          "ar": "Yahoo",
+          "en": "Yahoo"
+        },
+        "tint": "#5F01D1",
+        "ring": "rgba(95,1,209,.14)",
+        "logo": {
+          "type": "media",
+          "url": "/site-media/channels/yahoo.svg",
+          "name": "yahoo.svg",
+          "kind": "icon"
+        }
+      },
+      {
+        "key": "smtp",
+        "name": {
+          "ar": "SMTP",
+          "en": "SMTP"
+        },
+        "tint": "#475569",
+        "ring": "rgba(71,85,105,.16)",
+        "logo": {
+          "type": "media",
+          "url": "/site-media/channels/smtp.svg",
+          "name": "smtp.svg",
+          "kind": "icon"
+        }
+      },
+      {
+        "key": "livechat",
+        "name": {
+          "ar": "المحادثة المباشرة",
+          "en": "Live chat"
+        },
+        "tint": "#2563EB",
+        "ring": "rgba(37,99,235,.16)",
+        "logo": {
+          "type": "media",
+          "url": "/site-media/channels/livechat.svg",
+          "name": "livechat.svg",
+          "kind": "icon"
+        }
+      },
+      {
+        "key": "salla",
+        "name": {
+          "ar": "سلة",
+          "en": "Salla"
+        },
+        "tint": "#004D5A",
+        "ring": "rgba(0,77,90,.14)",
+        "logo": {
+          "type": "media",
+          "url": "/site-media/channels/salla.svg",
+          "name": "salla.svg",
+          "kind": "icon"
+        }
+      },
+      {
+        "key": "zid",
+        "name": {
+          "ar": "زد",
+          "en": "Zid"
+        },
+        "tint": "#6B46FF",
+        "ring": "rgba(107,70,255,.16)",
+        "logo": {
+          "type": "media",
+          "url": "/site-media/channels/zid.svg",
+          "name": "zid.svg",
+          "kind": "icon"
+        }
+      },
+      {
+        "key": "shopify",
+        "name": {
+          "ar": "شوبيفاي",
+          "en": "Shopify"
+        },
+        "tint": "#95BF47",
+        "ring": "rgba(149,191,71,.18)",
+        "logo": {
+          "type": "media",
+          "url": "/site-media/channels/shopify.svg",
+          "name": "shopify.svg",
+          "kind": "icon"
+        }
+      },
+      {
+        "key": "woocommerce",
+        "name": {
+          "ar": "ووكومرس",
+          "en": "WooCommerce"
+        },
+        "tint": "#96588A",
+        "ring": "rgba(150,88,138,.16)",
+        "logo": {
+          "type": "media",
+          "url": "/site-media/channels/woocommerce.svg",
+          "name": "woocommerce.svg",
+          "kind": "icon"
         }
       }
     ]
+  },
+  "partners": {
+    "items": [
+      {
+        "key": "sports-for-all",
+        "name": {
+          "ar": "الرياضة للجميع",
+          "en": "Sports for All"
+        },
+        "logo": {
+          "type": "media",
+          "url": "https://qhub-lp.apexes.click/partners/sports-for-all.svg",
+          "name": "sports-for-all.svg",
+          "kind": "image"
+        },
+        "inkRatio": 3.21,
+        "inkFill": 0.22
+      },
+      {
+        "key": "taibah-university",
+        "name": {
+          "ar": "جامعة طيبة",
+          "en": "Taibah University"
+        },
+        "logo": {
+          "type": "media",
+          "url": "https://qhub-lp.apexes.click/partners/taibah-university.svg",
+          "name": "taibah-university.svg",
+          "kind": "image"
+        },
+        "inkRatio": 4.43,
+        "inkFill": 0.96
+      },
+      {
+        "key": "mawhiba",
+        "name": {
+          "ar": "موهبة",
+          "en": "Mawhiba"
+        },
+        "logo": {
+          "type": "media",
+          "url": "https://qhub-lp.apexes.click/partners/mawhiba.svg",
+          "name": "mawhiba.svg",
+          "kind": "image"
+        },
+        "inkRatio": 2.79,
+        "inkFill": 0.99
+      },
+      {
+        "key": "inaash",
+        "name": {
+          "ar": "منصة إنعاش",
+          "en": "Inaash"
+        },
+        "logo": {
+          "type": "media",
+          "url": "https://qhub-lp.apexes.click/partners/inaash.svg",
+          "name": "inaash.svg",
+          "kind": "image"
+        },
+        "inkRatio": 2.44,
+        "inkFill": 0.27
+      },
+      {
+        "key": "rasekh",
+        "name": {
+          "ar": "منصة رسخ",
+          "en": "Rasekh"
+        },
+        "logo": {
+          "type": "media",
+          "url": "https://qhub-lp.apexes.click/partners/rasekh.svg",
+          "name": "rasekh.svg",
+          "kind": "image"
+        },
+        "inkRatio": 3.78,
+        "inkFill": 0.82
+      },
+      {
+        "key": "beem",
+        "name": {
+          "ar": "بيم",
+          "en": "Beem"
+        },
+        "logo": {
+          "type": "media",
+          "url": "https://qhub-lp.apexes.click/partners/beem.svg",
+          "name": "beem.svg",
+          "kind": "image"
+        },
+        "inkRatio": 3.37,
+        "inkFill": 0.16
+      },
+      {
+        "key": "ways",
+        "name": {
+          "ar": "وايز",
+          "en": "Ways"
+        },
+        "logo": {
+          "type": "media",
+          "url": "https://qhub-lp.apexes.click/partners/ways.svg",
+          "name": "ways.svg",
+          "kind": "image"
+        },
+        "inkRatio": 5.06,
+        "inkFill": 0.13
+      },
+      {
+        "key": "wateen",
+        "name": {
+          "ar": "وتين",
+          "en": "Wateen"
+        },
+        "logo": {
+          "type": "media",
+          "url": "https://qhub-lp.apexes.click/partners/wateen.svg",
+          "name": "wateen.svg",
+          "kind": "image"
+        },
+        "inkRatio": 2.39,
+        "inkFill": 0.29
+      },
+      {
+        "key": "momtathil",
+        "name": {
+          "ar": "ممتثل",
+          "en": "Momtathil"
+        },
+        "logo": {
+          "type": "media",
+          "url": "https://qhub-lp.apexes.click/partners/momtathil.svg",
+          "name": "momtathil.svg",
+          "kind": "image"
+        },
+        "inkRatio": 2.68,
+        "inkFill": 0.65
+      },
+      {
+        "key": "rehlat-manafe",
+        "name": {
+          "ar": "رحلات ومنافع",
+          "en": "Rehlat & Manafe"
+        },
+        "logo": {
+          "type": "media",
+          "url": "https://qhub-lp.apexes.click/partners/rehlat-manafe.svg",
+          "name": "rehlat-manafe.svg",
+          "kind": "image"
+        },
+        "inkRatio": 4.5,
+        "inkFill": 1
+      },
+      {
+        "key": "expo-time",
+        "name": {
+          "ar": "اكسبو تايم",
+          "en": "Expo Time"
+        },
+        "logo": {
+          "type": "media",
+          "url": "https://qhub-lp.apexes.click/partners/expo-time.png",
+          "name": "expo-time.png",
+          "kind": "image"
+        },
+        "inkRatio": 3.87,
+        "inkFill": 0.94
+      }
+    ]
+  },
+  "stats": {
+    "items": {
+      "messages": {
+        "to": 12,
+        "suffix": {
+          "ar": "M+",
+          "en": "M+"
+        },
+        "duration": 2200
+      },
+      "channels": {
+        "to": 10,
+        "unit": {
+          "ar": "+",
+          "en": "+"
+        }
+      },
+      "accuracy": {
+        "to": 95,
+        "suffix": {
+          "ar": "%+",
+          "en": "%+"
+        }
+      },
+      "response": {
+        "to": 2.4,
+        "decimals": 1
+      }
+    }
+  },
+  "legal": {
+    "privacy": {
+      "title": {
+        "ar": "سياسة الخصوصية",
+        "en": "Privacy Policy"
+      },
+      "updated": {
+        "ar": "23 أغسطس 2026",
+        "en": "23 August 2026"
+      },
+      "intro": {
+        "ar": "توضّح هذه السياسة أنواع البيانات الي نجمعها منك ومن عملائك، وكيف نستخدمها ونحميها، وما هي حقوقك تجاهها.",
+        "en": "This policy explains what data we collect from you and your customers, how we use and protect it, and what rights you have over it."
+      },
+      "sections": [
+        {
+          "h": {
+            "ar": "البيانات الي نجمعها",
+            "en": "The data we collect"
+          },
+          "p": {
+            "ar": [
+              "نجمع نوعين من البيانات:"
+            ],
+            "en": [
+              "We collect two kinds of data:"
+            ]
+          },
+          "list": {
+            "ar": [
+              "بيانات حسابك: الاسم، البريد الإلكتروني، رقم الجوال، اسم المنشأة وبيانات الفوترة.",
+              "بيانات محادثات عملائك: محتوى الرسائل والمرفقات وأرقام التواصل، وتُخزَّن نيابة عنك بصفتك المتحكّم فيها.",
+              "بيانات استخدام تقنية: عنوان IP، نوع المتصفح والجهاز، وسجلات الدخول والأخطاء."
+            ],
+            "en": [
+              "Your account data: name, email address, phone number, organisation name and billing details.",
+              "Your customers' conversation data: message content, attachments and contact numbers, stored on your behalf while you remain the controller of it.",
+              "Technical usage data: IP address, browser and device type, and sign-in and error logs."
+            ]
+          }
+        },
+        {
+          "h": {
+            "ar": "كيف نستخدم البيانات",
+            "en": "How we use the data"
+          },
+          "p": {
+            "ar": [
+              "نستخدم البيانات لأغراض محدّدة فقط:"
+            ],
+            "en": [
+              "We use data for specific purposes only:"
+            ]
+          },
+          "list": {
+            "ar": [
+              "تشغيل الخدمة وتقديم المزايا الي اشتركت فيها.",
+              "الدعم الفني والرد على استفساراتك.",
+              "تحسين الأداء والاستقرار عبر إحصاءات مجمّعة لا تحدّد هوية أحد.",
+              "الفوترة وإرسال إشعارات الخدمة الأساسية."
+            ],
+            "en": [
+              "Running the service and delivering the features you subscribed to.",
+              "Technical support and answering your questions.",
+              "Improving performance and stability through aggregate statistics that identify nobody.",
+              "Billing and sending essential service notifications."
+            ]
+          }
+        },
+        {
+          "h": {
+            "ar": "الذكاء الاصطناعي وبياناتك",
+            "en": "Artificial intelligence and your data"
+          },
+          "p": {
+            "ar": [
+              "محتوى محادثاتك يُستخدم لتشغيل مزايا الذكاء الاصطناعي داخل حسابك أنت فقط: الردود الآلية وقاعدة المعرفة والتلخيص.",
+              "لا نستخدم بياناتك لتدريب نماذج عامة، ولا نشاركها مع عملاء آخرين."
+            ],
+            "en": [
+              "Your conversation content powers the AI features inside your account only — automatic replies, the knowledge base and summarisation.",
+              "We do not use your data to train general-purpose models, and we never share it with other customers."
+            ]
+          }
+        },
+        {
+          "h": {
+            "ar": "مشاركة البيانات مع أطراف ثالثة",
+            "en": "Sharing data with third parties"
+          },
+          "p": {
+            "ar": [
+              "نشارك الحد الأدنى الضروري مع مزوّدي خدمات يشتغلون نيابة عنا وملتزمين باتفاقيات سرّية ومعالجة بيانات:"
+            ],
+            "en": [
+              "We share the minimum necessary with service providers acting on our behalf under confidentiality and data-processing agreements:"
+            ]
+          },
+          "list": {
+            "ar": [
+              "مزوّدو الاستضافة والبنية التحتية.",
+              "مزوّدو منصّات المراسلة الي تربطها (واتساب، ميتا، تيليجرام وغيرها) وفق شروطهم.",
+              "بوّابات الدفع لمعالجة الاشتراكات.",
+              "جهات حكومية عند وجود إلزام نظامي."
+            ],
+            "en": [
+              "Hosting and infrastructure providers.",
+              "The messaging platforms you connect (WhatsApp, Meta, Telegram and others), subject to their terms.",
+              "Payment gateways, to process subscriptions.",
+              "Government authorities, where legally required."
+            ]
+          }
+        },
+        {
+          "h": {
+            "ar": "أمان البيانات",
+            "en": "Data security"
+          },
+          "p": {
+            "ar": [
+              "نشفّر البيانات أثناء النقل وأثناء التخزين، ونطبّق صلاحيات وصول صارمة داخل فريقنا مع تسجيل كل وصول.",
+              "لا يطّلع أحد من فريقنا على محتوى محادثاتك إلا بطلب دعم منك وبموافقتك."
+            ],
+            "en": [
+              "We encrypt data in transit and at rest, and apply strict internal access controls with every access logged.",
+              "Nobody on our team reads your conversation content unless you open a support request and grant access."
+            ]
+          }
+        },
+        {
+          "h": {
+            "ar": "مدة الاحتفاظ",
+            "en": "Retention period"
+          },
+          "p": {
+            "ar": [
+              "نحتفظ ببياناتك طوال فترة اشتراكك. بعد إنهاء الحساب نحتفظ بها مدة محدودة تسمح لك بالاسترجاع، ثم تُحذف نهائياً ما لم يُلزمنا نظام بخلاف ذلك."
+            ],
+            "en": [
+              "We keep your data for as long as your subscription is active. After the account closes we retain it for a limited window so you can recover it, then delete it permanently unless the law requires otherwise."
+            ]
+          }
+        },
+        {
+          "h": {
+            "ar": "حقوقك",
+            "en": "Your rights"
+          },
+          "p": {
+            "ar": [
+              "تقدر في أي وقت:"
+            ],
+            "en": [
+              "At any time you can:"
+            ]
+          },
+          "list": {
+            "ar": [
+              "تطلب نسخة من بياناتك.",
+              "تصحّح بيانات غير دقيقة.",
+              "تطلب حذف حسابك وبياناته.",
+              "تعترض على معالجة معيّنة أو تسحب موافقتك."
+            ],
+            "en": [
+              "Request a copy of your data.",
+              "Correct inaccurate data.",
+              "Request deletion of your account and its data.",
+              "Object to a specific processing activity or withdraw your consent."
+            ]
+          }
+        },
+        {
+          "h": {
+            "ar": "ملفات تعريف الارتباط",
+            "en": "Cookies"
+          },
+          "p": {
+            "ar": [
+              "نستخدم ملفات ضرورية لتشغيل الموقع وحفظ تفضيلاتك مثل الثيم، وملفات تحليلية اختيارية تقدر ترفضها بدون ما تتأثر الخدمة."
+            ],
+            "en": [
+              "We use cookies that are necessary to run the site and remember preferences such as your theme, plus optional analytics cookies you can decline without affecting the service."
+            ]
+          }
+        },
+        {
+          "h": {
+            "ar": "التعديلات على السياسة",
+            "en": "Changes to this policy"
+          },
+          "p": {
+            "ar": [
+              "قد نحدّث هذه السياسة، ونشعرك بأي تغيير جوهري عبر البريد أو داخل لوحة التحكم قبل سريانه."
+            ],
+            "en": [
+              "We may update this policy, and we will notify you of any material change by email or inside your dashboard before it takes effect."
+            ]
+          }
+        }
+      ]
+    },
+    "terms": {
+      "title": {
+        "ar": "شروط الاستخدام",
+        "en": "Terms of Use"
+      },
+      "updated": {
+        "ar": "23 أغسطس 2026",
+        "en": "23 August 2026"
+      },
+      "intro": {
+        "ar": "باستخدامك منصّة Qhub فأنت توافق على هذه الشروط. اقرأها بعناية لأنها تحدّد حقوقك والتزاماتك.",
+        "en": "By using the Qhub platform you agree to these terms. Please read them carefully — they set out your rights and obligations."
+      },
+      "sections": [
+        {
+          "h": {
+            "ar": "الحساب",
+            "en": "Your account"
+          },
+          "p": {
+            "ar": [
+              "إنشاء الحساب واستخدامه مشروط بالآتي:"
+            ],
+            "en": [
+              "Creating and using an account is conditional on the following:"
+            ]
+          },
+          "list": {
+            "ar": [
+              "تقديم بيانات صحيحة وتحديثها عند تغيّرها.",
+              "أن تكون مخوّلاً بالتعاقد نيابة عن منشأتك.",
+              "المحافظة على سرّية بيانات الدخول، وأنت مسؤول عن أي نشاط يتم عبر حسابك.",
+              "إبلاغنا فوراً عند اشتباهك بأي استخدام غير مصرّح به."
+            ],
+            "en": [
+              "Providing accurate information and keeping it up to date.",
+              "Being authorised to contract on behalf of your organisation.",
+              "Keeping your sign-in credentials confidential; you are responsible for all activity under your account.",
+              "Telling us immediately if you suspect any unauthorised use."
+            ]
+          }
+        },
+        {
+          "h": {
+            "ar": "الاشتراك والدفع",
+            "en": "Subscription and payment"
+          },
+          "p": {
+            "ar": [
+              "الاشتراك يتجدّد تلقائياً في نهاية كل دورة ما لم تلغِه قبل موعد التجديد. تقدر تلغي في أي وقت وتستمر خدمتك لنهاية الدورة المدفوعة.",
+              "الأسعار المعروضة قبل الضريبة، وتُضاف الضريبة حسب دولتك عند الدفع."
+            ],
+            "en": [
+              "Subscriptions renew automatically at the end of each cycle unless cancelled before the renewal date. You may cancel at any time and your service continues to the end of the paid cycle.",
+              "Listed prices are before tax; tax is added for your country at checkout."
+            ]
+          }
+        },
+        {
+          "h": {
+            "ar": "الاستخدام المقبول",
+            "en": "Acceptable use"
+          },
+          "p": {
+            "ar": [
+              "يُمنع استخدام المنصّة في أيٍّ من الآتي:"
+            ],
+            "en": [
+              "The platform may not be used for any of the following:"
+            ]
+          },
+          "list": {
+            "ar": [
+              "إرسال رسائل جماعية غير مرغوبة أو مخالفة لسياسات منصّات المراسلة.",
+              "أي نشاط مخالف للأنظمة أو ينتهك حقوق الغير.",
+              "محاولة اختراق المنصّة أو تعطيلها أو تجاوز حدود باقتك تقنياً.",
+              "إعادة بيع الخدمة أو الوصول إليها آلياً بما يخالف حدود الاستخدام."
+            ],
+            "en": [
+              "Sending unsolicited bulk messages, or anything that breaches messaging platform policies.",
+              "Any activity that breaks the law or infringes the rights of others.",
+              "Attempting to breach or disrupt the platform, or to technically circumvent your plan's limits.",
+              "Reselling the service, or accessing it programmatically beyond the usage limits."
+            ]
+          }
+        },
+        {
+          "h": {
+            "ar": "محتواك وبيانات عملائك",
+            "en": "Your content and your customers' data"
+          },
+          "p": {
+            "ar": [
+              "أنت تملك محتواك وبيانات عملائك، وتمنحنا ترخيصاً محدوداً لمعالجتها لغرض تشغيل الخدمة لك فقط.",
+              "أنت مسؤول عن مشروعية جمع بيانات عملائك والحصول على موافقاتهم اللازمة قبل مراسلتهم."
+            ],
+            "en": [
+              "You own your content and your customers' data, and grant us a limited licence to process it solely to operate the service for you.",
+              "You are responsible for the lawfulness of collecting your customers' data and for obtaining the consents needed before messaging them."
+            ]
+          }
+        },
+        {
+          "h": {
+            "ar": "توفّر الخدمة",
+            "en": "Service availability"
+          },
+          "p": {
+            "ar": [
+              "نسعى لاستمرارية الخدمة، وقد نجري صيانة مجدولة نشعرك بها مسبقاً. الأعطال الناتجة عن منصّات خارجية تربطها خارج نطاق سيطرتنا المباشرة."
+            ],
+            "en": [
+              "We work to keep the service running, and may carry out scheduled maintenance with advance notice. Outages caused by the external platforms you connect are outside our direct control."
+            ]
+          }
+        },
+        {
+          "h": {
+            "ar": "الملكية الفكرية",
+            "en": "Intellectual property"
+          },
+          "p": {
+            "ar": [
+              "المنصّة وتصميمها وشعاراتها وبرمجياتها ملك لنا. لا يمنحك الاشتراك أي حق في نسخها أو اشتقاق أعمال منها."
+            ],
+            "en": [
+              "The platform, its design, logos and software belong to us. Your subscription grants no right to copy them or create derivative works."
+            ]
+          }
+        },
+        {
+          "h": {
+            "ar": "حدود المسؤولية",
+            "en": "Limitation of liability"
+          },
+          "p": {
+            "ar": [
+              "تُقدَّم الخدمة على حالتها. مسؤوليتنا الإجمالية عن أي مطالبة لا تتجاوز ما دفعته خلال الاثني عشر شهراً السابقة للمطالبة، ولا نتحمّل الأضرار غير المباشرة أو فوات الربح."
+            ],
+            "en": [
+              "The service is provided as is. Our total liability for any claim will not exceed what you paid in the twelve months preceding the claim, and we are not liable for indirect damages or lost profit."
+            ]
+          }
+        },
+        {
+          "h": {
+            "ar": "إنهاء الخدمة",
+            "en": "Termination"
+          },
+          "p": {
+            "ar": [
+              "تقدر تنهي اشتراكك في أي وقت. ونقدر نوقف الحساب عند مخالفة جوهرية لهذه الشروط بعد إشعارك ومنحك فرصة معالجة المخالفة، ما لم تكن المخالفة تمسّ أمن المنصّة أو أنظمتها."
+            ],
+            "en": [
+              "You may end your subscription at any time. We may suspend an account for a material breach of these terms after notifying you and giving you a chance to remedy it — unless the breach affects the security of the platform or its systems."
+            ]
+          }
+        },
+        {
+          "h": {
+            "ar": "القانون الواجب التطبيق",
+            "en": "Governing law"
+          },
+          "p": {
+            "ar": [
+              "تخضع هذه الشروط لأنظمة الدولة الي تأسّست فيها الشركة، وتختص محاكمها بأي نزاع ينشأ عنها."
+            ],
+            "en": [
+              "These terms are governed by the laws of the country in which the company is incorporated, and its courts have jurisdiction over any dispute arising from them."
+            ]
+          }
+        }
+      ]
+    },
+    "sla": {
+      "title": {
+        "ar": "اتفاقية مستوى الخدمة",
+        "en": "Service Level Agreement"
+      },
+      "updated": {
+        "ar": "23 أغسطس 2026",
+        "en": "23 August 2026"
+      },
+      "intro": {
+        "ar": "تحدّد هذه الاتفاقية مستوى التوفّر الي نلتزم به، وأزمنة الاستجابة للدعم، والتعويضات عند الإخلال. تنطبق على باقة المؤسسات ما لم يُتّفق على خلافها كتابةً.",
+        "en": "This agreement sets out the availability we commit to, our support response times, and the credits due if we fall short. It applies to the Enterprise plan unless otherwise agreed in writing."
+      },
+      "sections": [
+        {
+          "h": {
+            "ar": "التزام التوفّر",
+            "en": "Availability commitment"
+          },
+          "p": {
+            "ar": [
+              "نلتزم بتوفّر شهري لا يقل عن ‎99.9% لخدمات المنصّة الأساسية، محسوباً على مدار الشهر التقويمي."
+            ],
+            "en": [
+              "We commit to monthly availability of no less than 99.9% for the platform's core services, measured across the calendar month."
+            ]
+          }
+        },
+        {
+          "h": {
+            "ar": "ما لا يُحتسب في التوفّر",
+            "en": "What does not count against availability"
+          },
+          "p": {
+            "ar": [
+              "تُستثنى من الحساب الفترات الآتية:"
+            ],
+            "en": [
+              "The following periods are excluded from the calculation:"
+            ]
+          },
+          "list": {
+            "ar": [
+              "الصيانة المجدولة المُعلَن عنها قبل 48 ساعة على الأقل.",
+              "انقطاعات ناتجة عن منصّات خارجية (واتساب، ميتا، تيليجرام) أو مزوّد اتصالك.",
+              "الاستخدام المخالف لحدود الباقة أو للشروط.",
+              "ظروف قاهرة خارجة عن السيطرة المعقولة."
+            ],
+            "en": [
+              "Scheduled maintenance announced at least 48 hours in advance.",
+              "Outages caused by external platforms (WhatsApp, Meta, Telegram) or by your own connectivity provider.",
+              "Use that breaches your plan's limits or these terms.",
+              "Force majeure events outside reasonable control."
+            ]
+          }
+        },
+        {
+          "h": {
+            "ar": "تصنيف البلاغات وأزمنة الاستجابة",
+            "en": "Issue severity and response times"
+          },
+          "p": {
+            "ar": [
+              "نصنّف البلاغات حسب أثرها على شغلك:"
+            ],
+            "en": [
+              "We classify reports by their impact on your business:"
+            ]
+          },
+          "list": {
+            "ar": [
+              "حرج — توقّف كامل للخدمة: استجابة خلال ساعة، ومتابعة متواصلة حتى الحل.",
+              "عالٍ — تعطّل ميزة أساسية بدون بديل: استجابة خلال 4 ساعات عمل.",
+              "متوسط — خلل يؤثر جزئياً وله بديل: استجابة خلال يوم عمل.",
+              "منخفض — استفسار أو طلب تحسين: استجابة خلال يومَي عمل."
+            ],
+            "en": [
+              "Critical — the service is fully down: response within one hour, and continuous work until resolved.",
+              "High — a core feature is broken with no workaround: response within 4 working hours.",
+              "Medium — a partial fault with a workaround: response within one working day.",
+              "Low — a question or an improvement request: response within two working days."
+            ]
+          }
+        },
+        {
+          "h": {
+            "ar": "التعويض عند الإخلال",
+            "en": "Credits when we fall short"
+          },
+          "p": {
+            "ar": [
+              "إذا نزل التوفّر الشهري عن الالتزام، تستحق رصيداً على فاتورة الشهر التالي:"
+            ],
+            "en": [
+              "If monthly availability drops below our commitment, you earn a credit on the following month's invoice:"
+            ]
+          },
+          "list": {
+            "ar": [
+              "أقل من ‎99.9% وحتى ‎99.0%: رصيد ‎10% من قيمة الاشتراك الشهري.",
+              "أقل من ‎99.0% وحتى ‎95.0%: رصيد ‎25%.",
+              "أقل من ‎95.0%: رصيد ‎50%."
+            ],
+            "en": [
+              "Below 99.9% down to 99.0%: a credit of 10% of the monthly subscription.",
+              "Below 99.0% down to 95.0%: a credit of 25%.",
+              "Below 95.0%: a credit of 50%."
+            ]
+          }
+        },
+        {
+          "h": {
+            "ar": "كيف تطلب التعويض",
+            "en": "How to claim a credit"
+          },
+          "p": {
+            "ar": [
+              "تُقدَّم المطالبة خلال 30 يوماً من نهاية الشهر المتأثر عبر قنوات الدعم، مع بيان فترات الانقطاع. نراجعها ونرد خلال 10 أيام عمل.",
+              "الرصيد هو التعويض الوحيد المستحق عن الإخلال بمستوى التوفّر."
+            ],
+            "en": [
+              "Submit the claim within 30 days of the end of the affected month through our support channels, listing the outage periods. We review it and reply within 10 working days.",
+              "The credit is the sole remedy for a breach of the availability commitment."
+            ]
+          }
+        },
+        {
+          "h": {
+            "ar": "النسخ الاحتياطي والاسترجاع",
+            "en": "Backup and recovery"
+          },
+          "p": {
+            "ar": [
+              "نأخذ نسخاً احتياطية يومية ونحتفظ بها 30 يوماً. هدف زمن الاسترجاع 4 ساعات، وهدف نقطة الاسترجاع 24 ساعة."
+            ],
+            "en": [
+              "We take daily backups and retain them for 30 days. Our recovery time objective is 4 hours and our recovery point objective is 24 hours."
+            ]
+          }
+        },
+        {
+          "h": {
+            "ar": "الدعم المخصّص",
+            "en": "Dedicated support"
+          },
+          "p": {
+            "ar": [
+              "تشمل باقة المؤسسات مدير حساب مخصّص، وقناة دعم مباشرة، ومراجعة دورية لأداء حسابك واستخدامك للمنصّة."
+            ],
+            "en": [
+              "The Enterprise plan includes a dedicated account manager, a direct support channel, and a regular review of your account's performance and platform usage."
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "pricing": {
+    "page": {
+      "eyebrow": {
+        "ar": "الأسعار",
+        "en": "Pricing"
+      },
+      "title": {
+        "ar": "باقات مخصّصة لتناسب احتياجات عملك",
+        "en": "Plans tailored to what your business needs"
+      },
+      "highlight": {
+        "ar": [
+          "مخصّصة",
+          "لتناسب",
+          "احتياجات",
+          "عملك"
+        ],
+        "en": [
+          "tailored",
+          "to",
+          "what",
+          "your",
+          "business",
+          "needs"
+        ]
+      },
+      "lede": {
+        "ar": "ابدأ مجاناً 7 أيام، دون بطاقة ائتمان، ويمكنك ترقية باقتك أو تخفيضها في أي وقت.",
+        "en": "Start with 7 days free — no credit card, and you can move up or down a plan whenever you want."
+      },
+      "eyebrowIcon": {
+        "type": "library",
+        "set": "qhub",
+        "name": "shield"
+      }
+    },
+    "table": {
+      "compare": {
+        "ar": "قارن المزايا",
+        "en": "Compare features"
+      },
+      "featured": {
+        "ar": "الأكثر اختياراً",
+        "en": "Most popular"
+      },
+      "per": {
+        "ar": "محادثة / شهر",
+        "en": "conversations / month"
+      },
+      "perMonth": {
+        "ar": "/ شهرياً",
+        "en": "/ month"
+      },
+      "subscribe": {
+        "ar": "اشترك الآن",
+        "en": "Subscribe now"
+      },
+      "onRequest": {
+        "ar": "السعر بالتواصل",
+        "en": "Price on request"
+      },
+      "helpTitle": {
+        "ar": "لست متأكداً من الباقة المناسبة؟",
+        "en": "Not sure which plan fits?"
+      },
+      "helpBody": {
+        "ar": "تحدّث إلينا لنساعدك في الاختيار حسب حجم فريقك وعدد محادثاتك.",
+        "en": "Talk to us and we'll help you pick based on your team size and conversation volume."
+      },
+      "helpCta": {
+        "ar": "تواصل معنا",
+        "en": "Contact us"
+      },
+      "yes": {
+        "ar": "متوفرة",
+        "en": "Included"
+      },
+      "no": {
+        "ar": "غير متوفرة",
+        "en": "Not included"
+      }
+    },
+    "slider": {
+      "ask": {
+        "ar": "كم محادثة تستقبل شهرياً؟ اسحب المؤشّر —",
+        "en": "How many conversations do you handle each month? Drag the handle —"
+      },
+      "match": {
+        "ar": "الباقة المناسبة: {0}",
+        "en": "your plan: {0}"
+      },
+      "label": {
+        "ar": "اختيار الباقة حسب عدد المحادثات شهرياً",
+        "en": "Pick a plan by monthly conversation volume"
+      },
+      "per": {
+        "ar": "محادثة / شهر",
+        "en": "conversations / month"
+      }
+    },
+    "enterprise": {
+      "cta": {
+        "ar": "تواصل معنا",
+        "en": "Contact us"
+      },
+      "sentTitle": {
+        "ar": "وصلنا طلبك",
+        "en": "We got your request"
+      },
+      "sentBody": {
+        "ar": "فريق المؤسسات بيتواصل معك خلال يوم عمل واحد بعرض مفصّل يناسب حجم منشأتك.",
+        "en": "Our enterprise team will reach out within one business day with a detailed proposal for your organisation."
+      },
+      "close": {
+        "ar": "إغلاق",
+        "en": "Close"
+      },
+      "title": {
+        "ar": "اطلب اشتراك المؤسسات",
+        "en": "Request an Enterprise plan"
+      },
+      "lede": {
+        "ar": "نجهّز لك عرضاً مبنياً على حجم فريقك ومحادثاتك، مع SLA ومدير حساب مخصّص.",
+        "en": "We'll build a proposal around your team size and conversation volume — with an SLA and a dedicated account manager."
+      },
+      "company": {
+        "ar": "اسم المنشأة",
+        "en": "Organisation name"
+      },
+      "companyPh": {
+        "ar": "شركة …",
+        "en": "Company …"
+      },
+      "contactName": {
+        "ar": "اسم المسؤول",
+        "en": "Contact name"
+      },
+      "contactNamePh": {
+        "ar": "اسمك الكامل",
+        "en": "Your full name"
+      },
+      "email": {
+        "ar": "البريد الإلكتروني",
+        "en": "Email address"
+      },
+      "phone": {
+        "ar": "رقم الجوال",
+        "en": "Phone number"
+      },
+      "dialLabel": {
+        "ar": "مقدّمة الدولة",
+        "en": "Country code"
+      },
+      "phonePh": {
+        "ar": "9000 0000",
+        "en": "9000 0000"
+      },
+      "agents": {
+        "ar": "حد الموظفين المطلوب",
+        "en": "Agents needed"
+      },
+      "agentsPh": {
+        "ar": "مثال: 120",
+        "en": "e.g. 120"
+      },
+      "channels": {
+        "ar": "حد القنوات المطلوب",
+        "en": "Channels needed"
+      },
+      "channelsPh": {
+        "ar": "مثال: 15",
+        "en": "e.g. 15"
+      },
+      "convos": {
+        "ar": "حد المحادثات المطلوب",
+        "en": "Monthly conversations needed"
+      },
+      "convosPh": {
+        "ar": "مثال: 50,000",
+        "en": "e.g. 50,000"
+      },
+      "limitsNote": {
+        "ar": "نرشّح لك الباقة المناسبة من باقات المؤسسات بناءً على هذه الأرقام.",
+        "en": "We'll suggest the right Enterprise plan based on these numbers."
+      },
+      "needs": {
+        "ar": "احتياجاتك أو استفسارك (اختياري)",
+        "en": "Your needs or questions (optional)"
+      },
+      "needsPh": {
+        "ar": "أخبرنا باحتياجاتك الخاصة، الميزات المطلوبة، أو أي متطلبات أمنية…",
+        "en": "Tell us about your specific needs, the features you want, or any security requirements…"
+      },
+      "replyNote": {
+        "ar": "نرد خلال يوم عمل واحد.",
+        "en": "We reply within one business day."
+      },
+      "sending": {
+        "ar": "جارٍ الإرسال…",
+        "en": "Sending…"
+      },
+      "send": {
+        "ar": "إرسال الطلب",
+        "en": "Send request"
+      }
+    },
+    "plans": [
+      {
+        "id": "starter",
+        "name": {
+          "ar": "البداية",
+          "en": "Starter"
+        },
+        "tagline": {
+          "ar": "لصاحب المشروع في بدايته",
+          "en": "For the founder just getting going"
+        },
+        "reach": {
+          "ar": "حتى 500",
+          "en": "Up to 500"
+        },
+        "perks": {
+          "ar": [
+            "قناتان",
+            "موظفان",
+            "500 محادثة شهرياً",
+            "ردود AI أساسية"
+          ],
+          "en": [
+            "2 channels",
+            "2 agents",
+            "500 conversations a month",
+            "Basic AI replies"
+          ]
+        }
+      },
+      {
+        "id": "pro",
+        "name": {
+          "ar": "الاحترافية",
+          "en": "Professional"
+        },
+        "tagline": {
+          "ar": "للفرق التي تنمو بسرعة",
+          "en": "For teams growing fast"
+        },
+        "reach": {
+          "ar": "حتى 2,500",
+          "en": "Up to 2,500"
+        },
+        "perks": {
+          "ar": [
+            "5 قنوات",
+            "7 موظفين",
+            "محادثات غير محدودة",
+            "قاعدة معرفة + حملات"
+          ],
+          "en": [
+            "5 channels",
+            "7 agents",
+            "Unlimited conversations",
+            "Knowledge base + campaigns"
+          ]
+        },
+        "featured": true
+      },
+      {
+        "id": "business",
+        "name": {
+          "ar": "الأعمال",
+          "en": "Business"
+        },
+        "tagline": {
+          "ar": "لفرق خدمة العملاء الكاملة",
+          "en": "For a full customer service team"
+        },
+        "reach": {
+          "ar": "حتى 10,000",
+          "en": "Up to 10,000"
+        },
+        "perks": {
+          "ar": [
+            "كل القنوات",
+            "20 موظف",
+            "تقارير متقدّمة",
+            "تكاملات المتاجر"
+          ],
+          "en": [
+            "Every channel",
+            "20 agents",
+            "Advanced reports",
+            "Store integrations"
+          ]
+        }
+      },
+      {
+        "id": "enterprise",
+        "name": {
+          "ar": "المؤسسات",
+          "en": "Enterprise"
+        },
+        "tagline": {
+          "ar": "لمن يحتاج تحكّم كامل",
+          "en": "For teams that need full control"
+        },
+        "reach": {
+          "ar": "‎+10,000",
+          "en": "10,000+"
+        },
+        "perks": {
+          "ar": [
+            "موظفون بلا حد",
+            "SLA مخصّص",
+            "مدير حساب",
+            "تكامل API كامل"
+          ],
+          "en": [
+            "Unlimited agents",
+            "Custom SLA",
+            "Account manager",
+            "Full API integration"
+          ]
+        },
+        "contactOnly": true
+      }
+    ],
+    "comparison": [
+      {
+        "title": {
+          "ar": "الأساسيات",
+          "en": "Essentials"
+        },
+        "rows": [
+          {
+            "label": {
+              "ar": "القنوات المتصلة",
+              "en": "Connected channels"
+            },
+            "values": {
+              "ar": [
+                "قناتان",
+                "5 قنوات",
+                "كل القنوات",
+                "كل القنوات"
+              ],
+              "en": [
+                "2 channels",
+                "5 channels",
+                "Every channel",
+                "Every channel"
+              ]
+            }
+          },
+          {
+            "label": {
+              "ar": "عدد الموظفين",
+              "en": "Agents"
+            },
+            "values": {
+              "ar": [
+                "2",
+                "7",
+                "20",
+                "بلا حد"
+              ],
+              "en": [
+                "2",
+                "7",
+                "20",
+                "Unlimited"
+              ]
+            }
+          },
+          {
+            "label": {
+              "ar": "المحادثات شهرياً",
+              "en": "Conversations per month"
+            },
+            "values": {
+              "ar": [
+                "500",
+                "2,500",
+                "10,000",
+                "بلا حدّ"
+              ],
+              "en": [
+                "500",
+                "2,500",
+                "10,000",
+                "Unlimited"
+              ]
+            }
+          },
+          {
+            "label": {
+              "ar": "جهات الاتصال",
+              "en": "Contacts"
+            },
+            "values": {
+              "ar": [
+                "1,000",
+                "10,000",
+                "غير محدودة",
+                "غير محدودة"
+              ],
+              "en": [
+                "1,000",
+                "10,000",
+                "Unlimited",
+                "Unlimited"
+              ]
+            }
+          },
+          {
+            "label": {
+              "ar": "الأقسام",
+              "en": "Departments"
+            },
+            "values": {
+              "ar": [
+                false,
+                "3",
+                "10",
+                "بلا حد"
+              ],
+              "en": [
+                false,
+                "3",
+                "10",
+                "Unlimited"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "title": {
+          "ar": "الذكاء الاصطناعي",
+          "en": "Artificial intelligence"
+        },
+        "rows": [
+          {
+            "label": {
+              "ar": "ردود تلقائية ذكية",
+              "en": "Smart automatic replies"
+            },
+            "values": {
+              "ar": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "en": [
+                true,
+                true,
+                true,
+                true
+              ]
+            }
+          },
+          {
+            "label": {
+              "ar": "فهم اللهجات العربية",
+              "en": "Arabic dialect understanding"
+            },
+            "values": {
+              "ar": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "en": [
+                true,
+                true,
+                true,
+                true
+              ]
+            }
+          },
+          {
+            "label": {
+              "ar": "قاعدة معرفة مخصّصة",
+              "en": "Custom knowledge base"
+            },
+            "values": {
+              "ar": [
+                false,
+                true,
+                true,
+                true
+              ],
+              "en": [
+                false,
+                true,
+                true,
+                true
+              ]
+            }
+          },
+          {
+            "label": {
+              "ar": "تخصيص شخصية البوت",
+              "en": "Custom bot personality"
+            },
+            "values": {
+              "ar": [
+                false,
+                true,
+                true,
+                true
+              ],
+              "en": [
+                false,
+                true,
+                true,
+                true
+              ]
+            }
+          },
+          {
+            "label": {
+              "ar": "تفريغ الرسائل الصوتية",
+              "en": "Voice message transcription"
+            },
+            "values": {
+              "ar": [
+                false,
+                false,
+                true,
+                true
+              ],
+              "en": [
+                false,
+                false,
+                true,
+                true
+              ]
+            }
+          },
+          {
+            "label": {
+              "ar": "تحويل تلقائي للموظف",
+              "en": "Automatic handoff to an agent"
+            },
+            "values": {
+              "ar": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "en": [
+                true,
+                true,
+                true,
+                true
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "title": {
+          "ar": "التسويق",
+          "en": "Marketing"
+        },
+        "rows": [
+          {
+            "label": {
+              "ar": "حملات واتساب",
+              "en": "WhatsApp campaigns"
+            },
+            "values": {
+              "ar": [
+                false,
+                true,
+                true,
+                true
+              ],
+              "en": [
+                false,
+                true,
+                true,
+                true
+              ]
+            }
+          },
+          {
+            "label": {
+              "ar": "حملات إيميل",
+              "en": "Email campaigns"
+            },
+            "values": {
+              "ar": [
+                false,
+                true,
+                true,
+                true
+              ],
+              "en": [
+                false,
+                true,
+                true,
+                true
+              ]
+            }
+          },
+          {
+            "label": {
+              "ar": "قوالب جاهزة",
+              "en": "Ready-made templates"
+            },
+            "values": {
+              "ar": [
+                false,
+                true,
+                true,
+                true
+              ],
+              "en": [
+                false,
+                true,
+                true,
+                true
+              ]
+            }
+          },
+          {
+            "label": {
+              "ar": "جدولة الإرسال",
+              "en": "Send scheduling"
+            },
+            "values": {
+              "ar": [
+                false,
+                false,
+                true,
+                true
+              ],
+              "en": [
+                false,
+                false,
+                true,
+                true
+              ]
+            }
+          },
+          {
+            "label": {
+              "ar": "تقارير الحملات",
+              "en": "Campaign reports"
+            },
+            "values": {
+              "ar": [
+                false,
+                true,
+                true,
+                true
+              ],
+              "en": [
+                false,
+                true,
+                true,
+                true
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "title": {
+          "ar": "الإدارة والتقارير",
+          "en": "Management & reporting"
+        },
+        "rows": [
+          {
+            "label": {
+              "ar": "أدوار وصلاحيات",
+              "en": "Roles and permissions"
+            },
+            "values": {
+              "ar": [
+                false,
+                true,
+                true,
+                true
+              ],
+              "en": [
+                false,
+                true,
+                true,
+                true
+              ]
+            }
+          },
+          {
+            "label": {
+              "ar": "ساعات عمل للموظفين",
+              "en": "Agent working hours"
+            },
+            "values": {
+              "ar": [
+                false,
+                true,
+                true,
+                true
+              ],
+              "en": [
+                false,
+                true,
+                true,
+                true
+              ]
+            }
+          },
+          {
+            "label": {
+              "ar": "تقارير الأداء",
+              "en": "Performance reports"
+            },
+            "values": {
+              "ar": [
+                "أساسية",
+                "متقدّمة",
+                "متقدّمة",
+                "متقدّمة"
+              ],
+              "en": [
+                "Basic",
+                "Advanced",
+                "Advanced",
+                "Advanced"
+              ]
+            }
+          },
+          {
+            "label": {
+              "ar": "تقييمات العملاء",
+              "en": "Customer ratings"
+            },
+            "values": {
+              "ar": [
+                false,
+                true,
+                true,
+                true
+              ],
+              "en": [
+                false,
+                true,
+                true,
+                true
+              ]
+            }
+          },
+          {
+            "label": {
+              "ar": "تصدير التقارير",
+              "en": "Report export"
+            },
+            "values": {
+              "ar": [
+                false,
+                false,
+                true,
+                true
+              ],
+              "en": [
+                false,
+                false,
+                true,
+                true
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "title": {
+          "ar": "الربط والدعم",
+          "en": "Integrations & support"
+        },
+        "rows": [
+          {
+            "label": {
+              "ar": "ويدجت المحادثة",
+              "en": "Chat widget"
+            },
+            "values": {
+              "ar": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "en": [
+                true,
+                true,
+                true,
+                true
+              ]
+            }
+          },
+          {
+            "label": {
+              "ar": "سلة وزد",
+              "en": "Salla and Zid"
+            },
+            "values": {
+              "ar": [
+                false,
+                true,
+                true,
+                true
+              ],
+              "en": [
+                false,
+                true,
+                true,
+                true
+              ]
+            }
+          },
+          {
+            "label": {
+              "ar": "شوبيفاي وووكومرس",
+              "en": "Shopify and WooCommerce"
+            },
+            "values": {
+              "ar": [
+                false,
+                false,
+                true,
+                true
+              ],
+              "en": [
+                false,
+                false,
+                true,
+                true
+              ]
+            }
+          },
+          {
+            "label": {
+              "ar": "تكامل API",
+              "en": "API integration"
+            },
+            "values": {
+              "ar": [
+                false,
+                false,
+                "محدود",
+                "كامل"
+              ],
+              "en": [
+                false,
+                false,
+                "Limited",
+                "Full"
+              ]
+            }
+          },
+          {
+            "label": {
+              "ar": "الدعم",
+              "en": "Support"
+            },
+            "values": {
+              "ar": [
+                "إيميل",
+                "أولوية",
+                "أولوية",
+                "مدير حساب"
+              ],
+              "en": [
+                "Email",
+                "Priority",
+                "Priority",
+                "Account manager"
+              ]
+            }
+          },
+          {
+            "label": {
+              "ar": "اتفاقية مستوى خدمة (SLA)",
+              "en": "Service level agreement (SLA)"
+            },
+            "values": {
+              "ar": [
+                false,
+                false,
+                false,
+                true
+              ],
+              "en": [
+                false,
+                false,
+                false,
+                true
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "site": {
+    "links": {
+      "name": {
+        "ar": "Qhub",
+        "en": "Qhub"
+      },
+      "appUrl": {
+        "ar": "https://qhub-client.apexes.click/overview",
+        "en": "https://qhub-client.apexes.click/overview"
+      },
+      "loginUrl": {
+        "ar": "https://qhub-client.apexes.click/login",
+        "en": "https://qhub-client.apexes.click/login"
+      },
+      "signupUrl": {
+        "ar": "https://qhub-client.apexes.click/register",
+        "en": "https://qhub-client.apexes.click/register"
+      },
+      "email": {
+        "ar": "info@qhub.sa",
+        "en": "info@qhub.sa"
+      },
+      "whatsapp": {
+        "ar": "+968 0000 0000",
+        "en": "+968 0000 0000"
+      }
+    },
+    "navbar": {
+      "home": {
+        "ar": "Qhub — الرئيسية",
+        "en": "Qhub — Home"
+      },
+      "login": {
+        "ar": "تسجيل دخول",
+        "en": "Log in"
+      },
+      "start": {
+        "ar": "ابدأ مجاناً",
+        "en": "Start free"
+      },
+      "menu": {
+        "ar": "القائمة",
+        "en": "Menu"
+      }
+    },
+    "nav": [
+      {
+        "label": {
+          "ar": "الرئيسية",
+          "en": "Home"
+        },
+        "href": "/"
+      },
+      {
+        "label": {
+          "ar": "المزايا",
+          "en": "Product"
+        },
+        "href": "/features",
+        "children": [
+          {
+            "slug": "unified-inbox",
+            "title": {
+              "ar": "المحادثات الموحدة",
+              "en": "Unified Inbox"
+            },
+            "blurb": {
+              "ar": "كل محادثات عملائك في Inbox واحد",
+              "en": "Every channel in one place"
+            },
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "inbox"
+            }
+          },
+          {
+            "slug": "ai-assistant",
+            "title": {
+              "ar": "مساعد الذكاء الاصطناعي",
+              "en": "AI Assistant"
+            },
+            "blurb": {
+              "ar": "ردود فورية، مع فهم للسياق وطريقة كلام العميل",
+              "en": "Instant replies that read the context"
+            },
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "sparkles"
+            }
+          },
+          {
+            "slug": "campaigns",
+            "title": {
+              "ar": "الحملات التسويقية",
+              "en": "Campaigns"
+            },
+            "blurb": {
+              "ar": "إنشاء وإرسال وإدارة الحملات من مكان واحد",
+              "en": "WhatsApp and email campaigns in one place"
+            },
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "megaphone"
+            }
+          },
+          {
+            "slug": "team",
+            "title": {
+              "ar": "إدارة الفريق والصلاحيات",
+              "en": "Team & Permissions"
+            },
+            "blurb": {
+              "ar": "تنظيم المحادثات وتوزيعها على الفريق",
+              "en": "Roles, departments and working hours"
+            },
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "users"
+            }
+          },
+          {
+            "slug": "analytics",
+            "title": {
+              "ar": "التقارير والتحليلات",
+              "en": "Reports & Analytics"
+            },
+            "blurb": {
+              "ar": "بيانات واضحة لمتابعة أداء فريقك",
+              "en": "Reply time and team performance"
+            },
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "chart"
+            }
+          },
+          {
+            "slug": "chat-widget",
+            "title": {
+              "ar": "التواصل المباشر (Chat Widget)",
+              "en": "Chat Widget"
+            },
+            "blurb": {
+              "ar": "تواصل مباشر مع زوار موقعك",
+              "en": "A live chat widget on the website"
+            },
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "widget"
+            }
+          },
+          {
+            "slug": "integrations",
+            "title": {
+              "ar": "القنوات والربط",
+              "en": "Channels & Integrations"
+            },
+            "blurb": {
+              "ar": "قنوات التواصل ومتجرك في مكان واحد",
+              "en": "Your channels and your store in one place"
+            },
+            "icon": {
+              "type": "library",
+              "set": "qhub",
+              "name": "plug"
+            }
+          }
+        ]
+      },
+      {
+        "label": {
+          "ar": "الحلول",
+          "en": "Solutions"
+        },
+        "href": "/solutions"
+      },
+      {
+        "label": {
+          "ar": "الأسعار",
+          "en": "Pricing"
+        },
+        "href": "/pricing"
+      },
+      {
+        "label": {
+          "ar": "الأسئلة الشائعة",
+          "en": "FAQ"
+        },
+        "href": "/faq"
+      }
+    ],
+    "footer": {
+      "blurb": {
+        "ar": "منصة عربية توحّد محادثات عملائك من كل القنوات، مع مساعد ذكاء اصطناعي يفهم لهجتهم.",
+        "en": "An Arabic-first platform that brings every customer conversation into one place, with an AI assistant that speaks their dialect."
+      },
+      "rights": {
+        "ar": "جميع الحقوق محفوظة.",
+        "en": "All rights reserved."
+      },
+      "socials": {
+        "x": {
+          "ar": "إكس",
+          "en": "X"
+        },
+        "linkedin": {
+          "ar": "لينكدإن",
+          "en": "LinkedIn"
+        },
+        "instagram": {
+          "ar": "إنستغرام",
+          "en": "Instagram"
+        }
+      },
+      "groups": [
+        {
+          "title": {
+            "ar": "المنتج",
+            "en": "Product"
+          },
+          "links": [
+            {
+              "label": {
+                "ar": "المحادثات الموحدة",
+                "en": "Unified Inbox"
+              },
+              "href": "/features/unified-inbox"
+            },
+            {
+              "label": {
+                "ar": "مساعد الذكاء الاصطناعي",
+                "en": "AI Assistant"
+              },
+              "href": "/features/ai-assistant"
+            },
+            {
+              "label": {
+                "ar": "الحملات التسويقية",
+                "en": "Campaigns"
+              },
+              "href": "/features/campaigns"
+            },
+            {
+              "label": {
+                "ar": "إدارة الفريق والصلاحيات",
+                "en": "Team & Permissions"
+              },
+              "href": "/features/team"
+            },
+            {
+              "label": {
+                "ar": "التقارير والتحليلات",
+                "en": "Reports & Analytics"
+              },
+              "href": "/features/analytics"
+            },
+            {
+              "label": {
+                "ar": "التواصل المباشر (Chat Widget)",
+                "en": "Chat Widget"
+              },
+              "href": "/features/chat-widget"
+            },
+            {
+              "label": {
+                "ar": "القنوات والربط",
+                "en": "Channels & Integrations"
+              },
+              "href": "/features/integrations"
+            }
+          ]
+        },
+        {
+          "title": {
+            "ar": "الشركة",
+            "en": "Company"
+          },
+          "links": [
+            {
+              "label": {
+                "ar": "الحلول",
+                "en": "Solutions"
+              },
+              "href": "/solutions"
+            },
+            {
+              "label": {
+                "ar": "الأسعار",
+                "en": "Pricing"
+              },
+              "href": "/pricing"
+            },
+            {
+              "label": {
+                "ar": "الأسئلة الشائعة",
+                "en": "FAQ"
+              },
+              "href": "/faq"
+            },
+            {
+              "label": {
+                "ar": "تواصل معنا",
+                "en": "Contact us"
+              },
+              "href": "/contact"
+            }
+          ]
+        },
+        {
+          "title": {
+            "ar": "قانوني",
+            "en": "Legal"
+          },
+          "links": [
+            {
+              "label": {
+                "ar": "سياسة الخصوصية",
+                "en": "Privacy Policy"
+              },
+              "href": "/legal/privacy"
+            },
+            {
+              "label": {
+                "ar": "شروط الاستخدام",
+                "en": "Terms of Use"
+              },
+              "href": "/legal/terms"
+            },
+            {
+              "label": {
+                "ar": "اتفاقية مستوى الخدمة",
+                "en": "Service Level Agreement"
+              },
+              "href": "/legal/sla"
+            }
+          ]
+        }
+      ],
+      "links": [
+        {
+          "key": "x",
+          "href": "https://x.com"
+        },
+        {
+          "key": "linkedin",
+          "href": "https://linkedin.com"
+        },
+        {
+          "key": "instagram",
+          "href": "https://instagram.com"
+        }
+      ]
+    },
+    "payments": {
+      "ar": "وسائل الدفع المقبولة",
+      "en": "Accepted payment methods"
+    }
+  },
+  "seo": {
+    "root": {
+      "title": {
+        "ar": "Qhub — كل محادثات عملائك في مكان واحد",
+        "en": "Qhub — Every customer conversation in one place"
+      },
+      "description": {
+        "ar": "منصة عربية توحّد محادثات واتساب وإنستغرام وماسنجر وتيليجرام والإيميل في صندوق وارد واحد، مع مساعد ذكاء اصطناعي يفهم اللهجات العربية ويرد على عملائك فوراً.",
+        "en": "An Arabic-first platform that unifies WhatsApp, Instagram, Messenger, Telegram and email into a single shared inbox, with an AI assistant that understands Arabic dialects and replies to your customers instantly."
+      },
+      "og": {
+        "ar": "وحّد قنواتك، ودع المساعد يرد فوراً، وليتدخّل فريقك حين يلزم.",
+        "en": "Unify your channels, let AI answer instantly, and step in whenever your team is needed."
+      },
+      "keywords": {
+        "ar": [
+          "Qhub",
+          "كيوهب",
+          "منصة محادثات",
+          "خدمة عملاء",
+          "واتساب بيزنس",
+          "ذكاء اصطناعي",
+          "صندوق وارد موحد"
+        ],
+        "en": [
+          "Qhub",
+          "omnichannel inbox",
+          "customer service platform",
+          "WhatsApp Business API",
+          "AI customer support",
+          "shared inbox",
+          "Arabic AI assistant"
+        ]
+      }
+    },
+    "pages": {
+      "pricing": {
+        "title": {
+          "ar": "الأسعار",
+          "en": "Pricing"
+        },
+        "description": {
+          "ar": "باقات Qhub بكل تفاصيلها: قارن المزايا واختر ما يناسب عدد محادثاتك الشهرية. ابدأ مجاناً 7 أيام دون بطاقة ائتمان.",
+          "en": "Every Qhub plan in full — compare the features and pick the one that fits your monthly conversation volume. Start with a free 7-day trial, no credit card needed."
+        }
+      },
+      "features": {
+        "title": {
+          "ar": "مزايا المنتج",
+          "en": "Product features"
+        },
+        "description": {
+          "ar": "كل ما تحتاجه لإدارة محادثات عملائك: صندوق وارد موحّد، مساعد ذكي، حملات، تقارير، ربط القنوات وأكثر، مع عرض حيّ لكل ميزة.",
+          "en": "Everything you need to run customer conversations — a unified inbox, an AI assistant, campaigns, reports, channel integrations and more, each with a live demo."
+        }
+      },
+      "contact": {
+        "title": {
+          "ar": "تواصل معنا",
+          "en": "Contact us"
+        },
+        "description": {
+          "ar": "تحدّث إلى فريق Qhub لاستفسارات المبيعات أو الدعم الفني أو طلب عرض توضيحي، ونرد بسرعة.",
+          "en": "Talk to the Qhub team — sales questions, technical support, or a product demo. We reply fast."
+        }
+      },
+      "faq": {
+        "title": {
+          "ar": "الأسئلة الشائعة",
+          "en": "FAQ"
+        },
+        "description": {
+          "ar": "إجابات عن أكثر الأسئلة التي تصلنا عن Qhub: الربط والأسعار والذكاء الاصطناعي والخصوصية والدعم.",
+          "en": "Answers to the questions we get asked most about Qhub — setup, pricing, AI, privacy and support."
+        }
+      },
+      "solutions": {
+        "title": {
+          "ar": "الحلول",
+          "en": "Solutions"
+        },
+        "description": {
+          "ar": "Qhub لكل قطاع: التجارة الإلكترونية وصنّاع المحتوى والعيادات والعقار والخدمات والتجميل. انظر كيف يعمل في مجالك.",
+          "en": "Qhub for every sector — e-commerce, creators, clinics, real estate, services and beauty. See how it works in your field."
+        }
+      }
+    }
+  },
+  "ui": {
+    "contact": {
+      "page": {
+        "eyebrow": {
+          "ar": "تواصل معنا",
+          "en": "Contact us"
+        },
+        "title": {
+          "ar": "طرق التواصل مع فريق Qhub",
+          "en": "Ways to reach the Qhub team"
+        },
+        "highlight": {
+          "ar": [
+            "فريق",
+            "Qhub"
+          ],
+          "en": [
+            "Qhub",
+            "team"
+          ]
+        },
+        "lede": {
+          "ar": "سواء كان لديك سؤال عن الباقات، أو تريد عرضاً توضيحياً، أو تحتاج مساعدة تقنية، فنحن هنا.",
+          "en": "Whether it's a question about plans, a demo request, or something technical — we're here."
+        },
+        "eyebrowIcon": {
+          "type": "library",
+          "set": "qhub",
+          "name": "send"
+        }
+      },
+      "channels": [
+        {
+          "icon": {
+            "type": "library",
+            "set": "qhub",
+            "name": "send"
+          },
+          "title": {
+            "ar": "راسلنا",
+            "en": "Email us"
+          },
+          "body": {
+            "ar": "info@qhub.sa",
+            "en": "info@qhub.sa"
+          },
+          "href": "mailto:info@qhub.sa",
+          "hint": {
+            "ar": "نرد خلال ساعات العمل",
+            "en": "We reply during working hours"
+          }
+        },
+        {
+          "icon": {
+            "type": "library",
+            "set": "qhub",
+            "name": "clock"
+          },
+          "title": {
+            "ar": "ساعات العمل",
+            "en": "Working hours"
+          },
+          "body": {
+            "ar": "الأحد – الخميس، 9ص – 6م",
+            "en": "Sunday – Thursday, 9am – 6pm"
+          },
+          "hint": {
+            "ar": "بتوقيت مكة المكرمة",
+            "en": "Makkah time (GMT+3)"
+          }
+        },
+        {
+          "icon": {
+            "type": "library",
+            "set": "qhub",
+            "name": "shield"
+          },
+          "title": {
+            "ar": "عميل حالي؟",
+            "en": "Already a customer?"
+          },
+          "body": {
+            "ar": "الدعم من داخل لوحة التحكم",
+            "en": "Support lives inside your dashboard"
+          },
+          "href": "https://qhub-client.apexes.click/overview",
+          "hint": {
+            "ar": "أسرع طريقة للوصول إلى فريق الدعم",
+            "en": "The fastest way to reach the support team"
+          }
+        }
+      ],
+      "form": {
+        "subjects": [
+          {
+            "v": {
+              "ar": "استفسار عن الباقات",
+              "en": "Plans enquiry"
+            },
+            "ph": {
+              "ar": "كم موظفاً في فريقك؟ وكم محادثة تستقبلون شهرياً تقريباً؟",
+              "en": "How many agents are on your team, and roughly how many conversations a month?"
+            }
+          },
+          {
+            "v": {
+              "ar": "طلب عرض توضيحي",
+              "en": "Request a demo"
+            },
+            "ph": {
+              "ar": "ما القنوات التي تستعملونها اليوم؟ ومتى يناسبكم الموعد؟",
+              "en": "Which channels do you use today, and when suits you for a call?"
+            }
+          },
+          {
+            "v": {
+              "ar": "دعم فني",
+              "en": "Technical support"
+            },
+            "ph": {
+              "ar": "ما الذي حصل بالضبط؟ وعلى أي قناة أو صفحة؟ ومتى بدأ؟",
+              "en": "What exactly happened, on which channel or page, and when did it start?"
+            }
+          },
+          {
+            "v": {
+              "ar": "شراكة",
+              "en": "Partnership"
+            },
+            "ph": {
+              "ar": "حدّثنا عن شركتك ونوع الشراكة التي تقترحها.",
+              "en": "Tell us about your company and the kind of partnership you have in mind."
+            }
+          },
+          {
+            "v": {
+              "ar": "أخرى",
+              "en": "Other"
+            },
+            "ph": {
+              "ar": "اكتب لنا ما تحتاجه ونوجّهك للشخص المناسب.",
+              "en": "Tell us what you need and we'll point you to the right person."
+            }
+          }
+        ],
+        "sentTitle": {
+          "ar": "وصلتنا رسالتك",
+          "en": "Your message reached us"
+        },
+        "sentBody": {
+          "ar": "شكراً لتواصلك. فريقنا بيرد عليك خلال ساعات العمل.",
+          "en": "Thanks for getting in touch. Our team will reply during working hours."
+        },
+        "sendAnother": {
+          "ar": "إرسال رسالة أخرى",
+          "en": "Send another message"
+        },
+        "name": {
+          "ar": "الاسم",
+          "en": "Name"
+        },
+        "namePh": {
+          "ar": "اسمك الكامل",
+          "en": "Your full name"
+        },
+        "company": {
+          "ar": "اسم الشركة",
+          "en": "Company"
+        },
+        "companyPh": {
+          "ar": "اختياري",
+          "en": "Optional"
+        },
+        "email": {
+          "ar": "البريد الإلكتروني",
+          "en": "Email address"
+        },
+        "phone": {
+          "ar": "رقم الجوال",
+          "en": "Phone number"
+        },
+        "subject": {
+          "ar": "الموضوع",
+          "en": "Subject"
+        },
+        "message": {
+          "ar": "رسالتك",
+          "en": "Your message"
+        },
+        "sending": {
+          "ar": "جارٍ الإرسال…",
+          "en": "Sending…"
+        },
+        "send": {
+          "ar": "أرسل الرسالة",
+          "en": "Send message"
+        },
+        "consentBefore": {
+          "ar": "بإرسالك النموذج توافق على",
+          "en": "By submitting this form you agree to our"
+        },
+        "privacy": {
+          "ar": "سياسة الخصوصية",
+          "en": "Privacy Policy"
+        },
+        "consentAfter": {
+          "ar": ".",
+          "en": "."
+        }
+      }
+    },
+    "widget": {
+      "copy": {
+        "open": {
+          "ar": "افتح محادثة مع المساعد",
+          "en": "Open a chat with the assistant"
+        },
+        "close": {
+          "ar": "إغلاق",
+          "en": "Close"
+        },
+        "title": {
+          "ar": "مساعد Qhub",
+          "en": "Qhub assistant"
+        },
+        "status": {
+          "ar": "يردّ خلال ثوانٍ",
+          "en": "Replies in seconds"
+        },
+        "hello": {
+          "ar": "أهلاً بك. اسألني عن الأسعار، أو ربط واتساب، أو التكامل مع متجرك، وأجيبك فوراً.",
+          "en": "Hi. Ask me about pricing, connecting WhatsApp, or your store integration, and I'll answer right away."
+        },
+        "tryThis": {
+          "ar": "جرّب تسأل:",
+          "en": "Try asking:"
+        },
+        "placeholder": {
+          "ar": "اكتب سؤالك…",
+          "en": "Type your question…"
+        },
+        "send": {
+          "ar": "إرسال",
+          "en": "Send"
+        },
+        "leadIntro": {
+          "ar": "تحبّ نتابع معك؟ اترك اسمك ووسيلة تواصل واحدة ويردّ عليك الفريق.",
+          "en": "Want us to follow up? Leave your name and one way to reach you."
+        },
+        "name": {
+          "ar": "الاسم",
+          "en": "Name"
+        },
+        "namePh": {
+          "ar": "اسمك",
+          "en": "Your name"
+        },
+        "email": {
+          "ar": "البريد الإلكتروني",
+          "en": "Email"
+        },
+        "emailPh": {
+          "ar": "name@company.com",
+          "en": "name@company.com"
+        },
+        "or": {
+          "ar": "أو",
+          "en": "or"
+        },
+        "phone": {
+          "ar": "رقم الجوال",
+          "en": "Phone number"
+        },
+        "submit": {
+          "ar": "أرسل بياناتي",
+          "en": "Send my details"
+        },
+        "sending": {
+          "ar": "جارٍ الإرسال…",
+          "en": "Sending…"
+        },
+        "needName": {
+          "ar": "اكتب اسمك من فضلك.",
+          "en": "Please add your name."
+        },
+        "needContact": {
+          "ar": "اترك بريداً أو رقم جوال؛ واحد منهما يكفي.",
+          "en": "Leave an email or a phone number — either one is enough."
+        },
+        "thanks": {
+          "ar": "وصلتنا بياناتك ✅ سيتواصل معك الفريق خلال ساعات العمل، والمحادثة محفوظة معها.",
+          "en": "Got your details ✅ The team will reach out during working hours, and this conversation goes with them."
+        },
+        "talkToSales": {
+          "ar": "تواصل مع فريق المبيعات",
+          "en": "Talk to sales"
+        },
+        "note": {
+          "ar": "هذا مساعد الموقع. داخل حسابك يتدرّب على قاعدة معرفة منتجاتك أنت.",
+          "en": "This is the website assistant. Inside your account it trains on your own product knowledge base."
+        }
+      },
+      "suggestions": {
+        "ar": [
+          "كم سعر الباقات؟",
+          "كيف أربط واتساب؟",
+          "هل يتكامل مع سلة؟",
+          "هل يفهم اللهجات؟",
+          "ما مدّة التجربة؟"
+        ],
+        "en": [
+          "How much are the plans?",
+          "How do I connect WhatsApp?",
+          "Does it work with Shopify?",
+          "Which dialects does it understand?",
+          "How long is the trial?"
+        ]
+      },
+      "fallback": {
+        "ar": "سؤال وجيه. هذا عرض على الموقع بمعرفة عامة عن Qhub، أمّا المساعد داخل حسابك فيتدرّب على قاعدة معرفة منتجاتك أنت فيجيب بتفاصيل عملك بالضبط. اسألني عن الأسعار، أو ربط واتساب، أو التكامل مع متجرك، أو أوصّلك بفريق المبيعات؟",
+        "en": "Good question. This demo runs on general Qhub knowledge, while the assistant inside your account trains on your own product knowledge base and answers your specifics exactly. Try asking about pricing, connecting WhatsApp, or your store integration — or shall I connect you with sales?"
+      },
+      "answers": [
+        {
+          "id": "greeting",
+          "a": {
+            "ar": "أهلاً وسهلاً، معك مساعد Qhub. اسألني عن الأسعار، أو ربط واتساب، أو التكامل مع متجرك، أو التجربة المجانية، وأجيبك فوراً.",
+            "en": "Hello. This is the Qhub assistant. Ask me about pricing, connecting WhatsApp, your store integration, or the free trial — I'll answer right away."
+          }
+        },
+        {
+          "id": "thanks",
+          "a": {
+            "ar": "العفو. أنا جاهز لأي سؤال آخر عن المنصّة أو الباقات، ويمكنني توصيلك بموظف من فريق المبيعات.",
+            "en": "You're welcome. Happy to answer anything else about the platform or the plans, and I can hand you to a sales agent whenever you like."
+          }
+        },
+        {
+          "id": "pricing",
+          "a": {
+            "ar": "الباقات: البداية 19$ شهرياً، الاحترافية 49$ (تشمل المساعد الذكي)، الأعمال 99$، والمؤسّسات بالتواصل. والفوترة السنوية توفّر 20% على كل باقة. كم موظفاً في فريق الدعم لديك؟ أرشّح لك الأنسب.",
+            "en": "Plans: Starter $19/mo, Professional $49 (includes the AI assistant), Business $99, and Enterprise on request. Annual billing saves 20% on every plan. How many agents are on your support team? I'll suggest the right fit."
+          }
+        },
+        {
+          "id": "trial",
+          "a": {
+            "ar": "التجربة 7 أيام كاملة بلا بطاقة ائتمانية ✨ تسجّل، تربط قناة واحدة، وتصلك المحادثات في اليوم نفسه. ولو ما ناسبتك، ما في التزام ولا رسوم.",
+            "en": "The trial is a full 7 days with no credit card ✨ Sign up, connect one channel, and conversations start arriving the same day. If it isn't a fit, there's no commitment and no charge."
+          }
+        },
+        {
+          "id": "whatsapp",
+          "a": {
+            "ar": "ربط واتساب Business يتم بمسح رمز QR من صفحة «الحسابات والربط»، دون برمجة، وينتهي في أقل من دقيقة. ويمكنك ربط أكثر من رقم على الحساب نفسه، ولكل رقم تقاريره.",
+            "en": "You connect WhatsApp Business by scanning a QR code from the “Accounts & channels” page — no developer, under a minute. You can connect several numbers to one account, each with its own reports."
+          }
+        },
+        {
+          "id": "channels",
+          "a": {
+            "ar": "القنوات المدعومة: واتساب، ماسنجر، إنستغرام، تيليجرام، البريد الإلكتروني، وويدجت موقعك. كلها تصل إلى صندوق وارد واحد بسجلّ عميل مشترك، فيرى الموظف كل تاريخ العميل مهما تنقّل بين القنوات.",
+            "en": "Supported channels: WhatsApp, Messenger, Instagram, Telegram, email, and your site widget. They all land in one shared inbox with a single customer history — so an agent sees everything no matter which channel the customer used."
+          }
+        },
+        {
+          "id": "store",
+          "a": {
+            "ar": "التكامل جاهز مع سلة وزد وشوبيفاي وووكومرس. فور ربط المتجر يرى الموظف طلبات العميل وحالة الشحن بجانب المحادثة مباشرة، والمساعد يجاوب عن حالة الطلب بلا تدخّل.",
+            "en": "Ready-made integrations with Salla, Zid, Shopify and WooCommerce. Once your store is connected, the agent sees the customer's orders and shipping status right next to the conversation, and the assistant answers order-status questions on its own."
+          }
+        },
+        {
+          "id": "ai",
+          "a": {
+            "ar": "المساعد يتدرّب على قاعدة معرفة أنت تبنيها: ملفات، وصفحات موقعك، وأسئلة شائعة، وكتالوج منتجاتك. فيجيب من محتواك أنت لا من تخمين، وإن ما وجد الجواب حوّل المحادثة لموظف مع ملخّص بدل ما يخترع إجابة.",
+            "en": "The assistant trains on a knowledge base you build: files, your site pages, FAQs and your product catalogue. It answers from your content rather than guessing — and when it can't find an answer it hands the conversation to an agent with a summary instead of inventing one."
+          }
+        },
+        {
+          "id": "dialects",
+          "a": {
+            "ar": "المساعد يفهم الفصحى المبسّطة والخليجية والمصرية والشامية، ويجاوب بالإنجليزية كذلك. ونبرته قابلة للاختيار من الإعدادات: ودودة، أو رسمية، أو مختصرة.",
+            "en": "The assistant understands simplified Modern Standard Arabic plus Gulf, Egyptian and Levantine dialects, and replies in English too. Its tone is selectable in settings: friendly, formal, or brief."
+          }
+        },
+        {
+          "id": "team",
+          "a": {
+            "ar": "تنشئ أقسام (مبيعات، دعم، إدارة)، وتحدّد صلاحيات كل موظف وساعات عمله وسقف محادثاته المتزامنة. والتوزيع يمشي تلقائياً على المتاح، ويرى المشرف من يعمل على ماذا لحظياً.",
+            "en": "You create departments (sales, support, management) and set each agent's permissions, working hours and concurrent-conversation cap. Routing runs automatically to whoever is free, and a supervisor sees who is on what in real time."
+          }
+        },
+        {
+          "id": "reports",
+          "a": {
+            "ar": "التقارير تغطّي حجم المحادثات، ومتوسط زمن أول ردّ، ونسبة ما تولّاه المساعد مقابل ما حُوّل لموظف، وتقييم العملاء، وأداء كل موظف وكل قناة. وتُصدَّر PDF أو Excel، أو تصلك ملخّصاً دورياً على بريدك.",
+            "en": "Reports cover conversation volume, average first-reply time, the share handled by the assistant versus handed to an agent, customer ratings, and per-agent and per-channel performance. Export to PDF or Excel, or get a scheduled summary by email."
+          }
+        },
+        {
+          "id": "handoff",
+          "a": {
+            "ar": "أي محادثة تتحوّل إلى موظف بشري بضغطة واحدة، أو تلقائياً حين يخرج السؤال عن قاعدة المعرفة، أو يطلب العميل موظفاً، أو تُرصد نبرة غاضبة. والموظف يستلم ملخّصاً بالمحادثة فلا يعيد السؤال على العميل.",
+            "en": "Any conversation moves to a human with one click — or automatically when the question falls outside the knowledge base, the customer asks for a person, or an angry tone is detected. The agent receives a summary, so the customer never repeats themselves."
+          }
+        },
+        {
+          "id": "security",
+          "a": {
+            "ar": "البيانات مشفّرة أثناء النقل والتخزين، والوصول محكوم بصلاحيات وسجلّ تدقيق يبيّن من اطّلع على ماذا. والنسخ الاحتياطي يومي، وبياناتك تبقى ملكك، تُصدَّر أو تُحذف بطلبك في أي وقت.",
+            "en": "Data is encrypted in transit and at rest, access is governed by roles with an audit log showing who saw what, and backups run daily. Your data stays yours — export or delete it on request at any time."
+          }
+        },
+        {
+          "id": "setup",
+          "a": {
+            "ar": "الإعداد دون برمجة: تسجيل، وربط القنوات، ورفع قاعدة المعرفة، ودعوة الفريق؛ وأغلب الحسابات تعمل في أقل من ساعة. وننقل لك المحادثات والمعرفة من نظامك الحالي إن وُجدت.",
+            "en": "Setup needs no developer: sign up, connect channels, upload the knowledge base, invite the team — most accounts are live in under an hour. We'll also migrate conversations and knowledge from your current system if you have one."
+          }
+        },
+        {
+          "id": "mobile",
+          "a": {
+            "ar": "في تطبيق للآيفون والأندرويد بإشعارات فورية، فالموظف يردّ وهو خارج المكتب. واللوحة على المتصفّح تشتغل على أي جهاز بلا تثبيت.",
+            "en": "There are iOS and Android apps with push notifications, so agents can reply away from their desk. The web dashboard also works on any device with nothing to install."
+          }
+        },
+        {
+          "id": "api",
+          "a": {
+            "ar": "في واجهة API وWebhooks لربط أنظمتك: CRM، أو ERP، أو نظامك الداخلي، إضافةً للتكاملات الجاهزة مع المتاجر. والتوثيق متاح لفريقك التقني من داخل الحساب.",
+            "en": "There's a REST API and webhooks for wiring in your own systems — CRM, ERP, or something in-house — alongside the ready-made store integrations. Docs are available to your technical team inside the account."
+          }
+        },
+        {
+          "id": "campaigns",
+          "a": {
+            "ar": "الحملات تنطلق على واتساب والبريد من مكان واحد: تختار الشريحة، وقالباً معتمداً، وتجدول الإرسال، ثم ترى الوصول والفتح والردود في تقرير الحملة. والردود ترجع لصندوق الوارد نفسه.",
+            "en": "Campaigns run on WhatsApp and email from one place: pick a segment, an approved template, schedule the send — then watch reach, opens and replies in the campaign report. Replies land back in the same shared inbox."
+          }
+        },
+        {
+          "id": "automation",
+          "a": {
+            "ar": "تضبط ردوداً تلقائية وساعات عمل وقواعد توجيه: خارج الدوام يردّ المساعد ويجمع الطلب، وداخل الدوام يوجّه المحادثة للقسم المناسب حسب الكلمة أو القناة أو لغة العميل.",
+            "en": "You set auto-replies, working hours and routing rules: outside hours the assistant replies and captures the request; inside hours it routes the conversation to the right department by keyword, channel or customer language."
+          }
+        },
+        {
+          "id": "limits",
+          "a": {
+            "ar": "كل باقة لها سقف عملاء شهري ظاهر في صفحة الأسعار، والترقية فورية بلا انقطاع خدمة. وإن قاربت السقف يوصلك تنبيه قبل الوصول إليه لا بعده.",
+            "en": "Each plan has a monthly customer cap shown on the pricing page, and upgrading is instant with no interruption. If you approach the cap you're warned before you hit it, not after."
+          }
+        },
+        {
+          "id": "cancel",
+          "a": {
+            "ar": "لا يوجد عقد ملزم؛ الاشتراك شهري أو سنوي وتلغيه من الحساب متى شئت، وتصدّر بياناتك قبل الإلغاء. والسنوي فيه استرداد تناسبي حسب المدّة المتبقّية.",
+            "en": "There's no binding contract — the subscription is monthly or annual and you can cancel from your account at any time, exporting your data first. Annual plans are refunded pro-rata for the remaining term."
+          }
+        },
+        {
+          "id": "support",
+          "a": {
+            "ar": "فريق الدعم متاح عبر المحادثة والبريد، وباقات الأعمال والمؤسّسات لها مدير حساب مخصّص. وأقدر أرتّب لك عرضاً توضيحياً مباشراً مع فريق المبيعات. أي يوم يناسبك؟",
+            "en": "Support is available over chat and email, and Business and Enterprise plans get a dedicated account manager. I can also arrange a live demo with the sales team — which day suits you?"
+          }
+        }
+      ]
+    },
+    "legal": {
+      "eyebrow": {
+        "ar": "قانوني",
+        "en": "Legal"
+      },
+      "toc": {
+        "ar": "المحتويات",
+        "en": "Contents"
+      },
+      "others": {
+        "ar": "مستندات أخرى",
+        "en": "Other documents"
+      },
+      "updated": {
+        "ar": "آخر تحديث:",
+        "en": "Last updated:"
+      },
+      "question": {
+        "ar": "عندك سؤال عن هذا المستند؟",
+        "en": "Have a question about this document?"
+      },
+      "cta": {
+        "ar": "تواصل معنا",
+        "en": "Contact us"
+      },
+      "tail": {
+        "ar": "ونوضّح لك.",
+        "en": "and we'll walk you through it."
+      },
+      "eyebrowIcon": {
+        "type": "library",
+        "set": "qhub",
+        "name": "shield"
+      }
+    },
+    "featuresTabs": {
+      "tablist": {
+        "ar": "مزايا المنتج",
+        "en": "Product features"
+      },
+      "start": {
+        "ar": "ابدأ مجاناً",
+        "en": "Start free"
+      },
+      "demo": {
+        "ar": "اطلب عرضاً توضيحياً",
+        "en": "Request a demo"
+      },
+      "faqEyebrow": {
+        "ar": "أسئلة شائعة",
+        "en": "FAQ"
+      },
+      "faqTitle": {
+        "ar": "أسئلة عن {0}",
+        "en": "Questions about {0}"
+      },
+      "faqHighlight": {
+        "ar": [
+          "أسئلة"
+        ],
+        "en": [
+          "Questions"
+        ]
+      },
+      "restHighlight": {
+        "ar": [
+          "باقي"
+        ],
+        "en": [
+          "other"
+        ]
+      },
+      "liveEyebrow": {
+        "ar": "عرض حيّ",
+        "en": "Live demo"
+      },
+      "liveTitle": {
+        "ar": "شاشة حقيقية من داخل Qhub",
+        "en": "A real screen from inside Qhub"
+      },
+      "liveHighlight": {
+        "ar": [
+          "شاشة",
+          "حقيقية"
+        ],
+        "en": [
+          "real",
+          "screen"
+        ]
+      },
+      "liveLede": {
+        "ar": "هذه الشاشة تعمل فعلاً، وقابلة للضغط تماماً كالشاشة داخل الحساب.",
+        "en": "This screen actually works — clickable exactly like the one inside an account."
+      }
+    },
+    "videoDialog": {
+      "close": {
+        "ar": "إغلاق",
+        "en": "Close"
+      },
+      "unsupported": {
+        "ar": "متصفّحك لا يشغّل هذا الفيديو.",
+        "en": "Your browser cannot play this video."
+      }
+    },
+    "themeToggle": {
+      "toLight": {
+        "ar": "التبديل للوضع الفاتح",
+        "en": "Switch to light mode"
+      },
+      "toDark": {
+        "ar": "التبديل للوضع الداكن",
+        "en": "Switch to dark mode"
+      }
+    },
+    "phoneField": {
+      "country": {
+        "ar": "دولة الرقم",
+        "en": "Number's country"
+      },
+      "invalid": {
+        "ar": "رقم غير صحيح لهذه الدولة",
+        "en": "That is not a valid number for this country"
+      }
+    },
+    "countries": {
+      "OM": {
+        "ar": "عُمان",
+        "en": "Oman"
+      },
+      "SA": {
+        "ar": "السعودية",
+        "en": "Saudi Arabia"
+      },
+      "AE": {
+        "ar": "الإمارات",
+        "en": "UAE"
+      },
+      "KW": {
+        "ar": "الكويت",
+        "en": "Kuwait"
+      },
+      "QA": {
+        "ar": "قطر",
+        "en": "Qatar"
+      },
+      "BH": {
+        "ar": "البحرين",
+        "en": "Bahrain"
+      },
+      "EG": {
+        "ar": "مصر",
+        "en": "Egypt"
+      },
+      "JO": {
+        "ar": "الأردن",
+        "en": "Jordan"
+      }
+    }
+  },
+  "scenes": {
+    "feature": {
+      "rows": [
+        {
+          "n": {
+            "ar": "نورة العامري",
+            "en": "Noura Al-Amri"
+          },
+          "m": {
+            "ar": "وصلني الطلب، شكراً لكم",
+            "en": "The order arrived, thank you"
+          }
+        },
+        {
+          "n": {
+            "ar": "متجر لمسة",
+            "en": "Lamsa Store"
+          },
+          "m": {
+            "ar": "كم سعر الباقة الجديدة؟",
+            "en": "How much is the new plan?"
+          }
+        },
+        {
+          "n": {
+            "ar": "خالد الحارثي",
+            "en": "Khalid Al-Harthi"
+          },
+          "m": {
+            "ar": "متى يفتح المحل اليوم؟",
+            "en": "What time do you open today?"
+          }
+        }
+      ],
+      "filters": {
+        "ar": [
+          "الكل",
+          "غير مقروءة",
+          "متأخرة"
+        ],
+        "en": [
+          "All",
+          "Unread",
+          "Overdue"
+        ]
+      },
+      "search": {
+        "ar": "ابحث في المحادثات…",
+        "en": "Search conversations…"
+      },
+      "note": {
+        "ar": "ملاحظة داخلية",
+        "en": "Internal note"
+      },
+      "noteBody": {
+        "ar": "العميل طلب استبدالاً سابقاً، فتعامل معه بمرونة.",
+        "en": "This customer asked for an exchange before — be flexible."
+      },
+      "handoff": {
+        "ar": "تحويل تلقائي",
+        "en": "Auto-assigned"
+      },
+      "from": {
+        "ar": "م",
+        "en": "M"
+      },
+      "to": {
+        "ar": "س",
+        "en": "S"
+      },
+      "lost": {
+        "ar": "رسالة بلا رد",
+        "en": "No reply"
+      },
+      "oneList": {
+        "ar": "صندوق الوارد الموحّد",
+        "en": "Unified inbox"
+      },
+      "unified": {
+        "ar": "خمس قنوات، مجرى واحد",
+        "en": "Five channels, one stream"
+      },
+      "count": {
+        "ar": "12",
+        "en": "12"
+      },
+      "sources": {
+        "ar": [
+          "المنتجات",
+          "السياسات",
+          "الأسعار"
+        ],
+        "en": [
+          "Products",
+          "Policies",
+          "Pricing"
+        ]
+      },
+      "spark": {
+        "ar": "قاعدة المعرفة",
+        "en": "Knowledge base"
+      },
+      "reply": {
+        "ar": "الردّ مبنيّ على قاعدة المعرفة",
+        "en": "The answer comes from your own information"
+      },
+      "draft": {
+        "ar": "الباقة الاحترافية 49$ شهرياً، وتشمل خمس قنوات وسبعة موظفين.",
+        "en": "The Professional plan is $49 a month and covers five channels and seven agents."
+      },
+      "funnel": [
+        {
+          "l": {
+            "ar": "أُرسلت",
+            "en": "Sent"
+          },
+          "v": {
+            "ar": "2,140",
+            "en": "2,140"
+          }
+        },
+        {
+          "l": {
+            "ar": "وصلت",
+            "en": "Delivered"
+          },
+          "v": {
+            "ar": "2,076",
+            "en": "2,076"
+          }
+        },
+        {
+          "l": {
+            "ar": "فُتحت",
+            "en": "Opened"
+          },
+          "v": {
+            "ar": "1,327",
+            "en": "1,327"
+          }
+        },
+        {
+          "l": {
+            "ar": "ردّوا",
+            "en": "Replied"
+          },
+          "v": {
+            "ar": "385",
+            "en": "385"
+          }
+        }
+      ],
+      "campaign": {
+        "ar": "حملة عرض الجمعة",
+        "en": "Friday offer campaign"
+      },
+      "gates": {
+        "ar": [
+          "المبيعات",
+          "الدعم",
+          "الشحن"
+        ],
+        "en": [
+          "Sales",
+          "Support",
+          "Shipping"
+        ]
+      },
+      "agents": [
+        {
+          "n": {
+            "ar": "منال",
+            "en": "Manal"
+          },
+          "load": {
+            "ar": "3",
+            "en": "3"
+          }
+        },
+        {
+          "n": {
+            "ar": "سالم",
+            "en": "Salem"
+          },
+          "load": {
+            "ar": "7",
+            "en": "7"
+          }
+        },
+        {
+          "n": {
+            "ar": "نورة",
+            "en": "Noura"
+          },
+          "load": {
+            "ar": "2",
+            "en": "2"
+          }
+        }
+      ],
+      "incoming": {
+        "ar": "محادثة واردة",
+        "en": "Incoming conversation"
+      },
+      "kpi": [
+        {
+          "l": {
+            "ar": "متوسط أول رد",
+            "en": "Avg. first reply"
+          },
+          "v": {
+            "ar": "2.4",
+            "en": "2.4"
+          },
+          "unit": {
+            "ar": "د",
+            "en": "m"
+          }
+        },
+        {
+          "l": {
+            "ar": "نسبة الحل",
+            "en": "Resolution rate"
+          },
+          "v": {
+            "ar": "94",
+            "en": "94"
+          },
+          "unit": {
+            "ar": "٪",
+            "en": "%"
+          }
+        }
+      ],
+      "drill": {
+        "ar": "من الرقم إلى سببه",
+        "en": "From the number to its cause"
+      },
+      "drillRows": [
+        {
+          "l": {
+            "ar": "واتساب",
+            "en": "WhatsApp"
+          },
+          "v": {
+            "ar": "1.8",
+            "en": "1.8"
+          },
+          "ch": "whatsapp"
+        },
+        {
+          "l": {
+            "ar": "إنستغرام",
+            "en": "Instagram"
+          },
+          "v": {
+            "ar": "2.6",
+            "en": "2.6"
+          },
+          "ch": "instagram"
+        },
+        {
+          "l": {
+            "ar": "إكس",
+            "en": "X"
+          },
+          "v": {
+            "ar": "4.1",
+            "en": "4.1"
+          },
+          "ch": "x"
+        }
+      ],
+      "widgetStates": {
+        "ar": [
+          "زرّ",
+          "ترحيب",
+          "محادثة"
+        ],
+        "en": [
+          "Button",
+          "Greeting",
+          "Chat"
+        ]
+      },
+      "widgetAsk": {
+        "ar": "كيف نساعدك؟",
+        "en": "How can we help?"
+      },
+      "embed": {
+        "ar": "سطر واحد في الموقع",
+        "en": "One line on your site"
+      },
+      "order": {
+        "ar": "طلب #4821",
+        "en": "Order #4821"
+      },
+      "orderRows": [
+        {
+          "l": {
+            "ar": "الحالة",
+            "en": "Status"
+          },
+          "v": {
+            "ar": "خرج للتوصيل",
+            "en": "Out for delivery"
+          }
+        },
+        {
+          "l": {
+            "ar": "القيمة",
+            "en": "Value"
+          },
+          "v": {
+            "ar": "240 ر.س",
+            "en": "240 SAR"
+          }
+        }
+      ],
+      "stores": {
+        "ar": [
+          "سلة",
+          "زد",
+          "شوبيفاي"
+        ],
+        "en": [
+          "Salla",
+          "Zid",
+          "Shopify"
+        ]
+      },
+      "synced": {
+        "ar": "مزامنة مستمرة",
+        "en": "Continuously synced"
+      },
+      "rules": [
+        {
+          "when": {
+            "ar": "كلمة «سعر»",
+            "en": "The word “price”"
+          },
+          "then": {
+            "ar": "المبيعات",
+            "en": "Sales"
+          }
+        },
+        {
+          "when": {
+            "ar": "شكوى",
+            "en": "A complaint"
+          },
+          "then": {
+            "ar": "الدعم",
+            "en": "Support"
+          }
+        },
+        {
+          "when": {
+            "ar": "خارج الدوام",
+            "en": "Outside hours"
+          },
+          "then": {
+            "ar": "ردّ تلقائي",
+            "en": "Auto-reply"
+          }
+        }
+      ],
+      "when": {
+        "ar": "موعد الإرسال",
+        "en": "Send time"
+      },
+      "slots": [
+        {
+          "d": {
+            "ar": "الخميس",
+            "en": "Thursday"
+          },
+          "t": {
+            "ar": "10:00 ص",
+            "en": "10:00 am"
+          },
+          "on": false
+        },
+        {
+          "d": {
+            "ar": "الجمعة",
+            "en": "Friday"
+          },
+          "t": {
+            "ar": "07:00 م",
+            "en": "07:00 pm"
+          },
+          "on": true
+        },
+        {
+          "d": {
+            "ar": "السبت",
+            "en": "Saturday"
+          },
+          "t": {
+            "ar": "11:00 ص",
+            "en": "11:00 am"
+          },
+          "on": false
+        }
+      ],
+      "gradual": {
+        "ar": "إرسال تدريجي يحمي الرقم",
+        "en": "Gradual sending protects your number"
+      },
+      "site": {
+        "ar": "متجرك.com",
+        "en": "yourstore.com"
+      },
+      "siteNav": {
+        "ar": [
+          "الرئيسية",
+          "المنتجات",
+          "السلة"
+        ],
+        "en": [
+          "Home",
+          "Products",
+          "Cart"
+        ]
+      },
+      "launcher": {
+        "ar": "محتاج مساعدة؟",
+        "en": "Need a hand?"
+      }
+    },
+    "detail": {
+      "dialects": [
+        {
+          "d": {
+            "ar": "خليجي",
+            "en": "Gulf"
+          },
+          "q": {
+            "ar": "وش سعر الشحن؟",
+            "en": "wesh si3r al-shahn?"
+          }
+        },
+        {
+          "d": {
+            "ar": "مصري",
+            "en": "Egyptian"
+          },
+          "q": {
+            "ar": "بكام الشحن؟",
+            "en": "bekam el-shahn?"
+          }
+        },
+        {
+          "d": {
+            "ar": "شامي",
+            "en": "Levantine"
+          },
+          "q": {
+            "ar": "قدّيش التوصيل؟",
+            "en": "addaysh el-tawseel?"
+          }
+        }
+      ],
+      "understood": {
+        "ar": "سؤال واحد: كم تكلفة الشحن؟",
+        "en": "One question: how much is shipping?"
+      },
+      "broadcast": {
+        "ar": "حملة عرض الجمعة · ‎2,140 مستلماً",
+        "en": "Friday offer campaign · 2,140 recipients"
+      },
+      "replies": [
+        {
+          "n": {
+            "ar": "نورة العامري",
+            "en": "Noura Al-Amri"
+          },
+          "m": {
+            "ar": "أبغى أستفيد من العرض",
+            "en": "I'd like to use the offer"
+          }
+        },
+        {
+          "n": {
+            "ar": "خالد الحارثي",
+            "en": "Khalid Al-Harthi"
+          },
+          "m": {
+            "ar": "هل يشمل الشحن؟",
+            "en": "Does it include shipping?"
+          }
+        }
+      ],
+      "landed": {
+        "ar": "الردود تنزل في صندوق الوارد",
+        "en": "Replies land in the shared inbox"
+      },
+      "roles": {
+        "ar": [
+          "مدير",
+          "مشرف",
+          "موظف"
+        ],
+        "en": [
+          "Admin",
+          "Lead",
+          "Agent"
+        ]
+      },
+      "caps": [
+        {
+          "l": {
+            "ar": "يقرأ كل المحادثات",
+            "en": "Reads every conversation"
+          },
+          "icon": {
+            "type": "library",
+            "set": "qhub",
+            "name": "inbox"
+          },
+          "on": [
+            true,
+            true,
+            false
+          ]
+        },
+        {
+          "l": {
+            "ar": "يصدّر البيانات",
+            "en": "Exports data"
+          },
+          "icon": {
+            "type": "library",
+            "set": "qhub",
+            "name": "chart"
+          },
+          "on": [
+            true,
+            false,
+            false
+          ]
+        },
+        {
+          "l": {
+            "ar": "يحذف محادثة",
+            "en": "Deletes a conversation"
+          },
+          "icon": {
+            "type": "library",
+            "set": "qhub",
+            "name": "shield"
+          },
+          "on": [
+            true,
+            false,
+            false
+          ]
+        }
+      ],
+      "offHours": {
+        "ar": "خارج الدوام",
+        "en": "Outside hours"
+      },
+      "closed": {
+        "ar": "‎11:40 م — المكتب مغلق",
+        "en": "11:40 pm — the office is closed"
+      },
+      "autoReply": {
+        "ar": "نستلم رسالتك ونرد ‎9 ص",
+        "en": "We have your message and reply at 9 am"
+      },
+      "queued": {
+        "ar": "محفوظة في الطابور",
+        "en": "Held in the queue"
+      },
+      "drillTop": {
+        "l": {
+          "ar": "متوسط أول ردّ",
+          "en": "Avg. first reply"
+        },
+        "v": {
+          "ar": "2.4 د",
+          "en": "2.4 m"
+        }
+      },
+      "drillRows": [
+        {
+          "l": {
+            "ar": "واتساب",
+            "en": "WhatsApp"
+          },
+          "v": {
+            "ar": "1.8 د",
+            "en": "1.8 m"
+          },
+          "pct": 44,
+          "ch": "whatsapp"
+        },
+        {
+          "l": {
+            "ar": "إنستغرام",
+            "en": "Instagram"
+          },
+          "v": {
+            "ar": "2.6 د",
+            "en": "2.6 m"
+          },
+          "pct": 63,
+          "ch": "instagram"
+        },
+        {
+          "l": {
+            "ar": "إكس",
+            "en": "X"
+          },
+          "v": {
+            "ar": "4.1 د",
+            "en": "4.1 m"
+          },
+          "pct": 100,
+          "ch": "x"
+        }
+      ],
+      "digest": {
+        "ar": "التقرير الأسبوعي",
+        "en": "Weekly report"
+      },
+      "digestTo": {
+        "ar": "إلى بريد المدير",
+        "en": "To the manager's inbox"
+      },
+      "digestRows": [
+        {
+          "l": {
+            "ar": "المحادثات",
+            "en": "Conversations"
+          },
+          "v": {
+            "ar": "1,428",
+            "en": "1,428"
+          },
+          "icon": {
+            "type": "library",
+            "set": "qhub",
+            "name": "inbox"
+          }
+        },
+        {
+          "l": {
+            "ar": "نسبة الحل",
+            "en": "Resolution rate"
+          },
+          "v": {
+            "ar": "96%",
+            "en": "96%"
+          },
+          "icon": {
+            "type": "library",
+            "set": "qhub",
+            "name": "check"
+          }
+        },
+        {
+          "l": {
+            "ar": "أبطأ قناة",
+            "en": "Slowest channel"
+          },
+          "v": {
+            "ar": "إكس",
+            "en": "X"
+          },
+          "icon": {
+            "type": "library",
+            "set": "qhub",
+            "name": "clock"
+          }
+        }
+      ],
+      "every": {
+        "ar": "كل أحد ‎8:00 ص — بلا طلب",
+        "en": "Every Sunday at 8:00 am — unasked"
+      },
+      "instant": {
+        "ar": "ردّ خلال ثانيتين",
+        "en": "Answered in two seconds"
+      },
+      "visitorAsk": {
+        "ar": "كم سعر التوصيل للرياض؟",
+        "en": "How much is delivery to Riyadh?"
+      },
+      "botReply": {
+        "ar": "التوصيل للرياض ‎15 ر.س، ويصل خلال يومين.",
+        "en": "Delivery to Riyadh is 15 SAR and arrives within two days."
+      },
+      "seconds": {
+        "ar": "2.1 ثانية",
+        "en": "2.1 seconds"
+      },
+      "matchPhone": {
+        "ar": "‎+966 55 123 4567",
+        "en": "+966 55 123 4567"
+      },
+      "matchName": {
+        "ar": "نورة العامري",
+        "en": "Noura Al-Amri"
+      },
+      "matched": {
+        "ar": "طوبق مع حساب المتجر",
+        "en": "Matched to the store account"
+      },
+      "profile": [
+        {
+          "l": {
+            "ar": "الطلبات",
+            "en": "Orders"
+          },
+          "v": {
+            "ar": "7",
+            "en": "7"
+          }
+        },
+        {
+          "l": {
+            "ar": "آخر طلب",
+            "en": "Last order"
+          },
+          "v": {
+            "ar": "#4821",
+            "en": "#4821"
+          }
+        },
+        {
+          "l": {
+            "ar": "الإنفاق",
+            "en": "Spend"
+          },
+          "v": {
+            "ar": "3,420 ر.س",
+            "en": "3,420 SAR"
+          }
+        }
+      ],
+      "hooks": [
+        {
+          "l": {
+            "ar": "محادثة جديدة",
+            "en": "New conversation"
+          },
+          "s": {
+            "ar": "POST /webhook",
+            "en": "POST /webhook"
+          },
+          "icon": {
+            "type": "library",
+            "set": "qhub",
+            "name": "inbox"
+          }
+        },
+        {
+          "l": {
+            "ar": "أُغلقت محادثة",
+            "en": "Conversation closed"
+          },
+          "s": {
+            "ar": "POST /webhook",
+            "en": "POST /webhook"
+          },
+          "icon": {
+            "type": "library",
+            "set": "qhub",
+            "name": "check"
+          }
+        },
+        {
+          "l": {
+            "ar": "وسم أُضيف",
+            "en": "Tag added"
+          },
+          "s": {
+            "ar": "POST /webhook",
+            "en": "POST /webhook"
+          },
+          "icon": {
+            "type": "library",
+            "set": "qhub",
+            "name": "sparkles"
+          }
+        }
+      ],
+      "apiNote": {
+        "ar": "واجهة مفتوحة تربطها بأي نظام لديك",
+        "en": "An open API — wire it to any system you run"
+      }
+    },
+    "compare": {
+      "ai": {
+        "canned": {
+          "ar": "شكراً لتواصلك، سنعود إليك في أقرب وقت.",
+          "en": "Thanks for reaching out, we'll get back to you shortly."
+        },
+        "ask": {
+          "ar": "كم سعر الباقة الاحترافية؟",
+          "en": "How much is the Professional plan?"
+        },
+        "answer": {
+          "ar": "الاحترافية 49$ شهرياً، وتشمل المساعد وخمس قنوات.",
+          "en": "Professional is $49/mo and includes the assistant and five channels."
+        },
+        "sources": {
+          "ar": [
+            "المنتجات",
+            "السياسات",
+            "الأسعار"
+          ],
+          "en": [
+            "Products",
+            "Policies",
+            "Pricing"
+          ]
+        },
+        "from": {
+          "ar": "من قاعدة المعرفة · 1.8 ث",
+          "en": "From the knowledge base · 1.8s"
+        },
+        "bad": {
+          "ar": "الردّ نفسه لكل سؤال",
+          "en": "One reply for every question"
+        },
+        "good": {
+          "ar": "جواب يخصّ السؤال",
+          "en": "An answer to the actual question"
+        }
+      },
+      "camp": {
+        "blast": {
+          "ar": "نسخ ولصق على مئات الأرقام",
+          "en": "Copy-pasted to hundreds of numbers"
+        },
+        "segment": {
+          "ar": "سلّة متروكة · 640 عميلاً",
+          "en": "Abandoned cart · 640 customers"
+        },
+        "funnel": [
+          {
+            "l": {
+              "ar": "أُرسلت",
+              "en": "Sent"
+            },
+            "v": {
+              "ar": "640",
+              "en": "640"
+            }
+          },
+          {
+            "l": {
+              "ar": "وصلت",
+              "en": "Delivered"
+            },
+            "v": {
+              "ar": "628",
+              "en": "628"
+            }
+          },
+          {
+            "l": {
+              "ar": "فُتحت",
+              "en": "Opened"
+            },
+            "v": {
+              "ar": "401",
+              "en": "401"
+            }
+          },
+          {
+            "l": {
+              "ar": "ردّوا",
+              "en": "Replied"
+            },
+            "v": {
+              "ar": "112",
+              "en": "112"
+            }
+          }
+        ],
+        "bad": {
+          "ar": "الرقم محظور، ولا أحد يعرف من فتح",
+          "en": "Number blocked, and nobody knows who opened"
+        },
+        "good": {
+          "ar": "شريحة مستهدفة وأرقام لحظية",
+          "en": "A targeted segment with live numbers"
+        }
+      },
+      "team": {
+        "agents": {
+          "ar": [
+            "سالم",
+            "منال",
+            "نورة"
+          ],
+          "en": [
+            "Salem",
+            "Manal",
+            "Noura"
+          ]
+        },
+        "loads": [
+          9,
+          0,
+          4
+        ],
+        "balanced": [
+          4,
+          4,
+          5
+        ],
+        "incoming": {
+          "ar": "محادثة واردة",
+          "en": "Incoming conversation"
+        },
+        "rule": {
+          "ar": "قاعدة: للأقلّ حِملاً في المبيعات",
+          "en": "Rule: to the least loaded in Sales"
+        },
+        "bad": {
+          "ar": "المشرف يوزّع يدوياً",
+          "en": "A supervisor assigning by hand"
+        },
+        "good": {
+          "ar": "توزيع آلي بسقف لكل موظف",
+          "en": "Automatic routing with a cap per agent"
+        }
+      },
+      "stats": {
+        "metric": {
+          "ar": "متوسط أول ردّ",
+          "en": "Avg. first reply"
+        },
+        "value": {
+          "ar": "4.7",
+          "en": "4.7"
+        },
+        "unit": {
+          "ar": "د",
+          "en": "m"
+        },
+        "why": {
+          "ar": "لماذا ارتفع؟",
+          "en": "Why did it rise?"
+        },
+        "rows": [
+          {
+            "l": {
+              "ar": "واتساب · 3–5م",
+              "en": "WhatsApp · 3–5pm"
+            },
+            "v": {
+              "ar": "9.2 د",
+              "en": "9.2m"
+            }
+          },
+          {
+            "l": {
+              "ar": "إنستغرام",
+              "en": "Instagram"
+            },
+            "v": {
+              "ar": "3.1 د",
+              "en": "3.1m"
+            }
+          }
+        ],
+        "bad": {
+          "ar": "رقم بلا تفسير",
+          "en": "A number with no explanation"
+        },
+        "good": {
+          "ar": "نقرة على الرقم تكشف سببه",
+          "en": "Click the number, see what caused it"
+        }
+      },
+      "widget": {
+        "form": {
+          "ar": [
+            "الاسم",
+            "البريد",
+            "رسالتك"
+          ],
+          "en": [
+            "Name",
+            "Email",
+            "Your message"
+          ]
+        },
+        "send": {
+          "ar": "أرسل",
+          "en": "Send"
+        },
+        "ask": {
+          "ar": "عندكم شحن لصلالة؟",
+          "en": "Do you ship to Salalah?"
+        },
+        "reply": {
+          "ar": "نعم، خلال يومين.",
+          "en": "Yes, within two days."
+        },
+        "page": {
+          "ar": "من صفحة: /pricing",
+          "en": "From page: /pricing"
+        },
+        "bad": {
+          "ar": "نردّ خلال 48 ساعة",
+          "en": "We reply within 48 hours"
+        },
+        "good": {
+          "ar": "ردّ فوري مع سياق الصفحة",
+          "en": "An instant reply, with page context"
+        }
+      },
+      "integ": {
+        "store": {
+          "ar": "تطبيق واتساب",
+          "en": "WhatsApp app"
+        },
+        "chat": {
+          "ar": "تطبيق إنستغرام",
+          "en": "Instagram app"
+        },
+        "order": {
+          "ar": "محادثة واردة",
+          "en": "Incoming conversation"
+        },
+        "status": {
+          "ar": "وصلت من واتساب",
+          "en": "Arrived from WhatsApp"
+        },
+        "match": {
+          "ar": "أُسندت لمنال",
+          "en": "Assigned to Manal"
+        },
+        "bad": {
+          "ar": "تنقّل بين التطبيقات",
+          "en": "Switching between apps"
+        },
+        "good": {
+          "ar": "كل القنوات في صندوق واحد",
+          "en": "Every channel in one inbox"
+        }
+      }
+    },
+    "homeSectors": {
+      "order": {
+        "ar": "طلب #142",
+        "en": "Order #142"
+      },
+      "items": [
+        {
+          "ar": [
+            "برجر دجاج ×2",
+            "7.00"
+          ],
+          "en": [
+            "Chicken burger ×2",
+            "7.00"
+          ]
+        },
+        {
+          "ar": [
+            "سلطة سيزر",
+            "3.50"
+          ],
+          "en": [
+            "Caesar salad",
+            "3.50"
+          ]
+        },
+        {
+          "ar": [
+            "عصير برتقال",
+            "2.00"
+          ],
+          "en": [
+            "Orange juice",
+            "2.00"
+          ]
+        }
+      ],
+      "total": {
+        "ar": "الإجمالي",
+        "en": "Total"
+      },
+      "restaurant": {
+        "ar": "مطعم الواحة",
+        "en": "Al-Waha Restaurant"
+      },
+      "newOrder": {
+        "ar": "طلب جديد",
+        "en": "New order"
+      },
+      "askTitle": {
+        "ar": "سؤال متكرّر",
+        "en": "A repeat question"
+      },
+      "askWhen": {
+        "ar": "وصل 11:40 مساءً",
+        "en": "Arrived 11:40 pm"
+      },
+      "askAnswer": {
+        "ar": "دوام العيادة من 9 صباحاً إلى 9 مساءً طوال أيام الأسبوع 🌷",
+        "en": "The clinic is open 9 am to 9 pm, every day of the week 🌷"
+      },
+      "aiTag": {
+        "ar": "ردّ المساعد",
+        "en": "AI reply"
+      },
+      "clientName": {
+        "ar": "عمر المالكي",
+        "en": "Omar Al-Maliki"
+      },
+      "clientRole": {
+        "ar": "استشارة عقارية",
+        "en": "Property consultation"
+      },
+      "tags": {
+        "ar": [
+          "عميل محتمل",
+          "عاجل"
+        ],
+        "en": [
+          "Lead",
+          "Urgent"
+        ]
+      },
+      "confirmed": {
+        "ar": "مؤكّد",
+        "en": "Confirmed"
+      },
+      "ready": {
+        "ar": "طلبك جاهز للاستلام بعد 15 دقيقة ✅",
+        "en": "Your order is ready for pickup in 15 minutes ✅"
+      },
+      "clientInitials": {
+        "ar": "ع م",
+        "en": "OM"
+      },
+      "clientMsg": {
+        "ar": "أبغى أعرف عمولتكم على بيع فيلا",
+        "en": "What's your commission on selling a villa?"
+      },
+      "agentInitial": {
+        "ar": "ن",
+        "en": "N"
+      },
+      "autoAssigned": {
+        "ar": "أُسند تلقائياً",
+        "en": "Auto-assigned"
+      },
+      "agentName": {
+        "ar": "نورة · المبيعات",
+        "en": "Noura · Sales"
+      },
+      "creatorItems": [
+        {
+          "k": {
+            "ar": "instagram",
+            "en": "instagram"
+          },
+          "n": {
+            "ar": "سؤال من متابع",
+            "en": "A follower question"
+          }
+        },
+        {
+          "k": {
+            "ar": "telegram",
+            "en": "telegram"
+          },
+          "n": {
+            "ar": "طلب تعاون",
+            "en": "A collaboration request"
+          }
+        },
+        {
+          "k": {
+            "ar": "x",
+            "en": "x"
+          },
+          "n": {
+            "ar": "استفسار عن الأسعار",
+            "en": "A question about pricing"
+          }
+        }
+      ],
+      "creatorInbox": {
+        "ar": "صندوق واحد",
+        "en": "One inbox"
+      },
+      "beautyMenu": {
+        "ar": "قائمة الخدمات",
+        "en": "Service list"
+      },
+      "beautyItems": {
+        "ar": [
+          "قصّ وتصفيف",
+          "عناية بالبشرة",
+          "مناكير"
+        ],
+        "en": [
+          "Cut & styling",
+          "Facial",
+          "Manicure"
+        ]
+      },
+      "beautySent": {
+        "ar": "تُرسل بردّ جاهز",
+        "en": "Sent as a saved reply"
+      },
+      "realtyUnit": {
+        "ar": "وحدة A-12",
+        "en": "Unit A-12"
+      },
+      "realtyMeta": {
+        "ar": "3 غرف · 120م²",
+        "en": "3 rooms · 120 m²"
+      },
+      "realtyTag": {
+        "ar": "مهتم",
+        "en": "Interested"
+      },
+      "realtyAgent": {
+        "ar": "أُسندت إلى منال",
+        "en": "Assigned to Manal"
+      }
+    },
+    "solutions": {
+      "ecomAsk": {
+        "ar": "وين طلبي؟",
+        "en": "Where is my order?"
+      },
+      "ecomOrder": {
+        "ar": "طلب #4821",
+        "en": "Order #4821"
+      },
+      "ecomRows": [
+        {
+          "k": {
+            "ar": "الحالة",
+            "en": "Status"
+          },
+          "v": {
+            "ar": "خرج للتوصيل",
+            "en": "Out for delivery"
+          }
+        },
+        {
+          "k": {
+            "ar": "الوصول",
+            "en": "Arrives"
+          },
+          "v": {
+            "ar": "خلال يومين",
+            "en": "Within two days"
+          }
+        }
+      ],
+      "ecomAuto": {
+        "ar": "أُرسلت بردّ جاهز فيه رقم الطلب",
+        "en": "Sent from a saved reply with the order number"
+      },
+      "creatorTag": {
+        "ar": "تعاون تجاري",
+        "en": "Brand deal"
+      },
+      "creatorInbox": {
+        "ar": "صندوق واحد",
+        "en": "One inbox"
+      },
+      "creatorMsgs": {
+        "ar": [
+          "طلب تعاون",
+          "سؤال عن الأسعار",
+          "رسالة من متابع"
+        ],
+        "en": [
+          "A collaboration request",
+          "A question about pricing",
+          "A message from a follower"
+        ]
+      },
+      "clinicTitle": {
+        "ar": "طلب مراجع جديد",
+        "en": "New patient enquiry"
+      },
+      "clinicWhen": {
+        "ar": "سؤال عن خدمات العيادة",
+        "en": "Asking about your services"
+      },
+      "clinicConfirm": {
+        "ar": "ردّ جاهز",
+        "en": "Saved reply"
+      },
+      "clinicMove": {
+        "ar": "إسناد إلى قسم",
+        "en": "Assign to a department"
+      },
+      "clinicSent": {
+        "ar": "تُوزَّع على القسم المناسب",
+        "en": "Routed to the right department"
+      },
+      "realtyStages": {
+        "ar": [
+          "مهتم",
+          "عاين",
+          "تفاوض"
+        ],
+        "en": [
+          "Interested",
+          "Viewed",
+          "Negotiating"
+        ]
+      },
+      "realtyUnits": [
+        {
+          "u": {
+            "ar": "وحدة A-12",
+            "en": "Unit A-12"
+          },
+          "agent": {
+            "ar": "منال",
+            "en": "Manal"
+          },
+          "stage": 2
+        },
+        {
+          "u": {
+            "ar": "وحدة B-04",
+            "en": "Unit B-04"
+          },
+          "agent": {
+            "ar": "سالم",
+            "en": "Salem"
+          },
+          "stage": 1
+        },
+        {
+          "u": {
+            "ar": "فيلا C-31",
+            "en": "Villa C-31"
+          },
+          "agent": {
+            "ar": "نورة",
+            "en": "Noura"
+          },
+          "stage": 0
+        }
+      ],
+      "svcHours": {
+        "ar": "‎24/7 بلا انتظار",
+        "en": "24/7, no waiting"
+      },
+      "svcAr": {
+        "ar": "كم تكلفة الاستشارة الأولى؟",
+        "en": "كم تكلفة الاستشارة الأولى؟"
+      },
+      "svcEn": {
+        "ar": "Do you work with clients abroad?",
+        "en": "Do you work with clients abroad?"
+      },
+      "svcAt": {
+        "ar": [
+          "‎02:14 ص",
+          "‎03:47 ص"
+        ],
+        "en": [
+          "02:14 am",
+          "03:47 am"
+        ]
+      },
+      "beautyMenu": {
+        "ar": "قائمة الخدمات",
+        "en": "Service menu"
+      },
+      "beautyItems": [
+        {
+          "s": {
+            "ar": "قصّ وتصفيف",
+            "en": "Cut & styling"
+          },
+          "p": {
+            "ar": "120 ر.س",
+            "en": "120 SAR"
+          }
+        },
+        {
+          "s": {
+            "ar": "عناية بالبشرة",
+            "en": "Facial"
+          },
+          "p": {
+            "ar": "260 ر.س",
+            "en": "260 SAR"
+          }
+        },
+        {
+          "s": {
+            "ar": "مناكير",
+            "en": "Manicure"
+          },
+          "p": {
+            "ar": "90 ر.س",
+            "en": "90 SAR"
+          }
+        }
+      ],
+      "beautyBooked": {
+        "ar": "أُرسلت بردّ جاهز داخل المحادثة",
+        "en": "Sent as a saved reply in the chat"
+      }
+    }
+  },
+  "demos": {
+    "frame": {
+      "ar": "مباشر",
+      "en": "Live"
+    },
+    "inbox": {
+      "title": {
+        "ar": "صندوق وارد Qhub",
+        "en": "The Qhub inbox"
+      },
+      "chip": {
+        "ar": "{0} محادثة واردة من 5 قنوات",
+        "en": "{0} conversations from 5 channels"
+      },
+      "hint": {
+        "ar": "اضغط أي محادثة لتفتح تفاصيلها؛ الرسائل أعلاه تصل من واتساب وإنستغرام والبريد وتيليجرام وويدجت الموقع.",
+        "en": "Tap any conversation to open it — these messages arrive from WhatsApp, Instagram, email, Telegram and the site widget."
+      },
+      "tabs": [
+        {
+          "id": "all",
+          "label": {
+            "ar": "الكل",
+            "en": "All"
+          }
+        },
+        {
+          "id": "new",
+          "label": {
+            "ar": "جديدة",
+            "en": "New"
+          }
+        },
+        {
+          "id": "active",
+          "label": {
+            "ar": "قيد المعالجة",
+            "en": "In progress"
+          }
+        }
+      ],
+      "states": {
+        "new": {
+          "ar": "جديدة",
+          "en": "New"
+        },
+        "active": {
+          "ar": "قيد المعالجة",
+          "en": "In progress"
+        },
+        "closed": {
+          "ar": "مغلقة",
+          "en": "Closed"
+        },
+        "ai": {
+          "ar": "ردّ المساعد",
+          "en": "AI replied"
+        }
+      },
+      "assigned": {
+        "ar": "مُسندة",
+        "en": "Assigned"
+      },
+      "autoReply": {
+        "ar": "ردّ آلي",
+        "en": "Auto reply"
+      },
+      "agent": {
+        "ar": "سالم الرواحي",
+        "en": "Salem Al-Rawahi"
+      },
+      "agentInitial": {
+        "ar": "س",
+        "en": "S"
+      },
+      "aiName": {
+        "ar": "المساعد الذكي",
+        "en": "AI assistant"
+      },
+      "placeholder": {
+        "ar": "اكتب ردّك هنا…",
+        "en": "Write your reply…"
+      },
+      "back": {
+        "ar": "رجوع للقائمة",
+        "en": "Back to list"
+      },
+      "empty": {
+        "ar": "لا محادثات في هذه الحالة",
+        "en": "No conversations in this state"
+      },
+      "convs": [
+        {
+          "name": {
+            "ar": "منى الزدجالية",
+            "en": "Mona Al-Zadjali"
+          },
+          "msg": {
+            "ar": "أريد عرض الفيلا مع معاينة هذا الأسبوع",
+            "en": "I'd like to view the villa this week"
+          },
+          "time": {
+            "ar": "الآن",
+            "en": "Now"
+          },
+          "dept": {
+            "ar": "الإدارة",
+            "en": "Management"
+          },
+          "thread": {
+            "ar": [
+              "مساء الخير، رأيت إعلان فيلا الموج على إنستغرام",
+              "أريد عرض الفيلا مع معاينة هذا الأسبوع"
+            ],
+            "en": [
+              "Good evening — I saw the Al-Mouj villa listing on Instagram",
+              "I'd like to view the villa this week"
+            ]
+          }
+        },
+        {
+          "name": {
+            "ar": "سارة المعمري",
+            "en": "Sara Al-Maamari"
+          },
+          "msg": {
+            "ar": "كيف يمكنني ربط حساب الواتساب؟",
+            "en": "How do I connect a WhatsApp account?"
+          },
+          "time": {
+            "ar": "الآن",
+            "en": "Now"
+          },
+          "dept": {
+            "ar": "خدمة العملاء",
+            "en": "Customer service"
+          },
+          "thread": {
+            "ar": [
+              "كيف يمكنني ربط حساب الواتساب؟",
+              "من صفحة «الحسابات والربط» تختارين WhatsApp Business ثم «إدارة» وتمسحين رمز QR. الربط ينتهي خلال أقل من دقيقة 👍"
+            ],
+            "en": [
+              "How do I connect a WhatsApp account?",
+              "On the “Accounts & channels” page pick WhatsApp Business, then “Manage”, and scan the QR code. It takes under a minute 👍"
+            ]
+          }
+        },
+        {
+          "name": {
+            "ar": "خالد اللوجستية",
+            "en": "Khalid Logistics"
+          },
+          "msg": {
+            "ar": "طلب عرض سعر لعقد سنوي",
+            "en": "Requesting a quote for an annual contract"
+          },
+          "time": {
+            "ar": "قبل دقيقتين",
+            "en": "2m ago"
+          },
+          "dept": {
+            "ar": "المبيعات",
+            "en": "Sales"
+          },
+          "thread": {
+            "ar": [
+              "السلام عليكم، نحتاج عرض سعر لعقد سنوي لـ 25 موظفاً.",
+              "وعليكم السلام أستاذ خالد، جهّزت عرضاً مبدئياً وأرسلته على بريدك. أراجعه معك اليوم؟"
+            ],
+            "en": [
+              "Hello — we need a quote for an annual contract covering 25 agents.",
+              "Hello Khalid, I've put together an initial quote and sent it to your email. Shall we go through it today?"
+            ]
+          }
+        },
+        {
+          "name": {
+            "ar": "بدر السيابي",
+            "en": "Badr Al-Siyabi"
+          },
+          "msg": {
+            "ar": "أبحث عن تويوتا لاند كروزر",
+            "en": "Looking for a Toyota Land Cruiser"
+          },
+          "time": {
+            "ar": "قبل 5 دقائق",
+            "en": "5m ago"
+          },
+          "dept": {
+            "ar": "المبيعات",
+            "en": "Sales"
+          },
+          "thread": {
+            "ar": [
+              "أبحث عن تويوتا لاند كروزر موديل 2024، متوفّرة؟"
+            ],
+            "en": [
+              "Looking for a 2024 Toyota Land Cruiser — do you have one?"
+            ]
+          }
+        },
+        {
+          "name": {
+            "ar": "ريم اللواتي",
+            "en": "Reem Al-Lawati"
+          },
+          "msg": {
+            "ar": "نعم، هذا السعر مناسب",
+            "en": "Yes, that price works"
+          },
+          "time": {
+            "ar": "قبل 8 دقائق",
+            "en": "8m ago"
+          },
+          "dept": {
+            "ar": "المبيعات",
+            "en": "Sales"
+          },
+          "thread": {
+            "ar": [
+              "الباقة الاحترافية 49$ شهرياً وتشمل المساعد الذكي وثلاث قنوات.",
+              "نعم، هذا السعر مناسب",
+              "ممتاز! أرسلت رابط الاشتراك على بريدك. أهلاً بك معنا 🎉"
+            ],
+            "en": [
+              "The Professional plan is $49 a month and includes the AI assistant and three channels.",
+              "Yes, that price works",
+              "Great! I've sent the signup link to your email. Welcome aboard 🎉"
+            ]
+          }
+        }
+      ],
+      "incoming": [
+        {
+          "name": {
+            "ar": "هدى الزدجالية",
+            "en": "Huda Al-Zadjali"
+          },
+          "msg": {
+            "ar": "هل التوصيل متاح اليوم؟",
+            "en": "Is delivery available today?"
+          },
+          "dept": {
+            "ar": "المبيعات",
+            "en": "Sales"
+          },
+          "ch": "whatsapp",
+          "thread": {
+            "ar": [
+              "هل التوصيل متاح اليوم؟"
+            ],
+            "en": [
+              "Is delivery available today?"
+            ]
+          }
+        },
+        {
+          "name": {
+            "ar": "متجر أصالة",
+            "en": "Asala Store"
+          },
+          "msg": {
+            "ar": "أريد ربط حسابي على إنستغرام",
+            "en": "I want to connect my Instagram"
+          },
+          "dept": {
+            "ar": "الدعم",
+            "en": "Support"
+          },
+          "ch": "instagram",
+          "thread": {
+            "ar": [
+              "أريد ربط حسابي على إنستغرام بالمنصّة، كيف أبدأ؟"
+            ],
+            "en": [
+              "I want to connect my Instagram account — where do I start?"
+            ]
+          }
+        },
+        {
+          "name": {
+            "ar": "سالم الحجري",
+            "en": "Salem Al-Hajri"
+          },
+          "msg": {
+            "ar": "فاتورة الشهر الماضي",
+            "en": "Last month's invoice"
+          },
+          "dept": {
+            "ar": "المحاسبة",
+            "en": "Accounts"
+          },
+          "ch": "email",
+          "thread": {
+            "ar": [
+              "ممكن نسخة من فاتورة الشهر الماضي؟"
+            ],
+            "en": [
+              "Could I get a copy of last month's invoice?"
+            ]
+          }
+        },
+        {
+          "name": {
+            "ar": "نورة البلوشية",
+            "en": "Noura Al-Balushi"
+          },
+          "msg": {
+            "ar": "متى يفتح الفرع؟",
+            "en": "When does the branch open?"
+          },
+          "dept": {
+            "ar": "الدعم",
+            "en": "Support"
+          },
+          "ch": "telegram",
+          "thread": {
+            "ar": [
+              "متى يفتح فرع الخوض اليوم؟"
+            ],
+            "en": [
+              "What time does the Al-Khoud branch open today?"
+            ]
+          }
+        }
+      ],
+      "follow": [
+        {
+          "ask": {
+            "ar": "وهل في خصم على الطلب الثاني؟",
+            "en": "Is there a discount on a second order?"
+          },
+          "reply": {
+            "ar": "نعم، خصم ‎10% على الطلب الثاني خلال الشهر نفسه.",
+            "en": "Yes, 10% off a second order within the same month 🌿"
+          }
+        },
+        {
+          "ask": {
+            "ar": "ممكن الدفع عند الاستلام؟",
+            "en": "Can I pay on delivery?"
+          },
+          "reply": {
+            "ar": "متاح داخل مسقط، ولباقي المحافظات الدفع مسبق.",
+            "en": "Available inside Muscat; other governorates are prepaid."
+          }
+        },
+        {
+          "ask": {
+            "ar": "كم يوم يستغرق الشحن؟",
+            "en": "How long does shipping take?"
+          },
+          "reply": {
+            "ar": "من يومين إلى أربعة أيام عمل حسب المحافظة.",
+            "en": "Two to four working days depending on the governorate."
+          }
+        }
+      ],
+      "followMail": [
+        {
+          "ask": {
+            "ar": "وهل يمكن إرسالها بصيغة PDF؟",
+            "en": "Could you send it as a PDF?"
+          },
+          "reply": {
+            "ar": "أرسلنا الفاتورة PDF على بريدك الآن.",
+            "en": "The invoice has been emailed to you as a PDF ✅"
+          }
+        },
+        {
+          "ask": {
+            "ar": "أحتاج نسخة باسم الشركة وسجلّها التجاري.",
+            "en": "I need it issued to the company with its CR number."
+          },
+          "reply": {
+            "ar": "حدّثنا بيانات الفوترة وأعدنا إصدارها باسم الشركة.",
+            "en": "We updated the billing details and re-issued it to the company."
+          }
+        }
+      ]
+    },
+    "ai": {
+      "title": {
+        "ar": "محادثة واتساب حقيقية",
+        "en": "A real WhatsApp conversation"
+      },
+      "hint": {
+        "ar": "هذا عرض توضيحي على الموقع. داخل حسابك يتدرّب المساعد على قاعدة معرفة منتجاتك أنت.",
+        "en": "This is a demo on the website. Inside your account the assistant trains on your own product knowledge base."
+      },
+      "replay": {
+        "ar": "أعد العرض",
+        "en": "Replay"
+      },
+      "steps": {
+        "ar": [
+          "1 · العميل يسأل",
+          "2 · المساعد يردّ فوراً",
+          "3 · تحويل تلقائي بملخّص",
+          "4 · الموظف يكمّل"
+        ],
+        "en": [
+          "1 · Customer asks",
+          "2 · Instant AI reply",
+          "3 · Automatic handoff",
+          "4 · Agent finishes"
+        ]
+      },
+      "lines": {
+        "ar": [
+          "السلام عليكم، هل العرض ما زال متاحاً؟",
+          "وعليكم السلام ورحمة الله. العرض ما زال سارياً حتى نهاية الشهر: خصم 20% على كل باقات الاشتراك السنوي. هل أرسل لك التفاصيل؟",
+          "عندي فرعان ولكل فرع رقم واتساب مختلف، وأريد تقارير منفصلة لكل فرع مع فوترة واحدة. هل هذا ممكن؟",
+          "أهلاً أستاذ سالم، معك ريم من فريق المبيعات. نعم ممكن تماماً: تربط رقمين كحسابين منفصلين، فيصير لكل حساب تقاريره المستقلة، وتبقى الفوترة على اشتراك واحد. أرتّب لك عرضاً سريعاً اليوم؟"
+        ],
+        "en": [
+          "Hello — is the offer still available?",
+          "Hello. The offer runs until the end of the month: 20% off every annual plan. Shall I send you the details?",
+          "I have two branches, each with its own WhatsApp number, and I want separate reports per branch but a single invoice. Is that possible?",
+          "Hi Salem, this is Reem from sales. Yes, absolutely: you connect the two numbers as separate accounts, each with its own reports, while billing stays on one subscription. Shall I set up a quick call today?"
+        ]
+      },
+      "handoffTitle": {
+        "ar": "تحويل تلقائي لموظف",
+        "en": "Automatic handoff to an agent"
+      },
+      "handoffBody": {
+        "ar": "حالة تحتاج مراجعة بشرية: سؤال خارج قاعدة المعرفة (فوترة موحّدة مع فصل التقارير). حُوّلت المحادثة لقسم المبيعات مع ملخّص.",
+        "en": "A case needing human review — the question falls outside the knowledge base (unified billing with separated reporting). The conversation moved to sales with a summary."
+      },
+      "summaryTitle": {
+        "ar": "ملخّص المحادثة للموظف",
+        "en": "Conversation summary for the agent"
+      },
+      "summary": {
+        "ar": [
+          "العميل مهتم بالعرض السنوي (خصم 20%).",
+          "لديه فرعان برقمَي واتساب مختلفين.",
+          "يطلب تقارير منفصلة لكل فرع مع فوترة موحّدة."
+        ],
+        "en": [
+          "Customer is interested in the annual offer (20% off).",
+          "Has two branches on two different WhatsApp numbers.",
+          "Wants separate reports per branch with unified billing."
+        ]
+      },
+      "placeholder": {
+        "ar": "جرّب بنفسك: اكتب سؤالاً كأنك عميل…",
+        "en": "Try it — write a question as if you were a customer…"
+      },
+      "send": {
+        "ar": "إرسال",
+        "en": "Send"
+      },
+      "aiMeta": {
+        "ar": "المساعد الذكي · ردّ خلال 1.8 ث",
+        "en": "AI assistant · replied in 1.8s"
+      },
+      "agentMeta": {
+        "ar": "ريم اللواتي · مبيعات",
+        "en": "Reem Al-Lawati · Sales"
+      },
+      "customerMeta": {
+        "ar": "سالم — واتساب",
+        "en": "Salem — WhatsApp"
+      },
+      "agentInitial": {
+        "ar": "ر",
+        "en": "R"
+      },
+      "customerInitial": {
+        "ar": "س",
+        "en": "S"
+      },
+      "tryThis": {
+        "ar": "جرّب تسأل:",
+        "en": "Try asking:"
+      }
+    },
+    "campaign": {
+      "title": {
+        "ar": "إرسال حملة واتساب",
+        "en": "Sending a WhatsApp campaign"
+      },
+      "chip": {
+        "ar": "قوالب معتمدة",
+        "en": "Approved templates"
+      },
+      "hint": {
+        "ar": "في حسابك تجدول الإرسال، وتستهدف حسب الوسوم، وتتابع تقرير الحملة لحظة بلحظة.",
+        "en": "In your account you schedule the send, target by tags, and follow the campaign report as it happens."
+      },
+      "stepOne": {
+        "ar": "١ · اختر قالباً",
+        "en": "1 · Pick a template"
+      },
+      "stepTwo": {
+        "ar": "٢ · عايِن وأرسل",
+        "en": "2 · Preview and send"
+      },
+      "approved": {
+        "ar": "قالب معتمد",
+        "en": "Approved template"
+      },
+      "audience": {
+        "ar": "الجمهور",
+        "en": "Audience"
+      },
+      "recipients": {
+        "ar": "عدد المستلمين",
+        "en": "Recipients"
+      },
+      "channel": {
+        "ar": "القناة",
+        "en": "Channel"
+      },
+      "send": {
+        "ar": "أرسل الحملة الآن",
+        "en": "Send the campaign"
+      },
+      "sending": {
+        "ar": "{0} / {1} مُرسلة",
+        "en": "{0} / {1} sent"
+      },
+      "done": {
+        "ar": "تم إرسال {0} رسالة",
+        "en": "{0} messages sent"
+      },
+      "again": {
+        "ar": "جرّب حملة أخرى",
+        "en": "Try another campaign"
+      },
+      "stats": {
+        "ar": [
+          "الوصول",
+          "نسبة الفتح",
+          "نسبة النقر",
+          "ردود واردة"
+        ],
+        "en": [
+          "Reach",
+          "Open rate",
+          "Click rate",
+          "Replies"
+        ]
+      },
+      "tpls": [
+        {
+          "name": {
+            "ar": "عرض ترويجي",
+            "en": "Promotional offer"
+          },
+          "tag": {
+            "ar": "تسويق",
+            "en": "Marketing"
+          },
+          "body": {
+            "ar": "أهلاً {{الاسم}} 👋\nخصم 20% على كل الباقات حتى نهاية الشهر.\nاستخدم كود *QHUB20* عند الاشتراك.",
+            "en": "Hi {{name}} 👋\n20% off every plan until the end of the month.\nUse code *QHUB20* at checkout."
+          },
+          "audience": {
+            "ar": "كل العملاء",
+            "en": "All customers"
+          }
+        },
+        {
+          "name": {
+            "ar": "متابعة سلة متروكة",
+            "en": "Abandoned cart"
+          },
+          "tag": {
+            "ar": "متابعة",
+            "en": "Follow-up"
+          },
+          "body": {
+            "ar": "مرحباً {{الاسم}} 🛒\nلاحظنا أن طلبك لم يكتمل. نحجز لك المنتجات 24 ساعة إضافية.",
+            "en": "Hello {{name}} 🛒\nWe noticed your order wasn't completed. We'll hold the items for another 24 hours."
+          },
+          "audience": {
+            "ar": "عملاء لديهم سلة متروكة",
+            "en": "Customers with an abandoned cart"
+          }
+        },
+        {
+          "name": {
+            "ar": "ترحيب بعميل جديد",
+            "en": "New customer welcome"
+          },
+          "tag": {
+            "ar": "ترحيب",
+            "en": "Welcome"
+          },
+          "body": {
+            "ar": "أهلاً بك في {{الشركة}} 🎉\nحسابك جاهز. لأي استفسار راسلنا هنا ويصلك الردّ خلال دقائق.",
+            "en": "Welcome to {{company}} 🎉\nYour account is ready. Message us here any time and we'll reply within minutes."
+          },
+          "audience": {
+            "ar": "عملاء جدد هذا الأسبوع",
+            "en": "New customers this week"
+          }
+        },
+        {
+          "name": {
+            "ar": "تذكير بالدفع",
+            "en": "Payment reminder"
+          },
+          "tag": {
+            "ar": "دفع",
+            "en": "Billing"
+          },
+          "body": {
+            "ar": "تذكير ودّي {{الاسم}} 💳\nفاتورتك بقيمة {{المبلغ}} تستحق بعد ثلاثة أيام، ويمكن دفعها من هنا مباشرة.",
+            "en": "A friendly reminder {{name}} 💳\nYour invoice for {{amount}} is due in three days, and you can pay it right here."
+          },
+          "audience": {
+            "ar": "اشتراكات تستحق قريباً",
+            "en": "Subscriptions due soon"
+          }
+        }
+      ]
+    },
+    "routing": {
+      "title": {
+        "ar": "التوزيع التلقائي وهو يشتغل",
+        "en": "Automatic routing at work"
+      },
+      "hint": {
+        "ar": "القواعد المحدَّدة مسبقاً تقرأ الرسالة وتوجّهها إلى القسم والموظف الصحيح، بلا تدخّل يدوي.",
+        "en": "Rules set once read the message and send it to the right department and agent — with no manual step."
+      },
+      "run": {
+        "ar": "شغّل التوزيع",
+        "en": "Run the routing"
+      },
+      "again": {
+        "ar": "أعد التشغيل",
+        "en": "Run it again"
+      },
+      "incoming": {
+        "ar": "محادثة واردة من واتساب · قسم المبيعات",
+        "en": "Incoming WhatsApp conversation · Sales"
+      },
+      "arrived": {
+        "ar": "وصلت محادثة جديدة من واتساب — قسم المبيعات",
+        "en": "A new WhatsApp conversation arrived — Sales"
+      },
+      "names": {
+        "ar": [
+          "عبدالله الهنائي",
+          "سالم الحارثي",
+          "ريم اللواتي",
+          "لطيفة الحبسي"
+        ],
+        "en": [
+          "Abdullah Al-Hinai",
+          "Salem Al-Harthy",
+          "Reem Al-Lawati",
+          "Latifa Al-Habsi"
+        ]
+      },
+      "depts": {
+        "sales": {
+          "ar": "مبيعات",
+          "en": "Sales"
+        },
+        "support": {
+          "ar": "خدمة العملاء",
+          "en": "Customer service"
+        }
+      },
+      "statuses": {
+        "online": {
+          "ar": "متاح",
+          "en": "Available"
+        },
+        "busy": {
+          "ar": "مشغول",
+          "en": "At capacity"
+        },
+        "offline": {
+          "ar": "خارج الدوام",
+          "en": "Off shift"
+        }
+      },
+      "skipDept": {
+        "ar": "من قسم {0}، والمحادثة للمبيعات",
+        "en": "is in {0}, and this conversation is for Sales"
+      },
+      "skipOffline": {
+        "ar": "خارج ساعات العمل",
+        "en": "is outside working hours"
+      },
+      "skipBusy": {
+        "ar": "بلغ سقف المحادثات المتزامنة ({0})",
+        "en": "has hit the concurrent cap ({0})"
+      },
+      "assigned": {
+        "ar": "أُسندت إلى {0} — متاح وتحت السقف ({1})",
+        "en": "Assigned to {0} — available and under the cap ({1})"
+      },
+      "conversations": {
+        "ar": "محادثة",
+        "en": "conversations"
+      }
+    },
+    "reports": {
+      "title": {
+        "ar": "لوحة تقارير مصغّرة",
+        "en": "A miniature reports dashboard"
+      },
+      "hint": {
+        "ar": "بدّل بين اليوم والأسبوع والشهر، فتتحدّث كل الأرقام والرسوم. وفي حسابك تُصدَّر PDF أو Excel.",
+        "en": "Switch between today, the week and the month — every number and bar updates. In your account you export to PDF or Excel."
+      },
+      "periods": {
+        "today": {
+          "ar": "اليوم",
+          "en": "Today"
+        },
+        "week": {
+          "ar": "الأسبوع",
+          "en": "This week"
+        },
+        "month": {
+          "ar": "الشهر",
+          "en": "This month"
+        }
+      },
+      "kpis": [
+        {
+          "label": {
+            "ar": "محادثات جديدة",
+            "en": "New conversations"
+          },
+          "unit": {
+            "ar": "",
+            "en": ""
+          },
+          "color": {
+            "ar": "#2563EB",
+            "en": "#2563EB"
+          }
+        },
+        {
+          "label": {
+            "ar": "متوسط وقت الرد (د)",
+            "en": "Avg. reply time (m)"
+          },
+          "unit": {
+            "ar": "",
+            "en": ""
+          },
+          "color": {
+            "ar": "#F59E0B",
+            "en": "#F59E0B"
+          }
+        },
+        {
+          "label": {
+            "ar": "نسبة ردود المساعد",
+            "en": "Handled by AI"
+          },
+          "unit": {
+            "ar": "%",
+            "en": "%"
+          },
+          "color": {
+            "ar": "#8B5CF6",
+            "en": "#8B5CF6"
+          }
+        },
+        {
+          "label": {
+            "ar": "تقييم العملاء",
+            "en": "Customer rating"
+          },
+          "unit": {
+            "ar": " / 5",
+            "en": " / 5"
+          },
+          "color": {
+            "ar": "#10B981",
+            "en": "#10B981"
+          }
+        }
+      ],
+      "volume": {
+        "ar": "حجم المحادثات",
+        "en": "Conversation volume"
+      },
+      "whoReplied": {
+        "ar": "من ردّ؟",
+        "en": "Who replied?"
+      },
+      "byAi": {
+        "ar": "تولّاها المساعد الذكي",
+        "en": "handled by the assistant"
+      },
+      "toAgent": {
+        "ar": "حُوّلت لموظف بشري",
+        "en": "handed to a human agent"
+      },
+      "labels": {
+        "today": {
+          "ar": [
+            "9ص",
+            "11ص",
+            "1م",
+            "3م",
+            "5م",
+            "7م",
+            "9م"
+          ],
+          "en": [
+            "9am",
+            "11am",
+            "1pm",
+            "3pm",
+            "5pm",
+            "7pm",
+            "9pm"
+          ]
+        },
+        "week": {
+          "ar": [
+            "أحد",
+            "إثنين",
+            "ثلاثاء",
+            "أربعاء",
+            "خميس",
+            "جمعة",
+            "سبت"
+          ],
+          "en": [
+            "Sun",
+            "Mon",
+            "Tue",
+            "Wed",
+            "Thu",
+            "Fri",
+            "Sat"
+          ]
+        },
+        "month": {
+          "ar": [
+            "أ1",
+            "أ2",
+            "أ3",
+            "أ4",
+            "أ5",
+            "أ6",
+            "أ7"
+          ],
+          "en": [
+            "W1",
+            "W2",
+            "W3",
+            "W4",
+            "W5",
+            "W6",
+            "W7"
+          ]
+        }
+      }
+    },
+    "widget": {
+      "title": {
+        "ar": "خصّص الويدجت وشاهده يتغيّر",
+        "en": "Customise the widget and watch it change"
+      },
+      "chip": {
+        "ar": "تحرير مباشر",
+        "en": "Live editing"
+      },
+      "hint": {
+        "ar": "غيّر اللون والاسم ورسالة الترحيب، فيتحدّث الويدجت على اليسار فوراً؛ وهو ما يراه زائر موقعك بالضبط.",
+        "en": "Change the colour, the name and the greeting — the widget updates instantly, and this is exactly what a visitor sees."
+      },
+      "colorLabel": {
+        "ar": "لون الويدجت",
+        "en": "Widget colour"
+      },
+      "nameLabel": {
+        "ar": "اسم النشاط",
+        "en": "Business name"
+      },
+      "welcomeLabel": {
+        "ar": "رسالة الترحيب",
+        "en": "Greeting message"
+      },
+      "defaultName": {
+        "ar": "متجر نزوى",
+        "en": "Nizwa Store"
+      },
+      "defaultWelcome": {
+        "ar": "أهلاً بك 👋 كيف يمكننا مساعدتك اليوم؟",
+        "en": "Hi 👋 How can we help you today?"
+      },
+      "open": {
+        "ar": "افتح المحادثة",
+        "en": "Open the chat"
+      },
+      "close": {
+        "ar": "إغلاق",
+        "en": "Close"
+      },
+      "placeholder": {
+        "ar": "اكتب رسالتك…",
+        "en": "Write your message…"
+      },
+      "send": {
+        "ar": "إرسال",
+        "en": "Send"
+      },
+      "aiName": {
+        "ar": "المساعد الذكي",
+        "en": "AI assistant"
+      },
+      "visitorInitial": {
+        "ar": "أ",
+        "en": "V"
+      }
+    },
+    "integrations": {
+      "title": {
+        "ar": "التكاملات وخطوات ربطها",
+        "en": "Integrations and how they connect"
+      },
+      "chip": {
+        "ar": "{0} تكاملاً جاهزاً",
+        "en": "{0} ready integrations"
+      },
+      "hint": {
+        "ar": "اضغط أي منصّة ليفتح لوحها بخطوات الربط وما تحصل عليه بعده.",
+        "en": "Tap any platform to open its panel with the connection steps and what you get afterwards."
+      },
+      "filters": [
+        {
+          "id": "all",
+          "label": {
+            "ar": "الكل",
+            "en": "All"
+          }
+        },
+        {
+          "id": "channel",
+          "label": {
+            "ar": "قنوات",
+            "en": "Channels"
+          }
+        },
+        {
+          "id": "store",
+          "label": {
+            "ar": "متاجر",
+            "en": "Stores"
+          }
+        },
+        {
+          "id": "mail",
+          "label": {
+            "ar": "بريد",
+            "en": "Email"
+          }
+        }
+      ],
+      "types": {
+        "channel": {
+          "ar": "قناة تواصل",
+          "en": "Messaging channel"
+        },
+        "store": {
+          "ar": "متجر إلكتروني",
+          "en": "Online store"
+        },
+        "mail": {
+          "ar": "بريد",
+          "en": "Email"
+        }
+      },
+      "stepsTitle": {
+        "ar": "خطوات الربط",
+        "en": "Connection steps"
+      },
+      "factsTitle": {
+        "ar": "ماذا تحصل عليه",
+        "en": "What you get"
+      },
+      "close": {
+        "ar": "إغلاق",
+        "en": "Close"
+      },
+      "items": {
+        "whatsapp": {
+          "name": {
+            "ar": "WhatsApp Business",
+            "en": "WhatsApp Business"
+          },
+          "desc": {
+            "ar": "القناة الأكثر استخداماً في المنطقة. تصل رسائل العملاء إلى صندوق Qhub ويُردّ عليها منه، وتُرسَل الحملات بقوالب معتمدة.",
+            "en": "The most used channel in the region. Customer messages arrive in the Qhub inbox and are answered from it, and campaigns go out on approved templates."
+          },
+          "steps": {
+            "ar": [
+              "افتح «الحسابات والربط» من لوحة التحكّم واختر WhatsApp Business.",
+              "امسح رمز QR من تطبيق واتساب على جوال الشركة، أو أدخل بيانات Cloud API.",
+              "اختر القسم الافتراضي الذي تدخله محادثات هذه القناة.",
+              "فعّل المساعد الذكي على القناة إن رغبت، ثم احفظ."
+            ],
+            "en": [
+              "Open “Accounts & channels” in the dashboard and pick WhatsApp Business.",
+              "Scan the QR code from WhatsApp on the company phone, or enter Cloud API details.",
+              "Choose the default department this channel's conversations land in.",
+              "Enable the AI assistant on the channel if you want — then save."
+            ]
+          },
+          "facts": {
+            "ar": [
+              "أكثر من رقم على الحساب نفسه",
+              "قوالب معتمدة للحملات",
+              "إرسال واستقبال الصور والصوت والملفات"
+            ],
+            "en": [
+              "Several numbers on one account",
+              "Approved campaign templates",
+              "Send and receive images, audio and files"
+            ]
+          }
+        },
+        "instagram": {
+          "name": {
+            "ar": "Instagram Direct",
+            "en": "Instagram Direct"
+          },
+          "desc": {
+            "ar": "رسائل حساب الأعمال على إنستغرام تُدار مع بقية القنوات، بالإسناد نفسه والتقارير نفسها.",
+            "en": "Business-account DMs are managed alongside every other channel, with the same routing and the same reports."
+          },
+          "steps": {
+            "ar": [
+              "اربط صفحة فيسبوك المرتبطة بحساب إنستغرام للأعمال.",
+              "امنح Qhub صلاحية إدارة الرسائل عبر نافذة Meta.",
+              "اختر حساب إنستغرام من القائمة واحفظ الربط."
+            ],
+            "en": [
+              "Connect the Facebook page linked to the Instagram business account.",
+              "Grant Qhub message-management permission through the Meta dialog.",
+              "Pick the Instagram account from the list and save."
+            ]
+          },
+          "facts": {
+            "ar": [
+              "ردود على القصص والمنشورات",
+              "سجلّ عميل موحّد عبر القنوات",
+              "دعم الردود السريعة"
+            ],
+            "en": [
+              "Replies to stories and posts",
+              "One customer history across channels",
+              "Quick replies supported"
+            ]
+          }
+        },
+        "messenger": {
+          "name": {
+            "ar": "Facebook Messenger",
+            "en": "Facebook Messenger"
+          },
+          "desc": {
+            "ar": "رسائل صفحات فيسبوك تصل مباشرة إلى صندوق الوارد الموحّد.",
+            "en": "Page messages arrive straight in the shared inbox."
+          },
+          "steps": {
+            "ar": [
+              "اضغط «ربط» واختر الصفحة من حسابك على Meta.",
+              "وافق على صلاحيات الرسائل.",
+              "حدّد القسم وساعات العمل للقناة."
+            ],
+            "en": [
+              "Click “Connect” and pick the page from your Meta account.",
+              "Approve the messaging permissions.",
+              "Set the department and working hours for the channel."
+            ]
+          },
+          "facts": {
+            "ar": [
+              "ربط أكثر من صفحة",
+              "ردود آلية خارج الدوام",
+              "إسناد حسب القسم"
+            ],
+            "en": [
+              "Connect several pages",
+              "Automatic after-hours replies",
+              "Routing by department"
+            ]
+          }
+        },
+        "telegram": {
+          "name": {
+            "ar": "Telegram",
+            "en": "Telegram"
+          },
+          "desc": {
+            "ar": "بوت تيليجرام يستقبل رسائل عملائك ويوصلها إلى الصندوق نفسه.",
+            "en": "A Telegram bot receives your customers' messages and delivers them to the same inbox."
+          },
+          "steps": {
+            "ar": [
+              "أنشئ بوتاً عبر BotFather واحصل على التوكن.",
+              "الصق التوكن في Qhub.",
+              "اختر القسم واحفظ."
+            ],
+            "en": [
+              "Create a bot through BotFather and copy the token.",
+              "Paste the token into Qhub.",
+              "Pick the department and save."
+            ]
+          },
+          "facts": {
+            "ar": [
+              "ربط بلا حدود للقنوات",
+              "دعم الملفات والوسائط",
+              "ردود سريعة جاهزة"
+            ],
+            "en": [
+              "Unlimited channel connections",
+              "Files and media supported",
+              "Ready quick replies"
+            ]
+          }
+        },
+        "x": {
+          "name": {
+            "ar": "X (Twitter)",
+            "en": "X (Twitter)"
+          },
+          "desc": {
+            "ar": "الرسائل المباشرة على X تصل إلى الصندوق مع بقية القنوات.",
+            "en": "Direct messages on X arrive in the inbox with every other channel."
+          },
+          "steps": {
+            "ar": [
+              "اربط حساب X عبر نافذة الصلاحيات.",
+              "اختر القسم الافتراضي.",
+              "احفظ الربط."
+            ],
+            "en": [
+              "Connect the X account through the permissions dialog.",
+              "Pick the default department.",
+              "Save the connection."
+            ]
+          },
+          "facts": {
+            "ar": [
+              "رسائل مباشرة موحّدة",
+              "سجلّ عميل مشترك",
+              "تقارير بالقناة"
+            ],
+            "en": [
+              "Unified direct messages",
+              "Shared customer history",
+              "Per-channel reporting"
+            ]
+          }
+        },
+        "widget": {
+          "name": {
+            "ar": "ويدجت المحادثة",
+            "en": "Chat widget"
+          },
+          "desc": {
+            "ar": "زرّ محادثة على موقعك بسطر واحد، ورسائله تصل الصندوق نفسه.",
+            "en": "A chat button on your site from a single line, with its messages landing in the same inbox."
+          },
+          "steps": {
+            "ar": [
+              "انسخ سطر التركيب من إعدادات الويدجت.",
+              "ألصقه قبل إغلاق وسم body في موقعك.",
+              "اضبط اللون والترحيب وقواعد الظهور."
+            ],
+            "en": [
+              "Copy the install line from the widget settings.",
+              "Paste it before the closing body tag on your site.",
+              "Set the colour, greeting and display rules."
+            ]
+          },
+          "facts": {
+            "ar": [
+              "تخصيص كامل للشكل",
+              "ردّ آلي خارج الدوام",
+              "يعمل على أي منصّة تقبل HTML"
+            ],
+            "en": [
+              "Fully customisable look",
+              "Automatic after-hours reply",
+              "Works on any platform that allows HTML"
+            ]
+          }
+        },
+        "gmail": {
+          "name": {
+            "ar": "Gmail",
+            "en": "Gmail"
+          },
+          "desc": {
+            "ar": "بريد الدعم على Gmail أو Google Workspace يتحوّل إلى محادثات داخل الصندوق، بالإسناد والحالة نفسها.",
+            "en": "Support mail on Gmail or Google Workspace becomes conversations inside the inbox, with the same routing and status."
+          },
+          "steps": {
+            "ar": [
+              "افتح «الحسابات والربط» واختر Gmail.",
+              "سجّل الدخول بحساب جوجل ووافق على صلاحية القراءة والإرسال.",
+              "اختر القسم الذي تدخله رسائل هذا العنوان واحفظ."
+            ],
+            "en": [
+              "Open “Accounts & channels” and pick Gmail.",
+              "Sign in with Google and approve read and send access.",
+              "Choose the department this address routes to, and save."
+            ]
+          },
+          "facts": {
+            "ar": [
+              "بلا كلمة مرور — تفويض من جوجل",
+              "مرفقات كاملة",
+              "الردّ يخرج من عنوانك نفسه"
+            ],
+            "en": [
+              "No password — Google authorisation",
+              "Full attachments",
+              "Replies leave from your own address"
+            ]
+          }
+        },
+        "outlook": {
+          "name": {
+            "ar": "أوتلوك",
+            "en": "Outlook"
+          },
+          "desc": {
+            "ar": "حساب Outlook أو Microsoft 365 يُربط بتفويض واحد، وتصل رسائله محادثاتٍ مرتّبة.",
+            "en": "An Outlook or Microsoft 365 account connects with a single authorisation, and its mail arrives as tidy conversations."
+          },
+          "steps": {
+            "ar": [
+              "افتح «الحسابات والربط» واختر Outlook.",
+              "سجّل الدخول بحساب مايكروسوفت ووافق على الصلاحيات.",
+              "اختر القسم واحفظ."
+            ],
+            "en": [
+              "Open “Accounts & channels” and pick Outlook.",
+              "Sign in with Microsoft and approve the permissions.",
+              "Choose the department and save."
+            ]
+          },
+          "facts": {
+            "ar": [
+              "يدعم Microsoft 365",
+              "مزامنة المجلّدات",
+              "قوالب ردود محفوظة"
+            ],
+            "en": [
+              "Microsoft 365 supported",
+              "Folder sync",
+              "Saved reply templates"
+            ]
+          }
+        },
+        "smtp": {
+          "name": {
+            "ar": "SMTP",
+            "en": "SMTP"
+          },
+          "desc": {
+            "ar": "أي مزوّد بريد آخر: تدخل بيانات خادمه فيُستقبَل البريد ويُرسَل منه.",
+            "en": "Any other mail provider — enter its server details and mail is received and sent through it."
+          },
+          "steps": {
+            "ar": [
+              "جهّز بيانات خادمي SMTP وIMAP من مزوّدك.",
+              "أدخل المضيف والمنفذ واسم المستخدم وكلمة المرور في Qhub.",
+              "أرسل رسالة اختبار، ثم اختر القسم واحفظ."
+            ],
+            "en": [
+              "Get the SMTP and IMAP server details from your provider.",
+              "Enter host, port, username and password in Qhub.",
+              "Send a test message, then choose the department and save."
+            ]
+          },
+          "facts": {
+            "ar": [
+              "يعمل مع أي مزوّد",
+              "تشفير TLS",
+              "اختبار الاتصال قبل الحفظ"
+            ],
+            "en": [
+              "Works with any provider",
+              "TLS encryption",
+              "Connection tested before saving"
+            ]
+          }
+        },
+        "salla": {
+          "name": {
+            "ar": "سلة",
+            "en": "Salla"
+          },
+          "desc": {
+            "ar": "بيانات الطلبات والعملاء من متجرك على سلة تظهر بجانب المحادثة مباشرة.",
+            "en": "Order and customer data from your Salla store appears right beside the conversation."
+          },
+          "steps": {
+            "ar": [
+              "ثبّت تطبيق Qhub من متجر تطبيقات سلة.",
+              "وافق على صلاحيات القراءة.",
+              "اختر المتجر واحفظ."
+            ],
+            "en": [
+              "Install the Qhub app from the Salla app store.",
+              "Approve the read permissions.",
+              "Pick the store and save."
+            ]
+          },
+          "facts": {
+            "ar": [
+              "الطلب وحالته داخل المحادثة",
+              "مطابقة العميل برقمه",
+              "ردود آلية بحالة الشحن"
+            ],
+            "en": [
+              "Order and status inside the chat",
+              "Customer matched by number",
+              "Automatic shipping-status replies"
+            ]
+          }
+        },
+        "zid": {
+          "name": {
+            "ar": "زد",
+            "en": "Zid"
+          },
+          "desc": {
+            "ar": "ربط مباشر مع متجر زد لعرض الطلبات والسلّات داخل المحادثة.",
+            "en": "A direct connection to your Zid store showing orders and carts inside the conversation."
+          },
+          "steps": {
+            "ar": [
+              "ثبّت تطبيق Qhub من سوق تطبيقات زد.",
+              "وافق على الصلاحيات.",
+              "اختر المتجر واحفظ."
+            ],
+            "en": [
+              "Install the Qhub app from the Zid marketplace.",
+              "Approve the permissions.",
+              "Pick the store and save."
+            ]
+          },
+          "facts": {
+            "ar": [
+              "صلاحية قراءة فقط",
+              "بيانات الطلب لحظية",
+              "متابعة السلّات المتروكة"
+            ],
+            "en": [
+              "Read-only access",
+              "Live order data",
+              "Abandoned-cart follow-up"
+            ]
+          }
+        },
+        "shopify": {
+          "name": {
+            "ar": "Shopify",
+            "en": "Shopify"
+          },
+          "desc": {
+            "ar": "متجر Shopify يتصل بـ Qhub فتظهر الطلبات والشحن جنب كل محادثة.",
+            "en": "A Shopify store connects to Qhub so orders and shipping show next to every conversation."
+          },
+          "steps": {
+            "ar": [
+              "ثبّت تطبيق Qhub من Shopify App Store.",
+              "وافق على الصلاحيات.",
+              "اختر المتجر واحفظ."
+            ],
+            "en": [
+              "Install the Qhub app from the Shopify App Store.",
+              "Approve the permissions.",
+              "Pick the store and save."
+            ]
+          },
+          "facts": {
+            "ar": [
+              "طلبات وشحن داخل المحادثة",
+              "مطابقة تلقائية للعميل",
+              "بيئة تجريبية قبل التفعيل"
+            ],
+            "en": [
+              "Orders and shipping in the chat",
+              "Automatic customer matching",
+              "Sandbox before going live"
+            ]
+          }
+        },
+        "woo": {
+          "name": {
+            "ar": "WooCommerce",
+            "en": "WooCommerce"
+          },
+          "desc": {
+            "ar": "إضافة ووردبريس تربط متجر WooCommerce بصندوق Qhub.",
+            "en": "A WordPress plugin connects your WooCommerce store to the Qhub inbox."
+          },
+          "steps": {
+            "ar": [
+              "نزّل إضافة Qhub لووردبريس.",
+              "الصق مفتاح الـAPI من لوحتك.",
+              "اختر الأحداث التي تريد إشعاراً عنها."
+            ],
+            "en": [
+              "Download the Qhub plugin for WordPress.",
+              "Paste the API key from your dashboard.",
+              "Choose the events you want notifications for."
+            ]
+          },
+          "facts": {
+            "ar": [
+              "إشعارات بالطلبات الجديدة",
+              "بيانات العميل داخل المحادثة",
+              "تحكّم كامل بالأحداث"
+            ],
+            "en": [
+              "New-order notifications",
+              "Customer data inside the chat",
+              "Full control over events"
+            ]
+          }
+        }
+      }
+    }
   }
 };

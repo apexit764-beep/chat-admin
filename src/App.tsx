@@ -25,6 +25,17 @@ const AdminIntegrations = lazy(() => import('@pages/admin/Integrations'));
 const AdminIndustries = lazy(() => import('@pages/admin/Industries'));
 const AdminWidgetSettings = lazy(() => import('@pages/admin/WidgetSettings'));
 const AdminPlanRequests = lazy(() => import('@pages/admin/PlanRequests'));
+const SiteHome = lazy(() => import('@pages/admin/site/Home'));
+const SiteHomeSection = lazy(() => import('@pages/admin/site/HomeSection'));
+const SiteSolutions = lazy(() => import('@pages/admin/site/Solutions'));
+const SiteFaq = lazy(() => import('@pages/admin/site/Faq'));
+const SiteInbox = lazy(() => import('@pages/admin/site/Inbox'));
+const SiteNavigation = lazy(() => import('@pages/admin/site/Navigation'));
+const SiteLinks = lazy(() => import('@pages/admin/site/Links'));
+const SiteSeo = lazy(() => import('@pages/admin/site/Seo'));
+const SiteUiStrings = lazy(() => import('@pages/admin/site/UiStrings'));
+const SiteMedia = lazy(() => import('@pages/admin/site/Media'));
+const SitePublications = lazy(() => import('@pages/admin/site/Publications'));
 const SiteFeatures = lazy(() => import('@pages/admin/site/Features'));
 const SiteFeatureEditor = lazy(() => import('@pages/admin/site/FeatureEditor'));
 
@@ -71,6 +82,24 @@ export default function App(): JSX.Element {
           <Route path="/industries" element={<AdminIndustries />} />
           <Route path="/widget" element={<AdminWidgetSettings />} />
           <Route path="/profile" element={<AdminProfile />} />
+          <Route path="/site" element={<Navigate to="/site/home" replace />} />
+          <Route path="/site/home" element={<SiteHome />} />
+          <Route path="/site/home/:key" element={<SiteHomeSection />} />
+          <Route path="/site/solutions" element={<SiteSolutions />} />
+          <Route path="/site/faq" element={<SiteFaq />} />
+          <Route path="/site/testimonials" element={<Navigate to="/site/home/testimonials" replace />} />
+          <Route path="/site/channels" element={<Navigate to="/site/home/integrations" replace />} />
+          <Route path="/site/partners" element={<Navigate to="/site/home/partners_marquee" replace />} />
+          <Route path="/site/stats" element={<Navigate to="/site/home/stats" replace />} />
+          <Route path="/site/legal" element={<Navigate to="/settings#pages" replace />} />
+          <Route path="/site/pricing" element={<Navigate to="/plans#site" replace />} />
+          <Route path="/site/inbox/:kind" element={<SiteInbox />} />
+          <Route path="/site/navigation" element={<SiteNavigation />} />
+          <Route path="/site/links" element={<SiteLinks />} />
+          <Route path="/site/seo" element={<SiteSeo />} />
+          <Route path="/site/ui-strings" element={<SiteUiStrings />} />
+          <Route path="/site/media" element={<SiteMedia />} />
+          <Route path="/site/publications" element={<SitePublications />} />
           <Route path="/site/features" element={<SiteFeatures />} />
           <Route path="/site/features/:slug" element={<SiteFeatureEditor />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

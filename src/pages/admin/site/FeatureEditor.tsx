@@ -8,11 +8,11 @@ import { DualField, LIMITS } from '@components/site/DualField';
 import { IconPicker, IconView } from '@components/site/IconPicker';
 import { ListEditor } from '@components/site/ListEditor';
 import { PublishBar } from '@components/site/PublishBar';
-import { SceneTexts } from '@components/site/SceneTexts';
+import { AutoFields } from '@components/site/SchemaForm';
 import { TitleField } from '@components/site/TitleField';
 import { TranslationBadges } from '@components/site/TranslationBadges';
 import { useSiteContentStore } from '@/store/useSiteContentStore';
-import type { Dual, FeaturePage } from '@/types/siteContent';
+import type { Dual, FeaturePage, StepArt } from '@/types/siteContent';
 import { cn } from '@/lib/utils';
 import { missingTranslations } from '@/utils/siteContent';
 import { SITE_URL } from './Features';
@@ -37,8 +37,8 @@ type Tab = (typeof TABS)[number]['key'];
  */
 export default function SiteFeatureEditor(): JSX.Element {
   const { slug = '' } = useParams();
-  const card = useSiteContentStore((s) => s.draft.cards.find((c) => c.slug === slug));
-  const page = useSiteContentStore((s) => s.draft.pages[slug]);
+  const card = useSiteContentStore((s) => s.draft.features.cards.find((c) => c.slug === slug));
+  const page = useSiteContentStore((s) => s.draft.features.pages[slug]);
   const updateCard = useSiteContentStore((s) => s.updateCard);
   const updatePage = useSiteContentStore((s) => s.updatePage);
   const [tab, setTab] = useState<Tab>('hero');
@@ -179,7 +179,14 @@ export default function SiteFeatureEditor(): JSX.Element {
                     override={s.artOverride}
                     onChange={(artOverride) => update({ ...s, artOverride })}
                     sceneLabel={s.art.kind}
-                    sceneEditor={<SceneTexts art={s.art} onChange={(art) => update({ ...s, art })} />}
+                    sceneEditor={
+                      <div className="space-y-3 rounded-xl border border-border p-4">
+                        <p className="text-sm font-semibold">
+                          نصوص الرسمة <span className="font-normal text-muted-foreground">· البنية مقفلة، النصوص فقط تُحرَّر</span>
+                        </p>
+                        <AutoFields value={s.art} onChange={(art) => update({ ...s, art: art as StepArt })} />
+                      </div>
+                    }
                   />
                 </>
               )}
@@ -271,7 +278,7 @@ export default function SiteFeatureEditor(): JSX.Element {
         )}
       </div>
 
-      <PublishBar slug={slug} />
+      <PublishBar scope="features" />
     </div>
   );
 }

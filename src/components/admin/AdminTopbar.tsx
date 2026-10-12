@@ -42,7 +42,20 @@ const breadcrumbMap: Record<string, string> = {
   '/notifications': 'الإشعارات',
   '/widget': 'إعدادات المساعد الذكي',
   '/settings': 'الإعدادات',
-  '/site': 'صفحات المزايا',
+  '/site': 'الموقع التعريفي',
+  '/site/home': 'الصفحة الرئيسية',
+  '/site/features': 'المزايا',
+  '/site/solutions': 'الحلول',
+  '/site/faq': 'الأسئلة الشائعة',
+  '/site/inbox/contact': 'رسائل التواصل',
+  '/site/inbox/leads': 'Leads المساعد',
+  '/site/inbox/enterprise': 'طلبات المؤسسات',
+  '/site/navigation': 'القائمة والفوتر',
+  '/site/links': 'الروابط والتواصل',
+  '/site/seo': 'SEO',
+  '/site/ui-strings': 'نصوص الواجهة',
+  '/site/media': 'مكتبة الوسائط',
+  '/site/publications': 'النشر والإصدارات',
 };
 
 export function AdminTopbar(): JSX.Element {

@@ -33,6 +33,9 @@ import { renderEmail } from '@/utils/emailShell';
 import type { EmailTemplate, EmailButton } from '@/store/useSettingsStore';
 import { initials, avatarColor } from '@/utils/format';
 import { cn } from '@/lib/utils';
+import { PublishBar } from '@components/site/PublishBar';
+import { SiteEmbed } from '@components/site/SitePage';
+import SiteLegal from '@pages/admin/site/Legal';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -822,58 +825,10 @@ export default function AdminSettings(): JSX.Element {
             {/* PAGES CRUD */}
             {tab === 'pages' && (
               <div>
-                <Header
-                  icon={<FileStack className="h-5 w-5" />}
-                  title="الصفحات"
-                  subtitle="إدارة الصفحات الثابتة مثل الشروط وسياسة الخصوصية"
-                  action={
-                    <Button size="sm" onClick={() => { setPageErrors({}); setPageModal({ id: String(Date.now()), title: '', slug: '', content: '', status: 'draft', isNew: true }); }}>
-                      <Plus className="h-4 w-4 me-2" /> إضافة صفحة
-                    </Button>
-                  }
-                />
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-12">#</TableHead>
-                      <TableHead>عنوان الصفحة</TableHead>
-                      <TableHead>الرابط (Slug)</TableHead>
-                      <TableHead>الحالة</TableHead>
-                      <TableHead className="text-end">إجراءات</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {pages.map((p, idx) => (
-                      <TableRow key={p.id}>
-                        <TableCell className="text-xs text-muted-foreground font-mono">{idx + 1}</TableCell>
-                        <TableCell className="font-medium">{p.title}</TableCell>
-                        <TableCell className="font-mono text-xs text-muted-foreground">/{p.slug}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Switch
-                              checked={p.status === 'published'}
-                              onCheckedChange={(checked) => setPages((prev) => prev.map((x) => x.id === p.id ? { ...x, status: checked ? 'published' : 'draft' } : x))}
-                            />
-                            <span className="text-xs text-muted-foreground">{p.status === 'published' ? 'منشورة' : 'مسودة'}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-0.5 justify-end">
-                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => { setPageErrors({}); setPageModal({ ...p, isNew: false }); }}>
-                              <Edit2 className="h-3.5 w-3.5" />
-                            </Button>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={async () => {
-                              const ok = await confirm({ title: `حذف "${p.title}"؟`, variant: 'danger', confirmText: 'حذف' });
-                              if (ok) { setPages((prev) => prev.filter((x) => x.id !== p.id)); showToast('تم الحذف', 'success'); }
-                            }}>
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                <SiteEmbed>
+                  <SiteLegal />
+                </SiteEmbed>
+                <PublishBar scope="legal" />
               </div>
             )}
 

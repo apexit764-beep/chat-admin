@@ -8,13 +8,17 @@ import { cn } from '@/lib/utils';
 type FieldType = 'text' | 'textarea' | 'list';
 type ValueOf<T extends FieldType> = T extends 'list' ? string[] : string;
 
-/** حدود الطول المقترحة — تحذير لا منع */
-export const LIMITS = { title: 60, description: 180 } as const;
+/** حدود الطول المقترحة (§6.1) — تحذير لا منع */
+export const LIMITS = { title: 60, description: 180, testimonial: 220 } as const;
+
+const TAG: Record<Locale, string> = { ar: 'العربية', en: 'En' };
 
 /**
- * حقل ثنائي اللغة بنمط اللوحة نفسه (BilingualInput): حقل واحد ومبدّل
- * «العربية | En». يضيف ما يحتاجه محتوى الموقع: نوع «قائمة نقاط»، ونقطة
- * على «En» حين تنقص الترجمة، وعدّاد يحذّر عند تجاوز الطول المقترح ولا يمنع.
+ * الحقل ثنائي اللغة (CMS-PROMPT §6.1):
+ * - العربية والإنجليزية **جنباً إلى جنب** على الشاشات ≥ 1280px، وتبويبان
+ *   «العربية | En» تحتها — بشكل LanguageTabs نفسه في اللوحة.
+ * - كل لغة باتجاهها، وشارة «الترجمة ناقصة» عند الحقل الفارغ.
+ * - عدّاد أحرف بحدّ مقترح؛ تجاوزه تحذير لا منع.
  */
 export function DualField<T extends FieldType = 'text'>({
   label,
@@ -34,66 +38,75 @@ export function DualField<T extends FieldType = 'text'>({
   limit?: number;
   isTitle?: boolean;
   hint?: ReactNode;
-  /** يظهر تحت حقل اللغة المختارة — رقائق الكلمات مثلاً */
+  /** يظهر تحت حقل كل لغة — رقائق الكلمات مثلاً */
   below?: (locale: Locale) => ReactNode;
   compact?: boolean;
 }): JSX.Element {
-  const [lang, setLang] = useState<Locale>('ar');
-  const missingEn = !isBlank(value.ar) && isBlank(value.en);
-  const missingAr = isBlank(value.ar) && !isBlank(value.en);
-  const text = value[lang];
-  const dir = lang === 'ar' ? 'rtl' : 'ltr';
-  const length = Array.isArray(text) ? Math.max(0, ...text.map((s) => s.length)) : text.length;
-  const over = limit !== undefined && length > limit;
-  const set = (next: ValueOf<T>): void => onChange({ ...value, [lang]: next });
+  const [active, setActive] = useState<Locale>('ar');
+  const missing: Record<Locale, boolean> = {
+    ar: isBlank(value.ar) && !isBlank(value.en),
+    en: !isBlank(value.ar) && isBlank(value.en),
+  };
+  const set = (l: Locale, next: ValueOf<T>): void => onChange({ ...value, [l]: next });
 
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-2">
         <label className={cn('font-medium', compact ? 'text-xs text-muted-foreground' : 'text-sm')}>{label}</label>
-        <div className="flex gap-1 bg-muted p-1 rounded-md">
+        {/* التبويبان تحت 1280px فقط */}
+        <div className="flex gap-1 bg-muted p-1 rounded-md xl:hidden">
           {(['ar', 'en'] as const).map((l) => (
             <button
               key={l}
               type="button"
-              onClick={() => setLang(l)}
+              onClick={() => setActive(l)}
               className={cn(
                 'relative px-3 py-1 rounded text-sm font-medium transition-colors',
-                lang === l ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                active === l ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
               )}
             >
-              {l === 'ar' ? 'العربية' : 'En'}
-              {((l === 'en' && missingEn) || (l === 'ar' && missingAr)) && (
-                <span className="absolute -top-0.5 -end-0.5 h-2 w-2 rounded-full bg-warning ring-2 ring-muted" title="الترجمة ناقصة" />
-              )}
+              {TAG[l]}
+              {missing[l] && <span className="absolute -top-0.5 -end-0.5 h-2 w-2 rounded-full bg-warning ring-2 ring-muted" />}
             </button>
           ))}
         </div>
       </div>
 
-      {type === 'text' && <Input key={lang} value={text as string} dir={dir} onChange={(e) => set(e.target.value as ValueOf<T>)} />}
-      {type === 'textarea' && <Textarea key={lang} value={text as string} dir={dir} rows={3} onChange={(e) => set(e.target.value as ValueOf<T>)} />}
-      {type === 'list' && <StringList key={lang} dir={dir} items={text as string[]} onChange={(items) => set(items as ValueOf<T>)} />}
+      <div className="grid gap-3 xl:grid-cols-2">
+        {(['ar', 'en'] as const).map((l) => {
+          const text = value[l] ?? (type === 'list' ? [] : '');
+          const dir = l === 'ar' ? 'rtl' : 'ltr';
+          const length = Array.isArray(text) ? Math.max(0, ...text.map((s) => s.length)) : String(text).length;
+          const over = limit !== undefined && length > limit;
 
-      <div className="flex items-center gap-3 text-[11px]">
-        {((lang === 'en' && missingEn) || (lang === 'ar' && missingAr)) && (
-          <span className="flex items-center gap-1 text-warning">
-            <AlertTriangle className="h-3 w-3" /> الترجمة ناقصة
-          </span>
-        )}
-        {over && (
-          <span className="text-warning">
-            تجاوز الطول المقترح — {isTitle ? 'قد يلتفّ العنوان لسطر ثالث.' : 'قد يلتفّ لسطر إضافي.'}
-          </span>
-        )}
-        {limit !== undefined && type !== 'list' && (
-          <span dir="ltr" className={cn('ms-auto tabular-nums', over ? 'font-semibold text-warning' : 'text-muted-foreground')}>
-            {length}/{limit}
-          </span>
-        )}
+          return (
+            <div key={l} lang={l} className={cn('space-y-1.5', active !== l && 'hidden', 'xl:block')}>
+              <div className="hidden xl:flex items-center gap-2 text-[11px]">
+                <span className="rounded bg-muted px-1.5 py-0.5 font-semibold text-muted-foreground">{TAG[l]}</span>
+              </div>
+
+              {type === 'text' && <Input dir={dir} value={text as string} onChange={(e) => set(l, e.target.value as ValueOf<T>)} />}
+              {type === 'textarea' && <Textarea dir={dir} rows={3} value={text as string} onChange={(e) => set(l, e.target.value as ValueOf<T>)} />}
+              {type === 'list' && <StringList dir={dir} items={text as string[]} onChange={(items) => set(l, items as ValueOf<T>)} />}
+
+              <div className="flex items-center gap-3 text-[11px]">
+                {missing[l] && (
+                  <span className="flex items-center gap-1 text-warning">
+                    <AlertTriangle className="h-3 w-3" /> الترجمة ناقصة
+                  </span>
+                )}
+                {over && <span className="text-warning">{isTitle ? 'قد يلتفّ العنوان لسطر ثالث' : 'قد يلتفّ لسطر إضافي'}</span>}
+                {limit !== undefined && type !== 'list' && (
+                  <span dir="ltr" className={cn('ms-auto tabular-nums', over ? 'font-semibold text-warning' : 'text-muted-foreground')}>
+                    {length}/{limit}
+                  </span>
+                )}
+              </div>
+              {below?.(l)}
+            </div>
+          );
+        })}
       </div>
-
-      {below?.(lang)}
       {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
     </div>
   );

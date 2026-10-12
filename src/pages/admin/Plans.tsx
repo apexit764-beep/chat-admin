@@ -25,6 +25,9 @@ import { useUIStore } from '@/store/useUIStore';
 import { formatMoney } from '@/utils/money';
 import { cn } from '@/lib/utils';
 import type { Plan, PlanTier } from '@/types';
+import { PublishBar } from '@components/site/PublishBar';
+import { SiteEmbed } from '@components/site/SitePage';
+import SitePricing from '@pages/admin/site/Pricing';
 
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -90,6 +93,12 @@ const tierOrder: Record<PlanTier, number> = {
 
 export default function AdminPlans(): JSX.Element {
   const navigate = useNavigate();
+  // الباقات نفسها تُعرض على الموقع: تبويب «على الموقع» لنصوصها وجدول المقارنة
+  const [view, setViewState] = useState<'plans' | 'site'>(() => (window.location.hash === '#site' ? 'site' : 'plans'));
+  const setView = (v: 'plans' | 'site'): void => {
+    setViewState(v);
+    window.history.replaceState(null, '', v === 'site' ? '#site' : window.location.pathname);
+  };
   const plans = useAdminStore((s) => s.plans);
   const clients = useAdminStore((s) => s.clients);
   const countries = useAdminStore((s) => s.countries);
@@ -184,8 +193,29 @@ export default function AdminPlans(): JSX.Element {
         {/* Header */}
         <div>
           <h2 className="text-2xl font-bold">الباقات والأسعار</h2>
-          <p className="text-sm text-muted-foreground">أدر الباقات والأسعار حسب الدولة</p>
+          <p className="text-sm text-muted-foreground">أدر الباقات والأسعار حسب الدولة — وهي نفسها التي تظهر على الموقع</p>
         </div>
+
+        <div className="flex gap-1 border-b border-border">
+          {([['plans', 'الباقات والأسعار'], ['site', 'العرض على الموقع']] as const).map(([k, label]) => (
+            <button
+              key={k}
+              type="button"
+              onClick={() => setView(k)}
+              className={cn('-mb-px border-b-2 px-3 py-2.5 text-sm font-semibold', view === k ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground')}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {view === 'site' && (
+          <SiteEmbed>
+            <SitePricing />
+          </SiteEmbed>
+        )}
+
+        {view === 'plans' && (<>
 
 
         {/* Plans table */}
@@ -460,6 +490,10 @@ export default function AdminPlans(): JSX.Element {
             </div>
           </CardContent>
         </Card>
+
+        </>)}
+
+        {view === 'site' && <PublishBar scope="pricing" />}
 
         {/* Reassign clients before delete */}
         <Dialog open={!!reassignModal} onOpenChange={(open) => { if (!open) setReassignModal(null); }}>

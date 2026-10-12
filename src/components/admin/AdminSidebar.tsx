@@ -20,6 +20,17 @@ import {
   Plug,
   Sparkles,
   LayoutTemplate,
+  Home,
+  Building2,
+  HelpCircle,
+  Mail,
+  MessagesSquare,
+  Menu,
+  Link2,
+  Search,
+  Type,
+  Image,
+  Rocket,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useUIStore } from '@/store/useUIStore';
@@ -70,9 +81,31 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
-    title: 'الموقع',
+    title: 'محتوى الموقع',
     items: [
-      { to: '/site/features', label: 'صفحات المزايا', icon: LayoutTemplate },
+      { to: '/site/home', label: 'الصفحة الرئيسية', icon: Home },
+      { to: '/site/features', label: 'المزايا', icon: LayoutTemplate },
+      { to: '/site/solutions', label: 'الحلول', icon: Building2 },
+      { to: '/site/faq', label: 'الأسئلة الشائعة', icon: HelpCircle },
+    ],
+  },
+  {
+    title: 'الوارد من الموقع',
+    items: [
+      { to: '/site/inbox/contact', label: 'رسائل التواصل', icon: Mail },
+      { to: '/site/inbox/leads', label: 'Leads المساعد', icon: MessagesSquare },
+      { to: '/site/inbox/enterprise', label: 'طلبات المؤسسات', icon: Building2 },
+    ],
+  },
+  {
+    title: 'إعدادات الموقع',
+    items: [
+      { to: '/site/navigation', label: 'القائمة والفوتر', icon: Menu },
+      { to: '/site/links', label: 'الروابط والتواصل', icon: Link2 },
+      { to: '/site/seo', label: 'SEO', icon: Search },
+      { to: '/site/ui-strings', label: 'نصوص الواجهة', icon: Type },
+      { to: '/site/media', label: 'مكتبة الوسائط', icon: Image },
+      { to: '/site/publications', label: 'النشر والإصدارات', icon: Rocket },
     ],
   },
   {

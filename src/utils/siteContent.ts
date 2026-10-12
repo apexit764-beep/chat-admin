@@ -18,6 +18,9 @@ export function isBlank(v: unknown): boolean {
  * الترجمات الناقصة لكل لغة في أي كيان — يمشي في الكائن كله ويعدّ كل
  * `{ar, en}` فيه. حقل فارغ باللغتين اختياري، لا «ناقص».
  */
+/** قيم تقنية تختلف بين اللغتين عمداً (أعلام التعبير النمطي: i للإنجليزي فقط) — ليست ترجمة */
+const TECHNICAL = new Set(['flags', 'pattern']);
+
 export function missingTranslations(entity: unknown): Record<Locale, number> {
   const missing = { ar: 0, en: 0 };
   const walk = (node: unknown): void => {
@@ -28,7 +31,7 @@ export function missingTranslations(entity: unknown): Record<Locale, number> {
       return;
     }
     if (Array.isArray(node)) node.forEach(walk);
-    else if (typeof node === 'object' && node !== null) Object.values(node).forEach(walk);
+    else if (typeof node === 'object' && node !== null) for (const [k, v] of Object.entries(node)) if (!TECHNICAL.has(k)) walk(v);
   };
   walk(entity);
   return missing;
@@ -134,9 +137,31 @@ export function diff(before: unknown, after: unknown): DiffRow[] {
 }
 
 /** تسمية بشرية لمسار حقل في نافذة الفرق: pages.team.journey.steps.2.title ← … */
-const SEGMENTS: Record<string, string> = {
+export const SEGMENTS: Record<string, string> = {
   cards: 'البطاقات',
   pages: '',
+  items: 'العناصر',
+  quote: 'الاقتباس',
+  role: 'المنصب',
+  company: 'الشركة',
+  name: 'الاسم',
+  sector: 'القطاع',
+  pain: 'الوجع',
+  wins: 'المكاسب',
+  enabled: 'الظهور',
+  key: 'المفتاح',
+  intro: 'المقدّمة',
+  updated: 'آخر تحديث',
+  h: 'عنوان القسم',
+  p: 'الفقرات',
+  list: 'القائمة',
+  logo: 'الشعار',
+  tint: 'اللون',
+  inkRatio: 'نسبة الحبر',
+  plans: 'الباقات',
+  comparison: 'جدول المقارنة',
+  label: 'التسمية',
+  values: 'القيم',
   eyebrow: 'الشارة',
   h1: 'العنوان',
   highlight: 'الكلمات الملوّنة',
@@ -168,10 +193,8 @@ const SEGMENTS: Record<string, string> = {
   blurb: 'الوصف المختصر',
   icon: 'الأيقونة',
   // حقول الرسومات المبنية
-  items: 'العناصر',
   pairs: 'القواعد',
   turns: 'الرسائل',
-  label: 'التسمية',
   sub: 'السطر الثاني',
   badge: 'الشارة',
   initial: 'الحرف',
@@ -188,14 +211,50 @@ const SEGMENTS: Record<string, string> = {
   bubble: 'فقاعة الترحيب',
   merge: 'نصّ الدمج',
   alt: 'النص البديل',
+  // مفاتيح السكاشن والواجهة
+  headline: 'العنوان',
+  sectionLabel: 'اسم السكشن لقارئ الشاشة',
+  start: 'الزرّ الأساسي',
+  watchDemo: 'زرّ العرض',
+  inboxTitle: 'عنوان الوارد',
+  previews: 'نصوص البطاقات العائمة',
+  primary: 'الزرّ الأساسي',
+  secondary: 'الزرّ الثانوي',
+  titleLead: 'العنوان (الجزء الأوّل)',
+  titleRest: 'العنوان (الجزء الثاني)',
+  more: 'رابط «المزيد»',
+  desc: 'الوصف',
+  description: 'الوصف',
+  facts: 'الحقائق',
+  reply: 'الردّ',
+  ask: 'السؤال',
+  msg: 'الرسالة',
+  perks: 'المزايا',
+  tagline: 'السطر التعريفي',
+  reach: 'النطاق',
+  video: 'الفيديو',
+  poster: 'صورة الغلاف',
+  image: 'الصورة',
+  links: 'الروابط',
+  groups: 'المجموعات',
+  sectors: 'القطاعات',
+  chips: 'رقائق القنوات',
+  arcs: 'أقواس الشعارات',
+  dot: 'تسمية نقاط السلايدر',
+  heading: 'العنوان',
+  eyebrowIcon: 'أيقونة الشارة',
+  approvedAt: 'تاريخ الاعتماد',
+  approvedBy: 'المعتمِد',
 };
 
-export function labelFor(path: string, pageTitle?: (slug: string) => string): string {
+export function labelFor(path: string, pageTitle?: (slug: string) => string, scopeLabels?: Record<string, string>): string {
   const parts = path.split('.');
   const out: string[] = [];
   for (let i = 0; i < parts.length; i++) {
     const p = parts[i];
-    if (parts[i - 1] === 'pages' && pageTitle) out.push(pageTitle(p));
+    if (i === 0 && scopeLabels?.[p]) out.push(scopeLabels[p]);
+    else if (parts[i - 1] === 'pages' && pageTitle) out.push(pageTitle(p));
+    else if (p === 'data' || p === 'sections') continue;
     else if (/^\d+$/.test(p)) out.push(`#${Number(p) + 1}`);
     else if (p in SEGMENTS) {
       if (SEGMENTS[p]) out.push(SEGMENTS[p]);
