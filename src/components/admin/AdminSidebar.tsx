@@ -98,17 +98,6 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
-    title: 'إعدادات الموقع',
-    items: [
-      { to: '/site/navigation', label: 'القائمة والفوتر', icon: Menu },
-      { to: '/site/links', label: 'الروابط والتواصل', icon: Link2 },
-      { to: '/site/seo', label: 'SEO', icon: Search },
-      { to: '/site/ui-strings', label: 'نصوص الواجهة', icon: Type },
-      { to: '/site/media', label: 'مكتبة الوسائط', icon: Image },
-      { to: '/site/publications', label: 'النشر والإصدارات', icon: Rocket },
-    ],
-  },
-  {
     title: 'النظام',
     items: [
       { to: '/team', label: 'الموظفين والصلاحيات', icon: UsersRound },

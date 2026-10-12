@@ -30,12 +30,6 @@ const SiteHomeSection = lazy(() => import('@pages/admin/site/HomeSection'));
 const SiteSolutions = lazy(() => import('@pages/admin/site/Solutions'));
 const SiteFaq = lazy(() => import('@pages/admin/site/Faq'));
 const SiteInbox = lazy(() => import('@pages/admin/site/Inbox'));
-const SiteNavigation = lazy(() => import('@pages/admin/site/Navigation'));
-const SiteLinks = lazy(() => import('@pages/admin/site/Links'));
-const SiteSeo = lazy(() => import('@pages/admin/site/Seo'));
-const SiteUiStrings = lazy(() => import('@pages/admin/site/UiStrings'));
-const SiteMedia = lazy(() => import('@pages/admin/site/Media'));
-const SitePublications = lazy(() => import('@pages/admin/site/Publications'));
 const SiteFeatures = lazy(() => import('@pages/admin/site/Features'));
 const SiteFeatureEditor = lazy(() => import('@pages/admin/site/FeatureEditor'));
 
@@ -94,12 +88,6 @@ export default function App(): JSX.Element {
           <Route path="/site/legal" element={<Navigate to="/settings#pages" replace />} />
           <Route path="/site/pricing" element={<Navigate to="/plans#site" replace />} />
           <Route path="/site/inbox/:kind" element={<SiteInbox />} />
-          <Route path="/site/navigation" element={<SiteNavigation />} />
-          <Route path="/site/links" element={<SiteLinks />} />
-          <Route path="/site/seo" element={<SiteSeo />} />
-          <Route path="/site/ui-strings" element={<SiteUiStrings />} />
-          <Route path="/site/media" element={<SiteMedia />} />
-          <Route path="/site/publications" element={<SitePublications />} />
           <Route path="/site/features" element={<SiteFeatures />} />
           <Route path="/site/features/:slug" element={<SiteFeatureEditor />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
