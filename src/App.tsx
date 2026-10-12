@@ -25,6 +25,8 @@ const AdminIntegrations = lazy(() => import('@pages/admin/Integrations'));
 const AdminIndustries = lazy(() => import('@pages/admin/Industries'));
 const AdminWidgetSettings = lazy(() => import('@pages/admin/WidgetSettings'));
 const AdminPlanRequests = lazy(() => import('@pages/admin/PlanRequests'));
+const SiteFeatures = lazy(() => import('@pages/admin/site/Features'));
+const SiteFeatureEditor = lazy(() => import('@pages/admin/site/FeatureEditor'));
 
 function PageLoader(): JSX.Element {
   return (
@@ -69,6 +71,8 @@ export default function App(): JSX.Element {
           <Route path="/industries" element={<AdminIndustries />} />
           <Route path="/widget" element={<AdminWidgetSettings />} />
           <Route path="/profile" element={<AdminProfile />} />
+          <Route path="/site/features" element={<SiteFeatures />} />
+          <Route path="/site/features/:slug" element={<SiteFeatureEditor />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Route>
       </Routes>

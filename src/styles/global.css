@@ -238,3 +238,14 @@
 .rdp-sized .rdp-month_grid {
   border-spacing: 2px;
 }
+
+/* خط عناوين الموقع — لمعاينة العناوين في «صفحات المزايا» كما تظهر على الموقع */
+@font-face {
+  font-family: 'Thmanyah Sans';
+  src: url('/fonts/thmanyahsans-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+}
+.font-site-display {
+  font-family: 'Thmanyah Sans', 'IBM Plex Sans Arabic', sans-serif;
+}

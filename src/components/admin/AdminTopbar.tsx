@@ -42,6 +42,7 @@ const breadcrumbMap: Record<string, string> = {
   '/notifications': 'الإشعارات',
   '/widget': 'إعدادات المساعد الذكي',
   '/settings': 'الإعدادات',
+  '/site': 'صفحات المزايا',
 };
 
 export function AdminTopbar(): JSX.Element {

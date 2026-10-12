@@ -19,6 +19,7 @@ import {
   X,
   Plug,
   Sparkles,
+  LayoutTemplate,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useUIStore } from '@/store/useUIStore';
@@ -66,6 +67,12 @@ const navGroups: NavGroup[] = [
     items: [
       { to: '/finance', label: 'المالية', icon: Banknote },
       { to: '/subscriptions', label: 'الاشتراكات', icon: Repeat },
+    ],
+  },
+  {
+    title: 'الموقع',
+    items: [
+      { to: '/site/features', label: 'صفحات المزايا', icon: LayoutTemplate },
     ],
   },
   {
