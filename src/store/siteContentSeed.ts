@@ -1,6 +1,6 @@
 /**
  * محتوى الموقع التعريفي كما هو على الموقع — مولَّد، لا تعدّله يدوياً.
- * المصدر: qhub-site (2026-10-12T10:17:20.399Z)
+ * المصدر: qhub-site (2026-10-15T08:42:38.617Z)
  * إعادة التوليد: node scripts/import-site-content.mjs <content-seed.json>
  */
 import type { SiteContent } from '@/types/siteContent';
@@ -78,7 +78,7 @@ export const siteSeed: SiteContent = {
             "telegram",
             "messenger",
             "email",
-            "x"
+            "tiktok"
           ],
           "video": {
             "type": "media",
@@ -772,16 +772,6 @@ export const siteSeed: SiteContent = {
             },
             {
               "title": {
-                "ar": "التجميل والعناية",
-                "en": "Beauty & wellness"
-              },
-              "body": {
-                "ar": "تصلك الرسائل وأنت مع عميل، والمساعد يرد بدلك.",
-                "en": "Messages arrive while you are with a client, and the assistant replies for you."
-              }
-            },
-            {
-              "title": {
                 "ar": "العقارات",
                 "en": "Real estate"
               },
@@ -798,6 +788,16 @@ export const siteSeed: SiteContent = {
               "body": {
                 "ar": "كل استشارة تبدأ برسالة، وسجلّها محفوظ بالكامل.",
                 "en": "Every engagement starts with a message, and the whole record is kept."
+              }
+            },
+            {
+              "title": {
+                "ar": "التجميل والعناية",
+                "en": "Beauty & wellness"
+              },
+              "body": {
+                "ar": "تصلك الرسائل وأنت مع عميل، والمساعد يرد بدلك.",
+                "en": "Messages arrive while you are with a client, and the assistant replies for you."
               }
             }
           ],
@@ -861,26 +861,6 @@ export const siteSeed: SiteContent = {
               "icon": {
                 "type": "library",
                 "set": "qhub",
-                "name": "heart"
-              },
-              "video": {
-                "type": "media",
-                "url": "https://qhub-lp.apexes.click/videos/beauty.mp4",
-                "name": "beauty.mp4",
-                "kind": "video"
-              },
-              "poster": {
-                "type": "media",
-                "url": "https://qhub-lp.apexes.click/videos/beauty-poster.jpg",
-                "name": "beauty-poster.jpg",
-                "kind": "image"
-              },
-              "image": null
-            },
-            {
-              "icon": {
-                "type": "library",
-                "set": "qhub",
                 "name": "building"
               },
               "video": null,
@@ -895,6 +875,26 @@ export const siteSeed: SiteContent = {
               },
               "video": null,
               "poster": null,
+              "image": null
+            },
+            {
+              "icon": {
+                "type": "library",
+                "set": "qhub",
+                "name": "heart"
+              },
+              "video": {
+                "type": "media",
+                "url": "https://qhub-lp.apexes.click/videos/beauty.mp4",
+                "name": "beauty.mp4",
+                "kind": "video"
+              },
+              "poster": {
+                "type": "media",
+                "url": "https://qhub-lp.apexes.click/videos/beauty-poster.jpg",
+                "name": "beauty-poster.jpg",
+                "kind": "image"
+              },
               "image": null
             }
           ]
@@ -926,7 +926,7 @@ export const siteSeed: SiteContent = {
               "instagram",
               "messenger",
               "telegram",
-              "x",
+              "tiktok",
               "livechat",
               "gmail",
               "outlook"
@@ -967,20 +967,20 @@ export const siteSeed: SiteContent = {
             ]
           },
           "messages": {
-            "ar": "رسالة يعالجها Qhub شهرياً لفرق في مختلف القطاعات",
-            "en": "messages handled through Qhub every month, for teams across every sector"
+            "ar": "رسالة شهرياً عبر Qhub",
+            "en": "messages a month through Qhub"
           },
           "channels": {
-            "ar": "قناة ومنصة تربطها بحسابك، من تطبيقات المحادثة إلى متجرك",
-            "en": "channels and platforms you can connect to your account, from messaging apps to your store"
+            "ar": "قناة ومنصة تربطها بحسابك",
+            "en": "channels and platforms to connect"
           },
           "accuracy": {
-            "ar": "دقّة في فهم ما يقصده عميلك والرد عليه بلغته",
-            "en": "accuracy in understanding what your customer means and replying in their own language"
+            "ar": "دقّة في فهم عميلك",
+            "en": "accuracy in understanding your customers"
           },
           "response": {
-            "ar": "متوسط انتظار عميلك لأول رد",
-            "en": "average wait before your customer gets a first reply"
+            "ar": "متوسط زمن أول رد",
+            "en": "average time to first reply"
           },
           "seconds": {
             "ar": "ث",
@@ -1011,7 +1011,7 @@ export const siteSeed: SiteContent = {
             "gmail",
             "outlook",
             "yahoo",
-            "x",
+            "tiktok",
             "livechat",
             "salla",
             "zid",
@@ -1444,7 +1444,7 @@ export const siteSeed: SiteContent = {
       {
         "slug": "chat-widget",
         "title": {
-          "ar": "التواصل المباشر (Chat Widget)",
+          "ar": "نافذة الدردشة المباشرة",
           "en": "Chat Widget"
         },
         "blurb": {
@@ -1455,22 +1455,6 @@ export const siteSeed: SiteContent = {
           "type": "library",
           "set": "qhub",
           "name": "widget"
-        }
-      },
-      {
-        "slug": "integrations",
-        "title": {
-          "ar": "القنوات والربط",
-          "en": "Channels & Integrations"
-        },
-        "blurb": {
-          "ar": "قنوات التواصل ومتجرك في مكان واحد",
-          "en": "Your channels and your store in one place"
-        },
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "plug"
         }
       }
     ],
@@ -1494,20 +1478,20 @@ export const siteSeed: SiteContent = {
           ]
         },
         "lede": {
-          "ar": "بدل التنقّل بين أكثر من منصّة، يجمع Qhub محادثات عملائك في صندوق واحد، لتكون كل محادثة واضحة لفريقك وسهلة المتابعة.",
-          "en": "Instead of moving between several platforms, Qhub gathers your customers' conversations into one inbox, so every conversation is clear to your team and easy to follow."
+          "ar": "اربط واتساب وإنستغرام وتيك توك وبريدك ومتجرك، ويجمع Qhub محادثات عملائك في صندوق واحد، لتكون كل محادثة واضحة لفريقك وسهلة المتابعة.",
+          "en": "Connect WhatsApp, Instagram, TikTok, your email and your store, and Qhub gathers your customers' conversations into one inbox, so every conversation is clear to your team and easy to follow."
         },
         "heroShot": "inbox",
         "heroRoute": "inbox",
         "heroScene": "merge",
         "bullets": {
           "ar": [
-            "كل القنوات في صندوق واحد، بلا تنقّل بين المنصّات",
+            "كل قنواتك ومتجرك في صندوق واحد، بلا تنقّل بين المنصّات",
             "كل محادثة مرتبطة بالموظف المسؤول عنها",
             "معلومات العميل وسياق المحادثة في المكان نفسه"
           ],
           "en": [
-            "Every channel in one inbox, with no platform switching",
+            "Every channel and your store in one inbox, with no platform switching",
             "Every conversation tied to the agent who owns it",
             "Customer details and conversation context in the same place"
           ]
@@ -1572,12 +1556,12 @@ export const siteSeed: SiteContent = {
             },
             {
               "without": {
-                "ar": "متابعة المحادثات تحتاج أكثر من أداة",
-                "en": "Following conversations takes more than one tool"
+                "ar": "صعوبة معرفة القناة التي جاءت منها المحادثة",
+                "en": "Hard to tell which channel a conversation came from"
               },
               "with": {
-                "ar": "متابعة سهلة من أول رسالة حتى إغلاق المحادثة",
-                "en": "Easy follow-up from the first message to closing the conversation"
+                "ar": "مصدر كل محادثة ظاهر من أول نظرة",
+                "en": "The source of every conversation visible at a glance"
               }
             }
           ]
@@ -1800,15 +1784,15 @@ export const siteSeed: SiteContent = {
             "icon": {
               "type": "library",
               "set": "qhub",
-              "name": "inbox"
+              "name": "plug"
             },
             "title": {
-              "ar": "حالات واضحة",
-              "en": "Clear statuses"
+              "ar": "إدارة القنوات",
+              "en": "Channel management"
             },
             "body": {
-              "ar": "معرفة حالة كل محادثة في لمحة.",
-              "en": "See the status of every conversation at a glance."
+              "ar": "إضافة القنوات وضبط إعداداتها أو فصلها من مكان واحد.",
+              "en": "Add channels, adjust their settings or disconnect them from one place."
             }
           },
           {
@@ -1958,52 +1942,52 @@ export const siteSeed: SiteContent = {
         "faq": [
           {
             "q": {
-              "ar": "هل يمكن إدارة أكثر من حساب من الصندوق نفسه؟",
-              "en": "Can more than one account be managed from the same inbox?"
+              "ar": "هل يمكن ربط أكثر من حساب؟",
+              "en": "Can I link more than one account?"
             },
             "a": {
-              "ar": "نعم، يمكن إدارة الحسابات المرتبطة من صندوق واحد مع وضوح مصدر كل محادثة.",
-              "en": "Yes. Connected accounts are managed from a single inbox, with the source of each conversation clearly shown."
+              "ar": "نعم. يمكنك ربط أكثر من حساب في القناة الواحدة حسب باقتك، وتصل محادثاتها كلها إلى صفحة المحادثات مع إمكانية التصفية حسب القناة. كل بطاقة قناة تعرض عدد الحسابات المتاحة لك والمستخدم منها.",
+              "en": "Yes. You can link more than one account per channel, depending on your plan. All their conversations arrive in the Inbox, and you can filter by channel. Each channel card shows how many accounts are available to you and how many are used."
             }
           },
           {
             "q": {
-              "ar": "هل تظهر المحادثات السابقة؟",
-              "en": "Do earlier conversations appear?"
+              "ar": "أي قنوات تدعمونها؟",
+              "en": "Which channels do you support?"
             },
             "a": {
-              "ar": "تظهر المحادثات التي تصل بعد الربط، بينما تبقى المحادثات السابقة في منصّاتها الأصلية.",
-              "en": "Conversations that arrive after connecting appear in Qhub, while earlier ones stay on their original platforms."
+              "ar": "قنوات المراسلة: واتساب للأعمال، فيسبوك ماسنجر، إنستغرام دايركت، تيليجرام، ونافذة الدردشة المباشرة لموقعك. تيك توك قريباً. ويُستخدم البريد الإلكتروني (Gmail) للحملات والإشعارات.",
+              "en": "Messaging channels: WhatsApp Business, Facebook Messenger, Instagram Direct, Telegram and the Live Chat Widget for your website. TikTok is coming soon. Email (Gmail) is used for campaigns and notifications."
             }
           },
           {
             "q": {
-              "ar": "هل يستطيع كل موظف رؤية جميع المحادثات؟",
-              "en": "Can every agent see all conversations?"
-            },
-            "a": {
-              "ar": "لا، يمكن تحديد المحادثات والأقسام التي يصل إليها كل موظف.",
-              "en": "No. You decide which conversations and departments each agent can reach."
-            }
-          },
-          {
-            "q": {
-              "ar": "كيف يتم توزيع المحادثات على الفريق؟",
+              "ar": "كيف تُوزَّع المحادثات على الفريق؟",
               "en": "How are conversations distributed across the team?"
             },
             "a": {
-              "ar": "يمكن تحديد قواعد التوزيع حسب الأقسام وأوقات العمل وحجم المحادثات لكل موظف. ويمكن إعادة الإسناد يدوياً في أي وقت.",
-              "en": "Distribution rules can follow departments, working hours and how many conversations each agent is handling. Reassignment is possible manually at any time."
+              "ar": "تُسند المحادثة من لوحة التفاصيل إلى موظف مسؤول وقسم، ويمكن تغيير الإسناد في أي وقت. ويُربط كل قسم بقنواته من صفحة الأقسام. وإذا كان المساعد الذكي مفعّلاً، فإنه يحوّل المحادثة إلى الموظف الذي تحدده في التحويل والجدولة.",
+              "en": "A conversation is assigned to an employee and a department from the Details panel, and the assignment can be changed at any time. Each department is linked to its channels from Departments. If the Smart Assistant is on, it transfers conversations to the employee you choose in Transfer & schedule."
             }
           },
           {
             "q": {
-              "ar": "ماذا يحدث خارج ساعات العمل؟",
-              "en": "What happens outside working hours?"
+              "ar": "هل يمكن إعادة إسناد المحادثة أو تحويلها إلى موظف معيّن؟",
+              "en": "Can a conversation be reassigned or transferred to a specific employee?"
             },
             "a": {
-              "ar": "يمكن للعميل الحصول على رد تلقائي، وتبقى المحادثة بانتظار الفريق حتى يبدأ وقت العمل.",
-              "en": "The customer can receive an automatic reply, and the conversation waits for the team until working hours start."
+              "ar": "نعم. من لوحة التفاصيل غيّر الموظف المسؤول أو القسم في أي وقت، وتبقى الرسائل والملاحظات الداخلية في نفس المحادثة.",
+              "en": "Yes. In the Details panel, change the assigned employee or department at any time. Messages and internal notes stay in the same conversation."
+            }
+          },
+          {
+            "q": {
+              "ar": "ماذا يحدث إذا لم يكن هناك موظف متاح؟",
+              "en": "What happens if no employee is available?"
+            },
+            "a": {
+              "ar": "تبقى المحادثة بحالة جديدة في صفحة المحادثات حتى يستلمها موظف. وإذا كان المساعد الذكي مفعّلاً على القناة، فإنه يرد على العميل في هذه الأثناء.",
+              "en": "The conversation stays New in the Inbox until an employee picks it up. If the Smart Assistant is on for that channel, it replies to the customer in the meantime."
             }
           },
           {
@@ -2012,8 +1996,18 @@ export const siteSeed: SiteContent = {
               "en": "Can closed conversations be reached?"
             },
             "a": {
-              "ar": "نعم، تبقى المحادثات محفوظة ويمكن الوصول إليها من خلال البحث وسجلّ العميل.",
-              "en": "Yes. Conversations stay saved and can be reached through search and the customer's history."
+              "ar": "نعم. تبقى المحادثة المغلقة محفوظة، وتظهر عند تصفية القائمة حسب الحالة أو بالبحث. للعمل عليها مرة أخرى اضغط إعادة فتح.",
+              "en": "Yes. A closed conversation stays saved and appears when you filter the list by Status or search for it. To work on it again, click Reopen."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل يرى الموظف المحادثات السابقة للعميل؟",
+              "en": "Does the employee see the customer's earlier conversations?"
+            },
+            "a": {
+              "ar": "نعم. كل فتح وإغلاق للمحادثة يُعد جلسة، ويظهر فاصل برقم الجلسة وتاريخها، فيبقى سجل العميل كاملاً في محادثة واحدة أمام الموظف.",
+              "en": "Yes. Each time a conversation is opened and closed counts as a session, with a divider showing the session number and date, so the customer's full history stays in one conversation."
             }
           }
         ]
@@ -2457,12 +2451,12 @@ export const siteSeed: SiteContent = {
         "faq": [
           {
             "q": {
-              "ar": "هل المساعد يرد بناءً على معلومات نشاطي؟",
-              "en": "Does the assistant reply based on my business information?"
+              "ar": "هل المساعد يفهم اللهجات؟",
+              "en": "Does the assistant understand dialects?"
             },
             "a": {
-              "ar": "نعم، يعتمد على المعلومات التي توفّرها عن منتجاتك وخدماتك وسياساتك عند التعامل مع أسئلة العملاء.",
-              "en": "Yes. It relies on the information you provide about your products, services and policies when handling customer questions."
+              "ar": "نعم. تختار لهجة الرد من إعدادات الذكاء الاصطناعي ← اللغة والأسلوب: فصحى مبسّطة، خليجية، مصرية، أو شامية.",
+              "en": "Yes. Choose the reply dialect in AI settings → Language & tone: Simplified Modern Standard Arabic, Khaleeji, Egyptian or Levantine."
             }
           },
           {
@@ -2471,18 +2465,18 @@ export const siteSeed: SiteContent = {
               "en": "Does it support more than one language?"
             },
             "a": {
-              "ar": "نعم، يدعم لغات متعدّدة ويمكنه التعامل مع أكثر من لغة ضمن المحادثة نفسها.",
-              "en": "Yes. It supports several languages and can handle more than one language within the same conversation."
+              "ar": "يرد بالعربية أو الإنجليزية أو بكلتيهما، حسب اختيارك في اللغة والأسلوب.",
+              "en": "It replies in Arabic, English or both, depending on what you choose in Language & tone."
             }
           },
           {
             "q": {
-              "ar": "ماذا يحدث عندما لا يعرف المساعد الإجابة؟",
-              "en": "What happens when the assistant does not know the answer?"
+              "ar": "كيف أعرّف المساعد على منتجاتي وخدماتي؟",
+              "en": "How do I teach the assistant about my products and services?"
             },
             "a": {
-              "ar": "عندما لا تكون الإجابة واضحة، تُحوَّل المحادثة إلى الموظف المناسب بدل تقديم إجابة غير مؤكّدة.",
-              "en": "When the answer is not clear, the conversation is handed to the right agent instead of offering an uncertain reply."
+              "ar": "من المعرفة والقيود اختر الحساب المرتبط، واكتب تعليمات الشركة (من أنتم، ماذا تقدمون، وكيف يرد المساعد) حتى 4,000 حرف، ثم حدّد مصادر التعلم: المستندات وردود الموظفين. تُضبط الإعدادات لكل حساب مرتبط على حدة.",
+              "en": "In Knowledge & limits, choose the linked account and write the Company knowledge (Prompt): who you are, what you offer and how the assistant should reply, up to 4,000 characters. Then select the Learning sources: documents and employee replies. Settings are configured for each linked account separately."
             }
           },
           {
@@ -2491,48 +2485,58 @@ export const siteSeed: SiteContent = {
               "en": "How can the assistant be customised?"
             },
             "a": {
-              "ar": "يمكن تحديد معلومات النشاط، وأسلوب الرد، والمواضيع التي يتعامل معها المساعد.",
-              "en": "You can set your business information, the reply style, and the topics the assistant handles."
+              "ar": "يمكنك تحديد لغة الرد، والنبرة (مختصر ومباشر، ودود وحماسي، رسمي ومحترف، فاخر وراقي)، واللهجة، وتعليمات الشركة، والمواضيع الممنوعة والرد عليها، والقنوات التي يعمل عليها.",
+              "en": "You can set the reply language, the tone (short and direct, friendly and enthusiastic, formal and professional, luxurious and elegant), the dialect, the company knowledge, the forbidden topics and the reply to them, and the channels it works on."
             }
           },
           {
             "q": {
-              "ar": "هل يمكن مراجعة الردود قبل إرسالها؟",
-              "en": "Can replies be reviewed before they are sent?"
+              "ar": "هل يمكنني إيقافه؟",
+              "en": "Can I turn it off?"
             },
             "a": {
-              "ar": "نعم، يمكن للمساعد اقتراح الرد ليراجعه الموظف ويعتمده قبل الإرسال.",
-              "en": "Yes. The assistant can suggest the reply for an agent to review and approve before it is sent."
+              "ar": "نعم. أوقفه بالكامل من مفتاح التشغيل الرئيسي في إعدادات الذكاء الاصطناعي، أو شغّله على قنوات معيّنة فقط باختيار القنوات التي يعمل عليها.",
+              "en": "Yes. Turn it off completely with the main switch in AI settings, or run it on specific channels only by selecting the Enabled channels."
             }
           },
           {
             "q": {
-              "ar": "هل يعمل خارج ساعات العمل؟",
-              "en": "Does it work outside working hours?"
+              "ar": "ماذا يحدث عندما لا يعرف المساعد الإجابة؟",
+              "en": "What happens when the assistant doesn't know the answer?"
             },
             "a": {
-              "ar": "نعم، يتعامل مع الأسئلة المتكرّرة خارج ساعات العمل، وتنتقل الحالات التي تحتاج فريقك إليه عند توفّره.",
-              "en": "Yes. It handles the questions asked most outside working hours, and cases that need your team reach them once they are available."
-            }
-          },
-          {
-            "q": {
-              "ar": "هل يمكنه التعامل مع الرسائل الصوتية؟",
-              "en": "Can it handle voice messages?"
-            },
-            "a": {
-              "ar": "نعم، تُحوَّل الرسائل الصوتية إلى نص لتسهيل قراءتها والتعامل معها.",
-              "en": "Yes. Voice messages are turned into text, easier to read and act on."
+              "ar": "يعتمد المساعد على ما تحدده أنت. إذا طرح العميل موضوعاً من المواضيع الممنوعة يرسل الرد الذي كتبته لها، وإذا وردت كلمة من الكلمات المفتاحية للتحويل (مثل: شكوى، استرداد) تُحوَّل المحادثة إلى الموظف المحدد. لذلك اكتب تعليمات واضحة، وأضف الكلمات المفتاحية للحالات التي تريد أن يتولاها موظف.",
+              "en": "The assistant follows what you set. If a customer raises one of your Forbidden topics, it sends the reply you wrote for them. If a message contains one of your transfer Keywords (for example: complaint, refund), the conversation is transferred to the chosen employee. Write clear instructions and add keywords for the cases you want an employee to handle."
             }
           },
           {
             "q": {
               "ar": "هل يمكن للمساعد تحويل المحادثة إلى موظف؟",
-              "en": "Can the assistant hand a conversation to an agent?"
+              "en": "Can the assistant transfer a conversation to an employee?"
             },
             "a": {
-              "ar": "نعم، عند الحاجة إلى تدخّل بشري تنتقل المحادثة للموظف المناسب مع الحفاظ على كامل سياقها.",
-              "en": "Yes. When human help is needed, the conversation moves to the right agent while keeping its full context."
+              "ar": "نعم. فعّل التحويل إلى موظف من التحويل والجدولة، وحدّد شروطه والكلمات المفتاحية والموظف الذي تُحوَّل إليه. بعد التحويل يتولى الموظف الرد، وتبقى المحادثة كاملة أمامه، ويمكنه توليد ملخص لها من لوحة التفاصيل.",
+              "en": "Yes. Turn on Transfer to a human agent in Transfer & schedule, and set its conditions, keywords and the employee who receives the conversation. After the transfer, the employee takes over; the full conversation stays in front of them, and they can Generate summary from the Details panel."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل يعمل المساعد خارج ساعات العمل؟",
+              "en": "Does the assistant work outside working hours?"
+            },
+            "a": {
+              "ar": "نعم. حدّد ساعات عمل الموظفين لكل يوم من التحويل والجدولة، والمساعد يرد في باقي الأوقات، أو اجعله يعمل على مدار الساعة. ويمكنك كتابة رسالة تُرسل للعميل خارج ساعات العمل.",
+              "en": "Yes. Set the employees' working hours for each day in Transfer & schedule; the assistant replies the rest of the time, or you can let it work around the clock. You can also write a message that is sent outside working hours."
+            }
+          },
+          {
+            "q": {
+              "ar": "هل تكلفة المساعد الذكي مشمولة في الاشتراك؟",
+              "en": "Is the Smart Assistant's cost included in my subscription?"
+            },
+            "a": {
+              "ar": "يعمل المساعد عبر مزوّد ذكاء اصطناعي تربطه بحسابك (OpenAI أو Claude أو Gemini) بمفتاح ربط برمجي (API Key) من حسابك لدى المزوّد، وتكلفة الاستخدام تُدفع للمزوّد مباشرة.",
+              "en": "The assistant runs on an AI provider that you connect to your account (OpenAI, Claude or Gemini) with an API key from your account with that provider. Usage is billed by the provider directly."
             }
           }
         ]
@@ -3009,8 +3013,8 @@ export const siteSeed: SiteContent = {
               "en": "Can campaigns be scheduled in advance?"
             },
             "a": {
-              "ar": "نعم، يمكن تحديد تاريخ ووقت الإرسال مسبقاً وإدارة الحملة وفق الجدول المحدّد.",
-              "en": "Yes. You can set the date and time in advance and run the campaign on that schedule."
+              "ar": "نعم. عند إنشاء الحملة اختر جدولة موعد بدل إرسال الآن، وتظهر الحملات المجدولة في صفحة الحملات التسويقية.",
+              "en": "Yes. When creating a campaign, schedule a time instead of choosing Send Now. Scheduled campaigns appear on the Campaigns page."
             }
           },
           {
@@ -3019,8 +3023,8 @@ export const siteSeed: SiteContent = {
               "en": "How is the target audience chosen?"
             },
             "a": {
-              "ar": "يمكن تقسيم الجمهور بناءً على الوسوم والتفاعل السابق والبيانات المتاحة عن العملاء.",
-              "en": "You can segment the audience by tags, earlier engagement and the customer data you have."
+              "ar": "تختار الجمهور المستهدف في خطوة مستقلة أثناء إنشاء الحملة، من جهات الاتصال المسجّلة في حسابك.",
+              "en": "You select the Target Audience in its own step while creating the campaign, from the contacts in your account."
             }
           },
           {
@@ -3029,48 +3033,18 @@ export const siteSeed: SiteContent = {
               "en": "Can campaign results be followed?"
             },
             "a": {
-              "ar": "نعم، تظهر بيانات الحملة بشكل واضح لمتابعة الإرسال والتسليم والفتح والردود.",
-              "en": "Yes. Campaign data is shown clearly, so you can follow sending, delivery, opens and replies."
+              "ar": "نعم. صفحة الحملات التسويقية تعرض إجمالي الحملات والرسائل المُرسلة ومتوسط الفتح والحملات المجدولة، ولكل حملة: الجمهور، عدد المُرسل، معدل الفتح، التاريخ والحالة. ويمكنك تصدير القائمة بصيغة CSV.",
+              "en": "Yes. The Campaigns page shows total campaigns, messages sent, average open rate and scheduled campaigns, and for each campaign: audience, sent count, open rate, date and status. You can export the list as CSV."
             }
           },
           {
             "q": {
-              "ar": "أين تظهر ردود العملاء على الحملة؟",
-              "en": "Where do customer replies to a campaign appear?"
+              "ar": "هل يمكن مراجعة الحملة قبل إرسالها؟",
+              "en": "Can a campaign be checked before it is sent?"
             },
             "a": {
-              "ar": "تظهر الردود داخل صندوق الوارد، مع معرفة الحملة التي جاء منها الرد.",
-              "en": "Replies appear in the inbox, along with the campaign they came from."
-            }
-          },
-          {
-            "q": {
-              "ar": "هل يمكن استبعاد بعض العملاء من الحملات؟",
-              "en": "Can some customers be excluded from campaigns?"
-            },
-            "a": {
-              "ar": "نعم، يمكن إنشاء قوائم استبعاد لمن لا يرغبون في استقبال الحملات القادمة.",
-              "en": "Yes. You can build exclusion lists for anyone who does not want to receive future campaigns."
-            }
-          },
-          {
-            "q": {
-              "ar": "هل يمكن تجربة الحملة قبل إرسالها؟",
-              "en": "Can a campaign be tested before it is sent?"
-            },
-            "a": {
-              "ar": "نعم، يمكن إرسال الحملة إلى مجموعة صغيرة أولاً قبل إطلاقها على كامل الجمهور.",
-              "en": "Yes. You can send the campaign to a small group first, before releasing it to the whole audience."
-            }
-          },
-          {
-            "q": {
-              "ar": "هل يمكن إيقاف الحملة بعد بدء الإرسال؟",
-              "en": "Can a campaign be stopped after sending starts?"
-            },
-            "a": {
-              "ar": "نعم، يمكن إيقاف الحملة أثناء الإرسال عند الحاجة.",
-              "en": "Yes. A campaign can be stopped mid-send whenever you need to."
+              "ar": "راجع المعاينة قبل الإرسال. وللحملات الكبيرة اختر سرعة الإرسال بطيئة لأنها الأكثر أماناً.",
+              "en": "Check the Preview before sending. For large campaigns, choose the Slow sending speed; it is the safest."
             }
           }
         ]
@@ -3564,62 +3538,42 @@ export const siteSeed: SiteContent = {
         "faq": [
           {
             "q": {
-              "ar": "كم موظفاً يمكنني إضافته؟",
-              "en": "How many agents can I add?"
+              "ar": "هل يستطيع كل موظف رؤية جميع المحادثات؟",
+              "en": "Can every employee see all conversations?"
             },
             "a": {
-              "ar": "يعتمد عدد الموظفين على الباقة، ويمكن اختيار الباقة المناسبة لحجم فريقك.",
-              "en": "It depends on the plan; you can pick the plan that fits the size of your team."
-            }
-          },
-          {
-            "q": {
-              "ar": "هل يمكن للموظف العمل من الجوال؟",
-              "en": "Can agents work from their phone?"
-            },
-            "a": {
-              "ar": "نعم، يمكن لفريقك متابعة المحادثات وإدارتها من الجوال والكمبيوتر.",
-              "en": "Yes. Your team can follow and manage conversations from phone and computer."
+              "ar": "لا. ما يراه الموظف يحدده الدور المسند إليه والأقسام المرتبط بها. ويمكنك أيضاً تفعيل إخفاء أرقام جهات الاتصال عند دعوته حتى لا يرى أرقام العملاء.",
+              "en": "No. What an employee sees depends on their Role and the Departments they belong to. You can also turn on Hide customer numbers when inviting them, so they don't see customers' phone numbers."
             }
           },
           {
             "q": {
               "ar": "هل يمكنني متابعة أداء كل موظف؟",
-              "en": "Can I follow each agent's performance?"
+              "en": "Can I follow each employee's performance?"
             },
             "a": {
-              "ar": "نعم، يمكن متابعة أداء الموظفين من خلال بيانات المحادثات وأوقات الرد والتقييمات.",
-              "en": "Yes. You can follow agent performance through conversation data, reply times and ratings."
+              "ar": "نعم. افتح التقارير ← أداء الموظفين: عدد المحادثات، متوسط الرد، نسبة الحل والتقييم. ويظهر ملخص الأداء أيضاً في نظرة عامة.",
+              "en": "Yes. Open Reports → Employee performance: conversations, average reply, resolution rate and rating. A summary also appears on Overview."
             }
           },
           {
             "q": {
-              "ar": "هل يمكن منع موظف من رؤية قسم أو محادثات معيّنة؟",
-              "en": "Can an agent be stopped from seeing a department or certain conversations?"
+              "ar": "هل يمكن إعادة إسناد المحادثة أو تحويلها إلى موظف معيّن؟",
+              "en": "Can a conversation be reassigned or transferred to a specific employee?"
             },
             "a": {
-              "ar": "نعم، يمكن تحديد صلاحيات الوصول حسب الدور والقسم.",
-              "en": "Yes. Access permissions can be set by role and by department."
+              "ar": "نعم. من لوحة التفاصيل غيّر الموظف المسؤول أو القسم في أي وقت، وتبقى الرسائل والملاحظات الداخلية في نفس المحادثة.",
+              "en": "Yes. In the Details panel, change the assigned employee or department at any time. Messages and internal notes stay in the same conversation."
             }
           },
           {
             "q": {
               "ar": "ماذا يحدث إذا لم يكن هناك موظف متاح؟",
-              "en": "What happens if no agent is available?"
+              "en": "What happens if no employee is available?"
             },
             "a": {
-              "ar": "تبقى المحادثة محفوظة في قائمة الانتظار حتى يصبح الموظف المناسب متاحاً.",
-              "en": "The conversation stays in the queue until the right agent becomes available."
-            }
-          },
-          {
-            "q": {
-              "ar": "هل يمكن إعادة إسناد المحادثة يدوياً؟",
-              "en": "Can a conversation be reassigned manually?"
-            },
-            "a": {
-              "ar": "نعم، يمكن إعادة إسناد المحادثة في أي وقت مع الحفاظ على كامل سياقها وملاحظاتها.",
-              "en": "Yes, at any time, keeping its full context and its notes."
+              "ar": "تبقى المحادثة بحالة جديدة في صفحة المحادثات حتى يستلمها موظف. وإذا كان المساعد الذكي مفعّلاً على القناة، فإنه يرد على العميل في هذه الأثناء.",
+              "en": "The conversation stays New in the Inbox until an employee picks it up. If the Smart Assistant is on for that channel, it replies to the customer in the meantime."
             }
           }
         ]
@@ -3888,14 +3842,14 @@ export const siteSeed: SiteContent = {
                   },
                   {
                     "label": {
-                      "ar": "إكس",
-                      "en": "X"
+                      "ar": "تيك توك",
+                      "en": "TikTok"
                     },
                     "sub": {
                       "ar": "متوسط الردّ 4.1 د",
                       "en": "Avg. reply 4.1 m"
                     },
-                    "ch": "x",
+                    "ch": "tiktok",
                     "badge": {
                       "ar": "بطيء",
                       "en": "Slow"
@@ -4125,22 +4079,12 @@ export const siteSeed: SiteContent = {
         "faq": [
           {
             "q": {
-              "ar": "متى تبدأ البيانات بالظهور في التقارير؟",
-              "en": "When does data start appearing in the reports?"
-            },
-            "a": {
-              "ar": "تبدأ البيانات من لحظة تفعيل الحساب، وتُحتسب المحادثات التي تدخل النظام ضمن التقارير.",
-              "en": "Data starts from the moment the account is activated, and conversations entering the system count towards the reports."
-            }
-          },
-          {
-            "q": {
               "ar": "هل يمكن تصدير التقارير؟",
               "en": "Can reports be exported?"
             },
             "a": {
-              "ar": "نعم، يمكن تصدير البيانات والتقارير حسب الباقة المتاحة.",
-              "en": "Yes. Data and reports can be exported according to the plan you are on."
+              "ar": "نعم. من صفحة التقارير اضغط PDF أو Excel.",
+              "en": "Yes. On the Reports page, click PDF or Excel."
             }
           },
           {
@@ -4149,28 +4093,8 @@ export const siteSeed: SiteContent = {
               "en": "Can two periods be compared?"
             },
             "a": {
-              "ar": "نعم، يمكن مقارنة الأداء بين أسبوعين أو شهرين لمعرفة التغيّر في النتائج.",
-              "en": "Yes. You can compare performance between two weeks or two months to see how the results changed."
-            }
-          },
-          {
-            "q": {
-              "ar": "هل التقارير تتحدّث بشكل مستمر؟",
-              "en": "Do the reports update continuously?"
-            },
-            "a": {
-              "ar": "نعم، تتحدّث البيانات مع دخول المحادثات وتغيّر مؤشّرات الأداء.",
-              "en": "Yes. The data updates as conversations arrive and the performance metrics change."
-            }
-          },
-          {
-            "q": {
-              "ar": "هل يمكنني معرفة أداء كل موظف؟",
-              "en": "Can I see each agent's performance?"
-            },
-            "a": {
-              "ar": "نعم، يمكن متابعة مؤشّرات الأداء لكل موظف حسب الصلاحيات المتاحة.",
-              "en": "Yes. You can follow performance metrics for each agent, according to the permissions available."
+              "ar": "في نظرة عامة تظهر بجانب كل رقم نسبة التغيّر مقارنة بالفترة السابقة المساوية لها في الطول. غيّر الفترة الزمنية من أعلى الصفحة لتحديث الأرقام.",
+              "en": "On Overview, the percentage next to each number shows the change compared with the previous period of the same length. Change the date range at the top of the page to update the numbers."
             }
           },
           {
@@ -4179,15 +4103,15 @@ export const siteSeed: SiteContent = {
               "en": "Who can see the team's reports?"
             },
             "a": {
-              "ar": "يعتمد ذلك على الصلاحيات، بحيث يمكن تحديد مستوى الوصول للتقارير حسب دور كل موظف.",
-              "en": "That depends on permissions: the level of access to reports can be set according to each agent's role."
+              "ar": "يعتمد ذلك على صلاحيات الدور؛ ما يصل إليه كل موظف في النظام يحدده الدور المسند إليه في الأدوار والصلاحيات.",
+              "en": "It depends on role permissions: what each employee can access is set by their role in Roles & Permissions."
             }
           }
         ]
       },
       "chat-widget": {
         "eyebrow": {
-          "ar": "المحادثة المباشرة",
+          "ar": "نافذة الدردشة المباشرة",
           "en": "Live Chat"
         },
         "h1": {
@@ -4303,7 +4227,7 @@ export const siteSeed: SiteContent = {
             "en": "From a website visit to a live conversation"
           },
           "lede": {
-            "ar": "تظهر نافذة المحادثة للزائر أثناء تصفّحه، وتصل الرسائل مباشرة إلى فريقك. اضغط أي خطوة لتنتقل إليها.",
+            "ar": "تظهر نافذة الدردشة المباشرة للزائر أثناء تصفّحه، وتصل الرسائل مباشرة إلى فريقك. اضغط أي خطوة لتنتقل إليها.",
             "en": "The chat window appears to visitors while they browse, and the messages reach your team directly. Tap any step to jump to it."
           },
           "steps": [
@@ -4313,7 +4237,7 @@ export const siteSeed: SiteContent = {
                 "en": "It appears to the visitor"
               },
               "body": {
-                "ar": "تظهر نافذة المحادثة داخل الموقع بطريقة بسيطة وسهلة الوصول.",
+                "ar": "تظهر نافذة الدردشة المباشرة داخل الموقع بطريقة بسيطة وسهلة الوصول.",
                 "en": "The chat window shows inside the site in a simple, easy-to-reach way."
               },
               "art": {
@@ -4461,7 +4385,7 @@ export const siteSeed: SiteContent = {
                       "en": "Started in"
                     },
                     "v": {
-                      "ar": "ويدجت الموقع",
+                      "ar": "نافذة الدردشة المباشرة",
                       "en": "Site widget"
                     }
                   },
@@ -4512,7 +4436,7 @@ export const siteSeed: SiteContent = {
               "en": "Customise how the chat looks"
             },
             "body": {
-              "ar": "تخصيص مظهر نافذة المحادثة بما يتناسب مع هوية نشاطك.",
+              "ar": "تخصيص مظهر نافذة الدردشة المباشرة بما يتناسب مع هوية نشاطك.",
               "en": "Adjust the appearance of the chat window to match your brand."
             }
           },
@@ -4527,7 +4451,7 @@ export const siteSeed: SiteContent = {
               "en": "A welcome message"
             },
             "body": {
-              "ar": "عرض رسالة ترحيبية للزائر عند فتح نافذة المحادثة.",
+              "ar": "عرض رسالة ترحيبية للزائر عند فتح نافذة الدردشة المباشرة.",
               "en": "Show the visitor a welcome message when the chat window opens."
             }
           },
@@ -4647,13 +4571,13 @@ export const siteSeed: SiteContent = {
           }
         ],
         "liveTitle": {
-          "ar": "الويدجت بألوانه وسلوكه",
+          "ar": "نافذة الدردشة بألوانها وسلوكها",
           "en": "The widget, its colours and its behaviour"
         },
         "liveHighlight": {
           "ar": [
-            "بألوانه",
-            "وسلوكه"
+            "بألوانها",
+            "وسلوكها"
           ],
           "en": [
             "colours",
@@ -4663,593 +4587,42 @@ export const siteSeed: SiteContent = {
         "faq": [
           {
             "q": {
-              "ar": "هل يمكن إضافة المحادثة إلى موقعي؟",
-              "en": "Can the chat be added to my website?"
+              "ar": "هل يمكن إضافة نافذة الدردشة المباشرة إلى موقعي؟ وأين تظهر رسائلها؟",
+              "en": "Can I add live chat to my website, and where do its messages go?"
             },
             "a": {
-              "ar": "نعم، يمكن إضافة نافذة المحادثة إلى موقعك لتكون متاحة للزوار أثناء التصفّح.",
-              "en": "Yes. The chat window can be added to your site so it is available to visitors while they browse."
-            }
-          },
-          {
-            "q": {
-              "ar": "أين تظهر رسائل زوار الموقع؟",
-              "en": "Where do website visitors' messages appear?"
-            },
-            "a": {
-              "ar": "تصل المحادثات مباشرة إلى صندوق الوارد داخل Qhub.",
-              "en": "Conversations arrive straight in the inbox inside Qhub."
-            }
-          },
-          {
-            "q": {
-              "ar": "هل يمكن تخصيص شكل المحادثة؟",
-              "en": "Can the chat's appearance be customised?"
-            },
-            "a": {
-              "ar": "نعم، يمكن تخصيص مظهر المحادثة بما يتناسب مع هوية نشاطك.",
-              "en": "Yes. The chat's look can be adjusted to match your brand."
-            }
-          },
-          {
-            "q": {
-              "ar": "هل يمكن معرفة الصفحة التي بدأ منها الزائر المحادثة؟",
-              "en": "Can I see which page the visitor started the chat from?"
-            },
-            "a": {
-              "ar": "نعم، يمكن معرفة سياق زيارة الزائر والمعلومات المتاحة عنه.",
-              "en": "Yes. You can see the context of the visitor's session and the information available about them."
+              "ar": "نعم. اربط نافذة الدردشة المباشرة من الحسابات والربط لتظهر لزوار موقعك، وتصل رسائلهم إلى صفحة المحادثات مثل باقي القنوات.",
+              "en": "Yes. Link the Live Chat Widget from Channels & connections so the chat window appears to your website visitors. Their messages arrive in the Inbox like any other channel."
             }
           },
           {
             "q": {
               "ar": "ماذا يحدث إذا لم يكن هناك موظف متاح؟",
-              "en": "What happens if no agent is available?"
+              "en": "What happens if no employee is available?"
             },
             "a": {
-              "ar": "يمكن للزائر ترك رسالته، وتبقى المحادثة محفوظة حتى يتمكّن الموظف من متابعتها.",
-              "en": "The visitor can leave their message, and the conversation stays saved until an agent can follow it."
+              "ar": "تبقى المحادثة بحالة جديدة في صفحة المحادثات حتى يستلمها موظف. وإذا كان المساعد الذكي مفعّلاً على القناة، فإنه يرد على العميل في هذه الأثناء.",
+              "en": "The conversation stays New in the Inbox until an employee picks it up. If the Smart Assistant is on for that channel, it replies to the customer in the meantime."
             }
           },
           {
             "q": {
-              "ar": "هل يمكن تحويل المحادثة إلى موظف معيّن؟",
-              "en": "Can the conversation be transferred to a specific agent?"
+              "ar": "هل يمكن إعادة إسناد المحادثة أو تحويلها إلى موظف معيّن؟",
+              "en": "Can a conversation be reassigned or transferred to a specific employee?"
             },
             "a": {
-              "ar": "نعم، يمكن توزيع المحادثات حسب إعدادات الفريق وتحويلها إلى الموظف المناسب.",
-              "en": "Yes. Conversations can be routed according to your team settings and transferred to the right agent."
+              "ar": "نعم. من لوحة التفاصيل غيّر الموظف المسؤول أو القسم في أي وقت، وتبقى الرسائل والملاحظات الداخلية في نفس المحادثة.",
+              "en": "Yes. In the Details panel, change the assigned employee or department at any time. Messages and internal notes stay in the same conversation."
             }
           },
           {
             "q": {
-              "ar": "هل تظهر المحادثات السابقة للموظف؟",
-              "en": "Does the agent see earlier conversations?"
+              "ar": "هل يرى الموظف المحادثات السابقة للعميل؟",
+              "en": "Does the employee see the customer's earlier conversations?"
             },
             "a": {
-              "ar": "نعم، يظهر سجلّ المحادثة للموظف حتى يتمكّن من متابعة الحوار من النقطة نفسها.",
-              "en": "Yes. The conversation history is shown to the agent, so they can pick up from the same point."
-            }
-          }
-        ]
-      },
-      "integrations": {
-        "eyebrow": {
-          "ar": "القنوات والربط",
-          "en": "Channels & Integrations"
-        },
-        "h1": {
-          "ar": "كل قنوات التواصل في مكان واحد",
-          "en": "Every communication channel in one place"
-        },
-        "highlight": {
-          "ar": [
-            "مكان",
-            "واحد"
-          ],
-          "en": [
-            "one",
-            "place"
-          ]
-        },
-        "lede": {
-          "ar": "اربط قنوات التواصل الخاصة بنشاطك مع Qhub، لتصل جميع المحادثات إلى صندوق وارد واحد يتابعها فريقك بسهولة.",
-          "en": "Connect the channels your business uses to Qhub, so every conversation reaches a single inbox your team can follow easily."
-        },
-        "heroShot": "contacts",
-        "heroRoute": "contacts",
-        "heroScene": "merge",
-        "bullets": {
-          "ar": [
-            "ربط قنوات التواصل من مكان واحد",
-            "جمع المحادثات في صندوق وارد موحّد",
-            "الحفاظ على سياق كل محادثة"
-          ],
-          "en": [
-            "Connect your communication channels from one place",
-            "Gather conversations in a unified inbox",
-            "Keep the context of every conversation"
-          ]
-        },
-        "compare": {
-          "eyebrow": {
-            "ar": "الفرق",
-            "en": "The difference"
-          },
-          "title": {
-            "ar": "قنوات متعدّدة، وتجربة واحدة",
-            "en": "Several channels, one experience"
-          },
-          "withoutLabel": {
-            "ar": "بدون Qhub",
-            "en": "Without Qhub"
-          },
-          "withLabel": {
-            "ar": "مع Qhub",
-            "en": "With Qhub"
-          },
-          "rows": [
-            {
-              "without": {
-                "ar": "المحادثات موزّعة بين أكثر من قناة",
-                "en": "Conversations spread across several channels"
-              },
-              "with": {
-                "ar": "جمع المحادثات في صندوق وارد واحد",
-                "en": "Conversations gathered in a single inbox"
-              }
-            },
-            {
-              "without": {
-                "ar": "التنقّل المستمرّ بين الحسابات والمنصّات",
-                "en": "Constantly switching between accounts and platforms"
-              },
-              "with": {
-                "ar": "الوصول إلى جميع القنوات من مكان واحد",
-                "en": "Reach every channel from one place"
-              }
-            },
-            {
-              "without": {
-                "ar": "صعوبة متابعة جميع المحادثات",
-                "en": "Hard to follow all the conversations"
-              },
-              "with": {
-                "ar": "معرفة مصدر كل محادثة بوضوح",
-                "en": "The source of every conversation is clear"
-              }
-            },
-            {
-              "without": {
-                "ar": "تكرار الرد على العميل نفسه في أكثر من مكان",
-                "en": "Answering the same customer in more than one place"
-              },
-              "with": {
-                "ar": "توزيع المحادثات على الموظفين",
-                "en": "Conversations distributed across the team"
-              }
-            },
-            {
-              "without": {
-                "ar": "صعوبة معرفة مصدر كل محادثة",
-                "en": "Hard to tell which channel a conversation came from"
-              },
-              "with": {
-                "ar": "متابعة العميل مع الحفاظ على كامل سياق المحادثة",
-                "en": "Follow the customer with the full conversation context"
-              }
-            }
-          ]
-        },
-        "journey": {
-          "eyebrow": {
-            "ar": "داخل الشاشة",
-            "en": "Inside the screen"
-          },
-          "title": {
-            "ar": "من الربط إلى إدارة المحادثات",
-            "en": "From connecting to managing conversations"
-          },
-          "lede": {
-            "ar": "بعد ربط القنوات تظهر المحادثات في مكان واحد مع توضيح مصدر كل واحدة. اضغط أي خطوة لتنتقل إليها.",
-            "en": "Once the channels are connected, conversations appear in one place with the source of each one shown. Tap any step to jump to it."
-          },
-          "steps": [
-            {
-              "title": {
-                "ar": "ربط القناة",
-                "en": "Connecting the channel"
-              },
-              "body": {
-                "ar": "إضافة قناة التواصل الخاصة بنشاطك وربطها بحساب Qhub.",
-                "en": "Add the communication channel your business uses and connect it to your Qhub account."
-              },
-              "art": {
-                "kind": "flow",
-                "merge": true,
-                "from": "Qhub",
-                "to": {
-                  "ar": [
-                    "واتساب",
-                    "إنستغرام",
-                    "ويدجت الموقع"
-                  ],
-                  "en": [
-                    "WhatsApp",
-                    "Instagram",
-                    "Site widget"
-                  ]
-                }
-              }
-            },
-            {
-              "title": {
-                "ar": "استقبال المحادثات",
-                "en": "Conversations arrive"
-              },
-              "body": {
-                "ar": "تصل المحادثات الجديدة تلقائياً إلى صندوق الوارد الموحّد.",
-                "en": "New conversations reach the unified inbox automatically."
-              },
-              "art": {
-                "kind": "rules",
-                "pairs": [
-                  {
-                    "when": {
-                      "ar": "رسالة على واتساب",
-                      "en": "A WhatsApp message"
-                    },
-                    "then": {
-                      "ar": "تصل الصندوق",
-                      "en": "Lands in the inbox"
-                    }
-                  },
-                  {
-                    "when": {
-                      "ar": "رسالة على إنستغرام",
-                      "en": "An Instagram message"
-                    },
-                    "then": {
-                      "ar": "تصل الصندوق",
-                      "en": "Lands in the inbox"
-                    }
-                  },
-                  {
-                    "when": {
-                      "ar": "محادثة من موقعك",
-                      "en": "A chat from your site"
-                    },
-                    "then": {
-                      "ar": "تصل الصندوق",
-                      "en": "Lands in the inbox"
-                    }
-                  }
-                ]
-              }
-            },
-            {
-              "title": {
-                "ar": "توزيع المحادثات",
-                "en": "Routing the conversations"
-              },
-              "body": {
-                "ar": "تُوزَّع المحادثات على الموظفين والأقسام وفق إعدادات الفريق.",
-                "en": "Conversations are routed to agents and departments according to your team settings."
-              },
-              "art": {
-                "kind": "card",
-                "title": {
-                  "ar": "محادثة واردة",
-                  "en": "Incoming conversation"
-                },
-                "badge": {
-                  "ar": "أُسندت",
-                  "en": "Assigned"
-                },
-                "rows": [
-                  {
-                    "k": {
-                      "ar": "القناة",
-                      "en": "Channel"
-                    },
-                    "v": {
-                      "ar": "واتساب",
-                      "en": "WhatsApp"
-                    }
-                  },
-                  {
-                    "k": {
-                      "ar": "القسم",
-                      "en": "Department"
-                    },
-                    "v": {
-                      "ar": "المبيعات",
-                      "en": "Sales"
-                    }
-                  },
-                  {
-                    "k": {
-                      "ar": "الموظف",
-                      "en": "Agent"
-                    },
-                    "v": {
-                      "ar": "منال",
-                      "en": "Manal"
-                    }
-                  }
-                ]
-              }
-            },
-            {
-              "title": {
-                "ar": "متابعة العميل",
-                "en": "Following the customer"
-              },
-              "body": {
-                "ar": "يتابع الموظف المحادثة ويرد عليها مع ظهور كامل السياق.",
-                "en": "The agent follows the conversation and replies with the full context in view."
-              },
-              "art": {
-                "kind": "chat",
-                "turns": [
-                  {
-                    "from": "customer",
-                    "text": {
-                      "ar": "أبغى أستفسر عن خدماتكم",
-                      "en": "I would like to ask about your services"
-                    }
-                  },
-                  {
-                    "from": "agent",
-                    "text": {
-                      "ar": "أهلاً بك، تفضّل — محادثتك السابقة وتفاصيلها كلها أمامي.",
-                      "en": "Hello — go ahead. Your earlier conversation and all its details are in front of me."
-                    }
-                  }
-                ]
-              }
-            }
-          ]
-        },
-        "extras": {
-          "eyebrow": {
-            "ar": "تفاصيل إضافية",
-            "en": "More details"
-          },
-          "title": {
-            "ar": "أدوات تساعدك على إدارة القنوات",
-            "en": "Tools that help you manage your channels"
-          }
-        },
-        "benefits": [
-          {
-            "icon": {
-              "type": "library",
-              "set": "qhub",
-              "name": "plug"
-            },
-            "title": {
-              "ar": "صندوق وارد موحّد",
-              "en": "A unified inbox"
-            },
-            "body": {
-              "ar": "جمع المحادثات القادمة من القنوات المرتبطة في مكان واحد.",
-              "en": "Conversations from the connected channels gathered in one place."
-            }
-          },
-          {
-            "icon": {
-              "type": "library",
-              "set": "qhub",
-              "name": "widget"
-            },
-            "title": {
-              "ar": "معرفة مصدر المحادثة",
-              "en": "See where a conversation came from"
-            },
-            "body": {
-              "ar": "ظهور القناة التي بدأت منها كل محادثة بشكل واضح.",
-              "en": "The channel each conversation started on is clearly shown."
-            }
-          },
-          {
-            "icon": {
-              "type": "library",
-              "set": "qhub",
-              "name": "inbox"
-            },
-            "title": {
-              "ar": "ربط أكثر من قناة",
-              "en": "Connect more than one channel"
-            },
-            "body": {
-              "ar": "إمكانية ربط أكثر من قناة تواصل ضمن الحساب نفسه.",
-              "en": "More than one communication channel can be connected within the same account."
-            }
-          },
-          {
-            "icon": {
-              "type": "library",
-              "set": "qhub",
-              "name": "sparkles"
-            },
-            "title": {
-              "ar": "توزيع المحادثات",
-              "en": "Conversation routing"
-            },
-            "body": {
-              "ar": "توزيع المحادثات على الموظفين والأقسام حسب إعدادات الفريق.",
-              "en": "Conversations routed to agents and departments according to your team settings."
-            }
-          },
-          {
-            "icon": {
-              "type": "library",
-              "set": "qhub",
-              "name": "shield"
-            },
-            "title": {
-              "ar": "سجلّ موحّد للعميل",
-              "en": "A unified customer record"
-            },
-            "body": {
-              "ar": "الوصول إلى سجلّ المحادثات والمعلومات المرتبطة بالعميل.",
-              "en": "Reach the conversation history and the information tied to the customer."
-            }
-          },
-          {
-            "icon": {
-              "type": "library",
-              "set": "qhub",
-              "name": "clock"
-            },
-            "title": {
-              "ar": "إدارة القنوات",
-              "en": "Channel management"
-            },
-            "body": {
-              "ar": "إضافة القنوات المرتبطة وإدارة إعداداتها من مكان واحد.",
-              "en": "Add connected channels and manage their settings from one place."
-            }
-          }
-        ],
-        "details": [
-          {
-            "title": {
-              "ar": "سياق العميل يبقى واضحاً",
-              "en": "The customer's context stays clear"
-            },
-            "shot": "inbox",
-            "scene": "channel-list",
-            "body": {
-              "ar": "مهما كانت القناة التي بدأ منها العميل، تبقى تفاصيل المحادثة وسجلّها ومعلوماته واضحة أمام الموظف، ويمكن تحويلها ومتابعتها من النقطة نفسها.",
-              "en": "Whatever channel the customer started on, the conversation details, its history and their information stay clear in front of the agent, and it can be transferred and followed from the same point."
-            },
-            "points": {
-              "ar": [
-                "مصدر كل محادثة ظاهر للموظف",
-                "سجلّ محادثات العميل في مكان واحد",
-                "ملاحظات داخلية على المحادثة",
-                "تحويل المحادثة بكامل سياقها"
-              ],
-              "en": [
-                "The source of every conversation is visible to the agent",
-                "The customer's conversation history in one place",
-                "Internal notes on the conversation",
-                "Transfer a conversation with its full context"
-              ]
-            }
-          },
-          {
-            "title": {
-              "ar": "ربط أسهل وإدارة أوضح",
-              "en": "Easier connecting, clearer management"
-            },
-            "shot": "overview",
-            "scene": "api-hooks",
-            "body": {
-              "ar": "يمكن إدارة القنوات المرتبطة ومتابعة حالتها من مكان واحد، مع إضافة قنوات جديدة أو تعديل إعداداتها أو تعطيلها عند الحاجة.",
-              "en": "Connected channels can be managed and their status followed from one place, adding new channels or changing or disabling their settings when needed."
-            },
-            "points": {
-              "ar": [
-                "إضافة قناة جديدة وإدارتها",
-                "متابعة حالة كل قناة مرتبطة",
-                "واجهة API وويبهوكس للأنظمة الأخرى",
-                "تعطيل القناة أو فصلها عند الحاجة"
-              ],
-              "en": [
-                "Add a new channel and manage it",
-                "Follow the status of every connected channel",
-                "An API and webhooks for other systems",
-                "Disable or disconnect a channel when needed"
-              ]
-            }
-          }
-        ],
-        "liveTitle": {
-          "ar": "خطوات الربط لكل منصّة",
-          "en": "The connection steps for each channel"
-        },
-        "liveHighlight": {
-          "ar": [
-            "خطوات",
-            "الربط"
-          ],
-          "en": [
-            "connection",
-            "steps"
-          ]
-        },
-        "faq": [
-          {
-            "q": {
-              "ar": "ما القنوات التي يمكن ربطها مع Qhub؟",
-              "en": "Which channels can be connected to Qhub?"
-            },
-            "a": {
-              "ar": "يمكن ربط القنوات التي يدعمها Qhub وإدارتها من خلال صندوق الوارد الموحّد.",
-              "en": "The channels Qhub supports can be connected and managed through the unified inbox."
-            }
-          },
-          {
-            "q": {
-              "ar": "هل تظهر جميع المحادثات في مكان واحد؟",
-              "en": "Do all conversations appear in one place?"
-            },
-            "a": {
-              "ar": "نعم، تظهر المحادثات القادمة من القنوات المرتبطة داخل صندوق وارد واحد.",
-              "en": "Yes. Conversations from the connected channels appear in a single inbox."
-            }
-          },
-          {
-            "q": {
-              "ar": "هل يمكن معرفة القناة التي بدأت منها المحادثة؟",
-              "en": "Can I see which channel a conversation started on?"
-            },
-            "a": {
-              "ar": "نعم، يظهر مصدر كل محادثة بشكل واضح داخل صندوق الوارد.",
-              "en": "Yes. The source of each conversation is clearly shown inside the inbox."
-            }
-          },
-          {
-            "q": {
-              "ar": "هل يمكن ربط أكثر من قناة في الحساب نفسه؟",
-              "en": "Can more than one channel be connected to the same account?"
-            },
-            "a": {
-              "ar": "نعم، يمكن ربط القنوات المتاحة ضمن حساب Qhub نفسه.",
-              "en": "Yes. The available channels can be connected within the same Qhub account."
-            }
-          },
-          {
-            "q": {
-              "ar": "هل يمكن توزيع المحادثات على الموظفين؟",
-              "en": "Can conversations be distributed across agents?"
-            },
-            "a": {
-              "ar": "نعم، يمكن توزيع المحادثات حسب الأقسام وإعدادات فريقك.",
-              "en": "Yes. Conversations can be routed by department and by your team's settings."
-            }
-          },
-          {
-            "q": {
-              "ar": "ماذا يحدث عند فصل إحدى القنوات؟",
-              "en": "What happens when a channel is disconnected?"
-            },
-            "a": {
-              "ar": "تتوقّف المحادثات الجديدة القادمة من القناة بعد فصلها، بينما تبقى المحادثات السابقة محفوظة داخل النظام.",
-              "en": "New conversations from that channel stop once it is disconnected, while earlier conversations stay saved in the system."
-            }
-          },
-          {
-            "q": {
-              "ar": "هل يحتفظ Qhub بسجلّ المحادثات؟",
-              "en": "Does Qhub keep a record of conversations?"
-            },
-            "a": {
-              "ar": "نعم، تبقى المحادثات المرتبطة محفوظة ويمكن الرجوع إليها من خلال صندوق الوارد.",
-              "en": "Yes. Connected conversations stay saved and can be revisited through the inbox."
+              "ar": "نعم. كل فتح وإغلاق للمحادثة يُعد جلسة، ويظهر فاصل برقم الجلسة وتاريخها، فيبقى سجل العميل كاملاً في محادثة واحدة أمام الموظف.",
+              "en": "Yes. Each time a conversation is opened and closed counts as a session, with a divider showing the session number and date, so the customer's full history stays in one conversation."
             }
           }
         ]
@@ -5510,15 +4883,15 @@ export const siteSeed: SiteContent = {
         "en": "FAQ"
       },
       "title": {
-        "ar": "إجابات عن الباقات والذكاء الاصطناعي والخصوصية",
-        "en": "Answers on plans, AI and privacy"
+        "ar": "كل ما تحتاج معرفته عن Qhub",
+        "en": "Everything you need to know about Qhub"
       },
       "highlight": {
         "ar": [
-          "إجابات"
+          "Qhub"
         ],
         "en": [
-          "Answers"
+          "Qhub"
         ]
       },
       "lede": {
@@ -5580,8 +4953,116 @@ export const siteSeed: SiteContent = {
       {
         "id": "start",
         "title": {
-          "ar": "البداية والربط",
-          "en": "Getting started"
+          "ar": "البدء السريع",
+          "en": "Getting Started"
+        },
+        "icon": {
+          "type": "library",
+          "set": "qhub",
+          "name": "bolt"
+        },
+        "items": [
+          {
+            "q": {
+              "ar": "ما هو Qhub وكيف يعمل؟",
+              "en": "What is Qhub and how does it work?"
+            },
+            "a": {
+              "ar": "Qhub منصة تجمع محادثات عملائك من قنوات التواصل المختلفة في صندوق وارد واحد، ليتمكن فريقك والمساعد الذكي من الرد عليها ومتابعتها من مكان واحد.\nآلية العمل\n1. تربط قنواتك (واتساب، ماسنجر، إنستغرام، تيليجرام، نافذة الدردشة المباشرة) من الحسابات والربط.\n2. تصل رسائل العملاء مباشرة إلى صفحة المحادثات.\n3. يرد المساعد الذكي تلقائيًا إن كان مفعّلًا، ويحوّل المحادثة إلى موظف عند الحاجة.\n4. يرد الموظف المسؤول، ثم يغلق المحادثة عند انتهائها، ويمكن إغلاقها تلقائيًا حسب إعدادات الإغلاق التلقائي.\n5. يستلم العميل رابط تقييم بعد إغلاق المحادثة.\n6. تتابع الأداء من نظرة عامة والتقارير.\nملاحظة: يمكنك أيضًا إرسال حملات تسويقية عبر واتساب والبريد الإلكتروني من الحملات التسويقية.",
+              "en": "Qhub brings your customer conversations from different messaging channels into one inbox, so your team and the Smart Assistant can reply and follow up from a single place.\nHow it works\n1. Connect your channels (WhatsApp, Messenger, Instagram, Telegram, Live Chat Widget) from Channels & connections.\n2. Customer messages arrive directly in the Inbox.\n3. The Smart Assistant replies automatically if enabled, and transfers the conversation to an employee when needed.\n4. The assigned employee replies, then closes the conversation when it is done; it can also be closed automatically based on the auto-close settings.\n5. The customer receives a rating link after the conversation is closed.\n6. Track performance from Overview and Reports.\nNote: You can also send marketing campaigns by WhatsApp and email from Campaigns."
+            }
+          },
+          {
+            "q": {
+              "ar": "إنشاء حساب وتسجيل الدخول",
+              "en": "Create an account and sign in"
+            },
+            "a": {
+              "ar": "حساب الشركة يُنشئه مدير الحساب مرة واحدة، ثم يدعو باقي الموظفين.\n1. افتح صفحة إنشاء الحساب في Qhub.\n2. أدخل البيانات المطلوبة.\n3. وافق على الشروط والأحكام ثم اضغط إنشاء الحساب.\n4. أكمل خطوة التحقق من الحساب (OTP).\n5. لتسجيل الدخول لاحقًا: أدخل البريد الإلكتروني وكلمة المرور.\nملاحظة: الموظفون لا يُنشئون حسابات بأنفسهم؛ تصلهم دعوة بالبريد من فريق العمل.",
+              "en": "The company account is created once by the account owner, who then invites the rest of the team.\n1. Open the Qhub sign-up page.\n2. Enter the required details.\n3. Accept the terms and conditions, then click Create account.\n4. Complete the account verification step (OTP).\n5. To sign in later, enter your email and password.\nNote: Employees do not sign up by themselves; they receive an email invitation from Team."
+            }
+          },
+          {
+            "q": {
+              "ar": "خطوات الإعداد الأولى",
+              "en": "First-time setup checklist"
+            },
+            "a": {
+              "ar": "اتبع هذا الترتيب لتجهيز حسابك لاستقبال أول محادثة.\n1. أكمل بيانات شركتك من الإعدادات ← إعدادات الشركة.\n2. اربط أول قناة من الحسابات والربط (إجباري لنجاح عمل النظام).\n3. ادعُ موظفيك من فريق العمل وحدّد دور كل موظف وأقسامه.\n4. فعّل المساعد الذكي من إعدادات الذكاء الاصطناعي.\n5. أضف الردود السريعة والوسوم من الإعدادات.\n6. أرسل رسالة تجريبية إلى قناتك وتأكد من ظهورها في المحادثات.",
+              "en": "Follow this order to get your account ready for its first conversation.\n1. Complete your company details in Settings → Company.\n2. Connect your first channel from Channels & connections (mandatory for the system to work).\n3. Invite your employees from Team and set each employee's role and departments.\n4. Enable the Smart Assistant from AI settings.\n5. Add quick replies and tags from Settings.\n6. Send a test message to your channel and make sure it appears in the Inbox."
+            }
+          },
+          {
+            "q": {
+              "ar": "جولة في لوحة التحكم",
+              "en": "A tour of the dashboard"
+            },
+            "a": {
+              "ar": "تتكون الواجهة من قائمة جانبية للتنقل وشريط علوي للأدوات السريعة.\nالقائمة الجانبية\n• الرئيسية: نظرة عامة، المحادثات، جهات الاتصال، التقارير.\n• الإدارة: الحسابات والربط، الأقسام، فريق العمل، الحملات التسويقية، إعدادات الذكاء الاصطناعي.\n• النظام: الشكاوى والاقتراحات، الباقات والاشتراك، الإعدادات.\nالشريط العلوي\n• البحث: ابحث في المحادثات وجهات الاتصال والموظفين.\n• قاعدة المعرفة: أيقونة المساعدة لفتح مقالات الشرح.\n• الإشعارات: تنبيهات تخص الباقات والموظفين والشكاوى والقنوات.\n• الملف الشخصي: بيانات حسابك وتسجيل الخروج.\nملاحظة: ما يمكنك الوصول إليه يعتمد على صلاحيات دورك.",
+              "en": "The interface has a sidebar for navigation and a top bar for quick tools.\nSidebar\n• Main: Overview, Inbox, Contacts, Reports.\n• Management: Channels & connections, Departments, Team, Campaigns, AI settings.\n• System: Complaints & Suggestions, Plans & billing, Settings.\nTop bar\n• Search: search conversations, contacts and employees.\n• Knowledge base: the help icon that opens the help articles.\n• Notifications: alerts about plans, employees, complaints and channels.\n• Profile: your account details and sign out.\nNote: What you can access depends on the permissions of your role."
+            }
+          }
+        ]
+      },
+      {
+        "id": "channels",
+        "title": {
+          "ar": "القنوات",
+          "en": "Channels"
+        },
+        "icon": {
+          "type": "library",
+          "set": "qhub",
+          "name": "plug"
+        },
+        "items": [
+          {
+            "q": {
+              "ar": "القنوات المتاحة وعدد الحسابات",
+              "en": "Available channels and number of accounts"
+            },
+            "a": {
+              "ar": "القناة هي الوسيلة التي يتواصل بها عملاؤك معك. يمكنك ربط أكثر من حساب في القناة الواحدة حسب باقتك.\nقنوات المراسلة\n• واتساب للأعمال\n• فيسبوك ماسنجر\n• إنستغرام دايركت\n• تيليجرام\n• نافذة الدردشة المباشرة (لموقعك الإلكتروني)\n• تيك توك (قريبًا)\nالبريد الإلكتروني\n• Gmail: يُستخدم للحملات والإشعارات.\nملاحظة: كل بطاقة قناة تعرض عدد الحسابات المتاحة لك وعدد المستخدم منها.\nملاحظة: اضغط إدارة في بطاقة القناة لفتح صفحتها: عن القناة، الحسابات المرتبطة، كيفية الربط.",
+              "en": "A channel is the way your customers reach you. You can link more than one account per channel, depending on your plan.\nMessaging channels\n• WhatsApp Business\n• Facebook Messenger\n• Instagram Direct\n• Telegram\n• Live Chat Widget (for your website)\n• TikTok (coming soon)\nEmail\n• Gmail: used for campaigns and notifications.\nNote: Each channel card shows how many accounts are available to you and how many are used.\nNote: Click Manage on a channel card to open its page: About the Channel, Linked Accounts, How to Link."
+            }
+          },
+          {
+            "q": {
+              "ar": "ربط واتساب للأعمال",
+              "en": "Connect WhatsApp Business"
+            },
+            "a": {
+              "ar": "يوفّر Qhub ثلاث طرق لربط رقم واتساب. اختر الطريقة الأنسب لك.\n1. افتح الحسابات والربط ثم اضغط إدارة في بطاقة واتساب للأعمال.\n2. اضغط ربط حساب جديد.\n3. اختر طريقة الربط (انظر الطرق أدناه).\n4. اتبع التعليمات حتى يظهر الرقم ضمن الحسابات المرتبطة.\nطرق الربط\n• ربط سريع عبر Meta (موصى به): تسجيل دخول بحساب فيسبوك دون إدخال بيانات يدويًا. يتطلب صلاحيات على حساب Facebook Business.\n• Meta Business Cloud API (موصى به): الربط الرسمي باستخدام بيانات الاعتماد و Webhook. يتطلب إعداد حساب Meta Business وبيانات أكثر.\n• Coexistence: تواصل استخدام تطبيق WhatsApp Business على هاتفك وتُزامَن الرسائل مع Qhub. يجب إبقاء التطبيق متصلًا، وقد يتطلب موافقة Meta.\nملاحظة: رسوم رسائل واتساب تُدفع إلى Meta مباشرة من حسابك لديها، وهي منفصلة عن اشتراك Qhub.\nملاحظة: بعد الربط، أضف الحساب إلى القسم المناسب من الأقسام.",
+              "en": "Qhub offers three ways to link a WhatsApp number. Choose the one that suits you.\n1. Open Channels & connections, then click Manage on the WhatsApp Business card.\n2. Click Link New Account.\n3. Choose a linking method (see the methods below).\n4. Follow the instructions until the number appears under Linked Accounts.\nLinking methods\n• Quick link via Meta (recommended): sign in with Facebook, with no manual data entry. Requires permissions on the Facebook Business account.\n• Meta Business Cloud API (recommended): the official connection using credentials and a webhook. Requires a Meta Business setup and more details.\n• WhatsApp Business App (Coexistence): keep using the WhatsApp Business app on your phone while messages sync with Qhub. The app must stay connected, and Meta approval may be required.\nNote: WhatsApp message fees are paid directly to Meta from your Meta account and are separate from your Qhub subscription.\nNote: After linking, add the account to the right department from Departments."
+            }
+          },
+          {
+            "q": {
+              "ar": "ربط تيليجرام",
+              "en": "Connect Telegram"
+            },
+            "a": {
+              "ar": "يُربط تيليجرام عن طريق بوت تنشئه من داخل تيليجرام نفسه.\n1. افتح تيليجرام وابحث عن BotFather.\n2. أنشئ بوتًا جديدًا واتبع تعليمات BotFather.\n3. انسخ رمز البوت (Bot Token) الذي يرسله لك BotFather.\n4. في Qhub افتح الحسابات والربط ثم اضغط إدارة في بطاقة تيليجرام.\n5. اضغط ربط حساب جديد والصق الرمز في معالج الربط.\n6. أكمل الخطوات حتى يظهر البوت ضمن الحسابات المرتبطة.\nملاحظة: احتفظ برمز البوت سرًّا؛ من يملكه يستطيع التحكم في البوت.",
+              "en": "Telegram is linked through a bot that you create inside Telegram itself.\n1. Open Telegram and search for BotFather.\n2. Create a new bot and follow BotFather's instructions.\n3. Copy the Bot Token that BotFather sends you.\n4. In Qhub, open Channels & connections and click Manage on the Telegram card.\n5. Click Link New Account and paste the token into the linking wizard.\n6. Complete the steps until the bot appears under Linked Accounts.\nNote: Keep the Bot Token secret; anyone who has it can control the bot."
+            }
+          },
+          {
+            "q": {
+              "ar": "ربط القنوات الأخرى (ماسنجر، إنستغرام، نافذة الدردشة المباشرة، Gmail)",
+              "en": "Connect other channels (Messenger, Instagram, Live Chat Widget, Gmail)"
+            },
+            "a": {
+              "ar": "خطوات الربط واحدة في كل القنوات، وتختلف المتطلبات فقط.\n1. افتح الحسابات والربط.\n2. اضغط إدارة في بطاقة القناة المطلوبة.\n3. اضغط ربط حساب جديد واتبع الخطوات.\n4. تأكد من ظهور الحساب ضمن الحسابات المرتبطة.\nملاحظة: Gmail يُربط بكلمة مرور التطبيقات (App Password) وليس بكلمة مرور بريدك العادية.\nملاحظة: إذا وصلت للحد الأقصى من الحسابات في القناة، ستحتاج إلى ترقية باقتك لإضافة حساب جديد.",
+              "en": "The linking steps are the same for every channel; only the requirements differ.\n1. Open Channels & connections.\n2. Click Manage on the channel card you want.\n3. Click Link New Account and follow the steps.\n4. Make sure the account appears under Linked Accounts.\nNote: Gmail is linked with an App Password, not your normal email password.\nNote: If you have reached the maximum number of accounts for a channel, you will need to upgrade your plan to add a new one."
+            }
+          }
+        ]
+      },
+      {
+        "id": "inbox",
+        "title": {
+          "ar": "المحادثات",
+          "en": "Conversations"
         },
         "icon": {
           "type": "library",
@@ -5591,42 +5072,292 @@ export const siteSeed: SiteContent = {
         "items": [
           {
             "q": {
-              "ar": "كم يستغرق إعداد الحساب؟",
-              "en": "How long does setup take?"
+              "ar": "صندوق المحادثات",
+              "en": "The inbox"
             },
             "a": {
-              "ar": "أقل من 10 دقائق للربط الأساسي: تسجّل، وتربط قنواتك، وتبدأ استقبال الرسائل فوراً.",
-              "en": "Under 10 minutes for the basic connection. Sign up, link your channels, and messages start arriving right away."
+              "ar": "صفحة المحادثات تعرض محادثات العملاء من كل القنوات في قائمة واحدة.\n• البحث: ابحث عن محادثة من مربع البحث أعلى القائمة.\n• تصفية: اعرض المحادثات حسب القناة أو القسم.\n• الترتيب: غيّر ترتيب القائمة.\n• الحالة: اعرض المحادثات حسب حالتها.\n• محادثة جديدة: ابدأ محادثة مع عميل.\nاضغط على أي محادثة لفتحها وقراءة الرسائل والرد عليها.",
+              "en": "The Inbox page shows customer conversations from all channels in one list.\n• Search: find a conversation from the search box above the list.\n• Filter: show conversations by channel or department.\n• Sort: change the order of the list.\n• Status: show conversations by their status.\n• New conversation: start a conversation with a customer.\nClick any conversation to open it, read the messages and reply."
             }
           },
           {
             "q": {
-              "ar": "أي قنوات تدعمونها؟",
-              "en": "Which channels do you support?"
+              "ar": "الرد على العميل",
+              "en": "Reply to a customer"
             },
             "a": {
-              "ar": "واتساب، إنستغرام، فيسبوك ماسنجر، تيليجرام، إكس، الإيميل، وويدجت المحادثة على موقعك.",
-              "en": "WhatsApp, Instagram, Facebook Messenger, Telegram, X, email, and the chat widget on your own website."
+              "ar": "1. افتح المحادثة من القائمة.\n2. اكتب ردّك في مربع الكتابة أسفل المحادثة.\n3. أضف ما تحتاجه: رد سريع، إيموجي، مرفق أو رسالة صوتية.\n4. اضغط إرسال.\nالملاحظة الداخلية\n• بدّل من رد إلى ملاحظة داخلية لكتابة ملاحظة يراها فريقك فقط ولا تُرسل إلى العميل.\nملاحظة: على واتساب يمكنك الرد برسائل حرة خلال 24 ساعة من آخر رسالة للعميل؛ بعدها تحتاج إلى قالب رسالة معتمد.\nملاحظة: لا يمكن الرد على محادثة مغلقة قبل إعادة فتحها.",
+              "en": "1. Open the conversation from the list.\n2. Type your reply in the message box below the conversation.\n3. Add what you need: a quick reply, emoji, attachment or voice message.\n4. Click send.\nInternal note\n• Switch from Reply to Internal note to write a note that only your team can see; it is not sent to the customer.\nNote: On WhatsApp you can reply with free-form messages within 24 hours of the customer's last message; after that you need an approved message template.\nNote: You cannot reply to a closed conversation until it is reopened."
             }
           },
           {
             "q": {
-              "ar": "هل أحتاج واتساب بزنس API؟",
-              "en": "Do I need the WhatsApp Business API?"
+              "ar": "حالات المحادثة والجلسات",
+              "en": "Conversation statuses and sessions"
             },
             "a": {
-              "ar": "للاستخدام الاحترافي نعم، ونساعدك في إجراءات التسجيل والتحقق خطوة بخطوة.",
-              "en": "For professional use, yes — and we walk you through registration and verification step by step."
+              "ar": "الحالات\n• جديدة: وصلت ولم يبدأ العمل عليها بعد.\n• قيد المعالجة: يعمل عليها أحد الموظفين.\n• مغلقة: انتهت المحادثة.\nتغيير الحالة\n1. افتح المحادثة.\n2. اختر الحالة من القائمة أعلى المحادثة، أو اضغط إغلاق.\n3. عند الإغلاق يُرسل للعميل رابط تقييم.\n4. للعمل على محادثة مغلقة مرة أخرى اضغط إعادة فتح.\nالجلسات\nكل مرة تُفتح فيها المحادثة ثم تُغلق تُعد جلسة. يظهر فاصل برقم الجلسة وتاريخها بين الجلسات، فيبقى سجل العميل كاملًا في محادثة واحدة.\nملاحظة: يمكن ضبط الإغلاق التلقائي للمحادثات بعد عدد ساعات من إعدادات الذكاء الاصطناعي ← التحويل والجدولة.",
+              "en": "Statuses\n• New: received and not yet being worked on.\n• In progress: an employee is working on it.\n• Closed: the conversation is finished.\nChange the status\n1. Open the conversation.\n2. Choose the status from the menu above the conversation, or click Close.\n3. When it is closed, a rating link is sent to the customer.\n4. To work on a closed conversation again, click Reopen.\nSessions\nEach time a conversation is opened and then closed counts as one session (shown as Round in the conversation). A divider with the session number and date appears between sessions, so the customer's full history stays in one conversation.\nNote: You can set conversations to close automatically after a number of hours from AI settings → Transfer & schedule."
             }
           },
           {
             "q": {
-              "ar": "هل يمكنني نقل محادثاتي القديمة؟",
-              "en": "Can I bring over my old conversations?"
+              "ar": "إسناد المحادثة إلى موظف أو قسم",
+              "en": "Assign a conversation to an employee or department"
             },
             "a": {
-              "ar": "المحادثات التي تصل بعد الربط تدخل النظام، والسابقة تبقى في تطبيقك الأصلي.",
-              "en": "Conversations that arrive after you connect flow into Qhub. Earlier history stays in the original app."
+              "ar": "الإسناد يحدد من المسؤول عن متابعة المحادثة.\n1. افتح المحادثة ثم افتح لوحة التفاصيل.\n2. من حقل الموظف المسؤول اختر الموظف.\n3. من حقل القسم اختر القسم المناسب.\nملاحظة: يمكنك تصفية صندوق المحادثات حسب القسم لمتابعة محادثات كل قسم.\nملاحظة: أداء كل موظف يظهر في التقارير ضمن أداء الموظفين.",
+              "en": "Assignment defines who is responsible for following up on the conversation.\n1. Open the conversation, then open the Details panel.\n2. Choose the employee in the assigned employee field.\n3. Choose the right department in the department field.\nNote: You can filter the inbox by department to follow each department's conversations.\nNote: Each employee's performance appears in Reports under Employee performance."
+            }
+          },
+          {
+            "q": {
+              "ar": "تفاصيل المحادثة والملخص الذكي",
+              "en": "Conversation details and AI summary"
+            },
+            "a": {
+              "ar": "لوحة التفاصيل بجانب المحادثة تجمع كل ما يخصها.\n• الموظف المسؤول والقسم: من يتابع المحادثة.\n• الوسوم: أضف وسمًا لتصنيف موضوع المحادثة.\n• تصنيف العميل: حدّد تصنيف جهة الاتصال.\n• خصائص المحادثة: بيانات إضافية عن المحادثة.\n• توليد ملخص: ملخص تلقائي للمحادثة بالذكاء الاصطناعي.\n• ملء الشاشة: عرض المحادثة بكامل الشاشة.",
+              "en": "The Details panel next to the conversation gathers everything related to it.\n• Assigned employee and department: who is following the conversation.\n• Tags: add a tag to label the topic of the conversation.\n• Customer category: set the category of the contact.\n• Conversation attributes: extra data about the conversation.\n• Generate summary: an automatic AI summary of the conversation.\n• Full screen: view the conversation in full screen."
+            }
+          },
+          {
+            "q": {
+              "ar": "بدء محادثة جديدة",
+              "en": "Start a new conversation"
+            },
+            "a": {
+              "ar": "1. من المحادثات اضغط محادثة جديدة.\n2. اختر القناة المُرسلة (الحساب الذي سترسل منه).\n3. اختر جهة الاتصال، أو اضغط جهة اتصال جديدة لإضافتها.\n4. اختر الموظف المسؤول، والقسم إن أردت.\n5. اختر قالبًا من قوالب الردود السريعة، أو اتركه بدون قالب لكتابة نص حر.\n6. اكتب الرسالة ثم اضغط إرسال.\nملاحظة: على واتساب، مراسلة عميل لم يراسلك خلال آخر 24 ساعة تتطلب قالب رسالة معتمدًا من Meta.",
+              "en": "1. In the Inbox, click New conversation.\n2. Choose the Sending channel (the account you will send from).\n3. Choose the Contact, or click New contact to add one.\n4. Choose the responsible Employee, and the Department if you want.\n5. Choose a template from your quick replies, or leave it without a template to write free text.\n6. Write the Message, then click Send.\nNote: On WhatsApp, messaging a customer who has not messaged you in the last 24 hours requires a message template approved by Meta."
+            }
+          },
+          {
+            "q": {
+              "ar": "الردود السريعة والوسوم",
+              "en": "Quick replies and tags"
+            },
+            "a": {
+              "ar": "الردود السريعة نصوص جاهزة تدرجها أثناء الرد. الوسوم تسميات تصنّف بها المحادثات.\nالردود السريعة\n1. افتح الإعدادات ← الردود السريعة.\n2. اضغط إضافة رد وأدخل اسم الرد ونصه.\n3. نظّم الردود في مجموعات من إدارة التصنيفات.\nالوسوم\n1. افتح الإعدادات ← الوسوم.\n2. اضغط وسم جديد وأدخل اسم الوسم.\nملاحظة: يمكنك أيضًا إضافة وسم جديد مباشرة من لوحة تفاصيل المحادثة.\nملاحظة: توزيع المحادثات حسب الوسم يظهر في التقارير.",
+              "en": "Quick replies are ready-made texts you insert while replying. Tags are labels used to classify conversations.\nQuick replies\n1. Open Settings → Quick replies.\n2. Click Add reply and enter the reply name and text.\n3. Organise replies into groups from Manage categories.\nTags\n1. Open Settings → Tags.\n2. Click New tag and enter the tag name.\nNote: You can also add a new tag directly from the conversation details panel.\nNote: The breakdown of conversations by tag appears in Reports."
+            }
+          }
+        ]
+      },
+      {
+        "id": "contacts",
+        "title": {
+          "ar": "جهات الاتصال",
+          "en": "Contacts"
+        },
+        "icon": {
+          "type": "library",
+          "set": "qhub",
+          "name": "briefcase"
+        },
+        "items": [
+          {
+            "q": {
+              "ar": "إضافة جهة اتصال",
+              "en": "Add a contact"
+            },
+            "a": {
+              "ar": "صفحة جهات الاتصال هي قائمة عملائك مع رقم أو معرّف كل عميل وآخر تفاعل له وعدد محادثاته.\n1. افتح جهات الاتصال واضغط جهة اتصال جديدة.\n2. أدخل الاسم الكامل.\n3. اختر القناة، ثم أدخل رقم الهاتف أو المعرّف.\n4. اختر تصنيف جهة الاتصال وأضف ملاحظات (اختياري).\n5. اضغط إضافة.\nملاحظة: اضغط عرض بجانب أي جهة اتصال لفتح بياناتها.",
+              "en": "The Contacts page is your customer list, with each customer's phone number or username, last interaction and number of conversations.\n1. Open Contacts and click New contact.\n2. Enter the full name.\n3. Choose the channel, then enter the phone number or username.\n4. Choose a contact classification and add notes (optional).\n5. Click Add.\nNote: Click View next to any contact to open its details."
+            }
+          },
+          {
+            "q": {
+              "ar": "التصنيفات والفلاتر والاستيراد والتصدير",
+              "en": "Categories, filters, import and export"
+            },
+            "a": {
+              "ar": "• إدارة التصنيفات: أنشئ تصنيفات لعملائك وعدّلها.\n• البحث: ابحث بالاسم أو الرقم.\n• الفلاتر: صفِّ القائمة حسب القناة، النوع أو الحالة.\n• استيراد/تصدير: أضف جهات اتصال دفعة واحدة من ملف، أو صدّر القائمة.\nملاحظة: تصنيف العميل يظهر أيضًا في لوحة تفاصيل المحادثة ويمكن تغييره منها.",
+              "en": "• Manage categories: create and edit categories for your customers.\n• Search: search by name or number.\n• Filters: filter the list by channel, type or status.\n• Import/Export: add contacts in bulk from a file, or export the list.\nNote: The customer category also appears in the conversation details panel and can be changed from there."
+            }
+          }
+        ]
+      },
+      {
+        "id": "team",
+        "title": {
+          "ar": "الفريق والأدوار",
+          "en": "Team & Roles"
+        },
+        "icon": {
+          "type": "library",
+          "set": "qhub",
+          "name": "users"
+        },
+        "items": [
+          {
+            "q": {
+              "ar": "دعوة موظف",
+              "en": "Invite an employee"
+            },
+            "a": {
+              "ar": "1. افتح فريق العمل واضغط دعوة موظف.\n2. أدخل الاسم والبريد الإلكتروني (رقم الهاتف اختياري).\n3. اختر الدور.\n4. اختر الأقسام التي يعمل بها الموظف.\n5. فعّل إخفاء أرقام جهات الاتصال إن أردت ألا يرى الموظف أرقام العملاء.\n6. اضغط إرسال الدعوة.\nملاحظة: يصل الموظف رابط دعوة على بريده، يفتحه ويعيّن كلمة مروره بنفسه.\nملاحظة: من قائمة الفريق يمكنك تعديل بيانات الموظف، تعطيل حسابه أو حذفه.",
+              "en": "1. Open Team and click Invite employee.\n2. Enter the name and email (phone number is optional).\n3. Choose the Role.\n4. Choose the Departments the employee works in.\n5. Turn on Hide customer numbers if the employee should not see customer phone numbers.\n6. Click Send invitation.\nNote: The employee receives an invitation link by email, opens it and sets their own password.\nNote: From the team list you can edit an employee, disable their account or delete it."
+            }
+          },
+          {
+            "q": {
+              "ar": "الأدوار والصلاحيات",
+              "en": "Roles and permissions"
+            },
+            "a": {
+              "ar": "الدور مجموعة صلاحيات تحدد ما يستطيع الموظف رؤيته وفعله في النظام.\n1. افتح فريق العمل ثم الأدوار والصلاحيات.\n2. اضغط دور جديد.\n3. اكتب اسم الدور وحدّد صلاحياته.\n4. احفظ الدور، ثم اختره عند دعوة الموظف أو تعديله.\nملاحظة: دور الأدمن دور أساسي في النظام يملك كل الصلاحيات ولا يمكن تعديله.\nملاحظة: تعديل صلاحيات دور يُطبَّق على كل الموظفين المرتبطين به.",
+              "en": "A role is a set of permissions that defines what an employee can see and do in the system.\n1. Open Team, then Roles & Permissions.\n2. Click New role.\n3. Enter the role name and select its permissions.\n4. Save the role, then choose it when you invite or edit an employee.\nNote: The Admin role is a built-in system role with all permissions and cannot be edited.\nNote: Changing a role's permissions applies to every employee who has that role."
+            }
+          },
+          {
+            "q": {
+              "ar": "الأقسام",
+              "en": "Departments"
+            },
+            "a": {
+              "ar": "القسم يجمع الموظفين المسؤولين عن نوع من المحادثات، مثل المبيعات أو الدعم.\n1. افتح الأقسام واضغط قسم جديد.\n2. أدخل اسم القسم ووصفه.\n3. اختر لون القسم.\n4. ابحث عن القنوات وأضفها إلى القسم.\n5. اضغط إضافة.\n6. اربط الموظفين بالقسم من فريق العمل عند الدعوة أو التعديل.\nملاحظة: يمكنك تعديل القسم أو حذفه من صفحة الأقسام.",
+              "en": "A department groups the employees responsible for one type of conversation, such as Sales or Support.\n1. Open Departments and click New department.\n2. Enter the department name and description.\n3. Choose the department color.\n4. Search for channels and add them to the department.\n5. Click Add.\n6. Link employees to the department from Team when inviting or editing them.\nNote: You can edit or delete a department from the Departments page."
+            }
+          }
+        ]
+      },
+      {
+        "id": "ai",
+        "title": {
+          "ar": "المساعد الذكي",
+          "en": "Smart Assistant (AI)"
+        },
+        "icon": {
+          "type": "library",
+          "set": "qhub",
+          "name": "bot"
+        },
+        "items": [
+          {
+            "q": {
+              "ar": "تفعيل المساعد الذكي وربط المزوّد",
+              "en": "Enable the Smart Assistant and connect a provider"
+            },
+            "a": {
+              "ar": "المساعد الذكي يرد على عملائك تلقائيًا باستخدام مزوّد ذكاء اصطناعي تربطه بحسابك.\n1. افتح إعدادات الذكاء الاصطناعي.\n2. فعّل المساعد من مفتاح التشغيل الرئيسي.\n3. في تبويب إعدادات الربط اختر المزوّد: OpenAI أو Claude أو Gemini.\n4. أدخل مفتاح الربط البرمجي (API Key) ثم اضغط فحص الاتصال.\n5. اختر النموذج والحد الأقصى لطول الرد.\n6. حدّد القنوات التي يعمل عليها المساعد.\n7. احفظ التغييرات.\nملاحظة: مفتاح الربط تحصل عليه من حسابك لدى المزوّد، وتكلفة استخدامه تُدفع للمزوّد مباشرة.\nملاحظة: API اختصار Application Programming Interface، أي واجهة الربط البرمجي.",
+              "en": "The Smart Assistant replies to your customers automatically, using an AI provider that you connect to your account.\n1. Open AI settings.\n2. Turn the assistant on using the main switch.\n3. In the Connection tab, choose the provider: OpenAI, Claude or Gemini.\n4. Enter the API key, then click Check connection.\n5. Choose the Model and the Max response length.\n6. Select the Enabled channels the assistant works on.\n7. Save your changes.\nNote: You get the API key from your account with the provider, and usage is billed by the provider directly."
+            }
+          },
+          {
+            "q": {
+              "ar": "لغة المساعد وأسلوبه",
+              "en": "Assistant language and tone"
+            },
+            "a": {
+              "ar": "1. افتح إعدادات الذكاء الاصطناعي ← اللغة والأسلوب.\n2. اختر لغات الرد: العربية، الإنجليزية، أو كلتيهما.\n3. اختر النبرة المناسبة لعلامتك.\n4. اختر اللهجة العربية.\n5. احفظ التغييرات.\nالنبرات المتاحة\n• مختصر ومباشر: إجابات سريعة بلا تفاصيل زائدة.\n• ودود وحماسي: لطيف ويستخدم الإيموجي أحيانًا.\n• رسمي ومحترف: لغة جادة ومنظمة.\n• فاخر وراقي: أسلوب يناسب العلامات الفاخرة.\nاللهجات المتاحة\n• فصحى مبسّطة، خليجية، مصرية، شامية.",
+              "en": "1. Open AI settings → Language & tone.\n2. Choose the reply languages: Arabic, English, or both.\n3. Choose the tone that fits your brand.\n4. Choose the Arabic dialect.\n5. Save your changes.\nAvailable tones\n• Short and direct: quick answers without extra details.\n• Friendly and enthusiastic: kind, sometimes uses emojis.\n• Formal and professional: serious, organised language.\n• Luxurious and elegant: a style that suits luxury brands.\nAvailable dialects\n• Simplified Modern Standard Arabic, Khaleeji, Egyptian, Levantine."
+            }
+          },
+          {
+            "q": {
+              "ar": "معرفة المساعد والمواضيع الممنوعة",
+              "en": "Assistant knowledge and forbidden topics"
+            },
+            "a": {
+              "ar": "من تبويب المعرفة والقيود تحدد ما يعرفه المساعد عن شركتك وما لا يتحدث فيه. الإعدادات تُضبط لكل حساب مرتبط على حدة.\n1. افتح إعدادات الذكاء الاصطناعي ← المعرفة والقيود.\n2. اختر الحساب المرتبط الذي تريد ضبطه.\n3. اكتب تعليمات الشركة: من أنتم، ماذا تقدمون، وكيف يرد المساعد (حتى 4,000 حرف).\n4. حدّد مصادر التعلم: المستندات، ردود الموظفين.\n5. أضف المواضيع الممنوعة، موضوعًا في كل سطر.\n6. اكتب الرد الذي يُرسَل عند طرح موضوع ممنوع.\n7. احفظ التغييرات.\nملاحظة: كلما كانت التعليمات والمستندات أوضح وأحدث، كانت ردود المساعد أدق.",
+              "en": "In the Knowledge & limits tab you define what the assistant knows about your company and what it must not discuss. Settings are configured for each linked account separately.\n1. Open AI settings → Knowledge & limits.\n2. Choose the linked account you want to configure.\n3. Write the Company knowledge (Prompt): who you are, what you offer and how the assistant should reply (up to 4,000 characters).\n4. Select the Learning sources: documents, employee replies.\n5. Add Forbidden topics, one per line.\n6. Write the reply sent when a forbidden topic is raised.\n7. Save your changes.\nNote: The clearer and more up to date your instructions and documents are, the more accurate the assistant's replies will be."
+            }
+          },
+          {
+            "q": {
+              "ar": "التحويل إلى موظف وساعات عمل المساعد",
+              "en": "Transfer to an employee and assistant working hours"
+            },
+            "a": {
+              "ar": "1. افتح إعدادات الذكاء الاصطناعي ← التحويل والجدولة.\n2. فعّل التحويل إلى موظف وحدّد شروطه.\n3. أضف الكلمات المفتاحية التي تُحوَّل المحادثة عند ورودها (مثل: شكوى، استرداد).\n4. اختر الموظف الذي تُحوَّل إليه المحادثة.\n5. حدّد ساعات عمل الموظفين لكل يوم، والمساعد يعمل في باقي الأوقات أو اجعله يعمل على مدار الساعة.\n6. اكتب الرسالة التي تُرسَل خارج ساعات العمل.\n7. فعّل الإغلاق التلقائي وحدّد عدد الساعات (اختياري).\n8. احفظ التغييرات.\nملاحظة: بعد التحويل يتولى الموظف الرد على المحادثة.",
+              "en": "1. Open AI settings → Transfer & schedule.\n2. Turn on Transfer to a human agent and set its conditions.\n3. Add the Keywords that trigger transfer (for example: complaint, refund).\n4. Choose the employee the conversation is transferred to.\n5. Set the employees' working hours for each day, and the assistant works the rest of the time, or let it work around the clock.\n6. Write the message sent outside working hours.\n7. Turn on Auto-close conversations and set the number of hours (optional).\n8. Save your changes.\nNote: After the transfer, the employee takes over replying to the conversation."
+            }
+          }
+        ]
+      },
+      {
+        "id": "campaigns",
+        "title": {
+          "ar": "الحملات التسويقية",
+          "en": "Campaigns"
+        },
+        "icon": {
+          "type": "library",
+          "set": "qhub",
+          "name": "megaphone"
+        },
+        "items": [
+          {
+            "q": {
+              "ar": "إنشاء حملة واتساب",
+              "en": "Create a WhatsApp campaign"
+            },
+            "a": {
+              "ar": "الحملة رسالة جماعية ترسلها إلى مجموعة من عملائك دفعة واحدة أو في وقت مجدول.\n1. افتح الحملات التسويقية ثم تبويب حملات WhatsApp واضغط حملة جديدة.\n2. أدخل اسم الحملة واختر رقم الإرسال.\n3. اختر رسالة مخصصة أو قوالب الرسائل.\n4. اكتب نص الرسالة (حتى 1000 حرف). يمكنك استخدام المتغيرات بصيغة {{var}}.\n5. أضف مرفقًا (اختياري).\n6. حدّد الجمهور المستهدف.\n7. اختر التوقيت: إرسال الآن أو جدولة موعد.\n8. اختر سرعة الإرسال: بطيئة، عادية أو سريعة.\n9. راجع المعاينة ثم أرسل الحملة.\nملاحظة: يجب ربط حساب واتساب أولًا ليظهر في رقم الإرسال.\nملاحظة: السرعة البطيئة هي الأكثر أمانًا ويُنصح بها للحملات الكبيرة.\nملاحظة: على واتساب، الرسائل التسويقية لعملاء خارج نافذة 24 ساعة تتطلب قالبًا معتمدًا من Meta، وتخضع لرسوم Meta.",
+              "en": "A campaign is a bulk message sent to a group of your customers at once or at a scheduled time.\n1. Open Campaigns, go to the WhatsApp campaigns tab and click New campaign.\n2. Enter the Campaign Name and choose the Sending Number.\n3. Choose Custom message or Message templates.\n4. Write the Message Text (up to 1000 characters). You can use variables in the form {{var}}.\n5. Add an Attachment (optional).\n6. Select the Target Audience.\n7. Choose the Timing: Send Now or schedule a time.\n8. Choose the Sending speed: Slow, Normal or Fast.\n9. Check the Preview, then send the campaign.\nNote: A WhatsApp account must be linked first so it appears under Sending Number.\nNote: Slow speed is the safest and is recommended for large campaigns.\nNote: On WhatsApp, marketing messages to customers outside the 24-hour window require a template approved by Meta and are subject to Meta fees."
+            }
+          },
+          {
+            "q": {
+              "ar": "قوالب الرسائل وحملات البريد",
+              "en": "Message templates and email campaigns"
+            },
+            "a": {
+              "ar": "قوالب الرسائل\n1. افتح الحملات التسويقية واضغط إدارة القوالب.\n2. أنشئ قالبًا جديدًا أو عدّل قالبًا موجودًا.\n3. استخدم القالب عند إنشاء حملة باختيار قوالب الرسائل.\nحملات البريد الإلكتروني\n1. اربط بريدك من الحسابات والربط (Gmail).\n2. افتح الحملات التسويقية ثم تبويب حملات Email.\n3. أنشئ الحملة وحدّد الجمهور والتوقيت.",
+              "en": "Message templates\n1. Open Campaigns and click Manage templates.\n2. Create a new template or edit an existing one.\n3. Use the template when creating a campaign by choosing Message templates.\nEmail campaigns\n1. Link your email from Channels & connections (Gmail).\n2. Open Campaigns and go to the Email campaigns tab.\n3. Create the campaign and set the audience and timing."
+            }
+          },
+          {
+            "q": {
+              "ar": "متابعة نتائج الحملات",
+              "en": "Track campaign results"
+            },
+            "a": {
+              "ar": "صفحة الحملات التسويقية تعرض ملخصًا لأداء حملاتك.\n• البطاقات: إجمالي الحملات، الرسائل المُرسلة، متوسط الفتح، الحملات المجدولة.\n• جدول الحملات: الرسالة، الجمهور، عدد المُرسل، معدل الفتح، التاريخ والحالة لكل حملة.\n• فلتر الفترة: اعرض حملات فترة زمنية محددة.\n• CSV: صدّر قائمة الحملات إلى ملف.",
+              "en": "The Campaigns page shows a summary of how your campaigns are performing.\n• Cards: total campaigns, messages sent, average open rate, scheduled campaigns.\n• Campaigns table: message, audience, sent count, open rate, date and status for each campaign.\n• Period filter: show the campaigns of a specific period.\n• CSV: export the campaigns list to a file."
+            }
+          }
+        ]
+      },
+      {
+        "id": "analytics",
+        "title": {
+          "ar": "التقارير",
+          "en": "Reports"
+        },
+        "icon": {
+          "type": "library",
+          "set": "qhub",
+          "name": "chart"
+        },
+        "items": [
+          {
+            "q": {
+              "ar": "صفحة نظرة عامة",
+              "en": "The Overview page"
+            },
+            "a": {
+              "ar": "نظرة عامة هي الصفحة الرئيسية، وتعرض ملخصًا سريعًا لنشاط حسابك خلال الفترة المحددة.\n• البطاقات: أهم أرقام المحادثات في الفترة.\n• المساعد الذكي: ملخص أداء المساعد.\n• محادثات آخر 7 أيام: عدد المحادثات يومًا بيوم.\n• توزيع الحالات: نسبة المحادثات في كل حالة.\n• أحدث المحادثات وأداء الموظفين.\nملاحظة: النسبة المئوية بجانب الرقم تعني التغيّر مقارنة بالفترة السابقة المساوية لها في الطول.\nملاحظة: غيّر الفترة الزمنية من أعلى الصفحة لتحديث الأرقام.",
+              "en": "Overview is the home page and shows a quick summary of your account activity during the selected period.\n• Cards: the key conversation numbers for the period.\n• Smart Assistant: a summary of the assistant's performance.\n• Conversations last 7 days: number of conversations day by day.\n• Status distribution: the share of conversations in each status.\n• Latest conversations and Employee performance.\nNote: The percentage next to a number is the change compared with the previous period of the same length.\nNote: Change the date range at the top of the page to update the numbers."
+            }
+          },
+          {
+            "q": {
+              "ar": "صفحة التقارير والتصدير",
+              "en": "The Reports page and exporting"
+            },
+            "a": {
+              "ar": "1. افتح التقارير.\n2. اختر الفترة الزمنية والحساب من الفلاتر أعلى الصفحة.\n3. راجع أقسام التقرير.\n4. اضغط PDF أو Excel لتصدير التقرير.\nأقسام التقرير\n• أداء المساعد الذكي، ومقارنته بالموظفين، وأسباب التحويل إلى موظف.\n• المحادثات الجديدة ووقت الرد الأول.\n• ساعات الذروة: الأوقات الأكثر ازدحامًا خلال الأسبوع.\n• المحادثات حسب الوسم.\n• أداء الموظفين: عدد المحادثات، متوسط الرد، نسبة الحل والتقييم.",
+              "en": "1. Open Reports.\n2. Choose the date range and the account from the filters at the top of the page.\n3. Review the report sections.\n4. Click PDF or Excel to export the report.\nReport sections\n• Smart Assistant performance, Smart Assistant vs employees, and reasons for transfer to a human employee.\n• New conversations and first response time.\n• Peak hours: the busiest times during the week.\n• Conversations by tag.\n• Employee performance: conversations, average reply, resolution rate and rating."
+            }
+          },
+          {
+            "q": {
+              "ar": "تقييمات العملاء",
+              "en": "Customer ratings"
+            },
+            "a": {
+              "ar": "بعد إغلاق المحادثة يستلم العميل رابطًا لتقييم المحادثة والموظف.\n1. افتح التقارير وانزل إلى قسم تقييمات جهات الاتصال.\n2. اختر الفترة الزمنية.\n3. راجع توزيع الرضا وملخص سريع.\n4. ابحث بالاسم أو التعليق، أو صفِّ حسب التقييم.\n5. افتح المحادثة المرتبطة بأي تقييم من الجدول.\nملاحظة: جدول التقييمات يعرض تقييم المحادثة، تقييم الموظف، والتعليق الذي كتبه العميل.",
+              "en": "After a conversation is closed, the customer receives a link to rate the conversation and the employee.\n1. Open Reports and scroll to the Contact ratings section.\n2. Choose the date range.\n3. Review Satisfaction distribution and Quick summary.\n4. Search by name or comment, or filter by rating.\n5. Open the conversation related to any rating from the table.\nNote: The ratings table shows the conversation rating, the agent rating and the comment written by the customer."
             }
           }
         ]
@@ -5634,8 +5365,62 @@ export const siteSeed: SiteContent = {
       {
         "id": "pricing",
         "title": {
-          "ar": "الأسعار والاشتراك",
-          "en": "Pricing & billing"
+          "ar": "الفواتير والاشتراكات",
+          "en": "Billing & Subscriptions"
+        },
+        "icon": {
+          "type": "library",
+          "set": "qhub",
+          "name": "store"
+        },
+        "items": [
+          {
+            "q": {
+              "ar": "باقتك الحالية والفترة التجريبية",
+              "en": "Your current plan and the trial period"
+            },
+            "a": {
+              "ar": "• افتح الباقات والاشتراك لعرض باقتك الحالية وتفاصيل الاشتراك.\n• في الباقة التجريبية يظهر شريط أعلى الصفحة بعدد الأيام المتبقية وزر اختر باقة.\n• اشترك قبل انتهاء الفترة التجريبية حتى لا تنقطع محادثاتك وإعداداتك.",
+              "en": "• Open Plans & billing to see your current plan and Subscription details.\n• On the trial plan, a bar at the top of the page shows the days remaining and a Choose a plan button.\n• Subscribe before the trial ends to keep your conversations and settings without interruption."
+            }
+          },
+          {
+            "q": {
+              "ar": "تغيير الباقة",
+              "en": "Change your plan"
+            },
+            "a": {
+              "ar": "1. افتح الباقات والاشتراك واضغط تغيير الباقة.\n2. اختر دورة الدفع: شهري أو سنوي.\n3. حرّك شريط عدد المحادثات بحسب احتياجك.\n4. قارن بين الباقات ومزاياها ثم اختر الباقة.\n5. أكمل خطوات الدفع.\nملاحظة: لباقة Enterprise اضغط تواصل معنا.\nملاحظة: طلب تغيير الباقة يظهر في تبويب الطلبات.",
+              "en": "1. Open Plans & billing and click Change plan.\n2. Choose the billing cycle: monthly or annual.\n3. Move the conversations slider to match your needs.\n4. Compare the plans and their features, then choose a plan.\n5. Complete the payment steps.\nNote: For the Enterprise plan, click Contact us.\nNote: Your plan change request appears in the Orders tab."
+            }
+          },
+          {
+            "q": {
+              "ar": "الفواتير والطلبات",
+              "en": "Invoices and orders"
+            },
+            "a": {
+              "ar": "في صفحة الباقات والاشتراك تبويبان لمتابعة مدفوعاتك.\n• الفواتير: رقم الفاتورة، الوصف، التاريخ، المبلغ والحالة.\n• الطلبات: طلبات الاشتراك وتغيير الباقة وحالة كل طلب.\n• فلتر الحالة: الكل، مدفوعة، بانتظار الدفع.\n• فلتر الفترة: اعرض فواتير فترة زمنية محددة.",
+              "en": "The Plans & billing page has two tabs for tracking your payments.\n• Invoices: invoice number, description, date, amount and status.\n• Orders: subscription and plan change requests, with the status of each.\n• Status filter: All, Paid, Awaiting payment.\n• Period filter: show the invoices of a specific period."
+            }
+          },
+          {
+            "q": {
+              "ar": "طرق الدفع والتجديد التلقائي",
+              "en": "Payment methods and auto-renewal"
+            },
+            "a": {
+              "ar": "1. افتح الباقات والاشتراك ← إعدادات الدفع.\n2. راجع طرق الدفع المحفوظة.\n3. حدّد البطاقة الافتراضية أو احذف بطاقة لا تحتاجها.\n4. التجديد التلقائي مفعّل دائمًا ويتم إيقافه عند إلغاء الاشتراك.\nملاحظة: التجديد يتم تلقائيًا ما دام الاشتراك نشطًا.",
+              "en": "1. Open Plans & billing → Payment settings.\n2. Review your Saved payment methods.\n3. Set the default card, or remove a card you no longer need.\n4. Auto-renewal is always on and stops when the subscription is cancelled.\nNote: Renewal happens automatically as long as the subscription is active."
+            }
+          }
+        ]
+      },
+      {
+        "id": "security",
+        "title": {
+          "ar": "الإعدادات والأمان",
+          "en": "Settings & Security"
         },
         "icon": {
           "type": "library",
@@ -5645,318 +5430,62 @@ export const siteSeed: SiteContent = {
         "items": [
           {
             "q": {
-              "ar": "هل هناك تجربة مجانية؟",
-              "en": "Is there a free trial?"
+              "ar": "الملف الشخصي وإعدادات الشركة",
+              "en": "Profile and company settings"
             },
             "a": {
-              "ar": "نعم، 7 أيام مجاناً بكل المزايا ودون بطاقة ائتمان.",
-              "en": "Yes — 7 days with every feature unlocked, and no credit card required."
+              "ar": "الملف الشخصي\n• غيّر صورتك، اسم العرض ورقم الهاتف.\n• تغيير البريد الإلكتروني يتطلب رمز تحقق.\n• من هنا يمكنك أيضًا حذف حسابك نهائيًا.\nإعدادات الشركة\n• الشعار، اسم الشركة، القطاع، حجم الشركة والدولة.\nملاحظة: بعد أي تعديل اضغط حفظ التغييرات.\nملاحظة: حذف الحساب نهائي ولا يمكن التراجع عنه.\nملاحظة: الموظف ليس له صلاحية تغيير البريد الإلكتروني.",
+              "en": "Profile\n• Change your photo, display name and phone number.\n• Changing your email requires a verification code.\n• You can also delete your account permanently from here.\nCompany\n• Logo, company name, industry, company size and country.\nNote: After any change, click Save changes.\nNote: Deleting the account is permanent and cannot be undone.\nNote: Employees do not have permission to change the email address."
             }
           },
           {
             "q": {
-              "ar": "هل يمكنني تغيير باقتي لاحقاً؟",
-              "en": "Can I change my plan later?"
+              "ar": "الإشعارات والمظهر واللغة",
+              "en": "Notifications, appearance and language"
             },
             "a": {
-              "ar": "في أي وقت. الترقية تسري فوراً، والتخفيض يبدأ من دورة الفوترة التالية.",
-              "en": "Any time. Upgrades take effect immediately; downgrades start from the next billing cycle."
+              "ar": "• الإشعارات: اختر ما تريد التنبيه عليه: محادثة جديدة، رسالة جديدة، الحملات، إشعارات المتصفح والصوت.\n• المظهر: الوضع الفاتح أو الداكن، حجم الخط، والقائمة الجانبية المصغّرة.\n• اللغة والمنطقة: لغة الواجهة، المنطقة الزمنية وتنسيق التاريخ.",
+              "en": "• Notifications: choose what you are alerted about: new conversation, new message, campaigns, browser notifications and sound.\n• Appearance: light or dark mode, font size and compact sidebar.\n• Language & region: interface language, time zone and date format."
             }
           },
           {
             "q": {
-              "ar": "ماذا يحدث لو تجاوزت حدّ باقتي؟",
-              "en": "What happens if I go over my plan's limit?"
+              "ar": "أمان الحساب",
+              "en": "Account security"
             },
             "a": {
-              "ar": "ننبّهك قبل أن تبلغ الحدّ، ولا نوقف خدمتك فجأة. يمكنك الترقية أو انتظار تجديد الدورة.",
-              "en": "We warn you before you reach it, and we never cut off your service abruptly. Upgrade, or wait for the cycle to renew."
+              "ar": "من الإعدادات ← الأمان تتحكم في حماية حسابك.\n• تغيير كلمة المرور: غيّرها دوريًا واستخدم كلمة قوية.\n• التحقق بخطوتين (Two-Factor Authentication – 2FA): خطوة تأكيد إضافية عند تسجيل الدخول.\n• تسجيل الخروج التلقائي: حدّد مدة عدم النشاط التي يُسجَّل بعدها خروجك.\n• الجلسات النشطة: الأجهزة المسجّل منها الدخول. اضغط إنهاء لأي جلسة لا تعرفها.\nملاحظة: إذا رأيت جلسة لا تعرفها: أنهِها ثم غيّر كلمة المرور فورًا.",
+              "en": "In Settings → Security you control how your account is protected.\n• Change password: change it regularly and use a strong one.\n• Two-factor authentication (2FA): an extra confirmation step when signing in.\n• Auto logout: set the period of inactivity after which you are signed out.\n• Active sessions: the devices you are signed in from. Click End session for any session you do not recognise.\nNote: If you see a session you do not recognise, end it and change your password immediately."
             }
           },
           {
             "q": {
-              "ar": "هل الأسعار تشمل الضريبة؟",
-              "en": "Do prices include tax?"
+              "ar": "الدعم والمساعدة",
+              "en": "Support and help"
             },
             "a": {
-              "ar": "الأسعار المعروضة قبل الضريبة، وتُحتسب حسب دولتك عند الدفع.",
-              "en": "Listed prices are before tax; it's calculated for your country at checkout."
-            }
-          },
-          {
-            "q": {
-              "ar": "أي طرق دفع تقبلونها؟",
-              "en": "Which payment methods do you accept?"
-            },
-            "a": {
-              "ar": "البطاقات الائتمانية ومدى والتحويل البنكي للباقات السنوية.",
-              "en": "Credit cards, mada, and bank transfer for annual plans."
-            }
-          }
-        ]
-      },
-      {
-        "id": "ai",
-        "title": {
-          "ar": "الذكاء الاصطناعي",
-          "en": "Artificial intelligence"
-        },
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "sparkles"
-        },
-        "items": [
-          {
-            "q": {
-              "ar": "هل المساعد يفهم اللهجات؟",
-              "en": "Does the assistant understand dialects?"
-            },
-            "a": {
-              "ar": "نعم، مدرّب على العربية بلهجاتها: الخليجي والمصري والشامي والمغربي، ويرد باللهجة نفسها.",
-              "en": "Yes. It's trained on Arabic across its dialects — Gulf, Egyptian, Levantine and Maghrebi — and replies in the same dialect."
-            }
-          },
-          {
-            "q": {
-              "ar": "كيف أدرّبه على منتجاتي؟",
-              "en": "How do I train it on my products?"
-            },
-            "a": {
-              "ar": "ترفع ملفات أو تكتب أسئلة وأجوبة في قاعدة المعرفة، ويمكنه أيضاً أن يتعلّم من محادثاتك السابقة.",
-              "en": "Upload files or write question-and-answer pairs into the knowledge base. It can also learn from your past conversations."
-            }
-          },
-          {
-            "q": {
-              "ar": "هل يمكنني إيقافه؟",
-              "en": "What happens when it doesn't know the answer?"
-            },
-            "a": {
-              "ar": "نعم، كلياً أو على قنوات بعينها، أو تجعله يقترح الردّ ويعتمده الموظف.",
-              "en": "It hands the conversation to a human with a summary, instead of guessing."
-            }
-          },
-          {
-            "q": {
-              "ar": "",
-              "en": "Can I turn it off?"
-            },
-            "a": {
-              "ar": "",
-              "en": "Yes — entirely, or on specific channels, or you can have it suggest a reply that an agent approves before sending."
-            }
-          }
-        ]
-      },
-      {
-        "id": "privacy",
-        "title": {
-          "ar": "الخصوصية والأمان",
-          "en": "Privacy & security"
-        },
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "shield"
-        },
-        "items": [
-          {
-            "q": {
-              "ar": "أين تُخزَّن بياناتي؟",
-              "en": "Where is my data stored?"
-            },
-            "a": {
-              "ar": "على خوادم آمنة مع تشفير أثناء النقل والتخزين، ونسخ احتياطي دوري.",
-              "en": "On secure servers, encrypted in transit and at rest, with regular backups."
-            }
-          },
-          {
-            "q": {
-              "ar": "هل تُستخدم بياناتي لتدريب نماذج؟",
-              "en": "Is my data used to train models?"
-            },
-            "a": {
-              "ar": "لا. بيانات حسابك تُستخدم لخدمة حسابك فقط ولا تُشارك مع عملاء آخرين.",
-              "en": "No. Your account data serves your account only, and is never shared with other customers."
-            }
-          },
-          {
-            "q": {
-              "ar": "من في فريقكم يمكنه رؤية محادثاتي؟",
-              "en": "Who on your team can see my conversations?"
-            },
-            "a": {
-              "ar": "لا أحد إلا بطلب دعم منك وبموافقتك، ويُسجَّل كل وصول.",
-              "en": "Nobody, unless you open a support request and grant access — and every access is logged."
-            }
-          },
-          {
-            "q": {
-              "ar": "هل يمكنني حذف بياناتي؟",
-              "en": "Can I delete my data?"
-            },
-            "a": {
-              "ar": "نعم، يمكنك طلب حذف حسابك وبياناتك في أي وقت.",
-              "en": "Yes. You can request deletion of your account and its data at any time."
-            }
-          }
-        ]
-      },
-      {
-        "id": "support",
-        "title": {
-          "ar": "الدعم",
-          "en": "Support"
-        },
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "users"
-        },
-        "items": [
-          {
-            "q": {
-              "ar": "هل الدعم بالعربية؟",
-              "en": "Is support available in Arabic?"
-            },
-            "a": {
-              "ar": "نعم، فريق دعم عربي بالكامل عبر المحادثة والبريد.",
-              "en": "Yes — a fully Arabic-speaking support team over chat and email, and English too."
-            }
-          },
-          {
-            "q": {
-              "ar": "كم يستغرق الردّ على تذكرة الدعم؟",
-              "en": "How fast do you answer a support ticket?"
-            },
-            "a": {
-              "ar": "عادة خلال ساعات العمل بأقل من ساعتين، وباقات الأعمال والمؤسسات لها أولوية.",
-              "en": "Usually under two hours during working hours, and Business and Enterprise plans get priority."
-            }
-          },
-          {
-            "q": {
-              "ar": "هل تساعدوننا في التدريب؟",
-              "en": "Do you help with training?"
-            },
-            "a": {
-              "ar": "نعم، جلسة تدريب لفريقك ومكتبة شروحات، ومدير حساب مخصّص في باقة المؤسسات.",
-              "en": "Yes — a training session for your team, a library of walkthroughs, and a dedicated account manager on Enterprise."
+              "ar": "إرسال شكوى أو اقتراح\n1. افتح الشكاوى والاقتراحات واضغط تذكرة جديدة.\n2. اختر النوع: شكوى أو اقتراح.\n3. اختر الأولوية: عالية، متوسطة أو منخفضة.\n4. اكتب الموضوع والوصف بالتفصيل.\n5. اضغط إرسال، وتابع حالة التذكرة والرد على الشكوى من نفس الصفحة.\nطرق مساعدة أخرى\n• قاعدة المعرفة: من أيقونة المساعدة في الشريط العلوي.\n• دردشة الدعم: من أيقونة الدردشة أسفل الصفحة.\nملاحظة: التذاكر ذات الأولوية العالية تُعالج خلال 24 ساعة.",
+              "en": "Send a complaint or suggestion\n1. Open Complaints & Suggestions and click New ticket.\n2. Choose the type: Complaint or Suggestion.\n3. Choose the priority: High, Medium or Low.\n4. Write the subject and a detailed description.\n5. Click Send, then follow the ticket status and the reply to your complaint on the same page.\nOther ways to get help\n• Knowledge base: from the help icon in the top bar.\n• Support chat: from the chat icon at the bottom of the page.\nNote: High-priority tickets are handled within 24 hours."
             }
           }
         ]
       }
     ],
-    "featureSections": [
-      {
-        "slug": "unified-inbox",
-        "id": "inbox",
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "inbox"
-        },
-        "title": {
-          "ar": "صندوق الرسائل الموحّد",
-          "en": "Unified inbox"
-        }
-      },
-      {
-        "slug": "ai-assistant",
-        "id": "ai",
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "bot"
-        },
-        "into": {
-          "ar": "ai",
-          "en": "ai"
-        },
-        "title": {
-          "ar": "",
-          "en": ""
-        }
-      },
-      {
-        "slug": "team",
-        "id": "team",
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "users"
-        },
-        "title": {
-          "ar": "إدارة الفريق والصلاحيات",
-          "en": "Team & permissions"
-        }
-      },
-      {
-        "slug": "campaigns",
-        "id": "campaigns",
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "megaphone"
-        },
-        "title": {
-          "ar": "الحملات التسويقية",
-          "en": "Marketing campaigns"
-        }
-      },
-      {
-        "slug": "analytics",
-        "id": "analytics",
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "chart"
-        },
-        "title": {
-          "ar": "التقارير والتحليلات",
-          "en": "Reports & analytics"
-        }
-      },
-      {
-        "slug": "chat-widget",
-        "id": "widget",
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "widget"
-        },
-        "title": {
-          "ar": "المحادثة المباشرة",
-          "en": "Live chat"
-        }
-      },
-      {
-        "slug": "integrations",
-        "id": "channels",
-        "icon": {
-          "type": "library",
-          "set": "qhub",
-          "name": "plug"
-        },
-        "title": {
-          "ar": "القنوات والربط",
-          "en": "Channels & integrations"
-        }
-      }
-    ],
+    "featureSections": {
+      "ar": [],
+      "en": []
+    },
     "order": [
       "start",
+      "channels",
       "inbox",
-      "ai",
+      "contacts",
       "team",
+      "ai",
       "campaigns",
       "analytics",
-      "widget",
-      "channels",
       "pricing",
-      "privacy",
-      "support"
+      "security"
     ]
   },
   "testimonials": {
@@ -6118,17 +5647,17 @@ export const siteSeed: SiteContent = {
         }
       },
       {
-        "key": "x",
+        "key": "tiktok",
         "name": {
-          "ar": "منصة X",
-          "en": "X"
+          "ar": "تيك توك",
+          "en": "TikTok"
         },
-        "tint": "#0F1419",
-        "ring": "rgba(15,20,25,.12)",
+        "tint": "#FE2C55",
+        "ring": "rgba(254,44,85,.14)",
         "logo": {
           "type": "media",
-          "url": "/site-media/channels/x.svg",
-          "name": "x.svg",
+          "url": "/site-media/channels/tiktok.svg",
+          "name": "tiktok.svg",
           "kind": "icon"
         }
       },
@@ -6210,7 +5739,7 @@ export const siteSeed: SiteContent = {
       {
         "key": "livechat",
         "name": {
-          "ar": "المحادثة المباشرة",
+          "ar": "الدردشة المباشرة",
           "en": "Live chat"
         },
         "tint": "#2563EB",
@@ -6478,7 +6007,7 @@ export const siteSeed: SiteContent = {
         }
       },
       "response": {
-        "to": 2.4,
+        "to": 1.6,
         "decimals": 1
       }
     }
@@ -7802,7 +7331,7 @@ export const siteSeed: SiteContent = {
         "rows": [
           {
             "label": {
-              "ar": "ويدجت المحادثة",
+              "ar": "نافذة الدردشة المباشرة",
               "en": "Chat widget"
             },
             "values": {
@@ -8067,7 +7596,7 @@ export const siteSeed: SiteContent = {
           {
             "slug": "chat-widget",
             "title": {
-              "ar": "التواصل المباشر (Chat Widget)",
+              "ar": "نافذة الدردشة المباشرة",
               "en": "Chat Widget"
             },
             "blurb": {
@@ -8078,22 +7607,6 @@ export const siteSeed: SiteContent = {
               "type": "library",
               "set": "qhub",
               "name": "widget"
-            }
-          },
-          {
-            "slug": "integrations",
-            "title": {
-              "ar": "القنوات والربط",
-              "en": "Channels & Integrations"
-            },
-            "blurb": {
-              "ar": "قنوات التواصل ومتجرك في مكان واحد",
-              "en": "Your channels and your store in one place"
-            },
-            "icon": {
-              "type": "library",
-              "set": "qhub",
-              "name": "plug"
             }
           }
         ]
@@ -8130,17 +7643,21 @@ export const siteSeed: SiteContent = {
         "en": "All rights reserved."
       },
       "socials": {
-        "x": {
-          "ar": "إكس",
-          "en": "X"
-        },
-        "linkedin": {
-          "ar": "لينكدإن",
-          "en": "LinkedIn"
+        "facebook": {
+          "ar": "فيسبوك",
+          "en": "Facebook"
         },
         "instagram": {
           "ar": "إنستغرام",
           "en": "Instagram"
+        },
+        "tiktok": {
+          "ar": "تيك توك",
+          "en": "TikTok"
+        },
+        "x": {
+          "ar": "إكس",
+          "en": "X"
         }
       },
       "groups": [
@@ -8187,17 +7704,10 @@ export const siteSeed: SiteContent = {
             },
             {
               "label": {
-                "ar": "التواصل المباشر (Chat Widget)",
+                "ar": "نافذة الدردشة المباشرة",
                 "en": "Chat Widget"
               },
               "href": "/features/chat-widget"
-            },
-            {
-              "label": {
-                "ar": "القنوات والربط",
-                "en": "Channels & Integrations"
-              },
-              "href": "/features/integrations"
             }
           ]
         },
@@ -8269,16 +7779,20 @@ export const siteSeed: SiteContent = {
       ],
       "links": [
         {
-          "key": "x",
-          "href": "https://x.com"
-        },
-        {
-          "key": "linkedin",
-          "href": "https://linkedin.com"
+          "key": "facebook",
+          "href": "https://www.facebook.com/qhub2027"
         },
         {
           "key": "instagram",
-          "href": "https://instagram.com"
+          "href": "https://www.instagram.com/qhub2027/"
+        },
+        {
+          "key": "tiktok",
+          "href": "https://www.tiktok.com/@qhub2027"
+        },
+        {
+          "key": "x",
+          "href": "https://x.com/Qhub2027"
         }
       ]
     },
@@ -8359,8 +7873,8 @@ export const siteSeed: SiteContent = {
           "en": "FAQ"
         },
         "description": {
-          "ar": "إجابات عن أكثر الأسئلة التي تصلنا عن Qhub: الربط والأسعار والذكاء الاصطناعي والخصوصية والدعم.",
-          "en": "Answers to the questions we get asked most about Qhub — setup, pricing, AI, privacy and support."
+          "ar": "كل ما تحتاج معرفته عن Qhub في مكان واحد: إجابات واضحة وشروحات خطوة بخطوة لتبدأ وتدير محادثات عملائك بسهولة.",
+          "en": "Everything you need to know about Qhub in one place: clear answers and step-by-step guides to get started and manage your customer conversations with ease."
         }
       },
       "solutions": {
@@ -8736,7 +8250,7 @@ export const siteSeed: SiteContent = {
         {
           "id": "channels",
           "a": {
-            "ar": "القنوات المدعومة: واتساب، ماسنجر، إنستغرام، تيليجرام، البريد الإلكتروني، وويدجت موقعك. كلها تصل إلى صندوق وارد واحد بسجلّ عميل مشترك، فيرى الموظف كل تاريخ العميل مهما تنقّل بين القنوات.",
+            "ar": "القنوات المدعومة: واتساب، ماسنجر، إنستغرام، تيليجرام، البريد الإلكتروني، ونافذة الدردشة المباشرة على موقعك. كلها تصل إلى صندوق وارد واحد بسجلّ عميل مشترك، فيرى الموظف كل تاريخ العميل مهما تنقّل بين القنوات.",
             "en": "Supported channels: WhatsApp, Messenger, Instagram, Telegram, email, and your site widget. They all land in one shared inbox with a single customer history — so an agent sees everything no matter which channel the customer used."
           }
         },
@@ -9270,14 +8784,14 @@ export const siteSeed: SiteContent = {
         },
         {
           "l": {
-            "ar": "إكس",
-            "en": "X"
+            "ar": "تيك توك",
+            "en": "TikTok"
           },
           "v": {
             "ar": "4.1",
             "en": "4.1"
           },
-          "ch": "x"
+          "ch": "tiktok"
         }
       ],
       "widgetStates": {
@@ -9620,15 +9134,15 @@ export const siteSeed: SiteContent = {
         },
         {
           "l": {
-            "ar": "إكس",
-            "en": "X"
+            "ar": "تيك توك",
+            "en": "TikTok"
           },
           "v": {
             "ar": "4.1 د",
             "en": "4.1 m"
           },
           "pct": 100,
-          "ch": "x"
+          "ch": "tiktok"
         }
       ],
       "digest": {
@@ -9676,8 +9190,8 @@ export const siteSeed: SiteContent = {
             "en": "Slowest channel"
           },
           "v": {
-            "ar": "إكس",
-            "en": "X"
+            "ar": "تيك توك",
+            "en": "TikTok"
           },
           "icon": {
             "type": "library",
@@ -10192,8 +9706,8 @@ export const siteSeed: SiteContent = {
         },
         {
           "k": {
-            "ar": "x",
-            "en": "x"
+            "ar": "tiktok",
+            "en": "tiktok"
           },
           "n": {
             "ar": "استفسار عن الأسعار",
@@ -10443,7 +9957,7 @@ export const siteSeed: SiteContent = {
         "en": "{0} conversations from 5 channels"
       },
       "hint": {
-        "ar": "اضغط أي محادثة لتفتح تفاصيلها؛ الرسائل أعلاه تصل من واتساب وإنستغرام والبريد وتيليجرام وويدجت الموقع.",
+        "ar": "اضغط أي محادثة لتفتح تفاصيلها؛ الرسائل أعلاه تصل من واتساب وإنستغرام والبريد وتيليجرام ونافذة الدردشة المباشرة على الموقع.",
         "en": "Tap any conversation to open it — these messages arrive from WhatsApp, Instagram, email, Telegram and the site widget."
       },
       "tabs": [
@@ -11296,7 +10810,7 @@ export const siteSeed: SiteContent = {
     },
     "widget": {
       "title": {
-        "ar": "خصّص الويدجت وشاهده يتغيّر",
+        "ar": "خصّص نافذة الدردشة وشاهدها تتغيّر",
         "en": "Customise the widget and watch it change"
       },
       "chip": {
@@ -11304,11 +10818,11 @@ export const siteSeed: SiteContent = {
         "en": "Live editing"
       },
       "hint": {
-        "ar": "غيّر اللون والاسم ورسالة الترحيب، فيتحدّث الويدجت على اليسار فوراً؛ وهو ما يراه زائر موقعك بالضبط.",
+        "ar": "غيّر اللون والاسم ورسالة الترحيب، فتتحدّث نافذة الدردشة على اليسار فوراً؛ وهو ما يراه زائر موقعك بالضبط.",
         "en": "Change the colour, the name and the greeting — the widget updates instantly, and this is exactly what a visitor sees."
       },
       "colorLabel": {
-        "ar": "لون الويدجت",
+        "ar": "لون النافذة",
         "en": "Widget colour"
       },
       "nameLabel": {
@@ -11560,23 +11074,23 @@ export const siteSeed: SiteContent = {
             ]
           }
         },
-        "x": {
+        "tiktok": {
           "name": {
-            "ar": "X (Twitter)",
-            "en": "X (Twitter)"
+            "ar": "TikTok",
+            "en": "TikTok"
           },
           "desc": {
-            "ar": "الرسائل المباشرة على X تصل إلى الصندوق مع بقية القنوات.",
-            "en": "Direct messages on X arrive in the inbox with every other channel."
+            "ar": "الرسائل المباشرة على تيك توك تصل إلى الصندوق مع بقية القنوات.",
+            "en": "Direct messages on TikTok arrive in the inbox with every other channel."
           },
           "steps": {
             "ar": [
-              "اربط حساب X عبر نافذة الصلاحيات.",
+              "اربط حساب تيك توك عبر نافذة الصلاحيات.",
               "اختر القسم الافتراضي.",
               "احفظ الربط."
             ],
             "en": [
-              "Connect the X account through the permissions dialog.",
+              "Connect the TikTok account through the permissions dialog.",
               "Pick the default department.",
               "Save the connection."
             ]
@@ -11596,7 +11110,7 @@ export const siteSeed: SiteContent = {
         },
         "widget": {
           "name": {
-            "ar": "ويدجت المحادثة",
+            "ar": "نافذة الدردشة المباشرة",
             "en": "Chat widget"
           },
           "desc": {
@@ -11605,7 +11119,7 @@ export const siteSeed: SiteContent = {
           },
           "steps": {
             "ar": [
-              "انسخ سطر التركيب من إعدادات الويدجت.",
+              "انسخ سطر التركيب من إعدادات نافذة الدردشة.",
               "ألصقه قبل إغلاق وسم body في موقعك.",
               "اضبط اللون والترحيب وقواعد الظهور."
             ],
