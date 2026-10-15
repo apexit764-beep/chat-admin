@@ -1,6 +1,6 @@
 /**
  * محتوى الموقع التعريفي كما هو على الموقع — مولَّد، لا تعدّله يدوياً.
- * المصدر: qhub-site (2026-10-15T08:42:38.617Z)
+ * المصدر: qhub-site (2026-10-15T11:14:47.766Z)
  * إعادة التوليد: node scripts/import-site-content.mjs <content-seed.json>
  */
 import type { SiteContent } from '@/types/siteContent';
@@ -5697,8 +5697,8 @@ export const siteSeed: SiteContent = {
           "ar": "Outlook",
           "en": "Outlook"
         },
-        "tint": "#0C63B0",
-        "ring": "rgba(12,99,176,.16)",
+        "tint": "#1880E5",
+        "ring": "rgba(24,128,229,.16)",
         "logo": {
           "type": "media",
           "url": "/site-media/channels/outlook.svg",
@@ -5712,8 +5712,8 @@ export const siteSeed: SiteContent = {
           "ar": "Yahoo",
           "en": "Yahoo"
         },
-        "tint": "#5F01D1",
-        "ring": "rgba(95,1,209,.14)",
+        "tint": "#7D2EFF",
+        "ring": "rgba(125,46,255,.14)",
         "logo": {
           "type": "media",
           "url": "/site-media/channels/yahoo.svg",
@@ -5757,8 +5757,8 @@ export const siteSeed: SiteContent = {
           "ar": "سلة",
           "en": "Salla"
         },
-        "tint": "#004D5A",
-        "ring": "rgba(0,77,90,.14)",
+        "tint": "#004956",
+        "ring": "rgba(0,73,86,.14)",
         "logo": {
           "type": "media",
           "url": "/site-media/channels/salla.svg",
@@ -5772,8 +5772,8 @@ export const siteSeed: SiteContent = {
           "ar": "زد",
           "en": "Zid"
         },
-        "tint": "#6B46FF",
-        "ring": "rgba(107,70,255,.16)",
+        "tint": "#AE72FF",
+        "ring": "rgba(174,114,255,.18)",
         "logo": {
           "type": "media",
           "url": "/site-media/channels/zid.svg",
@@ -5802,8 +5802,8 @@ export const siteSeed: SiteContent = {
           "ar": "ووكومرس",
           "en": "WooCommerce"
         },
-        "tint": "#96588A",
-        "ring": "rgba(150,88,138,.16)",
+        "tint": "#873EFF",
+        "ring": "rgba(135,62,255,.16)",
         "logo": {
           "type": "media",
           "url": "/site-media/channels/woocommerce.svg",
