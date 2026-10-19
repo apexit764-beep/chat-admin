@@ -572,15 +572,18 @@ export default function PlanForm(): JSX.Element {
                                         <Pencil className="h-3 w-3" />
                                       </button>
                                     )}
-                                    <label className="flex items-center gap-1.5 shrink-0 cursor-pointer" title="ميزة معلنة ولم تُطلق بعد">
-                                      <Checkbox
-                                        checked={soon}
-                                        onCheckedChange={(c) => toggleSoon(feature.key, c === true)}
-                                      />
-                                      <span className={cn('text-[11px]', soon ? 'text-warning font-semibold' : 'text-muted-foreground')}>
-                                        قريباً
-                                      </span>
-                                    </label>
+                                    {/* only channels are announced before they ship */}
+                                    {group.allowSoon && (
+                                      <label className="flex items-center gap-1.5 shrink-0 cursor-pointer" title="ميزة معلنة ولم تُطلق بعد">
+                                        <Checkbox
+                                          checked={soon}
+                                          onCheckedChange={(c) => toggleSoon(feature.key, c === true)}
+                                        />
+                                        <span className={cn('text-[11px]', soon ? 'text-warning font-semibold' : 'text-muted-foreground')}>
+                                          قريباً
+                                        </span>
+                                      </label>
+                                    )}
                                     <Switch
                                       checked={enabled}
                                       disabled={soon}
