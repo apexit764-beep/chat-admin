@@ -405,7 +405,7 @@ function RequestDetail({
         <Field label="الباقة المطلوبة" value={plan?.nameAr ?? r.planId} />
         <Field label="حد الموظفين" value={limitText(plan?.limits.agents)} />
         <Field label="المحادثات / شهر" value={limitText(plan?.limits.conversations)} />
-        <Field label="الحسابات والأرقام" value={limitText(plan?.limits.accounts)} />
+        <Field label="الحسابات والأرقام المربوطة" value={limitText(plan?.limits.accounts)} />
       </div>
 
       {r.notes && (

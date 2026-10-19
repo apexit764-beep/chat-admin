@@ -313,7 +313,7 @@ export default function ClientDetail(): JSX.Element {
   const usageBars = limits
     ? [
         { label: 'الموظفون', used: client.agentCount, max: limits.agents, icon: Users },
-        { label: 'الحسابات والأرقام', used: client.channelCount, max: limits.accounts, icon: Radio },
+        { label: 'الحسابات والأرقام المربوطة', used: client.channelCount, max: limits.accounts, icon: Radio },
         { label: 'المحادثات', used: client.conversationCount, max: limits.conversations, icon: MessageSquare },
       ]
     : [];

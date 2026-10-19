@@ -17,7 +17,7 @@ import {
 import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
 import type { FeatureValue, PlanLimits, PlanPrice, PlanTier } from '@/types';
-import { DEFAULT_PRICE_KEY } from '@/types';
+import { CUSTOM_LIMIT, DEFAULT_PRICE_KEY, UNLIMITED } from '@/types';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
@@ -36,7 +36,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { ALL_FEATURE_KEYS, FEATURE_CATALOG, FEATURE_LABELS, featureText, isGranted } from '@/data/planFeatures';
-import { LIMIT_FIELDS, isLimitReduced, limitText } from '@/utils/planLimits';
+import { LIMIT_FIELDS, isLimitReduced } from '@/utils/planLimits';
 
 interface FormState {
   tier: PlanTier;
@@ -294,7 +294,7 @@ export default function PlanForm(): JSX.Element {
       newErrors.name = 'الاسم بالإنجليزية مطلوب';
     }
     if (LIMIT_FIELDS.some((f) => form.limits[f.key] === 0)) {
-      newErrors.limits = 'يجب تحديد جميع الحدود (-1 غير محدود · -2 مخصّص)';
+      newErrors.limits = 'يجب تحديد جميع الحدود — اكتب رقماً أو اختر «غير محدود» أو «مخصّص»';
     }
     if (ALL_FEATURE_KEYS.every((k) => !isGranted(form.features[k]))) {
       newErrors.features = 'يجب اختيار ميزة واحدة على الأقل';
@@ -376,27 +376,53 @@ export default function PlanForm(): JSX.Element {
           <Card>
             <CardHeader>
               <h3 className="text-lg font-semibold">الحدود<span className="text-destructive ms-0.5">*</span></h3>
-              <p className="text-xs text-muted-foreground mt-1">-1 = غير محدود · -2 = مخصّص يُحدَّد لكل صفقة</p>
+              <p className="text-xs text-muted-foreground mt-1">اختر «مخصّص» للحدّ الذي يُتَّفق عليه في كل صفقة</p>
               {errors.limits && <p className="text-xs text-destructive mt-1">{errors.limits}</p>}
             </CardHeader>
             <CardContent>
+              {/*
+                الحدّ ثلاث حالات لا رقم واحد، فيُختار نوعه ثم يُكتب الرقم إن لزم.
+                الصياغة السابقة كانت حقلاً رقمياً وحده و«‎-1‎ غير محدود · ‎-2‎ مخصّص»
+                مكتوبة تحته: الرقمان سالبان لأنهما علامتان لا كمّيات، فكان على
+                المحرّر أن يحفظ أيّهما أيّ — ويقرأ «‎-2‎» في الحقل بعد الحفظ.
+              */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {LIMIT_FIELDS.map((f) => (
-                  <div key={f.key} className="space-y-1.5">
-                    <Label className="flex items-center gap-1.5">
-                      {f.label}<span className="text-destructive ms-0.5">*</span>
-                    </Label>
-                    <Input
-                      type="number"
-                      min={-2}
-                      value={form.limits[f.key]}
-                      onChange={(e) => setLimit(f.key, Number(e.target.value) || 0)}
-                    />
-                    <p className="text-[11px] text-muted-foreground">
-                      {f.hint ? `${f.hint} · ` : ''}{limitText(form.limits[f.key])}
-                    </p>
-                  </div>
-                ))}
+                {LIMIT_FIELDS.map((f) => {
+                  const v = form.limits[f.key];
+                  const kind = v === UNLIMITED ? 'unlimited' : v === CUSTOM_LIMIT ? 'custom' : 'number';
+                  return (
+                    <div key={f.key} className="space-y-1.5">
+                      <Label className="flex items-center gap-1.5">
+                        {f.label}<span className="text-destructive ms-0.5">*</span>
+                      </Label>
+                      <div className="flex gap-2">
+                        <select
+                          value={kind}
+                          onChange={(e) => {
+                            const next = e.target.value;
+                            // الرجوع إلى «رقم محدد» يبدأ من صفر، وهو ما يمنعه التحقق
+                            // حتى يكتب المحرّر رقماً فعلياً.
+                            setLimit(f.key, next === 'unlimited' ? UNLIMITED : next === 'custom' ? CUSTOM_LIMIT : 0);
+                          }}
+                          className="h-9 rounded-md border border-input bg-background px-2 text-sm shrink-0"
+                        >
+                          <option value="number">رقم محدد</option>
+                          <option value="unlimited">غير محدود</option>
+                          <option value="custom">مخصّص</option>
+                        </select>
+                        {kind === 'number' && (
+                          <Input
+                            type="number"
+                            min={0}
+                            value={v}
+                            onChange={(e) => setLimit(f.key, Math.max(0, Number(e.target.value) || 0))}
+                          />
+                        )}
+                      </div>
+                      {f.hint && <p className="text-[11px] text-muted-foreground">{f.hint}</p>}
+                    </div>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
