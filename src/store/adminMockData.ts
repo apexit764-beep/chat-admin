@@ -9,10 +9,12 @@ import type {
   LiveChatConversation,
   PaymobConfig,
   Plan,
+  PlanLimits,
   PlanRequest,
   Subscription,
   Transaction,
 } from '@/types';
+import { CUSTOM_LIMIT, UNLIMITED } from '@/types';
 import { ALL_FEATURE_KEYS } from '@/data/planFeatures';
 
 const nowMinus = (min: number): string =>
@@ -66,6 +68,30 @@ export const industries: Industry[] = [
   { id: 'ind_14', name: 'بناء ومقاولات', addedBy: 'علي السالم', createdAt: nowMinus(60 * 24 * 90), active: true },
   { id: 'ind_15', name: 'تصنيع', addedBy: 'محمد الكندي', createdAt: nowMinus(60 * 24 * 60), active: true },
 ];
+
+/**
+ * سقف أعلى باقة منشورة — «الأعمال». باقات المؤسسات الداخلية تُشتقّ منه، فإن
+ * تغيّر الملف المعتمد تحرّكت معه بدل أن تبقى أرقامها معلّقة في الهواء.
+ */
+const BUSINESS_LIMITS: PlanLimits = {
+  conversations: 10000,
+  messages: UNLIMITED,
+  accounts: 12,
+  agents: 20,
+  contacts: UNLIMITED,
+  departments: UNLIMITED,
+  whatsappCampaigns: 20000,
+  emailCampaigns: 20000,
+};
+
+/**
+ * يضرب كل حدّ كمّي في `factor`. اللامحدود يبقى لامحدوداً — لا معنى لمضاعفته،
+ * ولو ضُرب لصار رقماً سالباً يُقرأ «مخصّص» بالغلط.
+ */
+const scaleLimits = (base: PlanLimits, factor: number): PlanLimits =>
+  Object.fromEntries(
+    Object.entries(base).map(([k, v]) => [k, v === UNLIMITED || v === CUSTOM_LIMIT ? v : v * factor]),
+  ) as unknown as PlanLimits;
 
 export const plans: Plan[] = [
   {
@@ -295,16 +321,7 @@ export const plans: Plan[] = [
     name: 'Business',
     nameAr: "الأعمال",
     tagline: "للشركات ذات حجم المحادثات الكبير",
-    limits: {
-      conversations: 10000,
-      messages: -1,
-      accounts: 12,
-      agents: 20,
-      contacts: -1,
-      departments: -1,
-      whatsappCampaigns: 20000,
-      emailCampaigns: 20000,
-    },
+    limits: BUSINESS_LIMITS,
     features: {
       mobile_app: true,
       ch_whatsapp: true,
@@ -446,9 +463,15 @@ export const plans: Plan[] = [
     tier: 'enterprise' as const,
     name: `Enterprise ${n}`,
     nameAr: `مؤسسات${n}`,
-    tagline: 'باقة مؤسسات مخصصة — تُسند يدوياً من لوحة الأدمن',
+    tagline: `باقة مؤسسات مخصصة — ${3 ** (i + 1)}× سقف «الأعمال»`,
     features: Object.fromEntries(ALL_FEATURE_KEYS.map((k) => [k, true])),
-    limits: { conversations: -2, messages: -1, accounts: -2, agents: -2, contacts: -1, departments: -1, whatsappCampaigns: -2, emailCampaigns: -2 },
+    /*
+      حدود حقيقية لا «مخصّص»: كل درجة ثلاثة أضعاف التي تحتها، ابتداءً من سقف
+      «الأعمال» — ‎3×‎ ثم ‎9×‎ ثم ‎27×‎. «مخصّص» تُترك للمؤسسات المنشورة التي
+      يُتَّفق على حدودها مع كل عميل؛ أما هذه فتُسند يدوياً، والإسناد يحتاج
+      رقماً يُقاس عليه الاستهلاك.
+    */
+    limits: scaleLimits(BUSINESS_LIMITS, 3 ** (i + 1)),
     // priced per deal from the plans page, like المؤسسات
     pricesPerCountry: {},
     adminOnly: true,
