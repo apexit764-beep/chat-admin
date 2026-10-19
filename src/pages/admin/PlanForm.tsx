@@ -2,6 +2,7 @@ import { useState, useMemo, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   X,
+  Pencil,
   ArrowRight,
   Users,
   MessageSquare,
@@ -550,12 +551,27 @@ export default function PlanForm(): JSX.Element {
                                 <div
                                   key={feature.key}
                                   className={cn(
-                                    'px-3 py-2 transition-colors',
+                                    'group/row px-3 py-2 transition-colors',
                                     enabled ? 'bg-primary/5' : soon ? 'bg-warning/5' : 'bg-background'
                                   )}
                                 >
                                   <div className="flex items-center justify-between gap-3">
                                     <span className="text-sm flex-1">{feature.label}</span>
+                                    {/*
+                                      Four features out of 46 carry a written allowance, so this
+                                      stays out of the way: no line of its own, and it surfaces
+                                      only when the row is pointed at or focused.
+                                    */}
+                                    {enabled && typeof value !== 'string' && (
+                                      <button
+                                        type="button"
+                                        onClick={() => setFeatureText(feature.key, ' ')}
+                                        title="إضافة قيمة محددة بدل التفعيل المجرّد"
+                                        className="shrink-0 h-6 w-6 rounded-md text-muted-foreground hover:bg-muted hover:text-primary flex items-center justify-center opacity-0 group-hover/row:opacity-100 focus-visible:opacity-100 transition-opacity"
+                                      >
+                                        <Pencil className="h-3 w-3" />
+                                      </button>
+                                    )}
                                     <label className="flex items-center gap-1.5 shrink-0 cursor-pointer" title="ميزة معلنة ولم تُطلق بعد">
                                       <Checkbox
                                         checked={soon}
@@ -571,12 +587,7 @@ export default function PlanForm(): JSX.Element {
                                       onCheckedChange={(c) => toggleFeature(feature.key, c)}
                                     />
                                   </div>
-                                  {/*
-                                    Only four features in the whole catalogue carry a written
-                                    allowance, so the field stays hidden until it is wanted —
-                                    otherwise 42 empty inputs sit in the way.
-                                  */}
-                                  {enabled && typeof value === 'string' ? (
+                                  {enabled && typeof value === 'string' && (
                                     <div className="flex items-center gap-1 mt-1.5">
                                       <Input
                                         value={value}
@@ -594,15 +605,7 @@ export default function PlanForm(): JSX.Element {
                                         <X className="h-3.5 w-3.5" />
                                       </button>
                                     </div>
-                                  ) : enabled ? (
-                                    <button
-                                      type="button"
-                                      onClick={() => setFeatureText(feature.key, ' ')}
-                                      className="mt-1 text-[11px] text-muted-foreground hover:text-primary transition-colors"
-                                    >
-                                      + قيمة محددة
-                                    </button>
-                                  ) : null}
+                                  )}
                                 </div>
                               );
                             })}
