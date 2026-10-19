@@ -15,7 +15,8 @@ import {
 } from 'lucide-react';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
-import type { PlanTier } from '@/types';
+import type { FeatureValue, PlanLimits, PlanPrice, PlanTier } from '@/types';
+import { DEFAULT_PRICE_KEY } from '@/types';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
@@ -33,19 +34,17 @@ import {
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { FEATURE_CATALOG } from '@/data/planFeatures';
+import { ALL_FEATURE_KEYS, FEATURE_CATALOG, FEATURE_LABELS, featureText, isGranted } from '@/data/planFeatures';
+import { LIMIT_FIELDS, isLimitReduced, limitText } from '@/utils/planLimits';
 
 interface FormState {
   tier: PlanTier;
   name: string;
   nameAr: string;
   tagline: string;
-  features: string[];
-  limitAgents: number;
-  limitChannels: number;
-  limitAccountsPerChannel: number;
-  limitConversations: number;
-  pricesPerCountry: Record<string, { monthly: number; yearly: number }>;
+  features: Record<string, FeatureValue>;
+  limits: PlanLimits;
+  pricesPerCountry: Record<string, PlanPrice>;
   popular: boolean;
   adminOnly: boolean;
   isTrial: boolean;
@@ -67,11 +66,20 @@ export default function PlanForm(): JSX.Element {
 
   const editing = useMemo(() => (id ? plans.find((p) => p.id === id) ?? null : null), [id, plans]);
 
+  /** every country, plus the catch-all row billed in USD */
+  const priceRows = useMemo(
+    () => [
+      ...countries.map((c) => ({ key: c.code, label: `${c.flag} ${c.nameAr}`, symbol: c.symbol })),
+      { key: DEFAULT_PRICE_KEY, label: '🌍 باقي دول العالم', symbol: '$' },
+    ],
+    [countries]
+  );
+
   const defaultPrices = useMemo(() => {
-    const defaults: Record<string, { monthly: number; yearly: number }> = {};
-    countries.forEach((c) => { defaults[c.code] = { monthly: 0, yearly: 0 }; });
+    const defaults: Record<string, PlanPrice> = {};
+    priceRows.forEach((r) => { defaults[r.key] = { monthly: 0, yearly: 0 }; });
     return defaults;
-  }, [countries]);
+  }, [priceRows]);
 
   const [form, setForm] = useState<FormState>(() => {
     if (editing) {
@@ -80,11 +88,8 @@ export default function PlanForm(): JSX.Element {
         name: editing.name,
         nameAr: editing.nameAr,
         tagline: editing.tagline,
-        features: [...editing.features],
-        limitAgents: editing.limits.agents,
-        limitChannels: editing.limits.channels,
-        limitAccountsPerChannel: editing.limits.accountsPerChannel ?? editing.limits.channels,
-        limitConversations: editing.limits.conversations,
+        features: { ...editing.features },
+        limits: { ...editing.limits },
         pricesPerCountry: { ...editing.pricesPerCountry },
         popular: editing.popular ?? false,
         adminOnly: editing.adminOnly ?? false,
@@ -98,11 +103,11 @@ export default function PlanForm(): JSX.Element {
       name: '',
       nameAr: '',
       tagline: '',
-      features: [],
-      limitAgents: 5,
-      limitChannels: 2,
-      limitAccountsPerChannel: 1,
-      limitConversations: 5000,
+      features: {},
+      limits: {
+        conversations: 3000, messages: -1, accounts: 6, agents: 10,
+        contacts: -1, departments: -1, whatsappCampaigns: 6000, emailCampaigns: 6000,
+      },
       pricesPerCountry: defaultPrices,
       popular: false,
       adminOnly: false,
@@ -126,12 +131,29 @@ export default function PlanForm(): JSX.Element {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const toggleFeature = (feature: string): void => {
-    const s = new Set(form.features);
-    if (s.has(feature)) s.delete(feature);
-    else s.add(feature);
-    setForm({ ...form, features: Array.from(s) });
-    if (errors.features) setErrors((prev) => { const { features, ...rest } = prev; return rest; });
+  /** cycles a feature: off → on → «قريباً» → off */
+  const cycleFeature = (key: string): void => {
+    const v = form.features[key];
+    const next: FeatureValue | undefined =
+      v === undefined || v === false ? true : v === true ? 'soon' : undefined;
+    const features = { ...form.features };
+    if (next === undefined) delete features[key];
+    else features[key] = next;
+    setForm({ ...form, features });
+    if (errors.features) setErrors((prev) => { const { features: _f, ...rest } = prev; return rest; });
+  };
+
+  /** replaces a feature's value with a written allowance, e.g. «شات بأولوية» */
+  const setFeatureText = (key: string, text: string): void => {
+    const features = { ...form.features };
+    if (text.trim()) features[key] = text;
+    else features[key] = true;
+    setForm({ ...form, features });
+  };
+
+  const setLimit = (key: keyof PlanLimits, value: number): void => {
+    setForm({ ...form, limits: { ...form.limits, [key]: value } });
+    if (errors.limits) setErrors((prev) => { const { limits, ...rest } = prev; return rest; });
   };
 
   interface ChangeImpact {
@@ -193,32 +215,20 @@ export default function PlanForm(): JSX.Element {
     else if (anyUp) impact.priceDirection = 'up';
     else if (anyDown) impact.priceDirection = 'down';
 
-    const limitLabels: Record<string, string> = {
-      agents: 'الموظفين', channels: 'القنوات', conversations: 'المحادثات',
-    };
-    const limitMap: Record<string, [number, number]> = {
-      agents: [editing.limits.agents, form.limitAgents],
-      channels: [editing.limits.channels, form.limitChannels],
-      conversations: [editing.limits.conversations, form.limitConversations],
-    };
-    for (const [key, [oldVal, newVal]] of Object.entries(limitMap)) {
-      if (newVal < oldVal && newVal !== -1) {
+    for (const f of LIMIT_FIELDS) {
+      if (isLimitReduced(editing.limits[f.key], form.limits[f.key])) {
         impact.limitsDecreased = true;
-        impact.decreasedLimits.push(limitLabels[key]);
+        impact.decreasedLimits.push(f.label);
       }
     }
 
-    // a tightened per-channel account cap is a downgrade too
-    const oldAccounts = editing.limits.accountsPerChannel ?? editing.limits.channels;
-    if (form.limitAccountsPerChannel < oldAccounts && form.limitAccountsPerChannel !== -1) {
-      impact.limitsDecreased = true;
-      impact.decreasedLimits.push('الحسابات لكل قناة');
-    }
-
-    const oldFeatures = new Set(editing.features);
-    const newFeatures = new Set(form.features);
-    impact.featuresRemoved = editing.features.filter((f) => !newFeatures.has(f));
-    impact.featuresAdded = form.features.filter((f) => !oldFeatures.has(f));
+    // a feature the client had and no longer has is a downgrade, whatever its value was
+    impact.featuresRemoved = ALL_FEATURE_KEYS
+      .filter((k) => isGranted(editing.features[k]) && !isGranted(form.features[k]))
+      .map((k) => FEATURE_LABELS[k]);
+    impact.featuresAdded = ALL_FEATURE_KEYS
+      .filter((k) => !isGranted(editing.features[k]) && isGranted(form.features[k]))
+      .map((k) => FEATURE_LABELS[k]);
 
     const hasSignificantChange =
       impact.priceChanged || impact.limitsDecreased || impact.featuresRemoved.length > 0 ||
@@ -233,12 +243,7 @@ export default function PlanForm(): JSX.Element {
     nameAr: form.nameAr,
     tagline: form.tagline,
     features: form.features,
-    limits: {
-      agents: form.limitAgents,
-      channels: form.limitChannels,
-      accountsPerChannel: form.limitAccountsPerChannel,
-      conversations: form.limitConversations,
-    },
+    limits: form.limits,
     pricesPerCountry: form.pricesPerCountry,
     popular: form.popular,
     adminOnly: form.adminOnly,
@@ -284,10 +289,10 @@ export default function PlanForm(): JSX.Element {
     if (!form.name.trim()) {
       newErrors.name = 'الاسم بالإنجليزية مطلوب';
     }
-    if (form.limitAgents === 0 || form.limitChannels === 0 || form.limitConversations === 0) {
-      newErrors.limits = 'يجب تحديد جميع الحدود (استخدم -1 لغير محدود)';
+    if (LIMIT_FIELDS.some((f) => form.limits[f.key] === 0)) {
+      newErrors.limits = 'يجب تحديد جميع الحدود (-1 غير محدود · -2 مخصّص)';
     }
-    if (form.features.length === 0) {
+    if (ALL_FEATURE_KEYS.every((k) => !isGranted(form.features[k]))) {
       newErrors.features = 'يجب اختيار ميزة واحدة على الأقل';
     }
     if (!form.isTrial && !form.requiresContact) {
@@ -363,34 +368,31 @@ export default function PlanForm(): JSX.Element {
             </CardContent>
           </Card>
 
-          {/* Limits - 2 per row */}
+          {/* Limits — the eight allowances from the approved sheet */}
           <Card>
             <CardHeader>
               <h3 className="text-lg font-semibold">الحدود<span className="text-destructive ms-0.5">*</span></h3>
+              <p className="text-xs text-muted-foreground mt-1">-1 = غير محدود · -2 = مخصّص يُحدَّد لكل صفقة</p>
               {errors.limits && <p className="text-xs text-destructive mt-1">{errors.limits}</p>}
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Label className="flex items-center gap-1.5"><MessageSquare className="h-3.5 w-3.5 text-muted-foreground" /> حد القنوات<span className="text-destructive ms-0.5">*</span></Label>
-                  <Input type="number" min={-1} value={form.limitChannels} onChange={(e) => { setForm({ ...form, limitChannels: Number(e.target.value) || 0 }); if (errors.limits) setErrors((prev) => { const { limits, ...rest } = prev; return rest; }); }} />
-                  <p className="text-[11px] text-muted-foreground">-1 = غير محدود</p>
-                </div>
-                <div className="space-y-2">
-                  <Label className="flex items-center gap-1.5"><Radio className="h-3.5 w-3.5 text-muted-foreground" /> حسابات لكل قناة<span className="text-destructive ms-0.5">*</span></Label>
-                  <Input type="number" min={-1} value={form.limitAccountsPerChannel} onChange={(e) => { setForm({ ...form, limitAccountsPerChannel: Number(e.target.value) || 0 }); if (errors.limits) setErrors((prev) => { const { limits, ...rest } = prev; return rest; }); }} />
-                  <p className="text-[11px] text-muted-foreground">-1 = غير محدود</p>
-                </div>
-                <div className="space-y-2">
-                  <Label className="flex items-center gap-1.5"><Database className="h-3.5 w-3.5 text-muted-foreground" /> محادثات/شهر<span className="text-destructive ms-0.5">*</span></Label>
-                  <Input type="number" min={-1} value={form.limitConversations} onChange={(e) => { setForm({ ...form, limitConversations: Number(e.target.value) || 0 }); if (errors.limits) setErrors((prev) => { const { limits, ...rest } = prev; return rest; }); }} />
-                  <p className="text-[11px] text-muted-foreground">-1 = غير محدود</p>
-                </div>
-                <div className="space-y-2">
-                  <Label className="flex items-center gap-1.5"><Users className="h-3.5 w-3.5 text-muted-foreground" /> حد الموظفين<span className="text-destructive ms-0.5">*</span></Label>
-                  <Input type="number" min={-1} value={form.limitAgents} onChange={(e) => { setForm({ ...form, limitAgents: Number(e.target.value) || 0 }); if (errors.limits) setErrors((prev) => { const { limits, ...rest } = prev; return rest; }); }} />
-                  <p className="text-[11px] text-muted-foreground">-1 = غير محدود</p>
-                </div>
+                {LIMIT_FIELDS.map((f) => (
+                  <div key={f.key} className="space-y-1.5">
+                    <Label className="flex items-center gap-1.5">
+                      {f.label}<span className="text-destructive ms-0.5">*</span>
+                    </Label>
+                    <Input
+                      type="number"
+                      min={-2}
+                      value={form.limits[f.key]}
+                      onChange={(e) => setLimit(f.key, Number(e.target.value) || 0)}
+                    />
+                    <p className="text-[11px] text-muted-foreground">
+                      {f.hint ? `${f.hint} · ` : ''}{limitText(form.limits[f.key])}
+                    </p>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
@@ -424,35 +426,34 @@ export default function PlanForm(): JSX.Element {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {countries.map((co) => {
-                    const price = form.pricesPerCountry[co.code] ?? { monthly: 0, yearly: 0 };
+                  {priceRows.map((row) => {
+                    const price = form.pricesPerCountry[row.key] ?? { monthly: 0, yearly: 0 };
                     return (
-                      <div key={co.code} className="grid grid-cols-[1fr_1fr_1fr] items-center gap-2 p-2.5 rounded-lg bg-muted">
+                      <div key={row.key} className="grid grid-cols-[1fr_1fr_1fr] items-center gap-2 p-2.5 rounded-lg bg-muted">
                         <div className="flex items-center gap-2 font-medium">
-                          <span className="text-lg">{co.flag}</span>
-                          <span className="text-sm">{co.nameAr}</span>
+                          <span className="text-sm">{row.label}</span>
                         </div>
                         <div className="relative">
                           <Input
                             type="number"
                             min={0}
                             value={price.monthly}
-                            onChange={(e) => setMonthlyPrice(co.code, Number(e.target.value) || 0)}
+                            onChange={(e) => setMonthlyPrice(row.key, Number(e.target.value) || 0)}
                             placeholder="0"
                             className="font-mono"
                           />
-                          <span className="absolute end-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground pointer-events-none">{co.symbol}/شهر</span>
+                          <span className="absolute end-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground pointer-events-none">{row.symbol}/شهر</span>
                         </div>
                         <div className="relative">
                           <Input
                             type="number"
                             min={0}
                             value={price.yearly}
-                            onChange={(e) => setForm({ ...form, pricesPerCountry: { ...form.pricesPerCountry, [co.code]: { ...price, yearly: Number(e.target.value) || 0 } } })}
+                            onChange={(e) => setForm({ ...form, pricesPerCountry: { ...form.pricesPerCountry, [row.key]: { ...price, yearly: Number(e.target.value) || 0 } } })}
                             placeholder="0"
                             className="font-mono"
                           />
-                          <span className="absolute end-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground pointer-events-none">{co.symbol}/سنة</span>
+                          <span className="absolute end-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground pointer-events-none">{row.symbol}/سنة — الإجمالي</span>
                         </div>
                       </div>
                     );
@@ -499,7 +500,9 @@ export default function PlanForm(): JSX.Element {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-semibold">الميزات<span className="text-destructive ms-0.5">*</span></h3>
-                  <span className="text-xs text-muted-foreground">{form.features.length} ميزة مفعّلة</span>
+                  <span className="text-xs text-muted-foreground">
+                    {ALL_FEATURE_KEYS.filter((k) => isGranted(form.features[k])).length} من {ALL_FEATURE_KEYS.length} ميزة
+                  </span>
                 </div>
                 {errors.features && <p className="text-xs text-destructive mt-1">{errors.features}</p>}
               </CardHeader>
@@ -507,7 +510,7 @@ export default function PlanForm(): JSX.Element {
                 <div className="space-y-2">
                   {FEATURE_CATALOG.map((group) => {
                     const isCollapsed = collapsed[group.label] ?? false;
-                    const enabledCount = group.items.filter((f) => form.features.includes(f)).length;
+                    const enabledCount = group.items.filter((f) => isGranted(form.features[f.key])).length;
                     return (
                       <div key={group.label} className="border rounded-lg overflow-hidden">
                         <button
@@ -527,18 +530,43 @@ export default function PlanForm(): JSX.Element {
                         {!isCollapsed && (
                           <div className="divide-y">
                             {group.items.map((feature) => {
-                              const enabled = form.features.includes(feature);
+                              const value = form.features[feature.key];
+                              const enabled = isGranted(value);
+                              const soon = value === 'soon';
                               return (
-                                <label
-                                  key={feature}
+                                <div
+                                  key={feature.key}
                                   className={cn(
-                                    'flex items-center justify-between gap-2 px-3 py-2 cursor-pointer transition-colors',
-                                    enabled ? 'bg-primary/5' : 'bg-background'
+                                    'px-3 py-2 transition-colors',
+                                    enabled ? 'bg-primary/5' : soon ? 'bg-warning/5' : 'bg-background'
                                   )}
                                 >
-                                  <span className="text-sm">{feature}</span>
-                                  <Switch checked={enabled} onCheckedChange={() => toggleFeature(feature)} />
-                                </label>
+                                  <div className="flex items-center justify-between gap-2">
+                                    <span className="text-sm flex-1">{feature.label}</span>
+                                    {/* one control, three states: مفعّلة ← قريباً ← غير مفعّلة */}
+                                    <button
+                                      type="button"
+                                      onClick={() => cycleFeature(feature.key)}
+                                      className={cn(
+                                        'shrink-0 text-[11px] font-semibold rounded-md px-2 py-1 border transition-colors min-w-[64px]',
+                                        enabled ? 'bg-success/15 text-success border-success/30'
+                                          : soon ? 'bg-warning/15 text-warning border-warning/30'
+                                          : 'bg-muted text-muted-foreground border-transparent'
+                                      )}
+                                    >
+                                      {enabled ? 'مفعّلة' : soon ? 'قريباً' : 'غير مفعّلة'}
+                                    </button>
+                                  </div>
+                                  {/* a granted feature may carry a written allowance instead of a plain ✔ */}
+                                  {enabled && (
+                                    <Input
+                                      value={value === true ? '' : String(value)}
+                                      onChange={(e) => setFeatureText(feature.key, e.target.value)}
+                                      placeholder="قيمة محددة (اختياري) — مثال: شات بأولوية"
+                                      className="h-7 text-xs mt-1.5"
+                                    />
+                                  )}
+                                </div>
                               );
                             })}
                           </div>

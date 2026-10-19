@@ -26,7 +26,7 @@ import { useNotificationStore } from '@/store/useNotificationStore';
 import { ClientFormDialog } from '@/components/admin/ClientFormDialog';
 import { formatMoney, formatUSD, approxUSD, taxFor, taxRateFor } from '@/utils/money';
 import { formatDate, initials, avatarColor } from '@/utils/format';
-import { tierRank } from '@/utils/plans';
+import { planAmount, tierRank } from '@/utils/plans';
 import { startOfMonth, endOfMonth } from 'date-fns';
 import { cn } from '@/lib/utils';
 import type { Client, Plan, SubscriptionStatus } from '@/types';
@@ -202,7 +202,7 @@ export default function AdminSubscriptions(): JSX.Element {
   const createClient: Client | undefined = createClientId ? clientOf(createClientId) : undefined;
   const createPlan: Plan | undefined = createPlanId ? planOf(createPlanId) : undefined;
   const createPrice = createClient && createPlan
-    ? createPlan.pricesPerCountry[createClient.country]?.[createCycle === 'yearly' ? 'yearly' : 'monthly']
+    ? planAmount(createPlan, createClient.country, createCycle)
     : undefined;
 
   /** the plan a client sits on right now, for the picker rows and the switch notice */

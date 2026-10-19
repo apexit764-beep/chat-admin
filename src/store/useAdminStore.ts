@@ -17,6 +17,7 @@ import type {
   Subscription,
   Transaction,
 } from '@/types';
+import { planAmount, planPrice } from '@/utils/plans';
 import { defaultPlatformTypes, defaultPlatforms, type Platform } from '@/data/platforms';
 import {
   adminUsers as initialAdminUsers,
@@ -652,7 +653,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       const client = state.clients.find((c) => c.id === sub.clientId);
       const nextPlanId = sub.scheduledPlanId ?? sub.planId;
       const plan = state.plans.find((p) => p.id === nextPlanId);
-      const price = client && plan ? plan.pricesPerCountry[client.country] : undefined;
+      const price = client && plan ? planPrice(plan, client.country) : undefined;
       const amount = price
         ? (sub.billingCycle === 'yearly' ? price.yearly : price.monthly)
         : sub.amount;
@@ -798,8 +799,9 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     const client = get().clients.find((c) => c.id === clientId);
     const plan = get().plans.find((p) => p.id === planId);
     if (!client || !plan) throw new Error('client or plan not found');
-    const price = plan.pricesPerCountry[client.country];
-    const amount = billingCycle === 'yearly' ? price.yearly : price.monthly;
+    // the trial is free and the enterprise plan is quoted per deal, so both
+    // legitimately have no price row — that bills as zero until one is set
+    const amount = planAmount(plan, client.country, billingCycle) ?? 0;
     const now = new Date();
     // A subscription only starts once payment succeeds, so it is parked as
     // past_due and its dates stay provisional until then.
@@ -884,8 +886,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     if (!sub || !client || !plan) return;
 
     if (mode === 'end_of_period') {
-      const scheduledPrice = plan.pricesPerCountry[client.country];
-      const scheduledAmount = sub.billingCycle === 'yearly' ? scheduledPrice.yearly : scheduledPrice.monthly;
+      const scheduledAmount = planAmount(plan, client.country, sub.billingCycle) ?? 0;
       const scheduledTax = Math.round(scheduledAmount * (taxRateOf(client.country, get().countries) / 100) * 100) / 100;
       /** the next period's invoice, held as «مجدولة» until the switch lands or the schedule is cancelled */
       const scheduledInvoice: Invoice = {
@@ -915,8 +916,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       return;
     }
 
-    const price = plan.pricesPerCountry[client.country];
-    const amount = sub.billingCycle === 'yearly' ? price.yearly : price.monthly;
+    const amount = planAmount(plan, client.country, sub.billingCycle) ?? 0;
     set((s) => ({
       subscriptions: s.subscriptions.map((x) =>
         x.id === id ? { ...x, planId: newPlanId, amount, scheduledPlanId: undefined } : x
@@ -941,8 +941,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     const plan = get().plans.find((p) => p.id === newPlanId);
     if (!sub || !client || !plan) return;
 
-    const price = plan.pricesPerCountry[client.country];
-    const amount = sub.billingCycle === 'yearly' ? price.yearly : price.monthly;
+    const amount = planAmount(plan, client.country, sub.billingCycle) ?? 0;
     const tax = Math.round(amount * (taxRateOf(client.country, get().countries) / 100) * 100) / 100;
     const now = new Date();
     const invoice: Invoice = {

@@ -21,6 +21,8 @@ import {
 } from 'lucide-react';
 import { useConfirm } from '@components/ui';
 import { useAdminStore } from '@/store/useAdminStore';
+import { ALL_FEATURE_KEYS, FEATURE_LABELS, featureText, isGranted } from '@/data/planFeatures';
+import { LIMIT_FIELDS, limitShort, limitText } from '@/utils/planLimits';
 import { useUIStore } from '@/store/useUIStore';
 import { formatMoney } from '@/utils/money';
 import { cn } from '@/lib/utils';
@@ -140,7 +142,7 @@ export default function AdminPlans(): JSX.Element {
       name: `${p.name} (Copy)`,
       nameAr: `${p.nameAr} (نسخة)`,
       tagline: p.tagline,
-      features: [...p.features],
+      features: { ...p.features },
       limits: { ...p.limits },
       pricesPerCountry: { ...p.pricesPerCountry },
       active: false,
@@ -294,14 +296,15 @@ export default function AdminPlans(): JSX.Element {
                         </TableCell>
                         <TableCell className="text-center">
                           <div className="inline-flex flex-wrap items-center gap-1.5 text-xs justify-center">
-                            <LimitPill icon={<Users className="h-3 w-3" />} value={p.limits.agents === -1 ? '∞' : p.limits.agents} label="الموظفين" />
+                            <LimitPill icon={<Database className="h-3 w-3" />} value={limitShort(p.limits.conversations)} label="محادثات/شهر" />
+                            <LimitPill icon={<Users className="h-3 w-3" />} value={limitShort(p.limits.agents)} label="الموظفين" />
                             <LimitPill
                               icon={<MessageSquare className="h-3 w-3" />}
-                              value={p.limits.channels === -1 ? '∞' : p.limits.channels}
-                              label="القنوات"
-                              detail={[`حسابات لكل قناة: ${(p.limits.accountsPerChannel ?? p.limits.channels) === -1 ? 'غير محدود' : (p.limits.accountsPerChannel ?? p.limits.channels)}`]}
+                              value={limitShort(p.limits.accounts)}
+                              label="حسابات وأرقام"
+                              detail={LIMIT_FIELDS.filter((f) => !['conversations', 'agents', 'accounts'].includes(f.key))
+                                .map((f) => `${f.label}: ${limitText(p.limits[f.key])}`)}
                             />
-                            <LimitPill icon={<Database className="h-3 w-3" />} value={p.limits.conversations === -1 ? '∞' : (p.limits.conversations / 1000) + 'K'} label="المحادثات" />
                           </div>
                         </TableCell>
                         <TableCell className="text-center">
@@ -312,16 +315,19 @@ export default function AdminPlans(): JSX.Element {
                                 className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
                               >
                                 <Check className="h-3 w-3" />
-                                {p.features.length} ميزة
+                                {ALL_FEATURE_KEYS.filter((k) => isGranted(p.features[k])).length} ميزة
                               </button>
                             </PopoverTrigger>
                             <PopoverContent side="top" align="start" className="w-64 p-3">
                               <p className="text-xs font-semibold mb-2 text-muted-foreground">ميزات الباقة</p>
                               <ul className="space-y-1.5 text-sm max-h-64 overflow-y-auto">
-                                {p.features.map((f, i) => (
-                                  <li key={i} className="flex items-start gap-1.5">
+                                {ALL_FEATURE_KEYS.filter((k) => isGranted(p.features[k])).map((k) => (
+                                  <li key={k} className="flex items-start gap-1.5">
                                     <Check className="h-3.5 w-3.5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                                    <span>{f}</span>
+                                    <span className="flex-1">{FEATURE_LABELS[k]}</span>
+                                    {p.features[k] !== true && (
+                                      <span className="text-[10px] text-muted-foreground shrink-0">{featureText(p.features[k])}</span>
+                                    )}
                                   </li>
                                 ))}
                               </ul>

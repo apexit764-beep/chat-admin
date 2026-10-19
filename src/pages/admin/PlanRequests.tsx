@@ -9,6 +9,7 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import { useAdminStore } from '@/store/useAdminStore';
+import { limitShort, limitText } from '@/utils/planLimits';
 import { useUIStore } from '@/store/useUIStore';
 import { useConfirm, StatCard } from '@components/ui';
 import { Button } from '@/components/ui/button';
@@ -250,10 +251,10 @@ export default function AdminPlanRequests({ embedded }: { embedded?: boolean }):
                       </Badge>
                     </TableCell>
                     <TableCell className="text-sm font-medium">
-                      {plan?.limits.agents === -1 ? '∞' : plan?.limits.agents ?? '—'}
+                      {limitShort(plan?.limits.agents)}
                     </TableCell>
                     <TableCell className="text-sm font-medium">
-                      {plan?.limits.channels === -1 ? '∞' : plan?.limits.channels ?? '—'}
+                      {limitShort(plan?.limits.conversations)}
                     </TableCell>
                     <TableCell>
                       <DropdownMenu>
@@ -402,8 +403,9 @@ function RequestDetail({
         {r.whatsapp && <Field label="رقم واتساب" value={r.whatsapp} dir="ltr" />}
         <Field label="الدولة" value={country ? `${country.flag} ${country.nameAr}` : r.country} />
         <Field label="الباقة المطلوبة" value={plan?.nameAr ?? r.planId} />
-        <Field label="حد الموظفين" value={plan?.limits.agents === -1 ? 'غير محدود' : String(plan?.limits.agents ?? '—')} />
-        <Field label="حد القنوات" value={plan?.limits.channels === -1 ? 'غير محدود' : String(plan?.limits.channels ?? '—')} />
+        <Field label="حد الموظفين" value={limitText(plan?.limits.agents)} />
+        <Field label="المحادثات / شهر" value={limitText(plan?.limits.conversations)} />
+        <Field label="الحسابات والأرقام" value={limitText(plan?.limits.accounts)} />
       </div>
 
       {r.notes && (

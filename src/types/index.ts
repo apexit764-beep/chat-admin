@@ -166,23 +166,58 @@ export interface Country {
 
 export type PlanTier = 'starter' | 'pro' | 'business' | 'enterprise';
 
+/**
+ * What a plan grants for one feature.
+ *   true   — included
+ *   false  — not in this plan
+ *   'soon' — announced, not shipped yet
+ *   string — a specific allowance, shown exactly as written ("20 تلخيص", "شات بأولوية")
+ */
+export type FeatureValue = boolean | 'soon' | string;
+
+/**
+ * Quantitative allowances. A plain count, or one of two sentinels:
+ *   -1 — غير محدود
+ *   -2 — مخصّص، يُحدَّد لكل صفقة (المؤسسات)
+ */
+export interface PlanLimits {
+  /** conversations per month; a conversation is (client × channel × calendar month) */
+  conversations: number;
+  /** messages inside a conversation */
+  messages: number;
+  /** connected accounts and numbers, counted as accounts not channel types */
+  accounts: number;
+  /** agents, not counting the owner */
+  agents: number;
+  contacts: number;
+  departments: number;
+  whatsappCampaigns: number;
+  emailCampaigns: number;
+}
+
+export const UNLIMITED = -1;
+export const CUSTOM_LIMIT = -2;
+
+export interface PlanPrice {
+  monthly: number;
+  /** the full year's total, not the monthly equivalent */
+  yearly: number;
+}
+
+/** price key for every country without a price of its own, billed in USD */
+export const DEFAULT_PRICE_KEY = '*';
+
 export interface Plan {
   id: string;
   tier: PlanTier;
   name: string;
   nameAr: string;
   tagline: string;
-  /** features in Arabic */
-  features: string[];
-  limits: {
-    agents: number; // -1 = unlimited
-    channels: number;
-    /** accounts allowed on each channel; absent falls back to the overall channel limit */
-    accountsPerChannel?: number;
-    conversations: number;
-  };
-  /** keyed by country code; price in local currency (monthly) */
-  pricesPerCountry: Record<string, { monthly: number; yearly: number }>;
+  /** keyed by feature key from the catalogue in src/data/planFeatures.ts */
+  features: Record<string, FeatureValue>;
+  limits: PlanLimits;
+  /** keyed by country code, plus DEFAULT_PRICE_KEY for the rest of the world */
+  pricesPerCountry: Record<string, PlanPrice>;
   popular?: boolean;
   isTrial?: boolean;
   requiresContact?: boolean;

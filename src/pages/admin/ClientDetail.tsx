@@ -69,6 +69,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import type { ClientStatus, ChannelType, Invoice } from '@/types';
+import { ALL_FEATURE_KEYS, FEATURE_LABELS, featureText, isGranted } from '@/data/planFeatures';
+import { LIMIT_FIELDS, limitText } from '@/utils/planLimits';
 import {
   accountStatusOf,
   accountStatusLabel,
@@ -311,7 +313,7 @@ export default function ClientDetail(): JSX.Element {
   const usageBars = limits
     ? [
         { label: 'الموظفون', used: client.agentCount, max: limits.agents, icon: Users },
-        { label: 'القنوات', used: client.channelCount, max: limits.channels, icon: Radio },
+        { label: 'الحسابات والأرقام', used: client.channelCount, max: limits.accounts, icon: Radio },
         { label: 'المحادثات', used: client.conversationCount, max: limits.conversations, icon: MessageSquare },
       ]
     : [];
@@ -647,10 +649,25 @@ export default function ClientDetail(): JSX.Element {
                 <div className="rounded-xl border bg-card p-5">
                   <h3 className="font-semibold mb-3 text-sm">مزايا الباقة</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {plan.features.map((f, i) => (
-                      <div key={i} className="flex items-center gap-2 text-sm">
-                        <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
-                        <span>{f}</span>
+                    {ALL_FEATURE_KEYS.filter((k) => isGranted(plan.features[k])).map((k) => {
+                      const v = plan.features[k];
+                      return (
+                        <div key={k} className="flex items-center gap-2 text-sm">
+                          <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
+                          <span>{FEATURE_LABELS[k]}</span>
+                          {/* a feature with an allowance shows it; a plain ✔ needs no caption */}
+                          {v !== true && (
+                            <Badge variant="secondary" className="text-[10px]">{featureText(v)}</Badge>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="mt-4 pt-4 border-t grid grid-cols-2 gap-x-4 gap-y-2">
+                    {LIMIT_FIELDS.map((f) => (
+                      <div key={f.key} className="flex items-center justify-between text-xs">
+                        <span className="text-muted-foreground">{f.label}</span>
+                        <span className="font-medium">{limitText(plan.limits[f.key])}</span>
                       </div>
                     ))}
                   </div>
