@@ -34,7 +34,6 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { ALL_FEATURE_KEYS, FEATURE_CATALOG, FEATURE_LABELS, featureText, isGranted } from '@/data/planFeatures';
@@ -574,15 +573,19 @@ export default function PlanForm(): JSX.Element {
                                     )}
                                     {/* only channels are announced before they ship */}
                                     {group.allowSoon && (
-                                      <label className="flex items-center gap-1.5 shrink-0 cursor-pointer" title="ميزة معلنة ولم تُطلق بعد">
-                                        <Checkbox
-                                          checked={soon}
-                                          onCheckedChange={(c) => toggleSoon(feature.key, c === true)}
-                                        />
-                                        <span className={cn('text-[11px]', soon ? 'text-warning font-semibold' : 'text-muted-foreground')}>
-                                          قريباً
-                                        </span>
-                                      </label>
+                                      <button
+                                        type="button"
+                                        onClick={() => toggleSoon(feature.key, !soon)}
+                                        title={soon ? 'إلغاء وسم «قريباً»' : 'وسم الميزة بأنها معلنة ولم تُطلق بعد'}
+                                        className={cn(
+                                          'shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-semibold border transition-colors',
+                                          soon
+                                            ? 'bg-warning/15 text-warning border-warning/30'
+                                            : 'bg-transparent text-muted-foreground/60 border-dashed border-border hover:text-warning hover:border-warning/40'
+                                        )}
+                                      >
+                                        قريباً
+                                      </button>
                                     )}
                                     <Switch
                                       checked={enabled}
