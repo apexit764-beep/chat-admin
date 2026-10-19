@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
+  X,
   ArrowRight,
   Users,
   MessageSquare,
@@ -144,11 +145,9 @@ export default function PlanForm(): JSX.Element {
   };
 
   /** replaces a feature's value with a written allowance, e.g. «شات بأولوية» */
+  /** '' clears the allowance back to a plain ✔; anything else is kept verbatim */
   const setFeatureText = (key: string, text: string): void => {
-    const features = { ...form.features };
-    if (text.trim()) features[key] = text;
-    else features[key] = true;
-    setForm({ ...form, features });
+    setForm({ ...form, features: { ...form.features, [key]: text === '' ? true : text } });
   };
 
   const setLimit = (key: keyof PlanLimits, value: number): void => {
@@ -557,15 +556,38 @@ export default function PlanForm(): JSX.Element {
                                       {enabled ? 'مفعّلة' : soon ? 'قريباً' : 'غير مفعّلة'}
                                     </button>
                                   </div>
-                                  {/* a granted feature may carry a written allowance instead of a plain ✔ */}
-                                  {enabled && (
-                                    <Input
-                                      value={value === true ? '' : String(value)}
-                                      onChange={(e) => setFeatureText(feature.key, e.target.value)}
-                                      placeholder="قيمة محددة (اختياري) — مثال: شات بأولوية"
-                                      className="h-7 text-xs mt-1.5"
-                                    />
-                                  )}
+                                  {/*
+                                    Only four features in the whole catalogue carry a written
+                                    allowance, so the field stays hidden until it is wanted —
+                                    otherwise 42 empty inputs sit in the way.
+                                  */}
+                                  {enabled && typeof value === 'string' ? (
+                                    <div className="flex items-center gap-1 mt-1.5">
+                                      <Input
+                                        value={value}
+                                        onChange={(e) => setFeatureText(feature.key, e.target.value)}
+                                        placeholder="مثال: شات بأولوية"
+                                        className="h-7 text-xs"
+                                        autoFocus
+                                      />
+                                      <button
+                                        type="button"
+                                        onClick={() => setFeatureText(feature.key, '')}
+                                        className="shrink-0 h-7 w-7 rounded-md text-muted-foreground hover:bg-muted flex items-center justify-center"
+                                        title="إزالة القيمة والاكتفاء بالتفعيل"
+                                      >
+                                        <X className="h-3.5 w-3.5" />
+                                      </button>
+                                    </div>
+                                  ) : enabled ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => setFeatureText(feature.key, ' ')}
+                                      className="mt-1 text-[11px] text-muted-foreground hover:text-primary transition-colors"
+                                    >
+                                      + قيمة محددة
+                                    </button>
+                                  ) : null}
                                 </div>
                               );
                             })}
