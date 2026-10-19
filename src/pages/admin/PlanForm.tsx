@@ -17,7 +17,7 @@ import {
 import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
 import type { FeatureValue, PlanLimits, PlanPrice, PlanTier } from '@/types';
-import { CUSTOM_LIMIT, DEFAULT_PRICE_KEY, UNLIMITED } from '@/types';
+import { CUSTOM_LIMIT, DEFAULT_PRICE_KEY } from '@/types';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
@@ -36,7 +36,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { ALL_FEATURE_KEYS, FEATURE_CATALOG, FEATURE_LABELS, featureText, isGranted } from '@/data/planFeatures';
-import { LIMIT_FIELDS, isLimitReduced } from '@/utils/planLimits';
+import { LIMIT_FIELDS, isLimitReduced, limitText } from '@/utils/planLimits';
 
 interface FormState {
   tier: PlanTier;
@@ -293,8 +293,8 @@ export default function PlanForm(): JSX.Element {
     if (!form.name.trim()) {
       newErrors.name = 'الاسم بالإنجليزية مطلوب';
     }
-    if (LIMIT_FIELDS.some((f) => form.limits[f.key] === 0)) {
-      newErrors.limits = 'يجب تحديد جميع الحدود — اكتب رقماً أو اختر «غير محدود» أو «مخصّص»';
+    if (!form.requiresContact && LIMIT_FIELDS.some((f) => form.limits[f.key] === 0)) {
+      newErrors.limits = 'يجب تحديد جميع الحدود (-1 = غير محدود)';
     }
     if (ALL_FEATURE_KEYS.every((k) => !isGranted(form.features[k]))) {
       newErrors.features = 'يجب اختيار ميزة واحدة على الأقل';
@@ -376,53 +376,40 @@ export default function PlanForm(): JSX.Element {
           <Card>
             <CardHeader>
               <h3 className="text-lg font-semibold">الحدود<span className="text-destructive ms-0.5">*</span></h3>
-              <p className="text-xs text-muted-foreground mt-1">اختر «مخصّص» للحدّ الذي يُتَّفق عليه في كل صفقة</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {form.requiresContact ? 'حدود مخصّصة تُتَّفق عليها في كل صفقة وتأتي من الباك إند' : '-1 = غير محدود'}
+              </p>
               {errors.limits && <p className="text-xs text-destructive mt-1">{errors.limits}</p>}
             </CardHeader>
             <CardContent>
               {/*
-                الحدّ ثلاث حالات لا رقم واحد، فيُختار نوعه ثم يُكتب الرقم إن لزم.
-                الصياغة السابقة كانت حقلاً رقمياً وحده و«‎-1‎ غير محدود · ‎-2‎ مخصّص»
-                مكتوبة تحته: الرقمان سالبان لأنهما علامتان لا كمّيات، فكان على
-                المحرّر أن يحفظ أيّهما أيّ — ويقرأ «‎-2‎» في الحقل بعد الحفظ.
+                «مخصّص» ليست حالة تُختار لكل حدّ على حدة، بل صفة الباقة التي
+                تُطلب بالتواصل: حدودها تُتَّفق عليها مع كل عميل وتأتي من الباك
+                إند، فحقولها معطّلة ولا تُحرَّر هنا — كما وسم «قريباً» في المزايا.
               */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {LIMIT_FIELDS.map((f) => {
-                  const v = form.limits[f.key];
-                  const kind = v === UNLIMITED ? 'unlimited' : v === CUSTOM_LIMIT ? 'custom' : 'number';
-                  return (
-                    <div key={f.key} className="space-y-1.5">
-                      <Label className="flex items-center gap-1.5">
-                        {f.label}<span className="text-destructive ms-0.5">*</span>
-                      </Label>
-                      <div className="flex gap-2">
-                        <select
-                          value={kind}
-                          onChange={(e) => {
-                            const next = e.target.value;
-                            // الرجوع إلى «رقم محدد» يبدأ من صفر، وهو ما يمنعه التحقق
-                            // حتى يكتب المحرّر رقماً فعلياً.
-                            setLimit(f.key, next === 'unlimited' ? UNLIMITED : next === 'custom' ? CUSTOM_LIMIT : 0);
-                          }}
-                          className="h-9 rounded-md border border-input bg-background px-2 text-sm shrink-0"
-                        >
-                          <option value="number">رقم محدد</option>
-                          <option value="unlimited">غير محدود</option>
-                          <option value="custom">مخصّص</option>
-                        </select>
-                        {kind === 'number' && (
-                          <Input
-                            type="number"
-                            min={0}
-                            value={v}
-                            onChange={(e) => setLimit(f.key, Math.max(0, Number(e.target.value) || 0))}
-                          />
-                        )}
-                      </div>
-                      {f.hint && <p className="text-[11px] text-muted-foreground">{f.hint}</p>}
-                    </div>
-                  );
-                })}
+                {LIMIT_FIELDS.map((f) => (
+                  <div key={f.key} className="space-y-1.5">
+                    <Label className="flex items-center gap-1.5">
+                      {f.label}
+                      {!form.requiresContact && <span className="text-destructive ms-0.5">*</span>}
+                    </Label>
+                    {form.requiresContact ? (
+                      <Input value="مخصّص" disabled readOnly />
+                    ) : (
+                      <Input
+                        type="number"
+                        min={-1}
+                        value={form.limits[f.key]}
+                        onChange={(e) => setLimit(f.key, Number(e.target.value) || 0)}
+                      />
+                    )}
+                    <p className="text-[11px] text-muted-foreground">
+                      {f.hint ? `${f.hint}${form.requiresContact ? '' : ' · '}` : ''}
+                      {!form.requiresContact && limitText(form.limits[f.key])}
+                    </p>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
@@ -442,7 +429,23 @@ export default function PlanForm(): JSX.Element {
                   <p className="text-sm font-medium">يتطلب تواصل</p>
                   <p className="text-xs text-muted-foreground">العميل يرسل طلب بدلاً من الاشتراك المباشر</p>
                 </div>
-                <Switch checked={form.requiresContact} onCheckedChange={(checked) => setForm({ ...form, requiresContact: checked })} />
+                {/*
+                  تشغيله يكتب الحدود الثمانية «مخصّص» دفعةً واحدة: الحقول تُعطَّل
+                  فلا يبقى من يكتبها، ولو تُركت أرقامها القديمة لحُفظت باقةٌ
+                  تُعرض «مخصّص» وتُقاس باستهلاك رقمٍ لم يعد أحد يراه.
+                */}
+                <Switch
+                  checked={form.requiresContact}
+                  onCheckedChange={(checked) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      requiresContact: checked,
+                      limits: checked
+                        ? LIMIT_FIELDS.reduce((acc, f) => ({ ...acc, [f.key]: CUSTOM_LIMIT }), prev.limits)
+                        : prev.limits,
+                    }))
+                  }
+                />
               </div>
             </CardContent>
           </Card>
@@ -566,9 +569,12 @@ export default function PlanForm(): JSX.Element {
                               return (
                                 <div
                                   key={feature.key}
+                                  // الصفّ أبيض سواء كان المفتاح مشغّلاً أو لا: المفتاح
+                                  // نفسه يقول حالته، وتلوين خلفية الصفّ معه يصبغ
+                                  // القائمة كلها فيضيع ما يُقصد إبرازه.
                                   className={cn(
                                     'px-3 py-2 transition-colors',
-                                    enabled ? 'bg-primary/5' : soon ? 'bg-warning/5' : 'bg-background'
+                                    soon ? 'bg-warning/5' : 'bg-background'
                                   )}
                                 >
                                   <div className="flex items-center justify-between gap-3">
