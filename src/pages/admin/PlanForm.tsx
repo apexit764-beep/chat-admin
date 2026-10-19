@@ -2,7 +2,6 @@ import { useState, useMemo, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   X,
-  Pencil,
   ArrowRight,
   Users,
   MessageSquare,
@@ -542,27 +541,12 @@ export default function PlanForm(): JSX.Element {
                                 <div
                                   key={feature.key}
                                   className={cn(
-                                    'group/row px-3 py-2 transition-colors',
+                                    'px-3 py-2 transition-colors',
                                     enabled ? 'bg-primary/5' : soon ? 'bg-warning/5' : 'bg-background'
                                   )}
                                 >
                                   <div className="flex items-center justify-between gap-3">
                                     <span className="text-sm flex-1">{feature.label}</span>
-                                    {/*
-                                      Four features out of 46 carry a written allowance, so this
-                                      stays out of the way: no line of its own, and it surfaces
-                                      only when the row is pointed at or focused.
-                                    */}
-                                    {enabled && typeof value !== 'string' && (
-                                      <button
-                                        type="button"
-                                        onClick={() => setFeatureText(feature.key, ' ')}
-                                        title="إضافة قيمة محددة بدل التفعيل المجرّد"
-                                        className="shrink-0 h-6 w-6 rounded-md text-muted-foreground hover:bg-muted hover:text-primary flex items-center justify-center opacity-0 group-hover/row:opacity-100 focus-visible:opacity-100 transition-opacity"
-                                      >
-                                        <Pencil className="h-3 w-3" />
-                                      </button>
-                                    )}
                                     {/*
                                       «قريباً» is set by the backend, not here: a feature that
                                       has not shipped has nothing to switch on or off, so the
@@ -582,24 +566,14 @@ export default function PlanForm(): JSX.Element {
                                       />
                                     )}
                                   </div>
-                                  {enabled && typeof value === 'string' && (
-                                    <div className="flex items-center gap-1 mt-1.5">
-                                      <Input
-                                        value={value}
-                                        onChange={(e) => setFeatureText(feature.key, e.target.value)}
-                                        placeholder="مثال: شات بأولوية"
-                                        className="h-7 text-xs"
-                                        autoFocus
-                                      />
-                                      <button
-                                        type="button"
-                                        onClick={() => setFeatureText(feature.key, '')}
-                                        className="shrink-0 h-7 w-7 rounded-md text-muted-foreground hover:bg-muted flex items-center justify-center"
-                                        title="إزالة القيمة والاكتفاء بالتفعيل"
-                                      >
-                                        <X className="h-3.5 w-3.5" />
-                                      </button>
-                                    </div>
+                                  {/* only the four features the sheet describes with words */}
+                                  {enabled && feature.hasValue && (
+                                    <Input
+                                      value={value === true ? '' : String(value)}
+                                      onChange={(e) => setFeatureText(feature.key, e.target.value)}
+                                      placeholder="قيمة محددة (اختياري) — مثال: شات بأولوية"
+                                      className="h-7 text-xs mt-1.5"
+                                    />
                                   )}
                                 </div>
                               );

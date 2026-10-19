@@ -5,6 +5,12 @@ export interface CatalogFeature {
   /** stable key stored on every plan */
   key: string;
   label: string;
+  /**
+   * Whether this feature is described by a written allowance rather than a
+   * plain ✔ — «شات بأولوية», «20 تلخيص». Four features in the approved sheet
+   * work this way; the rest are on or off.
+   */
+  hasValue?: boolean;
 }
 
 export interface FeatureGroup {
@@ -66,7 +72,7 @@ export const FEATURE_CATALOG: FeatureGroup[] = [
       { key: 'ai_reply_suggestions', label: "يقترح الردود لموظفيك" },
       { key: 'ai_sentiment', label: "تحليل مشاعر العميل (راضي / غاضب)" },
       { key: 'ai_tone', label: "تخصيص أسلوب ونبرة الرد" },
-      { key: 'ai_summary', label: "تلخيص المحادثة" },
+      { key: 'ai_summary', hasValue: true, label: "تلخيص المحادثة" },
       { key: 'ai_learns', label: "يتعلّم من ردود فريقك" },
     ],
   },
@@ -113,10 +119,10 @@ export const FEATURE_CATALOG: FeatureGroup[] = [
     label: "الدعم الفني",
     icon: LifeBuoy,
     items: [
-      { key: 'sup_support', label: "الدعم الفني" },
+      { key: 'sup_support', hasValue: true, label: "الدعم الفني" },
       { key: 'sup_tickets', label: "الشكاوى والاقتراحات" },
-      { key: 'sup_onboarding', label: "الإعداد والتدريب" },
-      { key: 'sup_whitelabel', label: "علامة تجارية خاصة (White-label)" },
+      { key: 'sup_onboarding', hasValue: true, label: "الإعداد والتدريب" },
+      { key: 'sup_whitelabel', hasValue: true, label: "علامة تجارية خاصة (White-label)" },
     ],
   },
 ];
