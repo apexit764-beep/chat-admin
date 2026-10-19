@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   X,
@@ -33,6 +33,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { ALL_FEATURE_KEYS, FEATURE_CATALOG, FEATURE_LABELS, featureText, isGranted } from '@/data/planFeatures';
@@ -132,21 +133,34 @@ export default function PlanForm(): JSX.Element {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  /** cycles a feature: off → on → «قريباً» → off */
-  const cycleFeature = (key: string): void => {
-    const v = form.features[key];
-    const next: FeatureValue | undefined =
-      v === undefined || v === false ? true : v === true ? 'soon' : undefined;
+  /** keeps a written allowance while its feature is switched off */
+  const lastValue = useRef<Record<string, string>>({});
+
+  /** the on/off switch; an existing written allowance survives a toggle off and on */
+  const toggleFeature = (key: string, on: boolean): void => {
     const features = { ...form.features };
-    if (next === undefined) delete features[key];
-    else features[key] = next;
+    if (on) features[key] = lastValue.current[key] ?? true;
+    else {
+      if (typeof features[key] === 'string' && features[key] !== 'soon') {
+        lastValue.current[key] = features[key] as string;
+      }
+      delete features[key];
+    }
     setForm({ ...form, features });
     if (errors.features) setErrors((prev) => { const { features: _f, ...rest } = prev; return rest; });
   };
 
-  /** replaces a feature's value with a written allowance, e.g. «شات بأولوية» */
+  /** «قريباً» announces a feature that has not shipped, so the switch is moot while it is on */
+  const toggleSoon = (key: string, soon: boolean): void => {
+    const features = { ...form.features };
+    if (soon) features[key] = 'soon';
+    else delete features[key];
+    setForm({ ...form, features });
+  };
+
   /** '' clears the allowance back to a plain ✔; anything else is kept verbatim */
   const setFeatureText = (key: string, text: string): void => {
+    if (text === '') delete lastValue.current[key];
     setForm({ ...form, features: { ...form.features, [key]: text === '' ? true : text } });
   };
 
@@ -540,21 +554,22 @@ export default function PlanForm(): JSX.Element {
                                     enabled ? 'bg-primary/5' : soon ? 'bg-warning/5' : 'bg-background'
                                   )}
                                 >
-                                  <div className="flex items-center justify-between gap-2">
+                                  <div className="flex items-center justify-between gap-3">
                                     <span className="text-sm flex-1">{feature.label}</span>
-                                    {/* one control, three states: مفعّلة ← قريباً ← غير مفعّلة */}
-                                    <button
-                                      type="button"
-                                      onClick={() => cycleFeature(feature.key)}
-                                      className={cn(
-                                        'shrink-0 text-[11px] font-semibold rounded-md px-2 py-1 border transition-colors min-w-[64px]',
-                                        enabled ? 'bg-success/15 text-success border-success/30'
-                                          : soon ? 'bg-warning/15 text-warning border-warning/30'
-                                          : 'bg-muted text-muted-foreground border-transparent'
-                                      )}
-                                    >
-                                      {enabled ? 'مفعّلة' : soon ? 'قريباً' : 'غير مفعّلة'}
-                                    </button>
+                                    <label className="flex items-center gap-1.5 shrink-0 cursor-pointer" title="ميزة معلنة ولم تُطلق بعد">
+                                      <Checkbox
+                                        checked={soon}
+                                        onCheckedChange={(c) => toggleSoon(feature.key, c === true)}
+                                      />
+                                      <span className={cn('text-[11px]', soon ? 'text-warning font-semibold' : 'text-muted-foreground')}>
+                                        قريباً
+                                      </span>
+                                    </label>
+                                    <Switch
+                                      checked={enabled}
+                                      disabled={soon}
+                                      onCheckedChange={(c) => toggleFeature(feature.key, c)}
+                                    />
                                   </div>
                                   {/*
                                     Only four features in the whole catalogue carry a written
