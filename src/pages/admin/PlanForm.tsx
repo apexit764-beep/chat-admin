@@ -150,14 +150,6 @@ export default function PlanForm(): JSX.Element {
     if (errors.features) setErrors((prev) => { const { features: _f, ...rest } = prev; return rest; });
   };
 
-  /** «قريباً» announces a feature that has not shipped, so the switch is moot while it is on */
-  const toggleSoon = (key: string, soon: boolean): void => {
-    const features = { ...form.features };
-    if (soon) features[key] = 'soon';
-    else delete features[key];
-    setForm({ ...form, features });
-  };
-
   /** '' clears the allowance back to a plain ✔; anything else is kept verbatim */
   const setFeatureText = (key: string, text: string): void => {
     if (text === '') delete lastValue.current[key];
@@ -571,27 +563,24 @@ export default function PlanForm(): JSX.Element {
                                         <Pencil className="h-3 w-3" />
                                       </button>
                                     )}
-                                    {/* only channels are announced before they ship */}
-                                    {group.allowSoon && (
-                                      <button
-                                        type="button"
-                                        onClick={() => toggleSoon(feature.key, !soon)}
-                                        title={soon ? 'إلغاء وسم «قريباً»' : 'وسم الميزة بأنها معلنة ولم تُطلق بعد'}
-                                        className={cn(
-                                          'shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-semibold border transition-colors',
-                                          soon
-                                            ? 'bg-warning/15 text-warning border-warning/30'
-                                            : 'bg-transparent text-muted-foreground/60 border-dashed border-border hover:text-warning hover:border-warning/40'
-                                        )}
+                                    {/*
+                                      «قريباً» is set by the backend, not here: a feature that
+                                      has not shipped has nothing to switch on or off, so the
+                                      tag stands in place of the switch and is read-only.
+                                    */}
+                                    {soon ? (
+                                      <span
+                                        title="ميزة معلنة ولم تُطلق بعد — تُدار من الباك إند"
+                                        className="shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold bg-warning/15 text-warning border border-warning/30"
                                       >
                                         قريباً
-                                      </button>
+                                      </span>
+                                    ) : (
+                                      <Switch
+                                        checked={enabled}
+                                        onCheckedChange={(c) => toggleFeature(feature.key, c)}
+                                      />
                                     )}
-                                    <Switch
-                                      checked={enabled}
-                                      disabled={soon}
-                                      onCheckedChange={(c) => toggleFeature(feature.key, c)}
-                                    />
                                   </div>
                                   {enabled && typeof value === 'string' && (
                                     <div className="flex items-center gap-1 mt-1.5">

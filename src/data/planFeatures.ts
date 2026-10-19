@@ -10,12 +10,6 @@ export interface CatalogFeature {
 export interface FeatureGroup {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
-  /**
-   * Whether a feature here can be announced before it ships. Channels are
-   * third-party integrations with public roadmaps, so they get a «قريباً»
-   * state; nothing else in the catalogue is announced ahead of launch.
-   */
-  allowSoon?: boolean;
   items: CatalogFeature[];
 }
 
@@ -35,7 +29,6 @@ export const FEATURE_CATALOG: FeatureGroup[] = [
   {
     label: "القنوات",
     icon: MessageCircle,
-    allowSoon: true,
     items: [
       { key: 'ch_whatsapp', label: "واتساب للأعمال" },
       { key: 'ch_instagram', label: "إنستغرام" },
