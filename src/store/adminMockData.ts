@@ -463,15 +463,15 @@ export const plans: Plan[] = [
     tier: 'enterprise' as const,
     name: `Enterprise ${n}`,
     nameAr: `مؤسسات${n}`,
-    tagline: `باقة مؤسسات مخصصة — ${3 ** (i + 1)}× سقف «الأعمال»`,
+    tagline: `باقة مؤسسات مخصصة — ${2 ** (i + 1)}× سقف «الأعمال»`,
     features: Object.fromEntries(ALL_FEATURE_KEYS.map((k) => [k, true])),
     /*
-      حدود حقيقية لا «مخصّص»: كل درجة ثلاثة أضعاف التي تحتها، ابتداءً من سقف
-      «الأعمال» — ‎3×‎ ثم ‎9×‎ ثم ‎27×‎. «مخصّص» تُترك للمؤسسات المنشورة التي
+      حدود حقيقية لا «مخصّص»: كل درجة ضعف التي تحتها، ابتداءً من سقف
+      «الأعمال» — ‎2×‎ ثم ‎4×‎ ثم ‎8×‎. «مخصّص» تُترك للمؤسسات المنشورة التي
       يُتَّفق على حدودها مع كل عميل؛ أما هذه فتُسند يدوياً، والإسناد يحتاج
       رقماً يُقاس عليه الاستهلاك.
     */
-    limits: scaleLimits(BUSINESS_LIMITS, 3 ** (i + 1)),
+    limits: scaleLimits(BUSINESS_LIMITS, 2 ** (i + 1)),
     // priced per deal from the plans page, like المؤسسات
     pricesPerCountry: {},
     adminOnly: true,
