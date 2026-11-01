@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Plus,
   Download,
+  LogIn,
   Eye,
   Edit2,
   Trash2,
@@ -180,6 +181,20 @@ export default function AdminClients(): JSX.Element {
     }
   };
 
+  const handleEnterDashboard = async (c: Client): Promise<void> => {
+    if (!c.dashboardUrl) {
+      showToast('لا يوجد رابط لوحة لهذه الشركة', 'error');
+      return;
+    }
+    const ok = await confirm({
+      title: `الدخول إلى لوحة ${c.companyName}؟`,
+      message: 'سيتم فتح لوحة تحكم هذه الشركة في تبويب جديد للدخول إليها كمسؤول لمعاينتها.',
+      variant: 'info',
+      confirmText: 'دخول',
+    });
+    if (ok) window.open(c.dashboardUrl, '_blank', 'noopener,noreferrer');
+  };
+
   const handleExport = (rows: Client[]): void => {
     downloadCsv(
       `clients-${new Date().toISOString().slice(0, 10)}.csv`,
@@ -252,9 +267,19 @@ export default function AdminClients(): JSX.Element {
       ),
     },
     {
-      key: 'actions', header: '', sortable: false, width: '160px', align: 'end',
+      key: 'actions', header: '', sortable: false, width: '190px', align: 'end',
       cell: (r) => (
         <div className="flex items-center gap-0.5 justify-end" onClick={(e) => e.stopPropagation()}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 rounded-lg text-primary hover:text-primary hover:bg-primary/10"
+            onClick={() => handleEnterDashboard(r)}
+            title="الدخول إلى لوحة الشركة"
+            aria-label="الدخول إلى لوحة الشركة"
+          >
+            <LogIn className="h-4 w-4" />
+          </Button>
           <Button
             variant="ghost"
             size="icon"

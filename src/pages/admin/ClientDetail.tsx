@@ -13,7 +13,7 @@ import {
   MessageSquare,
   Radio,
   Edit2,
-  ExternalLink,
+  LogIn,
   MoreHorizontal,
   PauseCircle,
   PlayCircle,
@@ -361,9 +361,9 @@ export default function ClientDetail(): JSX.Element {
           </div>
           <div className="flex items-center gap-2">
             {client.dashboardUrl && (
-              <Button variant="outline" size="sm" className="rounded-lg" asChild>
+              <Button variant="default" size="sm" className="rounded-lg" asChild>
                 <a href={client.dashboardUrl} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="h-4 w-4 me-2" /> لوحة العميل
+                  <LogIn className="h-4 w-4 me-2" /> الدخول إلى لوحة الشركة
                 </a>
               </Button>
             )}
