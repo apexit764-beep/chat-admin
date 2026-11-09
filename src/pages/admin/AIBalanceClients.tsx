@@ -8,6 +8,7 @@ import {
   formatTokens,
   formatUsd,
   isFreeAmountSubscriber,
+  lastTopupUsd,
   localAmount,
 } from '@/store/useAIBalanceStore';
 import { GiftBalanceDialog } from '@/components/admin/GiftBalanceDialog';
@@ -41,7 +42,7 @@ export default function AIBalanceClients(): JSX.Element {
   const visible = rows.filter(({ a }) => {
     if (filter === ALL) return true;
     if (filter === FREE) return isFreeAmountSubscriber(a, packs);
-    return a.autoChargeUsd === Number(filter);
+    return lastTopupUsd(a) === Number(filter);
   });
 
   const stats = useMemo(() => {
@@ -114,6 +115,7 @@ export default function AIBalanceClients(): JSX.Element {
                 <TableHead className="text-start">الدولة</TableHead>
                 <TableHead className="text-start">الرصيد</TableHead>
                 <TableHead className="text-start">استهلاك الشهر</TableHead>
+                <TableHead className="text-start">الاشتراك</TableHead>
                 <TableHead className="text-start">الشحن التلقائي</TableHead>
                 <TableHead className="text-start">الحالة</TableHead>
                 <TableHead className="w-[150px]" />
@@ -122,7 +124,7 @@ export default function AIBalanceClients(): JSX.Element {
             <TableBody>
               {visible.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center text-muted-foreground py-10">
+                  <TableCell colSpan={8} className="text-center text-muted-foreground py-10">
                     لا يوجد عملاء مطابقون.
                   </TableCell>
                 </TableRow>
@@ -133,6 +135,7 @@ export default function AIBalanceClients(): JSX.Element {
                 const local = localAmount(bal, client.country);
                 const country = countries.find((c) => c.code === client.country);
                 const free = isFreeAmountSubscriber(a, packs);
+                const last = lastTopupUsd(a);
                 return (
                   <TableRow
                     key={a.clientId}
@@ -147,13 +150,18 @@ export default function AIBalanceClients(): JSX.Element {
                     </TableCell>
                     <TableCell>{formatTokens(a.usedMonthTokens)} توكن</TableCell>
                     <TableCell>
-                      {a.autoChargeUsd === null ? (
-                        <Badge variant="secondary">غير مفعّل</Badge>
+                      {last === null ? (
+                        <span className="text-xs text-muted-foreground">—</span>
                       ) : (
-                        <Badge variant="success">
-                          {free ? 'مبلغ حر' : 'باقة'} · {formatUsd(a.autoChargeUsd)}
+                        <Badge variant="outline">
+                          {free ? 'مبلغ حر' : 'باقة'} · {formatUsd(last)}
                         </Badge>
                       )}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={a.autoChargeUsd !== null ? 'success' : 'secondary'}>
+                        {a.autoChargeUsd !== null ? `مفعّل · ${formatUsd(a.autoChargeUsd)}` : 'غير مفعّل'}
+                      </Badge>
                     </TableCell>
                     <TableCell>
                       <Badge variant={stopped ? 'destructive' : 'success'}>{stopped ? 'متوقف' : 'يعمل'}</Badge>

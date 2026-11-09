@@ -74,12 +74,12 @@ const DAY = 86_400_000;
 const daysAgo = (n: number): string => new Date(Date.now() - n * DAY).toISOString();
 
 /** Deterministic demo balances so the page is populated before the API exists */
-const SEED: { id: string; left: number; used: number; auto: number | null; negative?: number }[] = [
-  { id: 'client_1', left: 22.4, used: 5.2e6, auto: 10 },
-  { id: 'client_2', left: 0, used: 9.8e6, auto: null },
-  { id: 'client_3', left: 48.1, used: 14.3e6, auto: 25 },
-  { id: 'client_4', left: 6.2, used: 3.8e6, auto: 15 },
-  { id: 'client_5', left: 0, used: 2.1e6, auto: null, negative: 0.004 },
+const SEED: { id: string; left: number; used: number; auto: number | null; topup: number; negative?: number }[] = [
+  { id: 'client_1', left: 22.4, used: 5.2e6, auto: 10, topup: 25 },
+  { id: 'client_2', left: 0, used: 9.8e6, auto: null, topup: 5 },
+  { id: 'client_3', left: 48.1, used: 14.3e6, auto: 25, topup: 50 },
+  { id: 'client_4', left: 6.2, used: 3.8e6, auto: 15, topup: 15 },
+  { id: 'client_5', left: 0, used: 2.1e6, auto: null, topup: 10, negative: 0.004 },
 ];
 
 function buildAccounts(): BalanceAccount[] {
@@ -89,10 +89,10 @@ function buildAccounts(): BalanceAccount[] {
     usedMonthTokens: s.used,
     autoChargeUsd: s.auto,
     negative: s.negative ?? 0,
-    lots: s.left > 0 ? [{ id: `lot_${s.id}_1`, source: 'شحن', usd: Math.max(10, s.left), left: s.left }] : [],
+    lots: s.left > 0 ? [{ id: `lot_${s.id}_1`, source: 'شحن', usd: s.topup, left: s.left }] : [],
     tx: [
       { id: `tx_${s.id}_2`, date: daysAgo(1), type: 'usage', description: 'ردود المساعد', usd: -(s.used / 1e6) * DEFAULT_SETTINGS.pricePerMillion },
-      { id: `tx_${s.id}_1`, date: daysAgo(12 + i), type: 'topup', description: 'شحن رصيد المساعد', usd: Math.max(10, s.left) },
+      { id: `tx_${s.id}_1`, date: daysAgo(12 + i), type: 'topup', description: 'شحن رصيد المساعد', usd: s.topup },
     ],
   }));
 }
@@ -124,14 +124,20 @@ export const useAIBalanceStore = create<AIBalanceState>((set) => ({
 
 /* ---------- helpers ---------- */
 
-/** how many clients auto-charge exactly this amount, i.e. are subscribed to this pack */
-export function packSubscribers(accounts: BalanceAccount[], usd: number): number {
-  return accounts.filter((a) => a.autoChargeUsd === usd).length;
+/** last amount the client paid for (pack or free amount) — it defines what they are subscribed to */
+export function lastTopupUsd(a: BalanceAccount): number | null {
+  return a.tx.find((t) => t.type === 'topup' || t.type === 'auto')?.usd ?? null;
 }
 
-/** subscribed with an auto-charge amount that is not one of the packs */
+/** clients whose last top-up is exactly this pack */
+export function packSubscribers(accounts: BalanceAccount[], usd: number): number {
+  return accounts.filter((a) => lastTopupUsd(a) === usd).length;
+}
+
+/** clients whose last top-up is a free amount, i.e. not one of the packs */
 export function isFreeAmountSubscriber(a: BalanceAccount, packs: TopupPack[]): boolean {
-  return a.autoChargeUsd !== null && !packs.some((p) => p.usd === a.autoChargeUsd);
+  const last = lastTopupUsd(a);
+  return last !== null && !packs.some((p) => p.usd === last);
 }
 
 export function accountBalance(a: BalanceAccount): number {
