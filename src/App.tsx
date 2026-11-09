@@ -25,6 +25,9 @@ const AdminIntegrations = lazy(() => import('@pages/admin/Integrations'));
 const AdminIndustries = lazy(() => import('@pages/admin/Industries'));
 const AdminWidgetSettings = lazy(() => import('@pages/admin/WidgetSettings'));
 const AdminPlanRequests = lazy(() => import('@pages/admin/PlanRequests'));
+const AIBalanceSettings = lazy(() => import('@pages/admin/AIBalanceSettings'));
+const AIBalanceClients = lazy(() => import('@pages/admin/AIBalanceClients'));
+const AIBalanceClient = lazy(() => import('@pages/admin/AIBalanceClient'));
 
 function PageLoader(): JSX.Element {
   return (
@@ -68,6 +71,9 @@ export default function App(): JSX.Element {
           <Route path="/integrations" element={<AdminIntegrations />} />
           <Route path="/industries" element={<AdminIndustries />} />
           <Route path="/widget" element={<AdminWidgetSettings />} />
+          <Route path="/ai-balance" element={<AIBalanceClients />} />
+          <Route path="/ai-balance/settings" element={<AIBalanceSettings />} />
+          <Route path="/ai-balance/:id" element={<AIBalanceClient />} />
           <Route path="/profile" element={<AdminProfile />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Route>
