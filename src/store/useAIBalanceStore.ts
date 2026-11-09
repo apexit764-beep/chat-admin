@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { useAdminStore } from '@/store/useAdminStore';
+import { useNotificationStore } from '@/store/useNotificationStore';
 
 export interface TopupPack {
   usd: number;
@@ -21,6 +22,10 @@ export interface AIBalanceSettings {
   maxTopup: number;
   /** lowest balance a client can reach — the assistant stops drawing tokens there. Always positive: no balance is ever negative */
   minBalance: number;
+  /** alert the admin when Qhub's OWN token balance with the provider falls below this (tokens) */
+  providerAlertTokens: number;
+  /** where the low-balance alert is emailed, comma separated */
+  alertEmails: string;
 }
 
 export interface BalanceLot {
@@ -55,8 +60,12 @@ interface AIBalanceState {
   settings: AIBalanceSettings;
   /** tokens Qhub itself still has with the AI provider (read from the provider once connected) */
   providerTokens: number;
+  /** the low-balance alert was already sent and the balance has not been refilled since */
+  providerAlerted: boolean;
   accounts: BalanceAccount[];
   updateSettings: (patch: Partial<AIBalanceSettings>) => void;
+  /** raise the admin alert once when Qhub's own balance is under the threshold; re-arm when it recovers */
+  checkProviderBalance: () => void;
   addGift: (clientId: string, usd: number, reason: string) => void;
 }
 
@@ -68,6 +77,8 @@ const DEFAULT_SETTINGS: AIBalanceSettings = {
   minTopup: 5,
   maxTopup: 200,
   minBalance: 0.5,
+  providerAlertTokens: 20e6,
+  alertEmails: 'admin@apexes.click',
 };
 
 const DAY = 86_400_000;
@@ -98,11 +109,29 @@ function buildAccounts(): BalanceAccount[] {
 
 let seq = 0;
 
-export const useAIBalanceStore = create<AIBalanceState>((set) => ({
+export const useAIBalanceStore = create<AIBalanceState>((set, get) => ({
   settings: DEFAULT_SETTINGS,
   providerTokens: 120e6,
+  providerAlerted: false,
   accounts: buildAccounts(),
-  updateSettings: (patch) => set((s) => ({ settings: { ...s.settings, ...patch } })),
+  updateSettings: (patch) => {
+    set((s) => ({ settings: { ...s.settings, ...patch } }));
+    get().checkProviderBalance();
+  },
+  checkProviderBalance: () => {
+    const { providerTokens, providerAlerted, settings } = get();
+    const low = providerTokens < settings.providerAlertTokens;
+    if (low && !providerAlerted) {
+      set({ providerAlerted: true });
+      useNotificationStore.getState().addNotification({
+        title: 'رصيد Qhub لدى المزوّد منخفض',
+        body: `المتبقي ${formatTokens(providerTokens)} توكن، وهو أقل من حد التنبيه (${formatTokens(settings.providerAlertTokens)}). إن نفد توقف المساعد عن كل العملاء.`,
+        type: 'alert',
+      });
+    } else if (!low && providerAlerted) {
+      set({ providerAlerted: false });
+    }
+  },
   addGift: (clientId, usd, reason) =>
     set((s) => {
       const now = new Date().toISOString();

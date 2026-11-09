@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Gift, Users, Wallet, Repeat, Activity, Coins } from 'lucide-react';
 import { useAdminStore } from '@/store/useAdminStore';
@@ -31,6 +31,9 @@ export default function AIBalanceClients(): JSX.Element {
   const minBalance = useAIBalanceStore((s) => s.settings.minBalance);
   const price = useAIBalanceStore((s) => s.settings.pricePerMillion);
   const providerTokens = useAIBalanceStore((s) => s.providerTokens);
+  const providerAlertTokens = useAIBalanceStore((s) => s.settings.providerAlertTokens);
+  const checkProviderBalance = useAIBalanceStore((s) => s.checkProviderBalance);
+  useEffect(() => checkProviderBalance(), [checkProviderBalance, providerTokens, providerAlertTokens]);
   const clients = useAdminStore((s) => s.clients);
   const countries = useAdminStore((s) => s.countries);
   const [giftFor, setGiftFor] = useState<string | null>(null);
@@ -62,9 +65,10 @@ export default function AIBalanceClients(): JSX.Element {
 
   // what clients could still draw if they used all their balance — Qhub must hold at least this much
   const clientsTokens = tokensFor(stats.total, price);
+  const belowLimit = providerTokens < providerAlertTokens;
   const providerLow = providerTokens < clientsTokens;
 
-  const cards: { label: string; value: string; icon: React.ElementType; hint?: string; warn?: boolean }[] = [
+  const cards: { label: string; value: string; icon: React.ElementType; hint?: string; warn?: boolean; danger?: boolean }[] = [
     { label: 'إجمالي العملاء', value: String(stats.clients), icon: Users },
     { label: 'إجمالي الأرصدة', value: formatUsd(stats.total), icon: Wallet },
     { label: 'استهلاك الشهر (توكن)', value: formatTokens(stats.tokens), icon: Activity },
@@ -74,7 +78,8 @@ export default function AIBalanceClients(): JSX.Element {
       value: formatTokens(providerTokens),
       icon: Coins,
       hint: `أرصدة العملاء ≈ ${formatTokens(clientsTokens)}`,
-      warn: providerLow,
+      warn: belowLimit || providerLow,
+      danger: belowLimit,
     },
   ];
 
@@ -84,10 +89,10 @@ export default function AIBalanceClients(): JSX.Element {
 
       <div className="grid gap-3 grid-cols-2 lg:grid-cols-5">
         {cards.map((c) => (
-          <Card key={c.label} className={c.warn ? 'border-amber-400' : undefined}>
+          <Card key={c.label} className={c.danger ? 'border-red-500' : c.warn ? 'border-amber-400' : undefined}>
             <CardContent className="p-4 flex items-center gap-3">
               <div
-                className={`h-9 w-9 rounded-lg flex items-center justify-center flex-shrink-0 ${c.warn ? 'bg-amber-100 text-amber-600' : 'bg-primary/10 text-primary'}`}
+                className={`h-9 w-9 rounded-lg flex items-center justify-center flex-shrink-0 ${c.danger ? 'bg-red-100 text-red-600' : c.warn ? 'bg-amber-100 text-amber-600' : 'bg-primary/10 text-primary'}`}
               >
                 <c.icon className="h-4 w-4" />
               </div>
@@ -95,8 +100,8 @@ export default function AIBalanceClients(): JSX.Element {
                 <p className="text-xs text-muted-foreground truncate">{c.label}</p>
                 <p className="text-lg font-bold truncate" dir="auto">{c.value}</p>
                 {c.hint && (
-                  <p className={`text-[11px] ${c.warn ? 'text-amber-600' : 'text-muted-foreground'}`}>
-                    {c.warn ? 'أقل من أرصدة العملاء' : c.hint}
+                  <p className={`text-[11px] ${c.danger ? 'text-red-600' : c.warn ? 'text-amber-600' : 'text-muted-foreground'}`}>
+                    {c.danger ? 'تحت حد التنبيه' : c.warn ? 'أقل من أرصدة العملاء' : c.hint}
                   </p>
                 )}
               </div>

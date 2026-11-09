@@ -19,6 +19,9 @@ interface Draft {
   min: string;
   max: string;
   negative: string;
+  /** Qhub's own balance alert threshold, in millions of tokens */
+  providerAlert: string;
+  alertEmails: string;
 }
 
 export default function AIBalanceSettings(): JSX.Element {
@@ -34,9 +37,11 @@ export default function AIBalanceSettings(): JSX.Element {
       min: String(settings.minTopup),
       max: String(settings.maxTopup),
       negative: String(settings.minBalance),
+      providerAlert: String(settings.providerAlertTokens / 1e6),
+      alertEmails: settings.alertEmails,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [settings.modelName, settings.pricePerMillion, settings.minTopup, settings.maxTopup, settings.minBalance]
+    [settings.modelName, settings.pricePerMillion, settings.minTopup, settings.maxTopup, settings.minBalance, settings.providerAlertTokens, settings.alertEmails]
   );
   const [draft, setDraft] = useState<Draft>(initial);
   // after a save the saved values become the new baseline
@@ -108,6 +113,11 @@ export default function AIBalanceSettings(): JSX.Element {
     if (draft.negative.trim() === '' || Number.isNaN(Number(draft.negative)) || Number(draft.negative) < 0) {
       return showToast('أقل رصيد مسموح يجب أن يكون رقماً موجباً', 'error');
     }
+    if (!positive(draft.providerAlert)) return showToast('حد تنبيه رصيد Qhub يجب أن يكون رقماً أكبر من صفر', 'error');
+    const emails = draft.alertEmails.split(',').map((e) => e.trim()).filter(Boolean);
+    if (emails.length === 0 || emails.some((e) => !/^[\w.+-]+@[\w-]+\.[\w.-]+$/.test(e))) {
+      return showToast('أدخل إيميل تنبيه صحيحاً (أو أكثر مفصولة بفاصلة)', 'error');
+    }
     const priceChanged = Number(draft.price) !== settings.pricePerMillion;
     updateSettings({
       modelName: draft.modelName.trim(),
@@ -115,6 +125,8 @@ export default function AIBalanceSettings(): JSX.Element {
       minTopup: Number(draft.min),
       maxTopup: Number(draft.max),
       minBalance: Number(draft.negative),
+      providerAlertTokens: Number(draft.providerAlert) * 1e6,
+      alertEmails: emails.join(', '),
     });
     showToast(priceChanged ? 'تم الحفظ، وأُرسل إشعار للعملاء بالسعر الجديد' : 'تم الحفظ');
   };
@@ -221,6 +233,29 @@ export default function AIBalanceSettings(): JSX.Element {
             <p className="text-xs text-muted-foreground">
               أقل رصيد ممكن يصل له العميل، وعنده يتوقف سحب التوكن (يتوقف المساعد).
             </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">رصيد Qhub الخاص لدى المزوّد</CardTitle>
+          <p className="text-xs text-muted-foreground">
+            ده رصيد شركة Qhub نفسها من التوكنز عند مزوّد الذكاء الاصطناعي، وليس رصيد أي عميل. لو نفد توقف المساعد عن كل العملاء.
+          </p>
+        </CardHeader>
+        <CardContent className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label>حد التنبيه (مليون توكن)</Label>
+            <Input dir="ltr" type="number" step="0.1" min="0" value={draft.providerAlert} onChange={(e) => set('providerAlert', e.target.value)} />
+            <p className="text-xs text-muted-foreground">
+              لما يقل رصيد Qhub عن هذا الحد يصلك إشعار في اللوحة وإيميل، مرة واحدة إلى أن يُشحن الرصيد.
+            </p>
+          </div>
+          <div className="space-y-1.5">
+            <Label>إيميل التنبيه</Label>
+            <Input dir="ltr" value={draft.alertEmails} onChange={(e) => set('alertEmails', e.target.value)} />
+            <p className="text-xs text-muted-foreground">يمكن إدخال أكثر من إيميل مفصولة بفاصلة. الإرسال الفعلي للإيميل يعمل بعد ربط الخادم.</p>
           </div>
         </CardContent>
       </Card>
