@@ -10,6 +10,7 @@ import {
   localAmount,
 } from '@/store/useAIBalanceStore';
 import { GiftBalanceDialog } from '@/components/admin/GiftBalanceDialog';
+import { PrivateAssistantNav } from '@/components/admin/PrivateAssistantNav';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -28,10 +29,8 @@ export default function AIBalanceClients(): JSX.Element {
 
   return (
     <div className="p-4 lg:p-6 space-y-4 page-fade">
-      <div>
-        <h2 className="text-2xl font-bold">أرصدة العملاء</h2>
-        <p className="text-sm text-muted-foreground">العملاء الذين يستخدمون رصيد Qhub فقط</p>
-      </div>
+      <PrivateAssistantNav />
+      <p className="text-sm text-muted-foreground">العملاء الذين يستخدمون رصيد Qhub فقط</p>
 
       <Card>
         <CardContent className="p-0">

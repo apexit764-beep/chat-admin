@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Plus, X, Save } from 'lucide-react';
 import { useAIBalanceStore, formatUsd } from '@/store/useAIBalanceStore';
 import { useUIStore } from '@/store/useUIStore';
+import { PrivateAssistantNav } from '@/components/admin/PrivateAssistantNav';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -75,10 +76,8 @@ export default function AIBalanceSettings(): JSX.Element {
 
   return (
     <div className="p-4 lg:p-6 space-y-4 page-fade">
-      <div>
-        <h2 className="text-2xl font-bold">إعدادات رصيد المساعد</h2>
-        <p className="text-sm text-muted-foreground">الأسعار بالدولار، وتظهر لكل عميل بعملة دولته</p>
-      </div>
+      <PrivateAssistantNav />
+      <p className="text-sm text-muted-foreground">الأسعار بالدولار، وتظهر لكل عميل بعملة دولته</p>
 
       <Card>
         <CardHeader className="pb-3">

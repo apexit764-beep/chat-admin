@@ -19,8 +19,6 @@ import {
   X,
   Plug,
   Sparkles,
-  Wallet,
-  SlidersHorizontal,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useUIStore } from '@/store/useUIStore';
@@ -61,13 +59,6 @@ const navGroups: NavGroup[] = [
       { to: '/widget', label: 'إعدادات المساعد الذكي', icon: Sparkles },
       { to: '/plans', label: 'الباقات', icon: Package },
       { to: '/feedback', label: 'الشكاوى والاقتراحات', icon: MessageSquareWarning },
-    ],
-  },
-  {
-    title: 'رصيد المساعد الذكي',
-    items: [
-      { to: '/ai-balance/settings', label: 'إعدادات الرصيد', icon: SlidersHorizontal },
-      { to: '/ai-balance', label: 'أرصدة العملاء', icon: Wallet },
     ],
   },
   {
@@ -181,9 +172,11 @@ function SidebarInner({ collapsed, onToggleCollapse, onNavigate, mobile, onClose
               )}
               {group.items.map((item) => {
                 const Icon = item.icon;
+                // the private-assistant pages live under «إعدادات المساعد الذكي»
                 const isActive =
-                  (location.pathname === item.to || location.pathname.startsWith(item.to + '/')) &&
-                  !(item.to === '/ai-balance' && location.pathname.startsWith('/ai-balance/settings'));
+                  location.pathname === item.to ||
+                  location.pathname.startsWith(item.to + '/') ||
+                  (item.to === '/widget' && location.pathname.startsWith('/ai-balance'));
                 const linkEl = (
                   <NavLink
                     key={item.to}

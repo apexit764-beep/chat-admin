@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowRight, Gift } from 'lucide-react';
+import { Gift } from 'lucide-react';
 import { useAdminStore } from '@/store/useAdminStore';
 import {
   useAIBalanceStore,
@@ -13,6 +13,7 @@ import {
 } from '@/store/useAIBalanceStore';
 import { GiftBalanceDialog } from '@/components/admin/GiftBalanceDialog';
 import { formatDate } from '@/utils/format';
+import { PrivateAssistantNav } from '@/components/admin/PrivateAssistantNav';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -54,10 +55,7 @@ export default function AIBalanceClient(): JSX.Element {
 
   return (
     <div className="p-4 lg:p-6 space-y-4 page-fade">
-      <Link to="/ai-balance" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-        <ArrowRight className="h-4 w-4" />
-        أرصدة العملاء
-      </Link>
+      <PrivateAssistantNav />
 
       <div className="flex items-center justify-between">
         <div>

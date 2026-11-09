@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   MessageCircle,
   MessageSquare,
@@ -16,6 +17,7 @@ import {
   Sparkles,
   LayoutTemplate,
   Save,
+  Wallet,
 } from 'lucide-react';
 import { useSettingsStore, type WidgetSettings as WidgetSettingsType } from '@/store/useSettingsStore';
 import { useUIStore } from '@/store/useUIStore';
@@ -74,6 +76,7 @@ const TABS: { key: Tab; label: string; icon: React.ElementType }[] = [
 ];
 
 export default function WidgetSettingsPage(): JSX.Element {
+  const navigate = useNavigate();
   const widget = useSettingsStore((s) => s.widget);
   const setWidget = useSettingsStore((s) => s.setWidget);
   const ai = useSettingsStore((s) => s.ai);
@@ -171,9 +174,15 @@ export default function WidgetSettingsPage(): JSX.Element {
   return (
     <div className="p-4 lg:p-6 space-y-5">
       {/* Header */}
-      <div>
-        <h2 className="text-2xl font-bold">إعدادات المساعد الذكي</h2>
-        <p className="text-sm text-muted-foreground">تخصيص شكل الويدجت وسلوك المساعد الذكي الذي يرد على عملاء المشتركين</p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h2 className="text-2xl font-bold">إعدادات المساعد الذكي</h2>
+          <p className="text-sm text-muted-foreground">تخصيص شكل الويدجت وسلوك المساعد الذكي الذي يرد على عملاء المشتركين</p>
+        </div>
+        <Button variant="outline" className="gap-2" onClick={() => navigate('/ai-balance')}>
+          <Wallet className="h-4 w-4" />
+          المساعد الخاص
+        </Button>
       </div>
 
       {/* AI Master Toggle */}
