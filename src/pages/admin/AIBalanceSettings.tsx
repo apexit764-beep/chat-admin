@@ -45,6 +45,9 @@ export default function AIBalanceSettings(): JSX.Element {
     const u = Number(packInput);
     if (!(u > 0)) return showToast('أدخل مبلغاً أكبر من صفر', 'error');
     if (settings.packs.includes(u)) return showToast('هذه الباقة موجودة بالفعل', 'error');
+    if (u > Number(draft.max)) {
+      return showToast(`مبلغ الباقة لا يمكن أن يتجاوز الحد الأقصى للمبلغ الحر (${formatUsd(Number(draft.max))})`, 'error');
+    }
     updateSettings({ packs: [...settings.packs, u].sort((a, b) => a - b) });
     setPackInput('');
     showToast('تمت إضافة الباقة');
@@ -60,6 +63,10 @@ export default function AIBalanceSettings(): JSX.Element {
     if (!positive(draft.price)) return showToast('يجب أن يكون السعر أكبر من صفر', 'error');
     if (!positive(draft.min) || !positive(draft.max)) return showToast('يجب أن تكون القيم أرقاماً أكبر من صفر', 'error');
     if (Number(draft.min) >= Number(draft.max)) return showToast('يجب أن يكون الحد الأدنى أقل من الحد الأقصى', 'error');
+    const biggest = Math.max(...settings.packs);
+    if (biggest > Number(draft.max)) {
+      return showToast(`الحد الأقصى أقل من أكبر باقة شحن (${formatUsd(biggest)}). عدّل الباقة أو ارفع الحد الأقصى`, 'error');
+    }
     if (draft.negative.trim() === '' || Number.isNaN(Number(draft.negative)) || Number(draft.negative) < 0) {
       return showToast('أقل رصيد مسموح يجب أن يكون رقماً موجباً', 'error');
     }
