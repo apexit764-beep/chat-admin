@@ -90,8 +90,8 @@ export default function AIBalanceClient(): JSX.Element {
           <CardContent className="p-4">
             <p className="text-xs text-muted-foreground">الشحن التلقائي</p>
             <div className="mt-2">
-              <Badge variant={account.autoCharge ? 'success' : 'secondary'}>
-                {account.autoCharge ? 'مفعّل' : 'غير مفعّل'}
+              <Badge variant={account.autoChargeUsd !== null ? 'success' : 'secondary'}>
+                {account.autoChargeUsd !== null ? `مفعّل · ${formatUsd(account.autoChargeUsd)}` : 'غير مفعّل'}
               </Badge>
             </div>
           </CardContent>

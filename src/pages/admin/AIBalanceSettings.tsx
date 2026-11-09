@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Plus, X, Save } from 'lucide-react';
-import { useAIBalanceStore, formatUsd } from '@/store/useAIBalanceStore';
+import { useAIBalanceStore, formatUsd, packSubscribers } from '@/store/useAIBalanceStore';
 import { useUIStore } from '@/store/useUIStore';
 import { PrivateAssistantNav } from '@/components/admin/PrivateAssistantNav';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 /** most top-up packs a client can be offered — keeps the payment screen readable */
@@ -22,6 +23,7 @@ interface Draft {
 export default function AIBalanceSettings(): JSX.Element {
   const settings = useAIBalanceStore((s) => s.settings);
   const updateSettings = useAIBalanceStore((s) => s.updateSettings);
+  const accounts = useAIBalanceStore((s) => s.accounts);
   const showToast = useUIStore((s) => s.showToast);
 
   const initial = useMemo<Draft>(
@@ -47,19 +49,35 @@ export default function AIBalanceSettings(): JSX.Element {
   const addPack = (): void => {
     const u = Number(packInput);
     if (!(u > 0)) return showToast('أدخل مبلغاً أكبر من صفر', 'error');
-    if (settings.packs.includes(u)) return showToast('هذه الباقة موجودة بالفعل', 'error');
+    if (settings.packs.some((p) => p.usd === u)) return showToast('هذه الباقة موجودة بالفعل', 'error');
     if (settings.packs.length >= MAX_PACKS) return showToast(`الحد الأقصى ${MAX_PACKS} باقات شحن. احذف باقة لإضافة أخرى`, 'error');
     if (u > Number(draft.max)) {
       return showToast(`مبلغ الباقة لا يمكن أن يتجاوز الحد الأقصى للمبلغ الحر (${formatUsd(Number(draft.max))})`, 'error');
     }
-    updateSettings({ packs: [...settings.packs, u].sort((a, b) => a - b) });
+    updateSettings({ packs: [...settings.packs, { usd: u, active: true }].sort((a, b) => a.usd - b.usd) });
     setPackInput('');
     showToast('تمت إضافة الباقة');
   };
 
-  const removePack = (u: number): void => {
-    if (settings.packs.length === 1) return showToast('يجب أن تبقى باقة واحدة على الأقل', 'error');
-    updateSettings({ packs: settings.packs.filter((p) => p !== u) });
+  const activeCount = settings.packs.filter((p) => p.active).length;
+
+  /** hide from new subscribers / show again — current subscribers keep their pack either way */
+  const togglePack = (usd: number): void => {
+    const pack = settings.packs.find((p) => p.usd === usd);
+    if (!pack) return;
+    if (pack.active && activeCount === 1) return showToast('يجب أن تبقى باقة واحدة مفعّلة على الأقل', 'error');
+    updateSettings({ packs: settings.packs.map((p) => (p.usd === usd ? { ...p, active: !p.active } : p)) });
+    showToast(pack.active ? 'تم تعطيل الباقة: تختفي عن المشتركين الجدد وتستمر مع الحاليين' : 'تم تفعيل الباقة');
+  };
+
+  /** deleting is only allowed once nobody is subscribed to the pack any more */
+  const removePack = (usd: number): void => {
+    const pack = settings.packs.find((p) => p.usd === usd);
+    if (!pack) return;
+    const subs = packSubscribers(accounts, usd);
+    if (subs > 0) return showToast(`لا يمكن حذف الباقة: ${subs} عميل مشترك فيها. عطّلها بدلاً من حذفها`, 'error');
+    if (pack.active && activeCount === 1) return showToast('يجب أن تبقى باقة واحدة مفعّلة على الأقل', 'error');
+    updateSettings({ packs: settings.packs.filter((p) => p.usd !== usd) });
   };
 
   const save = (): void => {
@@ -67,7 +85,7 @@ export default function AIBalanceSettings(): JSX.Element {
     if (!positive(draft.price)) return showToast('يجب أن يكون السعر أكبر من صفر', 'error');
     if (!positive(draft.min) || !positive(draft.max)) return showToast('يجب أن تكون القيم أرقاماً أكبر من صفر', 'error');
     if (Number(draft.min) >= Number(draft.max)) return showToast('يجب أن يكون الحد الأدنى أقل من الحد الأقصى', 'error');
-    const biggest = Math.max(...settings.packs);
+    const biggest = Math.max(...settings.packs.map((p) => p.usd));
     if (biggest > Number(draft.max)) {
       return showToast(`الحد الأقصى أقل من أكبر باقة شحن (${formatUsd(biggest)}). عدّل الباقة أو ارفع الحد الأقصى`, 'error');
     }
@@ -114,21 +132,34 @@ export default function AIBalanceSettings(): JSX.Element {
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-base">باقات الشحن</CardTitle>
+          <p className="text-xs text-muted-foreground">
+            الباقة المعطّلة تختفي عن المشتركين الجدد وتستمر مع المشتركين الحاليين. الحد الأقصى {MAX_PACKS} باقات.
+          </p>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex flex-wrap gap-2">
-            {settings.packs.map((u) => (
-              <span key={u} className="inline-flex items-center gap-2 rounded-full border bg-card ps-3 pe-1.5 py-1 text-sm">
-                <b dir="ltr">{formatUsd(u)}</b>
-                <button
-                  onClick={() => removePack(u)}
-                  className="h-5 w-5 rounded-full bg-destructive/10 text-destructive flex items-center justify-center"
-                  aria-label="حذف الباقة"
+            {settings.packs.map((p) => {
+              const subs = packSubscribers(accounts, p.usd);
+              return (
+                <span
+                  key={p.usd}
+                  className={`inline-flex items-center gap-2 rounded-full border bg-card ps-3 pe-1.5 py-1 text-sm ${p.active ? '' : 'opacity-60'}`}
                 >
-                  <X className="h-3 w-3" />
-                </button>
-              </span>
-            ))}
+                  <b dir="ltr">{formatUsd(p.usd)}</b>
+                  <span className="text-xs text-muted-foreground">{subs > 0 ? `${subs} مشترك` : 'بدون مشتركين'}</span>
+                  <Switch checked={p.active} onCheckedChange={() => togglePack(p.usd)} aria-label="تفعيل الباقة" />
+                  <button
+                    onClick={() => removePack(p.usd)}
+                    disabled={subs > 0}
+                    title={subs > 0 ? 'لا يمكن الحذف: يوجد مشتركون. عطّل الباقة بدلاً من ذلك' : 'حذف الباقة'}
+                    className="h-5 w-5 rounded-full bg-destructive/10 text-destructive flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed"
+                    aria-label="حذف الباقة"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              );
+            })}
           </div>
           <div className="flex items-center gap-2">
             <Input

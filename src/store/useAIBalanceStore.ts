@@ -1,6 +1,11 @@
 import { create } from 'zustand';
 import { useAdminStore } from '@/store/useAdminStore';
 
+export interface TopupPack {
+  usd: number;
+  active: boolean;
+}
+
 /** Settings the admin controls for the AI assistant balance (all prices in USD) */
 export interface AIBalanceSettings {
   /** provider/model linked from the AI connection settings — never shown to clients */
@@ -9,8 +14,8 @@ export interface AIBalanceSettings {
   modelName: string;
   /** selling price per one million tokens, USD */
   pricePerMillion: number;
-  /** top-up packs offered to clients, USD */
-  packs: number[];
+  /** top-up packs, USD. An inactive pack is hidden from new subscribers but keeps serving its current ones */
+  packs: TopupPack[];
   /** free-amount top-up limits, USD */
   minTopup: number;
   maxTopup: number;
@@ -40,7 +45,8 @@ export interface BalanceAccount {
   clientId: string;
   /** tokens consumed this month */
   usedMonthTokens: number;
-  autoCharge: boolean;
+  /** amount charged automatically, USD; null when auto-charge is off. Defines which pack (or free amount) the client subscribes to */
+  autoChargeUsd: number | null;
   /** negative part of the balance, USD (always >= 0) */
   negative: number;
   lots: BalanceLot[];
@@ -58,7 +64,7 @@ const DEFAULT_SETTINGS: AIBalanceSettings = {
   provider: 'OpenAI · gpt-4.1-mini',
   modelName: 'Qhub AI',
   pricePerMillion: 2,
-  packs: [5, 10, 25, 50],
+  packs: [5, 10, 25, 50].map((usd) => ({ usd, active: true })),
   minTopup: 5,
   maxTopup: 200,
   negativeLimit: 0.5,
@@ -68,12 +74,12 @@ const DAY = 86_400_000;
 const daysAgo = (n: number): string => new Date(Date.now() - n * DAY).toISOString();
 
 /** Deterministic demo balances so the page is populated before the API exists */
-const SEED: { id: string; left: number; used: number; auto: boolean; negative?: number }[] = [
-  { id: 'client_1', left: 22.4, used: 5.2e6, auto: true },
-  { id: 'client_2', left: 0, used: 9.8e6, auto: false },
-  { id: 'client_3', left: 48.1, used: 14.3e6, auto: true },
-  { id: 'client_4', left: 6.2, used: 3.8e6, auto: false },
-  { id: 'client_5', left: 0, used: 2.1e6, auto: false, negative: 0.004 },
+const SEED: { id: string; left: number; used: number; auto: number | null; negative?: number }[] = [
+  { id: 'client_1', left: 22.4, used: 5.2e6, auto: 10 },
+  { id: 'client_2', left: 0, used: 9.8e6, auto: null },
+  { id: 'client_3', left: 48.1, used: 14.3e6, auto: 25 },
+  { id: 'client_4', left: 6.2, used: 3.8e6, auto: 15 },
+  { id: 'client_5', left: 0, used: 2.1e6, auto: null, negative: 0.004 },
 ];
 
 function buildAccounts(): BalanceAccount[] {
@@ -81,7 +87,7 @@ function buildAccounts(): BalanceAccount[] {
   return SEED.filter((s) => ids.has(s.id)).map((s, i) => ({
     clientId: s.id,
     usedMonthTokens: s.used,
-    autoCharge: s.auto,
+    autoChargeUsd: s.auto,
     negative: s.negative ?? 0,
     lots: s.left > 0 ? [{ id: `lot_${s.id}_1`, source: 'شحن', usd: Math.max(10, s.left), left: s.left }] : [],
     tx: [
@@ -103,7 +109,7 @@ export const useAIBalanceStore = create<AIBalanceState>((set) => ({
       const exists = s.accounts.some((a) => a.clientId === clientId);
       const base: BalanceAccount = exists
         ? (s.accounts.find((a) => a.clientId === clientId) as BalanceAccount)
-        : { clientId, usedMonthTokens: 0, autoCharge: false, negative: 0, lots: [], tx: [] };
+        : { clientId, usedMonthTokens: 0, autoChargeUsd: null, negative: 0, lots: [], tx: [] };
       const settle = Math.min(base.negative, usd);
       const add = Math.round((usd - settle) * 1e6) / 1e6;
       const next: BalanceAccount = {
@@ -117,6 +123,16 @@ export const useAIBalanceStore = create<AIBalanceState>((set) => ({
 }));
 
 /* ---------- helpers ---------- */
+
+/** how many clients auto-charge exactly this amount, i.e. are subscribed to this pack */
+export function packSubscribers(accounts: BalanceAccount[], usd: number): number {
+  return accounts.filter((a) => a.autoChargeUsd === usd).length;
+}
+
+/** subscribed with an auto-charge amount that is not one of the packs */
+export function isFreeAmountSubscriber(a: BalanceAccount, packs: TopupPack[]): boolean {
+  return a.autoChargeUsd !== null && !packs.some((p) => p.usd === a.autoChargeUsd);
+}
 
 export function accountBalance(a: BalanceAccount): number {
   return Math.round((a.lots.reduce((sum, l) => sum + l.left, 0) - a.negative) * 1e6) / 1e6;
