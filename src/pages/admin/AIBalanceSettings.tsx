@@ -8,6 +8,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
+/** most top-up packs a client can be offered — keeps the payment screen readable */
+const MAX_PACKS = 6;
+
 interface Draft {
   modelName: string;
   price: string;
@@ -45,6 +48,7 @@ export default function AIBalanceSettings(): JSX.Element {
     const u = Number(packInput);
     if (!(u > 0)) return showToast('أدخل مبلغاً أكبر من صفر', 'error');
     if (settings.packs.includes(u)) return showToast('هذه الباقة موجودة بالفعل', 'error');
+    if (settings.packs.length >= MAX_PACKS) return showToast(`الحد الأقصى ${MAX_PACKS} باقات شحن. احذف باقة لإضافة أخرى`, 'error');
     if (u > Number(draft.max)) {
       return showToast(`مبلغ الباقة لا يمكن أن يتجاوز الحد الأقصى للمبلغ الحر (${formatUsd(Number(draft.max))})`, 'error');
     }
