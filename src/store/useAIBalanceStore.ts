@@ -79,7 +79,7 @@ const SEED: { id: string; left: number; used: number; auto: number | null; topup
   { id: 'client_2', left: 0, used: 9.8e6, auto: null, topup: 5 },
   { id: 'client_3', left: 48.1, used: 14.3e6, auto: 25, topup: 50 },
   { id: 'client_4', left: 6.2, used: 3.8e6, auto: 15, topup: 15 },
-  { id: 'client_5', left: 0, used: 2.1e6, auto: null, topup: 10, negative: 0.004 },
+  { id: 'client_5', left: 0, used: 2.1e6, auto: null, topup: 10 },
 ];
 
 function buildAccounts(): BalanceAccount[] {
@@ -140,8 +140,9 @@ export function isFreeAmountSubscriber(a: BalanceAccount, packs: TopupPack[]): b
   return last !== null && !packs.some((p) => p.usd === last);
 }
 
+/** never negative: a client who overdrew shows 0 and the debt is settled from the next top-up */
 export function accountBalance(a: BalanceAccount): number {
-  return Math.round((a.lots.reduce((sum, l) => sum + l.left, 0) - a.negative) * 1e6) / 1e6;
+  return Math.max(0, Math.round((a.lots.reduce((sum, l) => sum + l.left, 0) - a.negative) * 1e6) / 1e6);
 }
 
 /** approximate remaining tokens for a USD amount at the current price */

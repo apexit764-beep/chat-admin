@@ -103,7 +103,7 @@ export default function AIBalanceClient(): JSX.Element {
           <CardTitle className="text-base">تفاصيل الرصيد</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          {account.lots.length === 0 && account.negative === 0 ? (
+          {account.lots.length === 0 ? (
             <p className="p-4 text-sm text-muted-foreground">لا يوجد رصيد.</p>
           ) : (
             <Table>
@@ -122,15 +122,6 @@ export default function AIBalanceClient(): JSX.Element {
                     <TableCell dir="ltr" className="text-end font-medium">{fmt(l.left)}</TableCell>
                   </TableRow>
                 ))}
-                {account.negative > 0 && (
-                  <TableRow>
-                    <TableCell>
-                      <Badge variant="destructive">رصيد سالب</Badge>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground text-xs">يُخصم من الشحنة القادمة</TableCell>
-                    <TableCell dir="ltr" className="text-end font-medium text-destructive">-{fmt(account.negative)}</TableCell>
-                  </TableRow>
-                )}
               </TableBody>
             </Table>
           )}
@@ -161,7 +152,7 @@ export default function AIBalanceClient(): JSX.Element {
                   <TableCell>{t.description}</TableCell>
                   <TableCell dir="ltr" className={`text-end ${t.usd >= 0 ? 'text-green-600' : 'text-destructive'}`}>
                     {t.usd >= 0 ? '+' : ''}
-                    {fmt(t.usd)}
+                    {fmt(Math.abs(t.usd))}
                   </TableCell>
                 </TableRow>
               ))}

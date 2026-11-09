@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Gift, Users, Wallet, PauseCircle, Repeat, Activity } from 'lucide-react';
+import { Gift, Users, Wallet, Repeat, Activity } from 'lucide-react';
 import { useAdminStore } from '@/store/useAdminStore';
 import {
   useAIBalanceStore,
@@ -50,25 +50,23 @@ export default function AIBalanceClients(): JSX.Element {
     return {
       clients: rows.length,
       total,
-      stopped: rows.filter(({ a }) => accountBalance(a) <= 0).length,
       auto: rows.filter(({ a }) => a.autoChargeUsd !== null).length,
       tokens: rows.reduce((sum, { a }) => sum + a.usedMonthTokens, 0),
     };
   }, [rows]);
 
   const cards = [
-    { label: 'عدد العملاء', value: String(stats.clients), icon: Users },
+    { label: 'إجمالي العملاء', value: String(stats.clients), icon: Users },
     { label: 'إجمالي الأرصدة', value: formatUsd(stats.total), icon: Wallet },
     { label: 'استهلاك الشهر (توكن)', value: formatTokens(stats.tokens), icon: Activity },
     { label: 'الشحن التلقائي مفعّل', value: String(stats.auto), icon: Repeat },
-    { label: 'المساعد متوقف', value: String(stats.stopped), icon: PauseCircle },
   ];
 
   return (
     <div className="p-4 lg:p-6 space-y-4 page-fade">
       <PrivateAssistantNav />
 
-      <div className="grid gap-3 grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
         {cards.map((c) => (
           <Card key={c.label}>
             <CardContent className="p-4 flex items-center gap-3">
