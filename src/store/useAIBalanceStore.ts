@@ -19,8 +19,8 @@ export interface AIBalanceSettings {
   /** free-amount top-up limits, USD */
   minTopup: number;
   maxTopup: number;
-  /** lowest balance a client can reach (as a positive number) — the assistant stops there */
-  negativeLimit: number;
+  /** lowest balance a client can reach — the assistant stops drawing tokens there. Always positive: no balance is ever negative */
+  minBalance: number;
 }
 
 export interface BalanceLot {
@@ -47,8 +47,6 @@ export interface BalanceAccount {
   usedMonthTokens: number;
   /** amount charged automatically, USD; null when auto-charge is off. Defines which pack (or free amount) the client subscribes to */
   autoChargeUsd: number | null;
-  /** negative part of the balance, USD (always >= 0) */
-  negative: number;
   lots: BalanceLot[];
   tx: BalanceTx[];
 }
@@ -67,14 +65,14 @@ const DEFAULT_SETTINGS: AIBalanceSettings = {
   packs: [5, 10, 25, 50].map((usd) => ({ usd, active: true })),
   minTopup: 5,
   maxTopup: 200,
-  negativeLimit: 0.5,
+  minBalance: 0.5,
 };
 
 const DAY = 86_400_000;
 const daysAgo = (n: number): string => new Date(Date.now() - n * DAY).toISOString();
 
 /** Deterministic demo balances so the page is populated before the API exists */
-const SEED: { id: string; left: number; used: number; auto: number | null; topup: number; negative?: number }[] = [
+const SEED: { id: string; left: number; used: number; auto: number | null; topup: number}[] = [
   { id: 'client_1', left: 22.4, used: 5.2e6, auto: 10, topup: 25 },
   { id: 'client_2', left: 0, used: 9.8e6, auto: null, topup: 5 },
   { id: 'client_3', left: 48.1, used: 14.3e6, auto: 25, topup: 50 },
@@ -88,7 +86,6 @@ function buildAccounts(): BalanceAccount[] {
     clientId: s.id,
     usedMonthTokens: s.used,
     autoChargeUsd: s.auto,
-    negative: s.negative ?? 0,
     lots: s.left > 0 ? [{ id: `lot_${s.id}_1`, source: 'شحن', usd: s.topup, left: s.left }] : [],
     tx: [
       { id: `tx_${s.id}_2`, date: daysAgo(1), type: 'usage', description: 'ردود المساعد', usd: -(s.used / 1e6) * DEFAULT_SETTINGS.pricePerMillion },
@@ -109,13 +106,10 @@ export const useAIBalanceStore = create<AIBalanceState>((set) => ({
       const exists = s.accounts.some((a) => a.clientId === clientId);
       const base: BalanceAccount = exists
         ? (s.accounts.find((a) => a.clientId === clientId) as BalanceAccount)
-        : { clientId, usedMonthTokens: 0, autoChargeUsd: null, negative: 0, lots: [], tx: [] };
-      const settle = Math.min(base.negative, usd);
-      const add = Math.round((usd - settle) * 1e6) / 1e6;
+        : { clientId, usedMonthTokens: 0, autoChargeUsd: null, lots: [], tx: [] };
       const next: BalanceAccount = {
         ...base,
-        negative: Math.round((base.negative - settle) * 1e6) / 1e6,
-        lots: [...base.lots, { id: `lot_gift_${++seq}`, source: 'رصيد مجاني', usd, left: add }],
+        lots: [...base.lots, { id: `lot_gift_${++seq}`, source: 'رصيد مجاني', usd, left: usd }],
         tx: [{ id: `tx_gift_${seq}`, date: now, type: 'gift' as const, description: reason, usd }, ...base.tx],
       };
       return { accounts: exists ? s.accounts.map((a) => (a.clientId === clientId ? next : a)) : [...s.accounts, next] };
@@ -140,9 +134,13 @@ export function isFreeAmountSubscriber(a: BalanceAccount, packs: TopupPack[]): b
   return last !== null && !packs.some((p) => p.usd === last);
 }
 
-/** never negative: a client who overdrew shows 0 and the debt is settled from the next top-up */
 export function accountBalance(a: BalanceAccount): number {
-  return Math.max(0, Math.round((a.lots.reduce((sum, l) => sum + l.left, 0) - a.negative) * 1e6) / 1e6);
+  return Math.round(a.lots.reduce((sum, l) => sum + l.left, 0) * 1e6) / 1e6;
+}
+
+/** the assistant stops once the balance reaches the minimum allowed balance */
+export function isStopped(a: BalanceAccount, minBalance: number): boolean {
+  return accountBalance(a) <= minBalance;
 }
 
 /** approximate remaining tokens for a USD amount at the current price */

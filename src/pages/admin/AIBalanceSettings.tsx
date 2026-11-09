@@ -33,10 +33,10 @@ export default function AIBalanceSettings(): JSX.Element {
       price: String(settings.pricePerMillion),
       min: String(settings.minTopup),
       max: String(settings.maxTopup),
-      negative: String(settings.negativeLimit),
+      negative: String(settings.minBalance),
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [settings.modelName, settings.pricePerMillion, settings.minTopup, settings.maxTopup, settings.negativeLimit]
+    [settings.modelName, settings.pricePerMillion, settings.minTopup, settings.maxTopup, settings.minBalance]
   );
   const [draft, setDraft] = useState<Draft>(initial);
   // after a save the saved values become the new baseline
@@ -114,7 +114,7 @@ export default function AIBalanceSettings(): JSX.Element {
       pricePerMillion: Number(draft.price),
       minTopup: Number(draft.min),
       maxTopup: Number(draft.max),
-      negativeLimit: Number(draft.negative),
+      minBalance: Number(draft.negative),
     });
     showToast(priceChanged ? 'تم الحفظ، وأُرسل إشعار للعملاء بالسعر الجديد' : 'تم الحفظ');
   };

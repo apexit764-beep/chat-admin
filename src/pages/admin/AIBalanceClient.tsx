@@ -5,6 +5,7 @@ import { useAdminStore } from '@/store/useAdminStore';
 import {
   useAIBalanceStore,
   accountBalance,
+  isStopped,
   formatTokens,
   formatUsd,
   localAmount,
@@ -30,6 +31,7 @@ export default function AIBalanceClient(): JSX.Element {
   const { id = '' } = useParams();
   const account = useAIBalanceStore((s) => s.accounts.find((a) => a.clientId === id));
   const price = useAIBalanceStore((s) => s.settings.pricePerMillion);
+  const minBalance = useAIBalanceStore((s) => s.settings.minBalance);
   const client = useAdminStore((s) => s.clients.find((c) => c.id === id));
   const countries = useAdminStore((s) => s.countries);
   const [giftOpen, setGiftOpen] = useState(false);
@@ -46,7 +48,7 @@ export default function AIBalanceClient(): JSX.Element {
   }
 
   const bal = accountBalance(account);
-  const stopped = bal <= 0;
+  const stopped = isStopped(account, minBalance);
   const fmt = (usd: number): string => {
     const l = localAmount(usd, client.country);
     return `${l.value} ${l.symbol}`;

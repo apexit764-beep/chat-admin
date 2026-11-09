@@ -8,6 +8,7 @@ import {
   formatTokens,
   formatUsd,
   isFreeAmountSubscriber,
+  isStopped,
   lastTopupUsd,
   localAmount,
 } from '@/store/useAIBalanceStore';
@@ -26,6 +27,7 @@ export default function AIBalanceClients(): JSX.Element {
   const navigate = useNavigate();
   const accounts = useAIBalanceStore((s) => s.accounts);
   const packs = useAIBalanceStore((s) => s.settings.packs);
+  const minBalance = useAIBalanceStore((s) => s.settings.minBalance);
   const clients = useAdminStore((s) => s.clients);
   const countries = useAdminStore((s) => s.countries);
   const [giftFor, setGiftFor] = useState<string | null>(null);
@@ -129,7 +131,7 @@ export default function AIBalanceClients(): JSX.Element {
               )}
               {visible.map(({ a, client }) => {
                 const bal = accountBalance(a);
-                const stopped = bal <= 0;
+                const stopped = isStopped(a, minBalance);
                 const local = localAmount(bal, client.country);
                 const country = countries.find((c) => c.code === client.country);
                 const free = isFreeAmountSubscriber(a, packs);
