@@ -53,6 +53,8 @@ export interface BalanceAccount {
 
 interface AIBalanceState {
   settings: AIBalanceSettings;
+  /** tokens Qhub itself still has with the AI provider (read from the provider once connected) */
+  providerTokens: number;
   accounts: BalanceAccount[];
   updateSettings: (patch: Partial<AIBalanceSettings>) => void;
   addGift: (clientId: string, usd: number, reason: string) => void;
@@ -98,6 +100,7 @@ let seq = 0;
 
 export const useAIBalanceStore = create<AIBalanceState>((set) => ({
   settings: DEFAULT_SETTINGS,
+  providerTokens: 120e6,
   accounts: buildAccounts(),
   updateSettings: (patch) => set((s) => ({ settings: { ...s.settings, ...patch } })),
   addGift: (clientId, usd, reason) =>
