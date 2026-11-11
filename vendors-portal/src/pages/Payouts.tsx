@@ -19,13 +19,14 @@ const TABS: [string, string][] = [
   ['بانتظار المراجعة', 'بانتظار المراجعة'],
   ['تم التحويل', 'تم التحويل'],
   ['مرفوض', 'مرفوض'],
+  ['ملغي', 'ملغي'],
 ];
 const PAGE_SIZE = 6;
 
 const poNo = (id: number): string => `PO-${String(id).padStart(4, '0')}`;
 
 export default function Payouts(): JSX.Element {
-  const { vendors, meId, comms, payouts, settings, requestPayout } = useVendorStore();
+  const { vendors, meId, comms, payouts, settings, requestPayout, cancelPayout } = useVendorStore();
   const showToast = useUIStore((s) => s.showToast);
   const v = vendors.find((x) => x.id === meId)!;
   const s = sumsFor(v.id, comms, payouts);
@@ -45,6 +46,7 @@ export default function Payouts(): JSX.Element {
   const shown = filtered.slice((cur - 1) * PAGE_SIZE, cur * PAGE_SIZE);
   const [reasonOf, setReasonOf] = useState<Payout | null>(null);
   const [receiptOf, setReceiptOf] = useState<Payout | null>(null);
+  const [cancelOf, setCancelOf] = useState<Payout | null>(null);
 
   // the first reason that blocks a new withdrawal request
   const why = v.status === 'مجمّد' ? 'حسابك مجمّد.'
@@ -167,6 +169,11 @@ export default function Payouts(): JSX.Element {
                       </span>
                     </TableCell>
                     <TableCell>
+                      {p.st === 'بانتظار المراجعة' && (
+                        <Button size="sm" variant="outline" onClick={() => setCancelOf(p)}>
+                          إلغاء الطلب
+                        </Button>
+                      )}
                       {p.st === 'تم التحويل' && (
                         <Button size="sm" variant="outline" onClick={() => setReceiptOf(p)}>
                           صورة التحويل
@@ -220,6 +227,34 @@ export default function Payouts(): JSX.Element {
               }}
             >
               تأكيد
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!cancelOf} onOpenChange={(o) => !o && setCancelOf(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>إلغاء طلب السحب · {cancelOf && poNo(cancelOf.id)}</DialogTitle>
+          </DialogHeader>
+          <div className="text-sm">
+            ستلغي طلب سحب <b>{cancelOf && <Money v={cancelOf.amt} cur={v.cur} />}</b>
+            <div className="mt-1.5 text-muted-foreground">إلى: {cancelOf?.acct}</div>
+          </div>
+          <Note>يعود المبلغ إلى رصيدك المتاح، ويمكنك تقديم طلب جديد. لا يمكن إلغاء الطلب بعد مراجعته.</Note>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCancelOf(null)}>
+              تراجع
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                cancelPayout(cancelOf!.id);
+                setCancelOf(null);
+                showToast('تم إلغاء الطلب');
+              }}
+            >
+              إلغاء الطلب
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -21,6 +21,7 @@ const PILL: Record<string, string> = {
   'بانتظار المراجعة': 'bg-amber-100 text-amber-800',
   'مرفوض': 'bg-red-100 text-red-700',
   'تم التحويل': 'bg-violet-100 text-violet-700',
+  'ملغي': 'bg-slate-100 text-slate-600',
   'نشط': 'bg-green-100 text-green-700',
   'مجمّد': 'bg-red-100 text-red-700',
   'اشترك': 'bg-green-100 text-green-700',

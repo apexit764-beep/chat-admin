@@ -9,6 +9,7 @@ const TABS: [string, string][] = [
   ['بانتظار المراجعة', 'بانتظار المراجعة'],
   ['تم التحويل', 'تم التحويل'],
   ['مرفوض', 'مرفوض'],
+  ['ملغي', 'ملغي (من المورد)'],
 ];
 
 export default function VendorPayouts(): JSX.Element {

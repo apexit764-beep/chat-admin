@@ -7,7 +7,7 @@ export type VCurrency = 'EGP' | 'OMR' | 'SAR';
 export type VendorStatus = 'نشط' | 'مجمّد' | 'دعوة مرسلة';
 export type VClientState = 'اشترك' | 'دعوة مرسلة' | 'سجل' | 'استرد المبلغ';
 export type CommissionState = 'معلّقة' | 'متاحة' | 'ملغاة';
-export type PayoutState = 'بانتظار المراجعة' | 'مرفوض' | 'تم التحويل';
+export type PayoutState = 'بانتظار المراجعة' | 'مرفوض' | 'تم التحويل' | 'ملغي';
 
 export const FX: Record<VCurrency, { sym: string; rate: number; country: string }> = {
   EGP: { sym: 'ج.م', rate: 48.5, country: 'مصر' },
@@ -198,6 +198,8 @@ export const useVendorsAdminStore = create<State>((set, get) => {
     ],
     payouts: [
       { id: 1, vid: 2, amt: 20, st: 'بانتظار المراجعة', date: '2 نوفمبر 2026', acct: 'حساب بنكي · بنك مسقط · OM81 0270 0000 1111', ...emptyPayout },
+      { id: 21, vid: 1, amt: 800, st: 'ملغي', date: '2 نوفمبر 2026', acct: 'حساب بنكي · بنك مصر · EG12 0002 0001 2345', ...emptyPayout, reviewedBy: 'المورد' },
+      { id: 22, vid: 1, amt: 600, st: 'ملغي', date: '20 أكتوبر 2026', acct: 'محفظة إلكترونية · فودافون كاش · 010 0123 4567', ...emptyPayout, reviewedBy: 'المورد' },
       { id: 2, vid: 1, amt: 500, st: 'مرفوض', date: '29 أكتوبر 2026', acct: 'حساب بنكي · بنك مصر · EG12 0002 0001 2345', ...emptyPayout, reason: 'اسم صاحب الحساب البنكي لا يطابق اسم المورد', reviewedBy: 'محمد الكندي' },
       { id: 3, vid: 3, amt: 300, st: 'تم التحويل', date: '20 أكتوبر 2026', acct: 'حساب بنكي · مصرف الراجحي · SA44 2000 0001 2345', ...emptyPayout, ref: 'TRX-88120', fileName: 'transfer-88120.pdf', reviewedBy: 'محمد الكندي', executedBy: 'محمد الكندي' },
       { id: 4, vid: 3, amt: 200, st: 'بانتظار المراجعة', date: '1 نوفمبر 2026', acct: 'حساب بنكي · مصرف الراجحي · SA44 2000 0001 2345', ...emptyPayout },

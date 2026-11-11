@@ -4,7 +4,7 @@ import { formatDate, planPriceUsd, toLocal, type Currency } from '@v/lib/vendorM
 export type VendorStatus = 'نشط' | 'مجمّد' | 'دعوة مرسلة';
 export type ClientState = 'اشترك' | 'دعوة مرسلة' | 'سجل' | 'استرد المبلغ';
 export type CommissionState = 'معلّقة' | 'متاحة' | 'ملغاة';
-export type PayoutState = 'بانتظار المراجعة' | 'مرفوض' | 'تم التحويل';
+export type PayoutState = 'بانتظار المراجعة' | 'مرفوض' | 'تم التحويل' | 'ملغي';
 export type AccountType = 'حساب بنكي' | 'محفظة إلكترونية' | 'PayPal';
 
 export interface TransferAccount {
@@ -89,6 +89,8 @@ interface VendorState {
   resendInvite: (clientId: number) => void;
   cancelInvite: (clientId: number) => void;
   requestPayout: (amt: number, accountId: number) => void;
+  /** the vendor withdraws an open request before review; the amount returns to «available» */
+  cancelPayout: (payoutId: number) => void;
   addAccount: (type: AccountType, details: string) => { ok: true } | { ok: false; error: string };
   setDefaultAccount: (id: number) => void;
   deleteAccount: (id: number) => void;
@@ -158,6 +160,8 @@ export const useVendorStore = create<VendorState>((set, get) => ({
     comm(6, 3, 'SAR', 30, 'متاحة'),
   ],
   payouts: [
+    { id: 21, vid: 1, amt: 800, st: 'ملغي', date: '2 نوفمبر 2026', reason: '', ref: '', fname: '', acct: 'حساب بنكي · بنك مصر · EG12 0002 0001 2345' },
+    { id: 22, vid: 1, amt: 600, st: 'ملغي', date: '20 أكتوبر 2026', reason: '', ref: '', fname: '', acct: 'محفظة إلكترونية · فودافون كاش · 010 0123 4567' },
     { id: 2, vid: 1, amt: 500, st: 'مرفوض', date: '29 أكتوبر 2026', reason: 'اسم صاحب الحساب البنكي لا يطابق اسم المورد', ref: '', fname: '', acct: 'حساب بنكي · بنك مصر · EG12 0002 0001 2345' },
     { id: 5, vid: 1, amt: 700, st: 'مرفوض', date: '25 أكتوبر 2026', reason: 'رقم المحفظة غير مسجل باسم المورد', ref: '', fname: '', acct: 'محفظة إلكترونية · فودافون كاش · 010 0123 4567' },
     { id: 6, vid: 1, amt: 2000, st: 'تم التحويل', date: '15 أكتوبر 2026', reason: '', ref: 'TRX-77410', fname: 'transfer-77410.png', acct: 'حساب بنكي · بنك مصر · EG12 0002 0001 2345' },
@@ -218,6 +222,10 @@ export const useVendorStore = create<VendorState>((set, get) => ({
   resendInvite: () => undefined,
   cancelInvite: (clientId) => set((s) => ({ clients: s.clients.filter((c) => c.id !== clientId) })),
 
+  cancelPayout: (payoutId) =>
+    set((s) => ({
+      payouts: s.payouts.map((p) => (p.id === payoutId && p.vid === s.meId && p.st === 'بانتظار المراجعة' ? { ...p, st: 'ملغي' } : p)),
+    })),
   requestPayout: (amt, accountId) => {
     const { meId, vendors, payouts } = get();
     const v = vendors.find((x) => x.id === meId) as Vendor;
