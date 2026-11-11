@@ -22,7 +22,7 @@ export default function Payouts(): JSX.Element {
   const s = sumsFor(v.id, comms, payouts);
   const mine = payouts.filter((p) => p.vid === v.id);
   const min = toLocal(settings.min, v.cur);
-  const open = mine.find((p) => p.st === 'بانتظار المراجعة' || p.st === 'تمت الموافقة');
+  const open = mine.find((p) => p.st === 'بانتظار المراجعة');
   const defaultAcc = v.accounts.find((a) => a.isDefault) ?? v.accounts[0];
 
   const [amount, setAmount] = useState('');

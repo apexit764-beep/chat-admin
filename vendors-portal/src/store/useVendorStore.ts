@@ -4,7 +4,7 @@ import { formatDate, planPriceUsd, toLocal, type Currency } from '@v/lib/vendorM
 export type VendorStatus = 'نشط' | 'مجمّد' | 'دعوة مرسلة';
 export type ClientState = 'اشترك' | 'دعوة مرسلة' | 'سجل' | 'استرد المبلغ';
 export type CommissionState = 'معلّقة' | 'متاحة' | 'ملغاة';
-export type PayoutState = 'بانتظار المراجعة' | 'تمت الموافقة' | 'مرفوض' | 'تم التحويل';
+export type PayoutState = 'بانتظار المراجعة' | 'مرفوض' | 'تم التحويل';
 export type AccountType = 'حساب بنكي' | 'محفظة إلكترونية' | 'PayPal';
 
 export interface TransferAccount {
@@ -155,7 +155,7 @@ export const useVendorStore = create<VendorState>((set, get) => ({
     { id: 1, vid: 2, amt: 20, st: 'بانتظار المراجعة', date: '2 نوفمبر 2026', reason: '', ref: '', fname: '', acct: 'حساب بنكي · بنك مسقط · OM81 0270 0000 1111' },
     { id: 2, vid: 1, amt: 500, st: 'مرفوض', date: '29 أكتوبر 2026', reason: 'اسم صاحب الحساب البنكي لا يطابق اسم المورد', ref: '', fname: '', acct: 'حساب بنكي · بنك مصر · EG12 0002 0001 2345' },
     { id: 3, vid: 3, amt: 300, st: 'تم التحويل', date: '20 أكتوبر 2026', reason: '', ref: 'TRX-88120', fname: 'transfer-88120.pdf', acct: 'حساب بنكي · مصرف الراجحي · SA44 2000 0001 2345' },
-    { id: 4, vid: 3, amt: 200, st: 'تمت الموافقة', date: '1 نوفمبر 2026', reason: '', ref: '', fname: '', acct: 'حساب بنكي · مصرف الراجحي · SA44 2000 0001 2345' },
+    { id: 4, vid: 3, amt: 200, st: 'بانتظار المراجعة', date: '1 نوفمبر 2026', reason: '', ref: '', fname: '', acct: 'حساب بنكي · مصرف الراجحي · SA44 2000 0001 2345' },
   ],
   meId: null,
 
@@ -249,7 +249,7 @@ export function sumsFor(vid: number, comms: Commission[], payouts: Payout[]): Ve
   const total = (st: CommissionState): number => c.filter((x) => x.st === st).reduce((a, b) => a + b.amt, 0);
   const po = payouts.filter((p) => p.vid === vid);
   const sumOf = (states: PayoutState[]): number => po.filter((p) => states.includes(p.st)).reduce((a, b) => a + b.amt, 0);
-  const inReview = sumOf(['بانتظار المراجعة', 'تمت الموافقة']);
+  const inReview = sumOf(['بانتظار المراجعة']);
   const paid = sumOf(['تم التحويل']);
   return { pending: round3(total('معلّقة')), avail: round3(total('متاحة') - inReview - paid), inReview: round3(inReview), paid: round3(paid) };
 }

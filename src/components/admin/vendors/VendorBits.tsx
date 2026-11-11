@@ -19,7 +19,6 @@ const PILL: Record<string, string> = {
   'متاحة': 'bg-green-100 text-green-700',
   'ملغاة': 'bg-red-100 text-red-700',
   'بانتظار المراجعة': 'bg-amber-100 text-amber-800',
-  'تمت الموافقة': 'bg-blue-100 text-blue-700',
   'مرفوض': 'bg-red-100 text-red-700',
   'تم التحويل': 'bg-violet-100 text-violet-700',
   'نشط': 'bg-green-100 text-green-700',
@@ -71,7 +70,7 @@ export function MiniStat({ label, value, tone }: { label: string; value: React.R
 
 type Dialogs = { kind: 'approve' | 'reject' | 'execute' | 'receipt' | 'reason'; payout: Payout } | null;
 
-/** approve/reject/execute stay separate steps, but a single admin user can do both */
+/** approve opens the request data, then the transfer details are entered; a single admin user does both */
 export function PayoutsTable({ list, showVendor }: { list: Payout[]; showVendor: boolean }): JSX.Element {
   const vendors = useVendorsAdminStore((s) => s.vendors);
   const [dlg, setDlg] = useState<Dialogs>(null);
@@ -124,11 +123,6 @@ export function PayoutsTable({ list, showVendor }: { list: Payout[]; showVendor:
                       </Button>
                     </span>
                   )}
-                  {p.st === 'تمت الموافقة' && (
-                    <Button size="sm" onClick={() => setDlg({ kind: 'execute', payout: p })}>
-                      تنفيذ التحويل
-                    </Button>
-                  )}
                   {p.st === 'تم التحويل' && (
                     <Button size="sm" variant="outline" onClick={() => setDlg({ kind: 'receipt', payout: p })}>
                       صورة التحويل
@@ -141,7 +135,7 @@ export function PayoutsTable({ list, showVendor }: { list: Payout[]; showVendor:
         </TableBody>
       </Table>
 
-      {dlg?.kind === 'approve' && <ApproveDialog payout={dlg.payout} vendor={vendorOf(dlg.payout)} onClose={() => setDlg(null)} onApproved={(p) => setDlg({ kind: 'execute', payout: p })} />}
+      {dlg?.kind === 'approve' && <ApproveDialog payout={dlg.payout} vendor={vendorOf(dlg.payout)} onClose={() => setDlg(null)} onApproved={() => setDlg({ kind: 'execute', payout: dlg.payout })} />}
       {dlg?.kind === 'reject' && <RejectDialog payout={dlg.payout} onClose={() => setDlg(null)} />}
       {dlg?.kind === 'execute' && <ExecuteDialog payout={dlg.payout} vendor={vendorOf(dlg.payout)} onClose={() => setDlg(null)} />}
       {dlg?.kind === 'receipt' && <ReceiptDialog payout={dlg.payout} vendor={vendorOf(dlg.payout)} onClose={() => setDlg(null)} />}
@@ -160,34 +154,25 @@ export function PayoutsTable({ list, showVendor }: { list: Payout[]; showVendor:
   );
 }
 
-function ApproveDialog({ payout, vendor, onClose, onApproved }: { payout: Payout; vendor: Vendor; onClose: () => void; onApproved: (p: Payout) => void }): JSX.Element {
-  const approve = useVendorsAdminStore((s) => s.approvePayout);
-  const showToast = useUIStore((s) => s.showToast);
+function ApproveDialog({ payout, vendor, onClose, onApproved }: { payout: Payout; vendor: Vendor; onClose: () => void; onApproved: () => void }): JSX.Element {
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>موافقة على طلب السحب</DialogTitle>
+          <DialogTitle>موافقة على طلب السحب · {poNo(payout.id)}</DialogTitle>
         </DialogHeader>
-        <div className="space-y-1 text-sm">
+        <div className="space-y-1.5 rounded-xl border p-4 text-sm">
           <div>المورد: <b>{vendor.name}</b></div>
           <div>المبلغ: <b><Money v={payout.amt} cur={vendor.cur} /></b></div>
-          <div className="text-muted-foreground">إلى: {payout.acct}</div>
+          <div>تاريخ الطلب: <b>{payout.date}</b></div>
+          <div>طريقة التحويل: <b>{payout.acct}</b></div>
         </div>
+        <Note>اضغط "تنفيذ التحويل" ثم أدخل رقم العملية وصورة التحويل لإغلاق الطلب.</Note>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
             إلغاء
           </Button>
-          <Button
-            className="bg-green-600 hover:bg-green-700"
-            onClick={() => {
-              approve(payout.id);
-              showToast('تمت الموافقة، أضف رقم العملية وصورة التحويل');
-              onApproved({ ...payout, st: 'تمت الموافقة' });
-            }}
-          >
-            موافقة
-          </Button>
+          <Button onClick={onApproved}>تنفيذ التحويل</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -276,7 +261,7 @@ function ExecuteDialog({ payout, vendor, onClose }: { payout: Payout; vendor: Ve
         <Note tone="warn">لا يمكن إغلاق الطلب بحالة "تم التحويل" دون رقم العملية وصورة التحويل.</Note>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
-            لاحقًا
+            إلغاء
           </Button>
           <Button onClick={submit}>تأكيد التحويل</Button>
         </DialogFooter>

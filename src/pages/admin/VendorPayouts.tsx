@@ -7,7 +7,6 @@ import { Card, CardContent } from '@/components/ui/card';
 const TABS: [string, string][] = [
   ['all', 'الكل'],
   ['بانتظار المراجعة', 'بانتظار المراجعة'],
-  ['تمت الموافقة', 'تمت الموافقة'],
   ['تم التحويل', 'تم التحويل'],
   ['مرفوض', 'مرفوض'],
 ];
@@ -21,7 +20,7 @@ export default function VendorPayouts(): JSX.Element {
     <div className="p-4 lg:p-6 space-y-4 page-fade">
       <div>
         <h2 className="text-2xl font-bold">طلبات السحب</h2>
-        <p className="text-sm text-muted-foreground">يمر كل طلب بمرحلتين: الموافقة أو الرفض، ثم تنفيذ التحويل ورفع صورته</p>
+        <p className="text-sm text-muted-foreground">راجع الطلب بالموافقة أو الرفض، وعند الموافقة نفّذ التحويل وارفع صورته</p>
       </div>
       <div className="flex flex-wrap gap-1.5">
         {TABS.map(([k, t]) => (

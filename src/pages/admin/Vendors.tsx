@@ -127,7 +127,7 @@ export default function Vendors(): JSX.Element {
         if (country !== 'all' && v.country !== country) return false;
         if (q && !(v.name + v.email).toLowerCase().includes(q.toLowerCase())) return false;
         if (balance === 'avail' && !(sumsFor(v.id, comms, payouts).avail > 0)) return false;
-        if (balance === 'open' && !payouts.some((p) => p.vid === v.id && (p.st === 'بانتظار المراجعة' || p.st === 'تمت الموافقة'))) return false;
+        if (balance === 'open' && !payouts.some((p) => p.vid === v.id && p.st === 'بانتظار المراجعة')) return false;
         return true;
       }),
     [vendors, comms, payouts, q, status, country, balance]

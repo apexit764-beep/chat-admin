@@ -5,7 +5,7 @@ export type VCurrency = 'EGP' | 'OMR' | 'SAR';
 export type VendorStatus = 'نشط' | 'مجمّد' | 'دعوة مرسلة';
 export type VClientState = 'اشترك' | 'دعوة مرسلة' | 'سجل' | 'استرد المبلغ';
 export type CommissionState = 'معلّقة' | 'متاحة' | 'ملغاة';
-export type PayoutState = 'بانتظار المراجعة' | 'تمت الموافقة' | 'مرفوض' | 'تم التحويل';
+export type PayoutState = 'بانتظار المراجعة' | 'مرفوض' | 'تم التحويل';
 
 export const FX: Record<VCurrency, { sym: string; rate: number; country: string }> = {
   EGP: { sym: 'ج.م', rate: 48.5, country: 'مصر' },
@@ -100,7 +100,6 @@ interface State {
   toggleFreeze: (id: number) => void;
   resendInvite: (id: number) => void;
   cancelCommission: (id: number, reason: string) => { ok: true } | { ok: false; error: string };
-  approvePayout: (id: number) => void;
   rejectPayout: (id: number, reason: string) => void;
   executePayout: (id: number, ref: string, fileName: string, img: string) => void;
   saveSettings: (s: VendorSettings) => void;
@@ -133,6 +132,13 @@ const SEED_CLIENTS: VendorClient[] = [
   { id: 4, vid: 2, name: 'مطعم البيت العماني', email: 'info@omani-house.om', plan: 'الأعمال', cycle: 'سنوي', state: 'اشترك', via: 'دعوة', date: '15 أكتوبر 2026' },
   { id: 5, vid: 3, name: 'مدرسة الفجر الذهبي', email: 'info@goldendawn.sa', plan: 'الأعمال', cycle: 'سنوي', state: 'اشترك', via: 'دعوة', date: '5 سبتمبر 2026' },
   { id: 6, vid: 3, name: 'عيادة الحياة الطبية', email: 'care@hayat-clinic.sa', plan: 'الأعمال', cycle: 'سنوي', state: 'اشترك', via: 'رابط', date: '12 سبتمبر 2026' },
+  { id: 7, vid: 1, name: 'شركة الدلتا للتجارة', email: 'sales@delta-trade.eg', plan: 'الأعمال', cycle: 'سنوي', state: 'اشترك', via: 'رابط', date: '3 سبتمبر 2026' },
+  { id: 8, vid: 1, name: 'أكاديمية المستقبل', email: 'info@future-academy.eg', plan: 'الاحترافي', cycle: 'سنوي', state: 'اشترك', via: 'دعوة', date: '9 سبتمبر 2026' },
+  { id: 9, vid: 1, name: 'متجر الريان', email: 'shop@rayyan.eg', plan: 'الأعمال', cycle: 'شهري', state: 'اشترك', via: 'رابط', date: '14 سبتمبر 2026' },
+  { id: 10, vid: 2, name: 'مركز اللؤلؤة التعليمي', email: 'info@pearl-center.om', plan: 'الاحترافي', cycle: 'سنوي', state: 'اشترك', via: 'رابط', date: '8 سبتمبر 2026' },
+  { id: 11, vid: 2, name: 'مقهى الواحة', email: 'hello@oasis-cafe.om', plan: 'الأعمال', cycle: 'شهري', state: 'اشترك', via: 'دعوة', date: '18 سبتمبر 2026' },
+  { id: 12, vid: 3, name: 'مجموعة النور العقارية', email: 'info@alnoor-re.sa', plan: 'الاحترافي', cycle: 'سنوي', state: 'اشترك', via: 'رابط', date: '2 سبتمبر 2026' },
+  { id: 13, vid: 3, name: 'صالون لمسة', email: 'book@lamsa.sa', plan: 'الأعمال', cycle: 'شهري', state: 'اشترك', via: 'دعوة', date: '20 سبتمبر 2026' },
 ];
 
 const seedComm = (cid: number, vid: number, cur: VCurrency, rate: number, st: CommissionState, left = 0): Commission => {
@@ -151,11 +157,20 @@ export const useVendorsAdminStore = create<State>((set, get) => {
     settings: { rate: 30, hold: 30, min: 10 },
     vendors: [
       { id: 1, name: 'محمود حسن', email: 'mahmoud@agency.com', phone: '+20 100 123 4567', country: 'مصر', cur: 'EGP', rate: 30, status: 'نشط', bankLock: false,
-        accounts: [{ id: 1, type: 'حساب بنكي', details: 'بنك مصر · EG12 0002 0001 2345', isDefault: true }] },
+        accounts: [
+          { id: 1, type: 'حساب بنكي', details: 'بنك مصر · EG12 0002 0001 2345', isDefault: true },
+          { id: 4, type: 'محفظة إلكترونية', details: 'فودافون كاش · 010 0123 4567', isDefault: false },
+        ] },
       { id: 2, name: 'شركة الأفق للتسويق', email: 'info@ufuq.om', phone: '+968 9123 0000', country: 'عمان', cur: 'OMR', rate: 25, status: 'نشط', bankLock: false,
-        accounts: [{ id: 2, type: 'حساب بنكي', details: 'بنك مسقط · OM81 0270 0000 1111', isDefault: true }] },
+        accounts: [
+          { id: 2, type: 'حساب بنكي', details: 'بنك مسقط · OM81 0270 0000 1111', isDefault: true },
+          { id: 5, type: 'PayPal', details: 'info@ufuq.om', isDefault: false },
+        ] },
       { id: 3, name: 'وكالة المدار', email: 'hello@madar.sa', phone: '+966 55 123 4567', country: 'السعودية', cur: 'SAR', rate: 30, status: 'نشط', bankLock: false,
-        accounts: [{ id: 3, type: 'حساب بنكي', details: 'مصرف الراجحي · SA44 2000 0001 2345', isDefault: true }] },
+        accounts: [
+          { id: 3, type: 'حساب بنكي', details: 'مصرف الراجحي · SA44 2000 0001 2345', isDefault: true },
+          { id: 6, type: 'محفظة إلكترونية', details: 'STC Pay · 055 123 4567', isDefault: false },
+        ] },
     ],
     clients: SEED_CLIENTS,
     comms: [
@@ -164,14 +179,32 @@ export const useVendorsAdminStore = create<State>((set, get) => {
       seedComm(4, 2, 'OMR', 25, 'متاحة'),
       seedComm(5, 3, 'SAR', 30, 'متاحة'),
       seedComm(6, 3, 'SAR', 30, 'متاحة'),
+      seedComm(7, 1, 'EGP', 30, 'متاحة'),
+      seedComm(8, 1, 'EGP', 30, 'متاحة'),
+      seedComm(9, 1, 'EGP', 30, 'متاحة'),
+      seedComm(10, 2, 'OMR', 25, 'متاحة'),
+      seedComm(11, 2, 'OMR', 25, 'متاحة'),
+      seedComm(12, 3, 'SAR', 30, 'متاحة'),
+      seedComm(13, 3, 'SAR', 30, 'متاحة'),
     ],
     payouts: [
       { id: 1, vid: 2, amt: 20, st: 'بانتظار المراجعة', date: '2 نوفمبر 2026', acct: 'حساب بنكي · بنك مسقط · OM81 0270 0000 1111', ...emptyPayout },
-      { id: 2, vid: 1, amt: 500, st: 'مرفوض', date: '29 أكتوبر 2026', acct: 'حساب بنكي · بنك مصر · EG12 0002 0001 2345', ...emptyPayout,
-        reason: 'اسم صاحب الحساب البنكي لا يطابق اسم المورد', reviewedBy: 'محمد الكندي' },
-      { id: 3, vid: 3, amt: 300, st: 'تم التحويل', date: '20 أكتوبر 2026', acct: 'حساب بنكي · مصرف الراجحي · SA44 2000 0001 2345', ...emptyPayout,
-        ref: 'TRX-88120', fileName: 'transfer-88120.pdf', reviewedBy: 'محمد الكندي', executedBy: 'محمد الكندي' },
-      { id: 4, vid: 3, amt: 200, st: 'تمت الموافقة', date: '1 نوفمبر 2026', acct: 'حساب بنكي · مصرف الراجحي · SA44 2000 0001 2345', ...emptyPayout, reviewedBy: 'محمد الكندي' },
+      { id: 2, vid: 1, amt: 500, st: 'مرفوض', date: '29 أكتوبر 2026', acct: 'حساب بنكي · بنك مصر · EG12 0002 0001 2345', ...emptyPayout, reason: 'اسم صاحب الحساب البنكي لا يطابق اسم المورد', reviewedBy: 'محمد الكندي' },
+      { id: 3, vid: 3, amt: 300, st: 'تم التحويل', date: '20 أكتوبر 2026', acct: 'حساب بنكي · مصرف الراجحي · SA44 2000 0001 2345', ...emptyPayout, ref: 'TRX-88120', fileName: 'transfer-88120.pdf', reviewedBy: 'محمد الكندي', executedBy: 'محمد الكندي' },
+      { id: 4, vid: 3, amt: 200, st: 'بانتظار المراجعة', date: '1 نوفمبر 2026', acct: 'حساب بنكي · مصرف الراجحي · SA44 2000 0001 2345', ...emptyPayout },
+      { id: 5, vid: 1, amt: 700, st: 'بانتظار المراجعة', date: '3 نوفمبر 2026', acct: 'محفظة إلكترونية · فودافون كاش · 010 0123 4567', ...emptyPayout },
+      { id: 6, vid: 1, amt: 1200, st: 'بانتظار المراجعة', date: '4 نوفمبر 2026', acct: 'حساب بنكي · بنك مصر · EG12 0002 0001 2345', ...emptyPayout },
+      { id: 7, vid: 1, amt: 900, st: 'بانتظار المراجعة', date: '5 نوفمبر 2026', acct: 'محفظة إلكترونية · فودافون كاش · 010 0123 4567', ...emptyPayout },
+      { id: 8, vid: 1, amt: 2000, st: 'تم التحويل', date: '15 أكتوبر 2026', acct: 'حساب بنكي · بنك مصر · EG12 0002 0001 2345', ...emptyPayout, ref: 'TRX-77410', fileName: 'transfer-77410.png', reviewedBy: 'محمد الكندي', executedBy: 'محمد الكندي' },
+      { id: 9, vid: 1, amt: 1500, st: 'تم التحويل', date: '5 أكتوبر 2026', acct: 'محفظة إلكترونية · فودافون كاش · 010 0123 4567', ...emptyPayout, ref: 'VC-5521908', fileName: 'vcash-5521908.jpg', reviewedBy: 'محمد الكندي', executedBy: 'محمد الكندي' },
+      { id: 10, vid: 1, amt: 600, st: 'مرفوض', date: '25 أكتوبر 2026', acct: 'محفظة إلكترونية · فودافون كاش · 010 0123 4567', ...emptyPayout, reason: 'رقم المحفظة غير مسجل باسم المورد', reviewedBy: 'محمد الكندي' },
+      { id: 11, vid: 2, amt: 8.5, st: 'بانتظار المراجعة', date: '4 نوفمبر 2026', acct: 'PayPal · info@ufuq.om', ...emptyPayout },
+      { id: 12, vid: 2, amt: 15, st: 'تم التحويل', date: '12 أكتوبر 2026', acct: 'PayPal · info@ufuq.om', ...emptyPayout, ref: 'PP-9X41-22A', fileName: 'paypal-9x41.pdf', reviewedBy: 'محمد الكندي', executedBy: 'محمد الكندي' },
+      { id: 13, vid: 2, amt: 5, st: 'مرفوض', date: '8 أكتوبر 2026', acct: 'حساب بنكي · بنك مسقط · OM81 0270 0000 1111', ...emptyPayout, reason: 'المبلغ أقل من الحد الأدنى للسحب', reviewedBy: 'محمد الكندي' },
+      { id: 14, vid: 3, amt: 150, st: 'بانتظار المراجعة', date: '5 نوفمبر 2026', acct: 'محفظة إلكترونية · STC Pay · 055 123 4567', ...emptyPayout },
+      { id: 15, vid: 3, amt: 250, st: 'تم التحويل', date: '10 أكتوبر 2026', acct: 'حساب بنكي · مصرف الراجحي · SA44 2000 0001 2345', ...emptyPayout, ref: 'TRX-66302', fileName: 'transfer-66302.pdf', reviewedBy: 'محمد الكندي', executedBy: 'محمد الكندي' },
+      { id: 16, vid: 3, amt: 120, st: 'تم التحويل', date: '2 أكتوبر 2026', acct: 'محفظة إلكترونية · STC Pay · 055 123 4567', ...emptyPayout, ref: 'STC-310778', fileName: 'stc-310778.png', reviewedBy: 'محمد الكندي', executedBy: 'محمد الكندي' },
+      { id: 17, vid: 3, amt: 90, st: 'مرفوض', date: '27 سبتمبر 2026', acct: 'حساب بنكي · مصرف الراجحي · SA44 2000 0001 2345', ...emptyPayout, reason: 'رقم الآيبان غير صحيح، يرجى تصحيحه وإعادة الطلب', reviewedBy: 'محمد الكندي' },
     ],
     log: [{ id: 1, who: 'النظام', text: 'تم تسجيل عمولة TechFlow Egypt لمحمود حسن', at: '2 أكتوبر 2026 · 10:30' }],
 
@@ -213,19 +246,15 @@ export const useVendorsAdminStore = create<State>((set, get) => {
       addLog(`ألغى عمولة ${clients.find((c) => c.id === k.cid)?.name} · السبب: ${reason}`);
       return { ok: true };
     },
-    approvePayout: (id) => {
-      set((s) => ({ payouts: s.payouts.map((p) => (p.id === id ? { ...p, st: 'تمت الموافقة', reviewedBy: actor() } : p)) }));
-      addLog(`وافق على طلب ${poNo(id)}`);
-    },
     rejectPayout: (id, reason) => {
       set((s) => ({ payouts: s.payouts.map((p) => (p.id === id ? { ...p, st: 'مرفوض', reason, reviewedBy: actor() } : p)) }));
       addLog(`رفض طلب ${poNo(id)} · ${reason}`);
     },
     executePayout: (id, ref, fileName, img) => {
       set((s) => ({
-        payouts: s.payouts.map((p) => (p.id === id ? { ...p, st: 'تم التحويل', ref, fileName, img, executedBy: actor() } : p)),
+        payouts: s.payouts.map((p) => (p.id === id ? { ...p, st: 'تم التحويل', ref, fileName, img, reviewedBy: actor(), executedBy: actor() } : p)),
       }));
-      addLog(`نفّذ تحويل ${poNo(id)} · رقم العملية ${ref}`);
+      addLog(`وافق على طلب ${poNo(id)} ونفّذ تحويله · رقم العملية ${ref}`);
     },
     saveSettings: (settings) => {
       set({ settings });
@@ -247,7 +276,7 @@ export function sumsFor(vid: number, comms: Commission[], payouts: Payout[]): Su
   const total = (st: CommissionState): number => c.filter((x) => x.st === st).reduce((a, b) => a + b.amt, 0);
   const po = payouts.filter((p) => p.vid === vid);
   const sumOf = (l: PayoutState[]): number => po.filter((p) => l.includes(p.st)).reduce((a, b) => a + b.amt, 0);
-  const inReview = sumOf(['بانتظار المراجعة', 'تمت الموافقة']);
+  const inReview = sumOf(['بانتظار المراجعة']);
   const paid = sumOf(['تم التحويل']);
   return { pending: round3(total('معلّقة')), avail: round3(total('متاحة') - inReview - paid), inReview: round3(inReview), paid: round3(paid) };
 }
