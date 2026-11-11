@@ -108,6 +108,8 @@ const initialClients: VendorClient[] = [
   { id: 3, vid: 1, name: 'مكتب الريادة', email: 'office@riyada.com', phone: '+20 155 666 7777', plan: '—', cycle: '—', state: 'دعوة مرسلة', via: 'دعوة', date: '1 نوفمبر 2026' },
   { id: 4, vid: 2, name: 'مطعم البحر', email: 'sea@food.om', phone: '+968 9555 0000', plan: 'الأعمال', cycle: 'سنوي', state: 'اشترك', date: '15 أكتوبر 2026' },
   { id: 5, vid: 3, name: 'شركة الواحة', email: 'oasis@co.sa', phone: '+966 50 111 2222', plan: 'الأعمال', cycle: 'سنوي', state: 'اشترك', date: '5 سبتمبر 2026' },
+  { id: 7, vid: 1, name: 'مؤسسة الندى', email: 'info@nada.com', phone: '+20 100 777 6666', plan: '—', cycle: '—', state: 'سجل', via: 'رابط', date: '4 نوفمبر 2026' },
+  { id: 8, vid: 1, name: 'مطعم السنابل', email: 'hello@sanabel.com', phone: '+20 109 888 7777', plan: 'الاحترافي', cycle: 'شهري', state: 'اشترك', via: 'رابط', date: '6 نوفمبر 2026' },
   { id: 6, vid: 3, name: 'متجر السحاب', email: 'sahab@store.sa', phone: '+966 53 333 4444', plan: 'الأعمال', cycle: 'سنوي', state: 'اشترك', date: '12 سبتمبر 2026' },
 ];
 
@@ -144,6 +146,7 @@ export const useVendorStore = create<VendorState>((set, get) => ({
   comms: [
     comm(1, 1, 'EGP', 30, 'متاحة'),
     comm(2, 1, 'EGP', 30, 'معلّقة', 18),
+    comm(8, 1, 'EGP', 30, 'معلّقة', 27),
     comm(4, 2, 'OMR', 25, 'متاحة'),
     comm(5, 3, 'SAR', 30, 'متاحة'),
     comm(6, 3, 'SAR', 30, 'متاحة'),
