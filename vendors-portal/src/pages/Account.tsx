@@ -210,7 +210,6 @@ export default function Account(): JSX.Element {
   const [adding, setAdding] = useState(false);
   const [defOf, setDefOf] = useState<TransferAccount | null>(null);
   const [delOf, setDelOf] = useState<TransferAccount | null>(null);
-  const [defStep, setDefStep] = useState<'confirm' | 'otp'>('confirm');
 
   const ro = (label: string, value: string, ltr = false): JSX.Element => (
     <div className="space-y-1.5">
@@ -281,7 +280,7 @@ export default function Account(): JSX.Element {
             </Table>
           )}
           <div className="space-y-2 px-6">
-            <Note>تتطلب إضافة حساب أو تغيير الحساب الافتراضي رمز تأكيد يُرسل إلى جوالك، وبعدها يتوقف السحب لمدة 48 ساعة للحماية.</Note>
+            <Note>تتطلب إضافة حساب جديد رمز تأكيد يُرسل إلى جوالك. وبعد إضافة حساب أو تغيير الحساب الافتراضي يتوقف السحب لمدة 48 ساعة للحماية.</Note>
             {v.bankLock && <Note tone="warn">السحب متوقف حاليًا لمدة 48 ساعة بسبب تغيير البيانات.</Note>}
           </div>
         </CardContent>
@@ -289,42 +288,28 @@ export default function Account(): JSX.Element {
 
       <AddAccountDialog open={adding} onClose={() => setAdding(false)} />
 
-      <Dialog open={!!defOf} onOpenChange={(o) => { if (!o) { setDefOf(null); setDefStep('confirm'); } }}>
+      <Dialog open={!!defOf} onOpenChange={(o) => !o && setDefOf(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>تعيين الحساب الافتراضي</DialogTitle>
           </DialogHeader>
-          {defStep === 'confirm' ? (
-            <>
-              <p className="text-sm">
-                سيصبح <b>{defOf?.type} · {defOf?.details}</b> الحساب الافتراضي للتحويل. سنرسل رمز تأكيد إلى جوالك في الخطوة التالية.
-              </p>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setDefOf(null)}>
-                  إلغاء
-                </Button>
-                <Button
-                  onClick={() => {
-                    showToast('تم إرسال رمز التأكيد إلى جوالك');
-                    setDefStep('otp');
-                  }}
-                >
-                  متابعة
-                </Button>
-              </DialogFooter>
-            </>
-          ) : (
-            <OtpStep
-              phone={v.phone}
-              onBack={() => setDefStep('confirm')}
-              onVerified={() => {
+          <p className="text-sm">
+            سيصبح <b>{defOf?.type} · {defOf?.details}</b> الحساب الافتراضي للتحويل، ويتوقف السحب لمدة 48 ساعة للحماية.
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDefOf(null)}>
+              إلغاء
+            </Button>
+            <Button
+              onClick={() => {
                 setDefaultAccount(defOf!.id);
                 setDefOf(null);
-                setDefStep('confirm');
                 showToast('تم تغيير الحساب الافتراضي، والسحب متوقف لمدة 48 ساعة');
               }}
-            />
-          )}
+            >
+              تأكيد
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
