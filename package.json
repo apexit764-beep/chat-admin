@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "lint": "eslint . --ext ts,tsx"
+    "lint": "eslint . --ext ts,tsx",
+    "dev:vendors": "vite --config vendors-portal/vite.config.ts",
+    "build:vendors": "tsc -p vendors-portal/tsconfig.json && vite build --config vendors-portal/vite.config.ts"
   },
   "dependencies": {
     "@radix-ui/react-alert-dialog": "^1.1.17",
