@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Eye } from 'lucide-react';
+import { Check, Eye, FileText, MoreHorizontal, XCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/store/useUIStore';
 import {
@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { FieldHint } from '@/components/ui/field-hint';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { isTransferRef, lengthBetween, MAX_RECEIPT_MB } from '@/utils/vendorValidation';
 
@@ -103,31 +104,44 @@ export function PayoutsTable({ list, showVendor }: { list: Payout[]; showVendor:
                 </TableCell>
                 <TableCell>{p.date}</TableCell>
                 <TableCell>
-                  <span className="inline-flex items-center gap-1.5">
-                    <StatusPill text={p.st} />
-                    {p.reason && (
-                      <Button size="icon" variant="outline" className="h-7 w-7" aria-label="عرض السبب" title="عرض السبب" onClick={() => setDlg({ kind: 'reason', payout: p })}>
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </span>
+                  <StatusPill text={p.st} />
                 </TableCell>
                 <TableCell className="text-xs">{p.executedBy || p.reviewedBy || '—'}</TableCell>
                 <TableCell className="whitespace-nowrap">
-                  {p.st === 'بانتظار المراجعة' && (
-                    <span className="inline-flex gap-1.5">
-                      <Button size="sm" className="bg-green-600 hover:bg-green-700" onClick={() => setDlg({ kind: 'approve', payout: p })}>
-                        موافقة
-                      </Button>
-                      <Button size="sm" variant="destructive" onClick={() => setDlg({ kind: 'reject', payout: p })}>
-                        رفض
-                      </Button>
-                    </span>
-                  )}
-                  {p.st === 'تم التحويل' && (
-                    <Button size="sm" variant="outline" onClick={() => setDlg({ kind: 'receipt', payout: p })}>
-                      صورة التحويل
-                    </Button>
+                  {p.st !== 'ملغي' && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground" aria-label="الإجراءات">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48">
+                        {p.st === 'بانتظار المراجعة' && (
+                          <>
+                            <DropdownMenuItem onClick={() => setDlg({ kind: 'approve', payout: p })}>
+                              <Check className="me-2 h-4 w-4 text-emerald-600" />
+                              موافقة
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => setDlg({ kind: 'reject', payout: p })}>
+                              <XCircle className="me-2 h-4 w-4" />
+                              رفض
+                            </DropdownMenuItem>
+                          </>
+                        )}
+                        {p.st === 'تم التحويل' && (
+                          <DropdownMenuItem onClick={() => setDlg({ kind: 'receipt', payout: p })}>
+                            <FileText className="me-2 h-4 w-4" />
+                            صورة التحويل
+                          </DropdownMenuItem>
+                        )}
+                        {p.st === 'مرفوض' && (
+                          <DropdownMenuItem onClick={() => setDlg({ kind: 'reason', payout: p })}>
+                            <Eye className="me-2 h-4 w-4" />
+                            عرض سبب الرفض
+                          </DropdownMenuItem>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   )}
                 </TableCell>
               </TableRow>
