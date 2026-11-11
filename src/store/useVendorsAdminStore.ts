@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useAdminStore } from '@/store/useAdminStore';
+import type { ActivityAction } from '@/store/adminMockData';
 
 export type VCurrency = 'EGP' | 'OMR' | 'SAR';
 export type VendorStatus = 'نشط' | 'مجمّد' | 'دعوة مرسلة';
@@ -73,13 +75,6 @@ export interface Payout {
   executedBy: string;
 }
 
-export interface LogEntry {
-  id: number;
-  who: string;
-  text: string;
-  at: string;
-}
-
 export interface VendorSettings {
   rate: number;
   hold: number;
@@ -93,7 +88,6 @@ interface State {
   clients: VendorClient[];
   comms: Commission[];
   payouts: Payout[];
-  log: LogEntry[];
 
   addVendor: (v: { name: string; email: string; phone: string; cur: VCurrency; rate: number }) => { ok: true } | { ok: false; error: string };
   editVendor: (id: number, v: { name: string; email: string; phone: string; cur: VCurrency; rate: number }) => { ok: true } | { ok: false; error: string };
@@ -110,8 +104,6 @@ export const toLocal = (usd: number, cur: VCurrency): number => round3(usd * FX[
 export const minLocal = (usd: number, cur: VCurrency): number => toLocal(usd, cur);
 export const poNo = (id: number): string => `PO-${String(id).padStart(4, '0')}`;
 
-const nowTime = (): string => new Date().toLocaleTimeString('ar-u-nu-latn', { hour: '2-digit', minute: '2-digit' });
-const today = (): string => new Date().toLocaleDateString('ar-u-nu-latn', { day: 'numeric', month: 'long', year: 'numeric' });
 const actor = (): string => useAuthStore.getState().user?.name ?? 'مسؤول النظام';
 
 const planUsd = (plan: string, cycle: string): number => {
@@ -150,8 +142,25 @@ const seedComm = (cid: number, vid: number, cur: VCurrency, rate: number, st: Co
 const emptyPayout = { reason: '', ref: '', fileName: '', img: '', reviewedBy: '', executedBy: '' };
 
 export const useVendorsAdminStore = create<State>((set, get) => {
-  const addLog = (text: string, who = actor()): void =>
-    set((s) => ({ log: [{ id: nid(), who, text, at: `${today()} · ${nowTime()}` }, ...s.log] }));
+  /** vendor events are written to the platform-wide activity log (سجل النشاط) */
+  const addLog = (action: ActivityAction, target: string, details?: string): void => {
+    const user = useAuthStore.getState().user;
+    useAdminStore.setState((s) => ({
+      activityLog: [
+        {
+          id: `act_v_${nid()}`,
+          action,
+          actor: user?.name ?? 'مسؤول النظام',
+          actorEmail: user?.email ?? '',
+          actorRole: 'admin' as const,
+          target,
+          details,
+          timestamp: new Date().toISOString(),
+        },
+        ...s.activityLog,
+      ],
+    }));
+  };
 
   return {
     settings: { rate: 30, hold: 30, min: 10 },
@@ -206,7 +215,6 @@ export const useVendorsAdminStore = create<State>((set, get) => {
       { id: 16, vid: 3, amt: 120, st: 'تم التحويل', date: '2 أكتوبر 2026', acct: 'محفظة إلكترونية · STC Pay · 055 123 4567', ...emptyPayout, ref: 'STC-310778', fileName: 'stc-310778.png', reviewedBy: 'محمد الكندي', executedBy: 'محمد الكندي' },
       { id: 17, vid: 3, amt: 90, st: 'مرفوض', date: '27 سبتمبر 2026', acct: 'حساب بنكي · مصرف الراجحي · SA44 2000 0001 2345', ...emptyPayout, reason: 'رقم الآيبان غير صحيح، يرجى تصحيحه وإعادة الطلب', reviewedBy: 'محمد الكندي' },
     ],
-    log: [{ id: 1, who: 'النظام', text: 'تم تسجيل عمولة TechFlow Egypt لمحمود حسن', at: '2 أكتوبر 2026 · 10:30' }],
 
     addVendor: (v) => {
       if (get().vendors.some((x) => x.email.toLowerCase() === v.email.toLowerCase())) {
@@ -215,7 +223,7 @@ export const useVendorsAdminStore = create<State>((set, get) => {
       set((s) => ({
         vendors: [...s.vendors, { id: nid(), ...v, country: FX[v.cur].country, status: 'دعوة مرسلة', bankLock: false, accounts: [] }],
       }));
-      addLog(`أضاف موردًا جديدًا وأرسل له دعوة: ${v.name}`);
+      addLog('vendor_created', v.name, 'إضافة مورد جديد وإرسال دعوة له');
       return { ok: true };
     },
     editVendor: (id, v) => {
@@ -224,18 +232,18 @@ export const useVendorsAdminStore = create<State>((set, get) => {
       }
       const old = get().vendors.find((x) => x.id === id) as Vendor;
       set((s) => ({ vendors: s.vendors.map((x) => (x.id === id ? { ...x, ...v, country: FX[v.cur].country } : x)) }));
-      addLog(`عدّل بيانات المورد ${v.name}${old.rate !== v.rate ? ` · النسبة من ${old.rate}% إلى ${v.rate}%` : ''}`);
+      addLog('vendor_updated', v.name, old.rate !== v.rate ? `تعديل البيانات · النسبة من ${old.rate}% إلى ${v.rate}%` : 'تعديل البيانات');
       return { ok: true };
     },
     toggleFreeze: (id) => {
       const v = get().vendors.find((x) => x.id === id) as Vendor;
       const freezing = v.status === 'نشط';
       set((s) => ({ vendors: s.vendors.map((x) => (x.id === id ? { ...x, status: freezing ? 'مجمّد' : 'نشط' } : x)) }));
-      addLog(`${freezing ? 'جمّد' : 'ألغى تجميد'} المورد ${v.name}`);
+      addLog(freezing ? 'vendor_frozen' : 'vendor_unfrozen', v.name, freezing ? 'تجميد المورد' : 'إلغاء تجميد المورد');
     },
     resendInvite: (id) => {
       const v = get().vendors.find((x) => x.id === id) as Vendor;
-      addLog(`أعاد إرسال الدعوة للمورد ${v.name}`);
+      addLog('vendor_invite_resent', v.name, 'إعادة إرسال الدعوة');
     },
     cancelCommission: (id, reason) => {
       const { comms, payouts, clients } = get();
@@ -243,22 +251,22 @@ export const useVendorsAdminStore = create<State>((set, get) => {
       const avail = sumsFor(k.vid, comms, payouts).avail;
       if (k.st === 'متاحة' && avail < k.amt) return { ok: false, error: 'لا يمكن إلغاؤها، فالمبلغ ضمن طلب سحب أو تم تحويله' };
       set((s) => ({ comms: s.comms.map((x) => (x.id === id ? { ...x, st: 'ملغاة' } : x)) }));
-      addLog(`ألغى عمولة ${clients.find((c) => c.id === k.cid)?.name} · السبب: ${reason}`);
+      addLog('vendor_commission_cancelled', clients.find((c) => c.id === k.cid)?.name ?? '', `إلغاء عمولة · السبب: ${reason}`);
       return { ok: true };
     },
     rejectPayout: (id, reason) => {
       set((s) => ({ payouts: s.payouts.map((p) => (p.id === id ? { ...p, st: 'مرفوض', reason, reviewedBy: actor() } : p)) }));
-      addLog(`رفض طلب ${poNo(id)} · ${reason}`);
+      addLog('vendor_payout_rejected', poNo(id), `رفض طلب السحب · ${reason}`);
     },
     executePayout: (id, ref, fileName, img) => {
       set((s) => ({
         payouts: s.payouts.map((p) => (p.id === id ? { ...p, st: 'تم التحويل', ref, fileName, img, reviewedBy: actor(), executedBy: actor() } : p)),
       }));
-      addLog(`وافق على طلب ${poNo(id)} ونفّذ تحويله · رقم العملية ${ref}`);
+      addLog('vendor_payout_transferred', poNo(id), `الموافقة وتنفيذ التحويل · رقم العملية ${ref}`);
     },
     saveSettings: (settings) => {
       set({ settings });
-      addLog('عدّل إعدادات الموردين');
+      addLog('vendor_settings_updated', 'إعدادات الموردين', 'تعديل القيم الافتراضية');
     },
   };
 });

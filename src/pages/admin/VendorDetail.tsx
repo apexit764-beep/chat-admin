@@ -182,7 +182,7 @@ export default function VendorDetail(): JSX.Element {
           <div className="space-y-1.5">
             <Label>السبب *</Label>
             <Textarea rows={3} maxLength={300} placeholder="مثلًا: حساب وهمي" value={reason} onChange={(e) => setReason(e.target.value)} />
-            <FieldHint>مطلوب. من 3 إلى 300 حرف، ويُسجل في سجل الحركات.</FieldHint>
+            <FieldHint>مطلوب. من 3 إلى 300 حرف، ويُسجل في سجل النشاط.</FieldHint>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={closeCancel}>

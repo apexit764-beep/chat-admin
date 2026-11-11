@@ -22,7 +22,6 @@ import {
   Handshake,
   HandCoins,
   SlidersHorizontal,
-  ScrollText,
   ChevronDown,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -79,7 +78,6 @@ const navGroups: NavGroup[] = [
           { to: '/vendors', label: 'قائمة الموردين', icon: Users },
           { to: '/vendors/payouts', label: 'طلبات السحب', icon: HandCoins },
           { to: '/vendors/settings', label: 'إعدادات الموردين', icon: SlidersHorizontal },
-          { to: '/vendors/log', label: 'سجل الحركات', icon: ScrollText },
         ],
       },
     ],
@@ -196,8 +194,8 @@ function SidebarInner({ collapsed, onToggleCollapse, onNavigate, mobile, onClose
               )}
               {group.items.map((item) => {
                 const Icon = item.icon;
-                // /vendors has sibling pages (payouts, settings, log): the list is active only on the list and a vendor's detail
-                const vendorSub = ['/vendors/payouts', '/vendors/settings', '/vendors/log'];
+                // /vendors has sibling pages (payouts, settings): the list is active only on the list and a vendor's detail
+                const vendorSub = ['/vendors/payouts', '/vendors/settings'];
                 const isActiveTo = (to: string): boolean =>
                   to === '/vendors'
                     ? location.pathname === '/vendors' || (location.pathname.startsWith('/vendors/') && !vendorSub.includes(location.pathname))

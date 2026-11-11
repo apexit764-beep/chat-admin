@@ -70,15 +70,26 @@ const actionMeta: Record<ActivityAction, { label: string; icon: React.ElementTyp
   admin_user_removed: { label: 'حذف مدير', icon: UserMinus, color: 'text-red-500 bg-red-500/10' },
   settings_updated: { label: 'تحديث إعدادات', icon: Settings, color: 'text-slate-500 bg-slate-500/10' },
   paymob_updated: { label: 'تحديث بوابة الدفع', icon: Shield, color: 'text-amber-500 bg-amber-500/10' },
+  vendor_created: { label: 'مورد جديد', icon: UserPlus, color: 'text-emerald-500 bg-emerald-500/10' },
+  vendor_updated: { label: 'تعديل مورد', icon: UserCheck, color: 'text-blue-500 bg-blue-500/10' },
+  vendor_frozen: { label: 'تجميد مورد', icon: UserX, color: 'text-amber-500 bg-amber-500/10' },
+  vendor_unfrozen: { label: 'إلغاء تجميد مورد', icon: UserCheck, color: 'text-blue-500 bg-blue-500/10' },
+  vendor_invite_resent: { label: 'إعادة إرسال دعوة', icon: UserPlus, color: 'text-blue-500 bg-blue-500/10' },
+  vendor_commission_recorded: { label: 'تسجيل عمولة', icon: CreditCard, color: 'text-emerald-500 bg-emerald-500/10' },
+  vendor_commission_cancelled: { label: 'إلغاء عمولة', icon: XCircle, color: 'text-red-500 bg-red-500/10' },
+  vendor_payout_rejected: { label: 'رفض طلب سحب', icon: XCircle, color: 'text-red-500 bg-red-500/10' },
+  vendor_payout_transferred: { label: 'تحويل لمورد', icon: CreditCard, color: 'text-violet-500 bg-violet-500/10' },
+  vendor_settings_updated: { label: 'إعدادات الموردين', icon: Settings, color: 'text-slate-500 bg-slate-500/10' },
 };
 
-type ActionFilter = 'all' | 'clients' | 'billing' | 'admin' | 'settings';
+type ActionFilter = 'all' | 'clients' | 'billing' | 'admin' | 'vendors' | 'settings';
 
 const filterGroups: Record<ActionFilter, { label: string; actions: ActivityAction[] }> = {
   all: { label: 'الكل', actions: [] },
   clients: { label: 'العملاء', actions: ['client_created', 'client_suspended', 'client_reactivated', 'client_deleted'] },
   billing: { label: 'المالية', actions: ['subscription_created', 'subscription_cancelled', 'invoice_refunded', 'payment_received', 'plan_created', 'plan_updated', 'plan_deleted'] },
   admin: { label: 'المديرون', actions: ['admin_login', 'admin_logout', 'admin_user_added', 'admin_user_removed'] },
+  vendors: { label: 'الموردون', actions: ['vendor_created', 'vendor_updated', 'vendor_frozen', 'vendor_unfrozen', 'vendor_invite_resent', 'vendor_commission_recorded', 'vendor_commission_cancelled', 'vendor_payout_rejected', 'vendor_payout_transferred', 'vendor_settings_updated'] },
   settings: { label: 'الإعدادات', actions: ['settings_updated', 'paymob_updated'] },
 };
 

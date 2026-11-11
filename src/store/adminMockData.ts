@@ -1172,7 +1172,17 @@ export type ActivityAction =
   | 'admin_user_added'
   | 'admin_user_removed'
   | 'settings_updated'
-  | 'paymob_updated';
+  | 'paymob_updated'
+  | 'vendor_created'
+  | 'vendor_updated'
+  | 'vendor_frozen'
+  | 'vendor_unfrozen'
+  | 'vendor_invite_resent'
+  | 'vendor_commission_recorded'
+  | 'vendor_commission_cancelled'
+  | 'vendor_payout_rejected'
+  | 'vendor_payout_transferred'
+  | 'vendor_settings_updated';
 
 export interface ActivityEntry {
   id: string;
@@ -1188,6 +1198,10 @@ export interface ActivityEntry {
 }
 
 export const activityLog: ActivityEntry[] = [
+  // Vendors
+  { id: 'act_v1', action: 'vendor_commission_recorded', actor: 'النظام', actorEmail: '', actorRole: 'system', target: 'TechFlow Egypt', details: 'تسجيل عمولة للمورد محمود حسن', timestamp: nowMinus(95) },
+  { id: 'act_v2', action: 'vendor_payout_transferred', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', actorRole: 'admin', target: 'PO-0003', details: 'الموافقة وتنفيذ التحويل · رقم العملية TRX-88120', timestamp: nowMinus(180) },
+  { id: 'act_v3', action: 'vendor_payout_rejected', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', actorRole: 'admin', target: 'PO-0002', details: 'رفض طلب السحب · اسم صاحب الحساب البنكي لا يطابق اسم المورد', timestamp: nowMinus(260) },
   // Global admin actions
   { id: 'act_1', action: 'admin_login', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', actorRole: 'admin', timestamp: nowMinus(2), ip: '185.69.144.12' },
   { id: 'act_7', action: 'plan_updated', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', actorRole: 'admin', target: 'الاحترافي', details: 'تحديث حدود المحادثات: 5,000 → 10,000', timestamp: nowMinus(420) },
