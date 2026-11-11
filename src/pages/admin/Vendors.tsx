@@ -109,55 +109,16 @@ function VendorFormDialog({ vendor, onClose }: { vendor: Vendor | 'new'; onClose
   );
 }
 
-function InviteDialog({ vendor, onClose }: { vendor: Vendor; onClose: () => void }): JSX.Element {
-  const resend = useVendorsAdminStore((s) => s.resendInvite);
-  const showToast = useUIStore((s) => s.showToast);
-  return (
-    <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>بريد الدعوة</DialogTitle>
-        </DialogHeader>
-        <div className="text-xs text-muted-foreground">إلى: <bdi dir="ltr">{vendor.email}</bdi> · من: Qhub Partners</div>
-        <div className="rounded-xl border p-4 text-sm leading-loose">
-          <b>أهلًا {vendor.name}،</b>
-          <br />
-          تم إنشاء حساب مورد لك على Qhub بعمولة {vendor.rate}% من أول اشتراك لكل عميل تضيفه.
-          <br />
-          اضغط على الزر لإنشاء كلمة المرور والدخول إلى لوحة التحكم.
-          <div className="my-3 text-center">
-            <span className="inline-block rounded-lg bg-primary px-5 py-2 text-primary-foreground">إنشاء كلمة المرور</span>
-          </div>
-          <span className="text-xs text-muted-foreground">الرابط صالح لمدة 48 ساعة ولمرة واحدة.</span>
-        </div>
-        <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => {
-              resend(vendor.id);
-              showToast('تم إرسال دعوة جديدة، وتوقف الرابط القديم');
-              onClose();
-            }}
-          >
-            إعادة إرسال الدعوة
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
 export default function Vendors(): JSX.Element {
   const navigate = useNavigate();
   const { confirm } = useConfirm();
   const showToast = useUIStore((s) => s.showToast);
-  const { vendors, clients, comms, payouts, toggleFreeze } = useVendorsAdminStore();
+  const { vendors, clients, comms, payouts, toggleFreeze, resendInvite } = useVendorsAdminStore();
   const [q, setQ] = useState('');
   const [status, setStatus] = useState('all');
   const [country, setCountry] = useState('all');
   const [balance, setBalance] = useState('all');
   const [form, setForm] = useState<Vendor | 'new' | null>(null);
-  const [invite, setInvite] = useState<Vendor | null>(null);
 
   const list = useMemo(
     () =>
@@ -251,8 +212,14 @@ export default function Vendors(): JSX.Element {
                           تعديل
                         </Button>
                         {v.status === 'دعوة مرسلة' ? (
-                          <Button size="sm" onClick={() => setInvite(v)}>
-                            بريد الدعوة
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              resendInvite(v.id);
+                              showToast('تم إرسال دعوة جديدة، وتوقف الرابط القديم');
+                            }}
+                          >
+                            إعادة إرسال الدعوة
                           </Button>
                         ) : (
                           <Switch checked={v.status === 'نشط'} onCheckedChange={() => void onToggle(v)} aria-label="تجميد المورد" />
@@ -268,7 +235,6 @@ export default function Vendors(): JSX.Element {
       </Card>
 
       {form && <VendorFormDialog vendor={form} onClose={() => setForm(null)} />}
-      {invite && <InviteDialog vendor={invite} onClose={() => setInvite(null)} />}
     </div>
   );
 }
