@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Plus } from 'lucide-react';
 import { useVendorStore, type AccountType, type TransferAccount } from '@v/store/useVendorStore';
 import { useUIStore } from '@/store/useUIStore';
@@ -19,36 +19,106 @@ const FIELDS: Record<AccountType, [string, string][]> = {
 };
 const OTP = '123456'; // demo code; the real one is sent by SMS from the backend
 
-function OtpField({ value, onChange }: { value: string; onChange: (v: string) => void }): JSX.Element {
+const OTP_RESEND_SECONDS = 30;
+const OTP_MAX_ATTEMPTS = 3;
+
+/** second step of any change to the transfer details: the code goes to the vendor's registered phone, not to the account being added */
+function OtpStep({ phone, onVerified, onBack }: { phone: string; onVerified: () => void; onBack: () => void }): JSX.Element {
+  const showToast = useUIStore((s) => s.showToast);
+  const [code, setCode] = useState('');
+  const [attempts, setAttempts] = useState(0);
+  const [wait, setWait] = useState(OTP_RESEND_SECONDS);
+  const masked = `••••${phone.replace(/\D/g, '').slice(-4)}`;
+
+  useEffect(() => {
+    if (wait <= 0) return undefined;
+    const t = setTimeout(() => setWait((w) => w - 1), 1000);
+    return () => clearTimeout(t);
+  }, [wait]);
+
+  const verify = (): void => {
+    if (code.trim() === OTP) return onVerified();
+    const left = OTP_MAX_ATTEMPTS - attempts - 1;
+    setAttempts(attempts + 1);
+    setCode('');
+    if (left <= 0) {
+      showToast('تجاوزت عدد المحاولات، ابدأ من جديد', 'error');
+      return onBack();
+    }
+    showToast(`الرمز غير صحيح، بقي ${left} ${left === 1 ? 'محاولة' : 'محاولات'}`, 'error');
+  };
+
   return (
-    <div className="space-y-1.5">
-      <Label>رمز التأكيد المرسل إلى جوالك *</Label>
-      <Input dir="ltr" inputMode="numeric" placeholder="للتجربة: 123456" value={value} onChange={(e) => onChange(e.target.value)} />
+    <div className="space-y-3 py-1">
+      <p className="text-sm leading-relaxed">
+        أرسلنا رمز تأكيد إلى جوالك المسجّل <bdi dir="ltr" className="font-bold">{masked}</bdi>. أدخله لتأكيد التغيير. الرمز صالح لمدة 5 دقائق.
+      </p>
+      <div className="space-y-1.5">
+        <Label>رمز التأكيد *</Label>
+        <Input
+          autoFocus
+          dir="ltr"
+          inputMode="numeric"
+          maxLength={6}
+          placeholder="للتجربة: 123456"
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && verify()}
+        />
+      </div>
+      <div className="flex items-center justify-between gap-2">
+        <button
+          className="text-xs text-primary disabled:text-muted-foreground"
+          disabled={wait > 0}
+          onClick={() => {
+            setWait(OTP_RESEND_SECONDS);
+            showToast('تم إرسال رمز جديد');
+          }}
+        >
+          {wait > 0 ? `إعادة إرسال الرمز بعد ${wait} ثانية` : 'إعادة إرسال الرمز'}
+        </button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={onBack}>
+            رجوع
+          </Button>
+          <Button disabled={code.trim().length < 6} onClick={verify}>
+            تأكيد
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }
 
 function AddAccountDialog({ open, onClose }: { open: boolean; onClose: () => void }): JSX.Element {
   const addAccount = useVendorStore((s) => s.addAccount);
+  const phone = useVendorStore((s) => s.vendors.find((v) => v.id === s.meId)?.phone ?? '');
   const showToast = useUIStore((s) => s.showToast);
+  const [step, setStep] = useState<'form' | 'otp'>('form');
   const [type, setType] = useState<AccountType>('حساب بنكي');
   const [vals, setVals] = useState<Record<string, string>>({});
-  const [otp, setOtp] = useState('');
   const fields = FIELDS[type];
 
   const reset = (): void => {
     setVals({});
-    setOtp('');
     setType('حساب بنكي');
+    setStep('form');
     onClose();
   };
 
-  const submit = (): void => {
+  const next = (): void => {
     if (fields.some(([k]) => !vals[k]?.trim())) return showToast('أكمل كل الحقول المطلوبة', 'error');
     if (type === 'PayPal' && !/^\S+@\S+\.\S+$/.test(vals.n.trim())) return showToast('أدخل بريدًا إلكترونيًا صحيحًا', 'error');
-    if (otp.trim() !== OTP) return showToast('الرمز غير صحيح', 'error');
+    showToast('تم إرسال رمز التأكيد إلى جوالك');
+    setStep('otp');
+  };
+
+  const confirm = (): void => {
     const r = addAccount(type, fields.map(([k]) => vals[k].trim()).join(' · '));
-    if (!r.ok) return showToast(r.error, 'error');
+    if (!r.ok) {
+      showToast(r.error, 'error');
+      return setStep('form');
+    }
     showToast('تمت إضافة الحساب، والسحب متوقف لمدة 48 ساعة');
     reset();
   };
@@ -57,44 +127,49 @@ function AddAccountDialog({ open, onClose }: { open: boolean; onClose: () => voi
     <Dialog open={open} onOpenChange={(o) => !o && reset()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>إضافة حساب تحويل</DialogTitle>
+          <DialogTitle>{step === 'form' ? 'إضافة حساب تحويل' : 'تأكيد إضافة الحساب'}</DialogTitle>
         </DialogHeader>
-        <div className="space-y-3 py-1">
-          <div className="space-y-1.5">
-            <Label>نوع الحساب *</Label>
-            <Select
-              value={type}
-              onValueChange={(t) => {
-                setType(t as AccountType);
-                setVals({});
-              }}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {(Object.keys(FIELDS) as AccountType[]).map((t) => (
-                  <SelectItem key={t} value={t}>
-                    {t}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          {fields.map(([k, label]) => (
-            <div key={k} className="space-y-1.5">
-              <Label>{label} *</Label>
-              <Input dir={k === 'n' ? 'ltr' : undefined} value={vals[k] ?? ''} onChange={(e) => setVals({ ...vals, [k]: e.target.value })} />
+        {step === 'form' ? (
+          <>
+            <div className="space-y-3 py-1">
+              <div className="space-y-1.5">
+                <Label>نوع الحساب *</Label>
+                <Select
+                  value={type}
+                  onValueChange={(t) => {
+                    setType(t as AccountType);
+                    setVals({});
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(Object.keys(FIELDS) as AccountType[]).map((t) => (
+                      <SelectItem key={t} value={t}>
+                        {t}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              {fields.map(([k, label]) => (
+                <div key={k} className="space-y-1.5">
+                  <Label>{label} *</Label>
+                  <Input dir={k === 'n' ? 'ltr' : undefined} value={vals[k] ?? ''} onChange={(e) => setVals({ ...vals, [k]: e.target.value })} />
+                </div>
+              ))}
             </div>
-          ))}
-          <OtpField value={otp} onChange={setOtp} />
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={reset}>
-            إلغاء
-          </Button>
-          <Button onClick={submit}>تأكيد</Button>
-        </DialogFooter>
+            <DialogFooter>
+              <Button variant="outline" onClick={reset}>
+                إلغاء
+              </Button>
+              <Button onClick={next}>متابعة</Button>
+            </DialogFooter>
+          </>
+        ) : (
+          <OtpStep phone={phone} onVerified={confirm} onBack={() => setStep('form')} />
+        )}
       </DialogContent>
     </Dialog>
   );
@@ -107,7 +182,7 @@ export default function Account(): JSX.Element {
   const [adding, setAdding] = useState(false);
   const [defOf, setDefOf] = useState<TransferAccount | null>(null);
   const [delOf, setDelOf] = useState<TransferAccount | null>(null);
-  const [otp, setOtp] = useState('');
+  const [defStep, setDefStep] = useState<'confirm' | 'otp'>('confirm');
 
   const ro = (label: string, value: string, ltr = false): JSX.Element => (
     <div className="space-y-1.5">
@@ -185,31 +260,42 @@ export default function Account(): JSX.Element {
 
       <AddAccountDialog open={adding} onClose={() => setAdding(false)} />
 
-      <Dialog open={!!defOf} onOpenChange={(o) => { if (!o) { setDefOf(null); setOtp(''); } }}>
+      <Dialog open={!!defOf} onOpenChange={(o) => { if (!o) { setDefOf(null); setDefStep('confirm'); } }}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>تعيين الحساب الافتراضي</DialogTitle>
           </DialogHeader>
-          <p className="text-sm">
-            سيصبح <b>{defOf?.type} · {defOf?.details}</b> الحساب الافتراضي للتحويل.
-          </p>
-          <OtpField value={otp} onChange={setOtp} />
-          <DialogFooter>
-            <Button variant="outline" onClick={() => { setDefOf(null); setOtp(''); }}>
-              إلغاء
-            </Button>
-            <Button
-              onClick={() => {
-                if (otp.trim() !== OTP) return showToast('الرمز غير صحيح', 'error');
+          {defStep === 'confirm' ? (
+            <>
+              <p className="text-sm">
+                سيصبح <b>{defOf?.type} · {defOf?.details}</b> الحساب الافتراضي للتحويل. سنرسل رمز تأكيد إلى جوالك في الخطوة التالية.
+              </p>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setDefOf(null)}>
+                  إلغاء
+                </Button>
+                <Button
+                  onClick={() => {
+                    showToast('تم إرسال رمز التأكيد إلى جوالك');
+                    setDefStep('otp');
+                  }}
+                >
+                  متابعة
+                </Button>
+              </DialogFooter>
+            </>
+          ) : (
+            <OtpStep
+              phone={v.phone}
+              onBack={() => setDefStep('confirm')}
+              onVerified={() => {
                 setDefaultAccount(defOf!.id);
                 setDefOf(null);
-                setOtp('');
+                setDefStep('confirm');
                 showToast('تم تغيير الحساب الافتراضي، والسحب متوقف لمدة 48 ساعة');
               }}
-            >
-              تأكيد
-            </Button>
-          </DialogFooter>
+            />
+          )}
         </DialogContent>
       </Dialog>
 
