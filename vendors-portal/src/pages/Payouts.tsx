@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { Eye } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { ChevronLeft, ChevronRight, Eye } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { useVendorStore, sumsFor, type Payout } from '@v/store/useVendorStore';
 import { FX, toLocal } from '@v/lib/vendorMath';
 import { useUIStore } from '@/store/useUIStore';
@@ -12,6 +13,14 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+
+const TABS: [string, string][] = [
+  ['all', 'الكل'],
+  ['بانتظار المراجعة', 'بانتظار المراجعة'],
+  ['تم التحويل', 'تم التحويل'],
+  ['مرفوض', 'مرفوض'],
+];
+const PAGE_SIZE = 6;
 
 const poNo = (id: number): string => `PO-${String(id).padStart(4, '0')}`;
 
@@ -28,6 +37,12 @@ export default function Payouts(): JSX.Element {
   const [amount, setAmount] = useState('');
   const [accId, setAccId] = useState<string>(String(defaultAcc?.id ?? ''));
   const [confirming, setConfirming] = useState(false);
+  const [tab, setTab] = useState('all');
+  const [page, setPage] = useState(1);
+  const filtered = useMemo(() => mine.filter((p) => tab === 'all' || p.st === tab), [mine, tab]);
+  const pages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const cur = Math.min(page, pages);
+  const shown = filtered.slice((cur - 1) * PAGE_SIZE, cur * PAGE_SIZE);
   const [reasonOf, setReasonOf] = useState<Payout | null>(null);
   const [receiptOf, setReceiptOf] = useState<Payout | null>(null);
 
@@ -107,9 +122,20 @@ export default function Payouts(): JSX.Element {
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-base">طلباتي</CardTitle>
+          <div className="flex flex-wrap gap-1.5 pt-2">
+            {TABS.map(([k, t]) => (
+              <button
+                key={k}
+                onClick={() => { setTab(k); setPage(1); }}
+                className={cn('rounded-lg border px-3 py-1.5 text-xs font-semibold', tab === k ? 'border-primary bg-primary text-primary-foreground' : 'bg-card hover:bg-muted')}
+              >
+                {t} ({mine.filter((p) => k === 'all' || p.st === k).length})
+              </button>
+            ))}
+          </div>
         </CardHeader>
         <CardContent className="p-0">
-          {mine.length === 0 ? (
+          {filtered.length === 0 ? (
             <p className="p-4 text-sm text-muted-foreground">لا توجد طلبات.</p>
           ) : (
             <Table>
@@ -123,7 +149,7 @@ export default function Payouts(): JSX.Element {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {mine.map((p) => (
+                {shown.map((p) => (
                   <TableRow key={p.id}>
                     <TableCell>{poNo(p.id)}</TableCell>
                     <TableCell>
@@ -151,6 +177,22 @@ export default function Payouts(): JSX.Element {
                 ))}
               </TableBody>
             </Table>
+          )}
+          {filtered.length > PAGE_SIZE && (
+            <div className="flex items-center justify-between gap-2 border-t px-4 py-3 text-xs text-muted-foreground">
+              <span>
+                {(cur - 1) * PAGE_SIZE + 1}–{Math.min(cur * PAGE_SIZE, filtered.length)} من {filtered.length}
+              </span>
+              <div className="flex items-center gap-1.5">
+                <Button size="icon" variant="outline" className="h-8 w-8" aria-label="الصفحة السابقة" disabled={cur === 1} onClick={() => setPage(cur - 1)}>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+                <span className="px-2 font-semibold text-foreground">صفحة {cur} من {pages}</span>
+                <Button size="icon" variant="outline" className="h-8 w-8" aria-label="الصفحة التالية" disabled={cur === pages} onClick={() => setPage(cur + 1)}>
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
           )}
         </CardContent>
       </Card>
