@@ -23,6 +23,7 @@ import {
   HandCoins,
   SlidersHorizontal,
   ScrollText,
+  ChevronDown,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useUIStore } from '@/store/useUIStore';
@@ -41,6 +42,8 @@ interface NavItem {
   to: string;
   label: string;
   icon: React.ElementType;
+  /** sub-modules: the item becomes a collapsible module */
+  children?: NavItem[];
 }
 
 interface NavGroup {
@@ -66,12 +69,19 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
-    title: 'الموردون',
+    title: '',
     items: [
-      { to: '/vendors', label: 'الموردون', icon: Handshake },
-      { to: '/vendors/payouts', label: 'طلبات السحب', icon: HandCoins },
-      { to: '/vendors/settings', label: 'إعدادات الموردين', icon: SlidersHorizontal },
-      { to: '/vendors/log', label: 'سجل الحركات', icon: ScrollText },
+      {
+        to: '/vendors',
+        label: 'الموردون',
+        icon: Handshake,
+        children: [
+          { to: '/vendors', label: 'قائمة الموردين', icon: Users },
+          { to: '/vendors/payouts', label: 'طلبات السحب', icon: HandCoins },
+          { to: '/vendors/settings', label: 'إعدادات الموردين', icon: SlidersHorizontal },
+          { to: '/vendors/log', label: 'سجل الحركات', icon: ScrollText },
+        ],
+      },
     ],
   },
   {
@@ -108,6 +118,7 @@ function SidebarInner({ collapsed, onToggleCollapse, onNavigate, mobile, onClose
   const { confirm } = useConfirm();
   const location = useLocation();
   const navigate = useNavigate();
+  const [openMods, setOpenMods] = useState<Record<string, boolean>>({});
 
   const handleLogout = async () => {
     const ok = await confirm({ title: 'تسجيل الخروج', message: 'هل أنت متأكد من تسجيل الخروج؟', variant: 'danger', confirmText: 'خروج' });
@@ -185,28 +196,67 @@ function SidebarInner({ collapsed, onToggleCollapse, onNavigate, mobile, onClose
               )}
               {group.items.map((item) => {
                 const Icon = item.icon;
-                // the private-assistant pages live under «إعدادات المساعد الذكي»
-                // /vendors has sibling pages (payouts, settings, log): it is active only on the list and a vendor's detail
+                // /vendors has sibling pages (payouts, settings, log): the list is active only on the list and a vendor's detail
                 const vendorSub = ['/vendors/payouts', '/vendors/settings', '/vendors/log'];
-                const isActive =
-                  item.to === '/vendors'
+                const isActiveTo = (to: string): boolean =>
+                  to === '/vendors'
                     ? location.pathname === '/vendors' || (location.pathname.startsWith('/vendors/') && !vendorSub.includes(location.pathname))
-                    : location.pathname === item.to ||
-                      location.pathname.startsWith(item.to + '/') ||
-                      (item.to === '/widget' && location.pathname.startsWith('/ai-balance'));
+                    : location.pathname === to ||
+                      location.pathname.startsWith(to + '/') ||
+                      // the private-assistant pages live under «إعدادات المساعد الذكي»
+                      (to === '/widget' && location.pathname.startsWith('/ai-balance'));
+                const itemClass = (active: boolean): string =>
+                  cn(
+                    'flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-200',
+                    collapsed ? 'h-10 w-10 justify-center mx-auto' : 'h-10 px-3',
+                    active
+                      ? 'bg-white/15 text-white shadow-lg shadow-black/10 backdrop-blur-sm'
+                      : 'text-white/60 hover:text-white hover:bg-white/8'
+                  );
+
+                // a module with sub-modules: expandable while the sidebar is open
+                if (item.children && !collapsed) {
+                  const inModule = location.pathname.startsWith(item.to);
+                  const isOpen = openMods[item.to] ?? inModule;
+                  return (
+                    <div key={item.to}>
+                      <button
+                        type="button"
+                        aria-expanded={isOpen}
+                        onClick={() => setOpenMods((m) => ({ ...m, [item.to]: !isOpen }))}
+                        className={cn(itemClass(inModule && !isOpen), 'w-full')}
+                      >
+                        <Icon className="h-[18px] w-[18px] flex-shrink-0" />
+                        <span className="truncate flex-1 text-start">{item.label}</span>
+                        <ChevronDown className={cn('h-4 w-4 flex-shrink-0 transition-transform', isOpen && 'rotate-180')} />
+                      </button>
+                      {isOpen && (
+                        <div className="ms-5 mt-0.5 mb-1 flex flex-col gap-0.5 border-s border-white/10 ps-2">
+                          {item.children.map((c) => {
+                            const CIcon = c.icon;
+                            return (
+                              <NavLink
+                                key={c.to}
+                                to={c.to}
+                                onClick={onNavigate}
+                                className={cn(
+                                  'flex h-9 items-center gap-2.5 rounded-lg px-3 text-[13px] transition-colors',
+                                  isActiveTo(c.to) ? 'bg-white/15 text-white' : 'text-white/55 hover:text-white hover:bg-white/8'
+                                )}
+                              >
+                                <CIcon className="h-4 w-4 flex-shrink-0" />
+                                <span className="truncate">{c.label}</span>
+                              </NavLink>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+
                 const linkEl = (
-                  <NavLink
-                    key={item.to}
-                    to={item.to}
-                    onClick={onNavigate}
-                    className={cn(
-                      'flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-200',
-                      collapsed ? 'h-10 w-10 justify-center mx-auto' : 'h-10 px-3',
-                      isActive
-                        ? 'bg-white/15 text-white shadow-lg shadow-black/10 backdrop-blur-sm'
-                        : 'text-white/60 hover:text-white hover:bg-white/8'
-                    )}
-                  >
+                  <NavLink key={item.to} to={item.to} onClick={onNavigate} className={itemClass(isActiveTo(item.to))}>
                     <Icon className="h-[18px] w-[18px] flex-shrink-0" />
                     {!collapsed && <span className="truncate">{item.label}</span>}
                   </NavLink>

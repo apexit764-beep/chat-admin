@@ -10,7 +10,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { FieldHint } from '@/components/ui/field-hint';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { isTransferRef, lengthBetween, MAX_RECEIPT_MB } from '@/utils/vendorValidation';
 
 const PILL: Record<string, string> = {
   'معلّقة': 'bg-amber-100 text-amber-800',
@@ -204,7 +206,8 @@ function RejectDialog({ payout, onClose }: { payout: Payout; onClose: () => void
         </DialogHeader>
         <div className="space-y-1.5">
           <Label>سبب الرفض *</Label>
-          <Textarea rows={3} value={reason} onChange={(e) => setReason(e.target.value)} />
+          <Textarea rows={3} maxLength={300} value={reason} onChange={(e) => setReason(e.target.value)} />
+          <FieldHint>مطلوب. من 3 إلى 300 حرف، ويظهر للمورد كما كُتب.</FieldHint>
         </div>
         <Note>يعود المبلغ "متاح" لدى المورد، ويرى سبب الرفض.</Note>
         <DialogFooter>
@@ -214,7 +217,7 @@ function RejectDialog({ payout, onClose }: { payout: Payout; onClose: () => void
           <Button
             variant="destructive"
             onClick={() => {
-              if (!reason.trim()) return showToast('أدخل السبب', 'error');
+              if (!lengthBetween(reason, 3, 300)) return showToast('السبب مطلوب، من 3 إلى 300 حرف', 'error');
               reject(payout.id, reason.trim());
               onClose();
             }}
@@ -235,6 +238,9 @@ function ExecuteDialog({ payout, vendor, onClose }: { payout: Payout; vendor: Ve
 
   const submit = (): void => {
     if (!ref.trim() || !file) return showToast('رقم العملية وصورة التحويل مطلوبان', 'error');
+    if (!isTransferRef(ref)) return showToast('رقم العملية: حروف إنجليزية وأرقام وشرطة فقط، من 4 إلى 40 خانة', 'error');
+    if (!(file.type.startsWith('image/') || file.type === 'application/pdf')) return showToast('الملف يجب أن يكون صورة أو PDF', 'error');
+    if (file.size > MAX_RECEIPT_MB * 1024 * 1024) return showToast(`حجم الملف يتجاوز ${MAX_RECEIPT_MB} ميجابايت`, 'error');
     const done = (img: string): void => {
       execute(payout.id, ref.trim(), file.name, img);
       showToast('تم، وسيرى المورد صورة التحويل');
@@ -259,11 +265,13 @@ function ExecuteDialog({ payout, vendor, onClose }: { payout: Payout; vendor: Ve
         </div>
         <div className="space-y-1.5">
           <Label>رقم العملية *</Label>
-          <Input dir="ltr" value={ref} onChange={(e) => setRef(e.target.value)} />
+          <Input dir="ltr" maxLength={40} value={ref} onChange={(e) => setRef(e.target.value)} />
+          <FieldHint>مطلوب. حروف إنجليزية وأرقام وشرطة (-) فقط، من 4 إلى 40 خانة، بدون مسافات.</FieldHint>
         </div>
         <div className="space-y-1.5">
           <Label>صورة التحويل *</Label>
           <Input type="file" accept="image/*,.pdf" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
+          <FieldHint>مطلوب. صورة (PNG أو JPG) أو ملف PDF، بحد أقصى {MAX_RECEIPT_MB} ميجابايت.</FieldHint>
         </div>
         <Note tone="warn">لا يمكن إغلاق الطلب بحالة "تم التحويل" دون رقم العملية وصورة التحويل.</Note>
         <DialogFooter>
@@ -294,3 +302,5 @@ function ReceiptDialog({ payout, vendor, onClose }: { payout: Payout; vendor: Ve
     </Dialog>
   );
 }
+
+export { FieldHint };

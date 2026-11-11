@@ -69,3 +69,8 @@ export function PageHeader({ title, desc, actions }: { title: string; desc?: str
     </div>
   );
 }
+
+/** the validation rule of a field, shown right under it */
+export function FieldHint({ children, className }: { children: React.ReactNode; className?: string }): JSX.Element {
+  return <p className={cn('text-[11px] leading-relaxed text-muted-foreground', className)}>{children}</p>;
+}

@@ -6,6 +6,7 @@ import { PrivateAssistantNav } from '@/components/admin/PrivateAssistantNav';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { FieldHint } from '@/components/ui/field-hint';
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -144,15 +145,17 @@ export default function AIBalanceSettings(): JSX.Element {
           <div className="space-y-1.5">
             <Label>النموذج المربوط</Label>
             <Input value={settings.provider} disabled dir="ltr" />
-            <p className="text-xs text-muted-foreground">من إعدادات الربط · لا يظهر للعميل</p>
+            <FieldHint>للقراءة فقط، من إعدادات الربط، ولا يظهر للعميل.</FieldHint>
           </div>
           <div className="space-y-1.5">
             <Label>الاسم الظاهر للعميل</Label>
             <Input value={draft.modelName} onChange={(e) => set('modelName', e.target.value)} />
+            <FieldHint>مطلوب. نص غير فارغ، هو الاسم الذي يراه العميل للمساعد.</FieldHint>
           </div>
           <div className="space-y-1.5">
             <Label>سعر البيع لكل مليون توكن ($)</Label>
             <Input dir="ltr" type="number" step="0.01" value={draft.price} onChange={(e) => set('price', e.target.value)} />
+            <FieldHint>مطلوب. رقم أكبر من صفر بالدولار. تغييره يرسل إشعارًا للعملاء.</FieldHint>
           </div>
         </CardContent>
       </Card>
@@ -203,6 +206,9 @@ export default function AIBalanceSettings(): JSX.Element {
               إضافة باقة
             </Button>
           </div>
+          <FieldHint>
+            مبلغ بالدولار أكبر من صفر، غير مكرر، ولا يتجاوز الحد الأقصى للمبلغ الحر. الحد الأقصى 6 باقات، ولا يمكن حذف باقة.
+          </FieldHint>
         </CardContent>
       </Card>
 
@@ -214,10 +220,12 @@ export default function AIBalanceSettings(): JSX.Element {
           <div className="space-y-1.5">
             <Label>الحد الأدنى ($)</Label>
             <Input dir="ltr" type="number" value={draft.min} onChange={(e) => set('min', e.target.value)} />
+            <FieldHint>مطلوب. رقم أكبر من صفر، وأقل من الحد الأقصى.</FieldHint>
           </div>
           <div className="space-y-1.5">
             <Label>الحد الأقصى ($)</Label>
             <Input dir="ltr" type="number" value={draft.max} onChange={(e) => set('max', e.target.value)} />
+            <FieldHint>مطلوب. رقم أكبر من الحد الأدنى، ولا يقل عن أكبر باقة شحن.</FieldHint>
           </div>
         </CardContent>
       </Card>
@@ -230,9 +238,9 @@ export default function AIBalanceSettings(): JSX.Element {
           <div className="space-y-1.5">
             <Label>أقل رصيد مسموح ($)</Label>
             <Input dir="ltr" type="number" step="0.01" min="0" value={draft.negative} onChange={(e) => set('negative', e.target.value)} />
-            <p className="text-xs text-muted-foreground">
-              أقل رصيد ممكن يصل له العميل، وعنده يتوقف سحب التوكن (يتوقف المساعد).
-            </p>
+            <FieldHint>
+              مطلوب. رقم موجب (صفر أو أكبر)، لا يقبل السالب. هو أقل رصيد ممكن يصل له العميل، وعنده يتوقف سحب التوكن (يتوقف المساعد).
+            </FieldHint>
           </div>
         </CardContent>
       </Card>
@@ -248,14 +256,16 @@ export default function AIBalanceSettings(): JSX.Element {
           <div className="space-y-1.5">
             <Label>حد التنبيه (مليون توكن)</Label>
             <Input dir="ltr" type="number" step="0.1" min="0" value={draft.providerAlert} onChange={(e) => set('providerAlert', e.target.value)} />
-            <p className="text-xs text-muted-foreground">
-              لما يقل رصيد Qhub عن هذا الحد يصلك إشعار في اللوحة وإيميل، مرة واحدة إلى أن يُشحن الرصيد.
-            </p>
+            <FieldHint>
+              مطلوب. رقم أكبر من صفر بالمليون توكن. لما يقل رصيد Qhub عن هذا الحد يصلك إشعار في اللوحة وإيميل، مرة واحدة إلى أن يُشحن الرصيد.
+            </FieldHint>
           </div>
           <div className="space-y-1.5">
             <Label>إيميل التنبيه</Label>
             <Input dir="ltr" value={draft.alertEmails} onChange={(e) => set('alertEmails', e.target.value)} />
-            <p className="text-xs text-muted-foreground">يمكن إدخال أكثر من إيميل مفصولة بفاصلة. الإرسال الفعلي للإيميل يعمل بعد ربط الخادم.</p>
+            <FieldHint>
+              مطلوب. إيميل واحد أو أكثر بصيغة صحيحة، مفصولة بفاصلة. الإرسال الفعلي للإيميل يعمل بعد ربط الخادم.
+            </FieldHint>
           </div>
         </CardContent>
       </Card>
@@ -268,6 +278,7 @@ export default function AIBalanceSettings(): JSX.Element {
           <div className="space-y-1.5 py-2">
             <Label>المبلغ ($)</Label>
             <Input dir="ltr" type="number" value={editValue} onChange={(e) => setEditValue(e.target.value)} />
+            <FieldHint>مطلوب. أكبر من صفر، غير مكرر، ولا يتجاوز الحد الأقصى للمبلغ الحر. التعديل مسموح فقط لباقة بلا مشتركين.</FieldHint>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditFrom(null)}>

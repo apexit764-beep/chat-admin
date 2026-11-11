@@ -3,7 +3,8 @@ import { Eye } from 'lucide-react';
 import { useVendorStore, sumsFor, type Payout } from '@v/store/useVendorStore';
 import { FX, toLocal } from '@v/lib/vendorMath';
 import { useUIStore } from '@/store/useUIStore';
-import { Money, Note, PageHeader, Stat, StatusPill } from '@v/components/ui-bits';
+import { FieldHint, Money, Note, PageHeader, Stat, StatusPill } from '@v/components/ui-bits';
+import { decimalsAtMost3 } from '@v/lib/validation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -42,7 +43,8 @@ export default function Payouts(): JSX.Element {
   const account = v.accounts.find((a) => String(a.id) === accId);
 
   const start = (): void => {
-    if (!amt) return showToast('أدخل المبلغ', 'error');
+    if (!(amt > 0)) return showToast('أدخل مبلغًا أكبر من صفر', 'error');
+    if (!decimalsAtMost3(amt)) return showToast('المبلغ بحد أقصى 3 خانات عشرية', 'error');
     if (amt < min) return showToast('المبلغ أقل من الحد الأدنى', 'error');
     if (amt > s.avail) return showToast('المبلغ أكبر من الرصيد المتاح', 'error');
     if (!account) return showToast('اختر حساب التحويل', 'error');
@@ -69,7 +71,8 @@ export default function Payouts(): JSX.Element {
           <div className="grid items-end gap-3 md:grid-cols-2">
             <div className="space-y-1.5">
               <Label>المبلغ ({FX[v.cur].sym})</Label>
-              <Input dir="ltr" inputMode="decimal" disabled={!!why} placeholder={`من ${min} إلى ${s.avail}`} value={amount} onChange={(e) => setAmount(e.target.value)} />
+              <Input dir="ltr" inputMode="decimal" disabled={!!why} placeholder={`من ${min} إلى ${s.avail}`} value={amount} onChange={(e) => setAmount(e.target.value.replace(/[^\d.]/g, ''))} />
+              <FieldHint>مطلوب. رقم أكبر من صفر، من الحد الأدنى ({min} {FX[v.cur].sym}) إلى المتاح ({s.avail} {FX[v.cur].sym})، بحد أقصى 3 خانات عشرية.</FieldHint>
             </div>
             <div className="text-xs leading-relaxed text-muted-foreground">
               المتاح: <b className="text-foreground"><Money v={s.avail} cur={v.cur} /></b> · الحد الأدنى: <Money v={min} cur={v.cur} />
@@ -91,6 +94,7 @@ export default function Payouts(): JSX.Element {
                   ))}
                 </SelectContent>
               </Select>
+              <FieldHint>مطلوب. اختر أحد حسابات التحويل المضافة في صفحة "حسابي"، والافتراضي محدد مسبقًا.</FieldHint>
             </div>
           )}
           {why && <Note tone="warn">{why}</Note>}

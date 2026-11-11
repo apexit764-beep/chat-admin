@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Save } from 'lucide-react';
 import { useUIStore } from '@/store/useUIStore';
 import { useVendorsAdminStore } from '@/store/useVendorsAdminStore';
-import { Note } from '@/components/admin/vendors/VendorBits';
+import { FieldHint, Note } from '@/components/admin/vendors/VendorBits';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -21,6 +21,7 @@ export default function VendorSettings(): JSX.Element {
     const [rate, hold, min] = [Number(d.rate), Number(d.hold), Number(d.min)];
     if (![rate, hold, min].every((x) => x > 0)) return showToast('يجب أن تكون القيم أرقامًا أكبر من صفر', 'error');
     if (rate > 100) return showToast('نسبة العمولة لا تتجاوز 100%', 'error');
+    if (!Number.isInteger(hold) || hold > 365) return showToast('مدة التعليق عدد صحيح من 1 إلى 365 يومًا', 'error');
     saveSettings({ rate, hold, min });
     showToast('تم الحفظ');
   };
@@ -37,17 +38,17 @@ export default function VendorSettings(): JSX.Element {
             <div className="space-y-1.5">
               <Label>نسبة العمولة الافتراضية</Label>
               <Input dir="ltr" inputMode="decimal" value={d.rate} onChange={(e) => set('rate', e.target.value)} />
-              <p className="text-xs text-muted-foreground">%، من أول اشتراك</p>
+              <FieldHint>مطلوب. رقم أكبر من 0 وحتى 100 (%)، يُحسب من أول اشتراك.</FieldHint>
             </div>
             <div className="space-y-1.5">
               <Label>مدة تعليق الرصيد</Label>
               <Input dir="ltr" inputMode="numeric" value={d.hold} onChange={(e) => set('hold', e.target.value)} />
-              <p className="text-xs text-muted-foreground">يوم بعد دفع العميل قبل أن تصبح العمولة متاحة</p>
+              <FieldHint>مطلوب. عدد صحيح من 1 إلى 365 يومًا بعد دفع العميل قبل أن تصبح العمولة متاحة.</FieldHint>
             </div>
             <div className="space-y-1.5">
               <Label>الحد الأدنى للسحب</Label>
               <Input dir="ltr" inputMode="decimal" value={d.min} onChange={(e) => set('min', e.target.value)} />
-              <p className="text-xs text-muted-foreground">بالدولار، ويظهر للمورد بعملة دولته</p>
+              <FieldHint>مطلوب. رقم أكبر من 0 بالدولار، ويظهر للمورد بعملة دولته.</FieldHint>
             </div>
           </div>
           <Note>يُطبق التغيير على العمولات الجديدة فقط.</Note>

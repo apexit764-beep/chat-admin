@@ -6,7 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Toast } from '@/components/ui/Toast';
 import { useUIStore } from '@/store/useUIStore';
 import { useVendorStore } from '@v/store/useVendorStore';
-import { Note } from '@v/components/ui-bits';
+import { FieldHint, Note } from '@v/components/ui-bits';
+import { isEmail, passwordRules, PASSWORD_CHARSET } from '@v/lib/validation';
 
 function AuthBox({ children }: { children: React.ReactNode }): JSX.Element {
   return (
@@ -29,6 +30,8 @@ export function Login(): JSX.Element {
   const [error, setError] = useState('');
 
   const submit = (): void => {
+    if (!isEmail(email)) return setError('أدخل بريدًا إلكترونيًا صحيحًا');
+    if (!password) return setError('كلمة المرور مطلوبة');
     const r = login(email, password);
     if (r.ok) navigate('/home');
     else setError(r.error);
@@ -42,10 +45,12 @@ export function Login(): JSX.Element {
         <div className="space-y-1.5">
           <Label>البريد الإلكتروني</Label>
           <Input dir="ltr" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@company.com" />
+          <FieldHint>مطلوب. بريد إلكتروني بصيغة صحيحة، مثل name@company.com.</FieldHint>
         </div>
         <div className="space-y-1.5">
           <Label>كلمة المرور</Label>
           <Input dir="ltr" type="password" value={password} onChange={(e) => setPassword(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && submit()} />
+          <FieldHint>مطلوبة. هي كلمة المرور التي أنشأتها من رابط الدعوة.</FieldHint>
         </div>
         {error && <Note tone="error">{error}</Note>}
         <button className="text-xs text-primary" onClick={() => navigate('/forgot')}>
@@ -74,10 +79,12 @@ export function Forgot(): JSX.Element {
         <div className="space-y-1.5">
           <Label>البريد الإلكتروني</Label>
           <Input dir="ltr" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@company.com" />
+          <FieldHint>مطلوب. بريد إلكتروني بصيغة صحيحة، وهو البريد المسجّل في حسابك.</FieldHint>
         </div>
         <Button
           className="w-full"
           onClick={() => {
+            if (!isEmail(email)) return showToast('أدخل بريدًا إلكترونيًا صحيحًا', 'error');
             showToast('إذا كان البريد الإلكتروني مسجلًا، سيصلك رابط إعادة التعيين');
             navigate('/login');
           }}
@@ -92,12 +99,6 @@ export function Forgot(): JSX.Element {
   );
 }
 
-const RULES: [(p: string) => boolean, string][] = [
-  [(p) => p.length >= 8, '8 حروف على الأقل'],
-  [(p) => /[A-Za-z]/.test(p), 'حرف إنجليزي واحد على الأقل'],
-  [(p) => /\d/.test(p), 'رقم واحد على الأقل'],
-];
-
 /** Shared by the invite link (first password + terms) and the reset link */
 export function CreatePassword({ mode }: { mode: 'invite' | 'reset' }): JSX.Element {
   const { vid } = useParams();
@@ -109,8 +110,8 @@ export function CreatePassword({ mode }: { mode: 'invite' | 'reset' }): JSX.Elem
   const [p2, setP2] = useState('');
   const [terms, setTerms] = useState(false);
 
-  const rules = useMemo(() => RULES.map(([f, label]) => ({ ok: f(p1), label })), [p1]);
-  const valid = rules.every((r) => r.ok) && p1 === p2 && (mode === 'reset' || terms);
+  const rules = useMemo(() => passwordRules(p1), [p1]);
+  const valid = rules.every((r) => r.ok) && p1.length > 0 && PASSWORD_CHARSET.test(p1) && p1 === p2 && (mode === 'reset' || terms);
 
   // a link is single use: an active account cannot open its invite again
   if (!vendor || (mode === 'invite' && vendor.status !== 'دعوة مرسلة')) {
@@ -150,6 +151,7 @@ export function CreatePassword({ mode }: { mode: 'invite' | 'reset' }): JSX.Elem
         <div className="space-y-1.5">
           <Label>البريد الإلكتروني</Label>
           <Input dir="ltr" value={vendor.email} disabled />
+          <FieldHint>للقراءة فقط، وهو البريد الذي وصلته عليه الدعوة.</FieldHint>
         </div>
         <div className="space-y-1.5">
           <Label>كلمة المرور *</Label>
@@ -165,12 +167,13 @@ export function CreatePassword({ mode }: { mode: 'invite' | 'reset' }): JSX.Elem
         <div className="space-y-1.5">
           <Label>تأكيد كلمة المرور *</Label>
           <Input dir="ltr" type="password" value={p2} onChange={(e) => setP2(e.target.value)} />
+          <FieldHint>مطلوب. يجب أن يطابق كلمة المرور تمامًا.</FieldHint>
           {p2 && p2 !== p1 && <div className="text-xs text-red-600">كلمتا المرور غير متطابقتين</div>}
         </div>
         {mode === 'invite' && (
           <label className="flex items-start gap-2 text-xs leading-relaxed">
             <input type="checkbox" className="mt-1" checked={terms} onChange={(e) => setTerms(e.target.checked)} />
-            أوافق على شروط وأحكام برنامج الموردين
+            أوافق على شروط وأحكام برنامج الموردين (إلزامي للمتابعة)
           </label>
         )}
         <Button className="w-full" disabled={!valid} onClick={submit}>

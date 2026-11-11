@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Link2, Plus, RotateCw } from 'lucide-react';
 import { useVendorStore } from '@v/store/useVendorStore';
 import { useUIStore } from '@/store/useUIStore';
-import { Money, Note, PageHeader, StatusPill } from '@v/components/ui-bits';
+import { FieldHint, Money, Note, PageHeader, StatusPill } from '@v/components/ui-bits';
+import { isEmail, isPhoneDigits, lengthBetween } from '@v/lib/validation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -28,8 +29,9 @@ function AddClientDialog({ open, onClose }: { open: boolean; onClose: () => void
   const [phone, setPhone] = useState('');
 
   const submit = (): void => {
-    if (!name.trim() || !email.trim()) return showToast('الاسم والبريد الإلكتروني مطلوبان', 'error');
-    if (!phone.trim()) return showToast('رقم الجوال مطلوب', 'error');
+    if (!lengthBetween(name, 2, 100)) return showToast('اسم الشركة مطلوب، من حرفين إلى 100 حرف', 'error');
+    if (!isEmail(email)) return showToast('أدخل بريدًا إلكترونيًا صحيحًا', 'error');
+    if (!isPhoneDigits(phone)) return showToast('رقم الجوال أرقام فقط، من 6 إلى 15 رقمًا', 'error');
     const r = addClient({ name: name.trim(), email: email.trim(), phone: `${code} ${phone.trim()}` });
     if (!r.ok) return showToast(r.error, 'error');
     showToast('تم إرسال الدعوة');
@@ -48,11 +50,13 @@ function AddClientDialog({ open, onClose }: { open: boolean; onClose: () => void
         <div className="space-y-3 py-1">
           <div className="space-y-1.5">
             <Label>اسم الشركة أو النشاط *</Label>
-            <Input value={name} onChange={(e) => setName(e.target.value)} />
+            <Input value={name} onChange={(e) => setName(e.target.value)} maxLength={100} />
+            <FieldHint>مطلوب. من حرفين إلى 100 حرف.</FieldHint>
           </div>
           <div className="space-y-1.5">
             <Label>البريد الإلكتروني *</Label>
             <Input dir="ltr" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <FieldHint>مطلوب. بريد إلكتروني بصيغة صحيحة وغير مسجّل مسبقًا في Qhub، وإلا يُرفض.</FieldHint>
           </div>
           <div className="space-y-1.5">
             <Label>رقم الجوال *</Label>
@@ -69,8 +73,9 @@ function AddClientDialog({ open, onClose }: { open: boolean; onClose: () => void
                   ))}
                 </SelectContent>
               </Select>
-              <Input dir="ltr" inputMode="numeric" placeholder="1001234567" value={phone} onChange={(e) => setPhone(e.target.value)} />
+              <Input dir="ltr" inputMode="numeric" placeholder="1001234567" value={phone} onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))} />
             </div>
+            <FieldHint>مطلوب. أرقام فقط، من 6 إلى 15 رقمًا، بدون رمز الدولة. رمز الدولة يُختار من القائمة.</FieldHint>
           </div>
           <Note>سيصل إلى العميل بريد دعوة لإكمال التسجيل واختيار باقته. تُحسب عمولتك على أول اشتراك فقط.</Note>
         </div>

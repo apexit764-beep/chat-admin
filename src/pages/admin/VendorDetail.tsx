@@ -3,7 +3,8 @@ import { Link, useParams } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { useUIStore } from '@/store/useUIStore';
 import { FX, sumsFor, useVendorsAdminStore, type Commission } from '@/store/useVendorsAdminStore';
-import { MiniStat, Money, Note, PayoutsTable, StatusPill } from '@/components/admin/vendors/VendorBits';
+import { FieldHint, MiniStat, Money, Note, PayoutsTable, StatusPill } from '@/components/admin/vendors/VendorBits';
+import { lengthBetween } from '@/utils/vendorValidation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -180,7 +181,8 @@ export default function VendorDetail(): JSX.Element {
           </div>
           <div className="space-y-1.5">
             <Label>السبب *</Label>
-            <Textarea rows={3} placeholder="مثلًا: حساب وهمي" value={reason} onChange={(e) => setReason(e.target.value)} />
+            <Textarea rows={3} maxLength={300} placeholder="مثلًا: حساب وهمي" value={reason} onChange={(e) => setReason(e.target.value)} />
+            <FieldHint>مطلوب. من 3 إلى 300 حرف، ويُسجل في سجل الحركات.</FieldHint>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={closeCancel}>
@@ -189,7 +191,7 @@ export default function VendorDetail(): JSX.Element {
             <Button
               variant="destructive"
               onClick={() => {
-                if (!reason.trim()) return showToast('أدخل السبب', 'error');
+                if (!lengthBetween(reason, 3, 300)) return showToast('السبب مطلوب، من 3 إلى 300 حرف', 'error');
                 const r = cancelCommission(cancelOf!.id, reason.trim());
                 if (!r.ok) return showToast(r.error, 'error');
                 closeCancel();

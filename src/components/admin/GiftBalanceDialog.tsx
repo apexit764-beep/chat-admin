@@ -5,6 +5,7 @@ import { useUIStore } from '@/store/useUIStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { FieldHint } from '@/components/ui/field-hint';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
@@ -58,6 +59,7 @@ export function GiftBalanceDialog({ clientId, onClose }: Props): JSX.Element {
                 {usd > 0 ? `≈ ${formatTokens(tokensFor(usd, price))} توكن` : ''}
               </b>
             </div>
+            <FieldHint>مطلوب. رقم أكبر من صفر بالدولار، ولا يقبل السالب (الإضافة فقط).</FieldHint>
           </div>
           <div className="space-y-1.5">
             <Label>السبب *</Label>
@@ -67,6 +69,7 @@ export function GiftBalanceDialog({ clientId, onClose }: Props): JSX.Element {
               value={reason}
               onChange={(e) => setReason(e.target.value)}
             />
+            <FieldHint>مطلوب. نص غير فارغ، ويُسجل في سجل حركات العميل.</FieldHint>
           </div>
         </div>
         <DialogFooter>

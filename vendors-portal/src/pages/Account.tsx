@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { Plus } from 'lucide-react';
 import { useVendorStore, type AccountType, type TransferAccount } from '@v/store/useVendorStore';
 import { useUIStore } from '@/store/useUIStore';
-import { Note, PageHeader, StatusPill } from '@v/components/ui-bits';
+import { FieldHint, Note, PageHeader, StatusPill } from '@v/components/ui-bits';
+import { isAccountNumber, isEmail, isHolderName, isWalletNumber, lengthBetween } from '@v/lib/validation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -10,6 +11,20 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+
+/** validation rule shown under each field, per account type and key */
+const HINTS: Record<AccountType, Record<string, string>> = {
+  'حساب بنكي': {
+    b: 'مطلوب. من حرفين إلى 60 حرفًا.',
+    n: 'مطلوب. حروف إنجليزية وأرقام فقط، من 8 إلى 34 خانة، وتُتجاهل المسافات.',
+    h: 'مطلوب. حروف ومسافات فقط، من 3 إلى 80 حرفًا، ويجب أن يطابق اسمك المسجّل وإلا يُرفض طلب السحب.',
+  },
+  'محفظة إلكترونية': {
+    b: 'مطلوب. من حرفين إلى 40 حرفًا.',
+    n: 'مطلوب. أرقام فقط، من 8 إلى 15 رقمًا.',
+  },
+  PayPal: { n: 'مطلوب. بريد إلكتروني بصيغة صحيحة.' },
+};
 
 /** fields per account type: [key, label] */
 const FIELDS: Record<AccountType, [string, string][]> = {
@@ -62,9 +77,10 @@ function OtpStep({ phone, onVerified, onBack }: { phone: string; onVerified: () 
           maxLength={6}
           placeholder="للتجربة: 123456"
           value={code}
-          onChange={(e) => setCode(e.target.value)}
+          onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
           onKeyDown={(e) => e.key === 'Enter' && verify()}
         />
+        <FieldHint>مطلوب. 6 أرقام فقط، صالح لمدة 5 دقائق، و3 محاولات بحد أقصى.</FieldHint>
       </div>
       <div className="flex items-center justify-between gap-2">
         <button
@@ -108,7 +124,17 @@ function AddAccountDialog({ open, onClose }: { open: boolean; onClose: () => voi
 
   const next = (): void => {
     if (fields.some(([k]) => !vals[k]?.trim())) return showToast('أكمل كل الحقول المطلوبة', 'error');
-    if (type === 'PayPal' && !/^\S+@\S+\.\S+$/.test(vals.n.trim())) return showToast('أدخل بريدًا إلكترونيًا صحيحًا', 'error');
+    const v = (k: string): string => (vals[k] ?? '').trim();
+    if (type === 'PayPal' && !isEmail(v('n'))) return showToast('أدخل بريدًا إلكترونيًا صحيحًا', 'error');
+    if (type === 'حساب بنكي') {
+      if (!lengthBetween(v('b'), 2, 60)) return showToast('اسم البنك من حرفين إلى 60 حرفًا', 'error');
+      if (!isAccountNumber(v('n'))) return showToast('رقم الحساب أو IBAN: حروف إنجليزية وأرقام فقط، من 8 إلى 34 خانة', 'error');
+      if (!isHolderName(v('h'))) return showToast('اسم صاحب الحساب: حروف ومسافات فقط، من 3 إلى 80 حرفًا', 'error');
+    }
+    if (type === 'محفظة إلكترونية') {
+      if (!lengthBetween(v('b'), 2, 40)) return showToast('اسم المحفظة من حرفين إلى 40 حرفًا', 'error');
+      if (!isWalletNumber(v('n'))) return showToast('رقم المحفظة: أرقام فقط، من 8 إلى 15 رقمًا', 'error');
+    }
     showToast('تم إرسال رمز التأكيد إلى جوالك');
     setStep('otp');
   };
@@ -152,11 +178,13 @@ function AddAccountDialog({ open, onClose }: { open: boolean; onClose: () => voi
                     ))}
                   </SelectContent>
                 </Select>
+                <FieldHint>مطلوب. حساب بنكي أو محفظة إلكترونية أو PayPal، وتتغير الحقول التالية حسب النوع.</FieldHint>
               </div>
               {fields.map(([k, label]) => (
                 <div key={k} className="space-y-1.5">
                   <Label>{label} *</Label>
                   <Input dir={k === 'n' ? 'ltr' : undefined} value={vals[k] ?? ''} onChange={(e) => setVals({ ...vals, [k]: e.target.value })} />
+                  <FieldHint>{HINTS[type][k]}</FieldHint>
                 </div>
               ))}
             </div>
@@ -188,6 +216,7 @@ export default function Account(): JSX.Element {
     <div className="space-y-1.5">
       <Label>{label}</Label>
       <Input value={value} disabled dir={ltr ? 'ltr' : undefined} />
+      <FieldHint>للقراءة فقط. للتعديل تواصل مع فريق Qhub.</FieldHint>
     </div>
   );
 

@@ -4,7 +4,8 @@ import { Pencil, Plus } from 'lucide-react';
 import { useConfirm } from '@components/ui';
 import { useUIStore } from '@/store/useUIStore';
 import { FX, sumsFor, useVendorsAdminStore, type VCurrency, type Vendor } from '@/store/useVendorsAdminStore';
-import { Note, StatusPill } from '@/components/admin/vendors/VendorBits';
+import { FieldHint, Note, StatusPill } from '@/components/admin/vendors/VendorBits';
+import { isEmail, isIntlPhone, lengthBetween } from '@/utils/vendorValidation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -34,8 +35,9 @@ function VendorFormDialog({ vendor, onClose }: { vendor: Vendor | 'new'; onClose
   const set = (k: keyof FormState, v: string): void => setF((s) => ({ ...s, [k]: v }));
 
   const submit = (): void => {
-    if (!f.name.trim() || !f.email.trim()) return showToast('الاسم والبريد الإلكتروني مطلوبان', 'error');
-    if (!f.phone.trim()) return showToast('رقم الجوال مطلوب', 'error');
+    if (!lengthBetween(f.name, 2, 100)) return showToast('الاسم مطلوب، من حرفين إلى 100 حرف', 'error');
+    if (!isEmail(f.email)) return showToast('أدخل بريدًا إلكترونيًا صحيحًا', 'error');
+    if (!isIntlPhone(f.phone)) return showToast('رقم الجوال: يبدأ برمز الدولة مثل +20، أرقام ومسافات من 8 إلى 20 خانة', 'error');
     const rate = Number(f.rate);
     if (!(rate > 0 && rate <= 100)) return showToast('نسبة العمولة يجب أن تكون بين 1 و100', 'error');
     const input = { name: f.name.trim(), email: f.email.trim(), phone: f.phone.trim(), cur: f.cur, rate };
@@ -54,16 +56,19 @@ function VendorFormDialog({ vendor, onClose }: { vendor: Vendor | 'new'; onClose
         <div className="space-y-3 py-1">
           <div className="space-y-1.5">
             <Label>الاسم *</Label>
-            <Input value={f.name} onChange={(e) => set('name', e.target.value)} />
+            <Input maxLength={100} value={f.name} onChange={(e) => set('name', e.target.value)} />
+            <FieldHint>مطلوب. من حرفين إلى 100 حرف.</FieldHint>
           </div>
           <div className="space-y-1.5">
             <Label>البريد الإلكتروني *</Label>
             <Input dir="ltr" value={f.email} onChange={(e) => set('email', e.target.value)} />
+            <FieldHint>مطلوب. بريد إلكتروني بصيغة صحيحة وغير مسجّل لمورد آخر.</FieldHint>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label>رقم الجوال *</Label>
-              <Input dir="ltr" value={f.phone} onChange={(e) => set('phone', e.target.value)} />
+              <Input dir="ltr" value={f.phone} onChange={(e) => set('phone', e.target.value.replace(/[^\d+\s]/g, ''))} />
+              <FieldHint>مطلوب. يبدأ برمز الدولة مثل ‎+20، أرقام ومسافات من 8 إلى 20 خانة.</FieldHint>
             </div>
             <div className="space-y-1.5">
               <Label>الدولة *</Label>
@@ -79,11 +84,13 @@ function VendorFormDialog({ vendor, onClose }: { vendor: Vendor | 'new'; onClose
                   ))}
                 </SelectContent>
               </Select>
+              <FieldHint>مطلوب. تحدد عملة العمولات الجديدة.</FieldHint>
             </div>
           </div>
           <div className="space-y-1.5">
             <Label>نسبة العمولة %</Label>
-            <Input dir="ltr" inputMode="decimal" value={f.rate} onChange={(e) => set('rate', e.target.value)} />
+            <Input dir="ltr" inputMode="decimal" value={f.rate} onChange={(e) => set('rate', e.target.value.replace(/[^\d.]/g, ''))} />
+            <FieldHint>مطلوب. رقم أكبر من 0 وحتى 100.</FieldHint>
           </div>
           <Note>
             {isNew
