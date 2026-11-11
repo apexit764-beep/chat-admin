@@ -39,7 +39,7 @@ function VendorFormDialog({ vendor, onClose }: { vendor: Vendor | 'new'; onClose
     if (!isEmail(f.email)) return showToast('أدخل بريدًا إلكترونيًا صحيحًا', 'error');
     if (!isIntlPhone(f.phone)) return showToast('رقم الجوال: يبدأ برمز الدولة مثل +20، أرقام ومسافات من 8 إلى 20 خانة', 'error');
     const rate = Number(f.rate);
-    if (!(rate > 0 && rate <= 100)) return showToast('نسبة العمولة يجب أن تكون بين 1 و100', 'error');
+    if (!(rate > 0 && rate <= 100)) return showToast('نسبة العمولة يجب أن تكون أكبر من 0 وحتى 100', 'error');
     const input = { name: f.name.trim(), email: f.email.trim(), phone: f.phone.trim(), cur: f.cur, rate };
     const r = isNew ? addVendor(input) : editVendor(vendor.id, input);
     if (!r.ok) return showToast(r.error, 'error');
