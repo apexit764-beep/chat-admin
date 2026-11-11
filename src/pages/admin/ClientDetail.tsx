@@ -33,6 +33,7 @@ import {
   Download,
   Send,
   Upload,
+  Gift,
 } from 'lucide-react';
 import { useAdminStore, TRIAL_DAYS } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
@@ -40,6 +41,7 @@ import { formatMoney, formatUSD } from '@/utils/money';
 import { formatDate, timeAgo, initials, avatarColor } from '@/utils/format';
 import { cn } from '@/lib/utils';
 import { useConfirm } from '@components/ui';
+import { ReferralTab } from '@/components/admin/referrals/ReferralTab';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -415,6 +417,7 @@ export default function ClientDetail(): JSX.Element {
               { value: 'support', label: 'الدعم', icon: Headphones },
               { value: 'audit', label: 'السجل', icon: Shield },
               { value: 'attachments', label: 'المرفقات', icon: Paperclip },
+              { value: 'referrals', label: 'الترويج', icon: Gift },
             ].map((tab) => (
               <TabsTrigger
                 key={tab.value}
@@ -909,6 +912,11 @@ export default function ClientDetail(): JSX.Element {
                 </div>
               </>
             )}
+          </TabsContent>
+
+          {/* Referrals Tab */}
+          <TabsContent value="referrals" className="mt-5">
+            <ReferralTab clientId={client.id} />
           </TabsContent>
         </Tabs>
 

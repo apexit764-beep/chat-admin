@@ -80,9 +80,11 @@ const actionMeta: Record<ActivityAction, { label: string; icon: React.ElementTyp
   vendor_payout_rejected: { label: 'رفض طلب سحب', icon: XCircle, color: 'text-red-500 bg-red-500/10' },
   vendor_payout_transferred: { label: 'تحويل لمورد', icon: CreditCard, color: 'text-violet-500 bg-violet-500/10' },
   vendor_settings_updated: { label: 'إعدادات الموردين', icon: Settings, color: 'text-slate-500 bg-slate-500/10' },
+  referral_settings_updated: { label: 'إعدادات المروّجين', icon: Settings, color: 'text-slate-500 bg-slate-500/10' },
+  referral_program_toggled: { label: 'تشغيل/إيقاف المروّجين', icon: Shield, color: 'text-amber-500 bg-amber-500/10' },
 };
 
-type ActionFilter = 'all' | 'clients' | 'billing' | 'admin' | 'vendors' | 'settings';
+type ActionFilter = 'all' | 'clients' | 'billing' | 'admin' | 'vendors' | 'referrals' | 'settings';
 
 const filterGroups: Record<ActionFilter, { label: string; actions: ActivityAction[] }> = {
   all: { label: 'الكل', actions: [] },
@@ -90,6 +92,7 @@ const filterGroups: Record<ActionFilter, { label: string; actions: ActivityActio
   billing: { label: 'المالية', actions: ['subscription_created', 'subscription_cancelled', 'invoice_refunded', 'payment_received', 'plan_created', 'plan_updated', 'plan_deleted'] },
   admin: { label: 'المديرون', actions: ['admin_login', 'admin_logout', 'admin_user_added', 'admin_user_removed'] },
   vendors: { label: 'الموردون', actions: ['vendor_created', 'vendor_updated', 'vendor_frozen', 'vendor_unfrozen', 'vendor_invite_resent', 'vendor_commission_recorded', 'vendor_commission_cancelled', 'vendor_payout_rejected', 'vendor_payout_transferred', 'vendor_settings_updated'] },
+  referrals: { label: 'المروّجون', actions: ['referral_settings_updated', 'referral_program_toggled'] },
   settings: { label: 'الإعدادات', actions: ['settings_updated', 'paymob_updated'] },
 };
 

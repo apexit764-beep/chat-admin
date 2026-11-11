@@ -84,7 +84,7 @@ export default function AdminClients(): JSX.Element {
   const [statusFilter, setStatusFilter] = useState<'all' | ClientAccountStatus>('all');
   const [countryFilter, setCountryFilter] = useState<'all' | string>('all');
   const [planFilter, setPlanFilter] = useState<'all' | string>('all');
-  const [sourceFilter, setSourceFilter] = useState<'all' | 'direct' | 'vendor'>('all');
+  const [sourceFilter, setSourceFilter] = useState<'all' | 'direct' | 'vendor' | 'referrer'>('all');
   const [vendorFilter, setVendorFilter] = useState<'all' | string>('all');
   const vendors = useVendorsAdminStore((s) => s.vendors);
   const [modalOpen, setModalOpen] = useState(false);
@@ -109,7 +109,8 @@ export default function AdminClients(): JSX.Element {
       if (statusFilter !== 'all' && accountStatusOf(c) !== statusFilter) return false;
       if (countryFilter !== 'all' && c.country !== countryFilter) return false;
       if (planFilter !== 'all' && c.planId !== planFilter) return false;
-      if (sourceFilter === 'direct' && c.vendorId) return false;
+      if (sourceFilter === 'direct' && (c.vendorId || c.referredBy)) return false;
+      if (sourceFilter === 'referrer' && !c.referredBy) return false;
       if (sourceFilter === 'vendor' && (!c.vendorId || (vendorFilter !== 'all' && String(c.vendorId) !== vendorFilter))) return false;
       return true;
     });
@@ -263,6 +264,20 @@ export default function AdminClients(): JSX.Element {
       key: 'source', header: 'المصدر', accessor: (r) => r.vendorId ?? 0, hideOn: 'md',
       cell: (r) => {
         const v = vendors.find((x) => x.id === r.vendorId);
+        const ref = clients.find((x) => x.id === r.referredBy);
+        if (ref) {
+          return (
+            <span className="inline-flex items-center gap-1.5">
+              <Badge variant="secondary" className="bg-blue-100 text-blue-700">مروّج</Badge>
+              <button
+                className="text-xs text-primary hover:underline"
+                onClick={(e) => { e.stopPropagation(); navigate(`/clients/${ref.id}`); }}
+              >
+                {ref.companyName}
+              </button>
+            </span>
+          );
+        }
         return v ? (
           <span className="inline-flex items-center gap-1.5">
             <Badge variant="secondary" className="bg-violet-100 text-violet-700">مورد</Badge>
@@ -481,13 +496,14 @@ export default function AdminClients(): JSX.Element {
                 {countries.map((c) => <SelectItem key={c.code} value={c.code}>{c.flag} {c.nameAr}</SelectItem>)}
               </SelectContent>
             </Select>
-            <Select value={sourceFilter} onValueChange={(v) => { setSourceFilter(v as 'all' | 'direct' | 'vendor'); setVendorFilter('all'); }}>
+            <Select value={sourceFilter} onValueChange={(v) => { setSourceFilter(v as 'all' | 'direct' | 'vendor' | 'referrer'); setVendorFilter('all'); }}>
               <SelectTrigger className="h-9 w-[140px] rounded-lg text-sm">
                 <SelectValue placeholder="كل المصادر" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">المصدر: الكل</SelectItem>
                 <SelectItem value="direct">مباشر</SelectItem>
+                <SelectItem value="referrer">عن طريق مروّج</SelectItem>
                 <SelectItem value="vendor">عن طريق مورد</SelectItem>
               </SelectContent>
             </Select>

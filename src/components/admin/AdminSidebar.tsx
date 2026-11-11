@@ -23,6 +23,7 @@ import {
   HandCoins,
   SlidersHorizontal,
   ChevronDown,
+  Gift,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useUIStore } from '@/store/useUIStore';
@@ -80,6 +81,7 @@ const navGroups: NavGroup[] = [
           { to: '/vendors/settings', label: 'إعدادات الموردين', icon: SlidersHorizontal },
         ],
       },
+      { to: '/referrals', label: 'برنامج المروّجين', icon: Gift },
     ],
   },
   {

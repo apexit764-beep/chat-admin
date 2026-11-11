@@ -265,6 +265,8 @@ export interface Client {
   companyName: string;
   /** set when the client came through a vendor; absent means a direct sign-up */
   vendorId?: number;
+  /** set when the client signed up through another client's referral link (the referrer's client id) */
+  referredBy?: string;
   contactName: string;
   email: string;
   phone: string;
@@ -346,6 +348,8 @@ export interface Invoice {
   status: InvoiceStatus;
   dueDate: string;
   paidAt?: string;
+  /** referral reward applied to this invoice, in the invoice currency (already deducted from the amount) */
+  referralDiscount?: number;
   items: Array<{ description: string; quantity: number; unitPrice: number; total: number }>;
   notes?: string;
   createdAt: string;

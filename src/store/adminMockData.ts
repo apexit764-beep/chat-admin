@@ -783,6 +783,7 @@ export const clients: Client[] = [
   {
     id: 'client_13',
     companyName: 'متجر نبض الخليج',
+    referredBy: 'client_2',
     contactName: 'فاطمة الشمري',
     email: 'f.alshamri@nabd.sa',
     phone: '+966504445555',
@@ -854,6 +855,7 @@ export const clients: Client[] = [
   {
     id: 'client_16',
     companyName: 'شركة الأندلس للتجارة',
+    referredBy: 'client_2',
     contactName: 'خالد المنصوري',
     email: 'k.almansoori@andalus.ae',
     phone: '+971504445566',
@@ -877,6 +879,7 @@ export const clients: Client[] = [
   {
     id: 'client_17',
     companyName: 'مركز الشفاء الطبي',
+    referredBy: 'client_2',
     contactName: 'د. سارة الكندي',
     email: 's.alkindi@shifa.om',
     phone: '+96895556677',
@@ -900,6 +903,7 @@ export const clients: Client[] = [
   {
     id: 'client_18',
     companyName: 'أكاديمية النخبة',
+    referredBy: 'client_2',
     contactName: 'ياسر البلوشي',
     email: 'y.albalushi@nukhba.bh',
     phone: '+97334567890',
@@ -974,7 +978,7 @@ function makeInvoice(client: Client, monthsAgo: number, status: Invoice['status'
   };
 }
 
-export const invoices: Invoice[] = clients
+const baseInvoices: Invoice[] = clients
   .filter((c) => c.planId)
   .flatMap((c) => {
     const list: Invoice[] = [];
@@ -988,6 +992,25 @@ export const invoices: Invoice[] = clients
     }
     return list;
   });
+
+// a referral reward already applied to one renewal invoice of the referrer (client_2), see useReferralsStore
+const REFERRAL_DISCOUNT_USD = 8;
+export const invoices: Invoice[] = baseInvoices.map((inv) => {
+  if (inv.id !== 'inv_client_2_1') return inv;
+  const c = clients.find((x) => x.id === inv.clientId) as Client;
+  const country = countries.find((x) => x.code === c.country);
+  const disc = Math.round(REFERRAL_DISCOUNT_USD * (country?.usdRate ?? 1) * 1000) / 1000;
+  const amount = Math.round((inv.amount - disc) * 1000) / 1000;
+  const tax = Math.round(amount * ((country?.taxRate ?? 0) / 100) * 1000) / 1000;
+  return {
+    ...inv,
+    amount,
+    tax,
+    total: Math.round((amount + tax) * 1000) / 1000,
+    referralDiscount: disc,
+    items: [...inv.items, { description: 'خصم مكافأة الإحالة (شهر واحد · 50%)', quantity: 1, unitPrice: -disc, total: -disc }],
+  };
+});
 
 // =====================================================================
 // Transactions
@@ -1182,7 +1205,9 @@ export type ActivityAction =
   | 'vendor_commission_cancelled'
   | 'vendor_payout_rejected'
   | 'vendor_payout_transferred'
-  | 'vendor_settings_updated';
+  | 'vendor_settings_updated'
+  | 'referral_settings_updated'
+  | 'referral_program_toggled';
 
 export interface ActivityEntry {
   id: string;
@@ -1198,6 +1223,8 @@ export interface ActivityEntry {
 }
 
 export const activityLog: ActivityEntry[] = [
+  // Referral program
+  { id: 'act_r1', action: 'referral_settings_updated', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', actorRole: 'admin', target: 'برنامج المروّجين', details: 'تعديل مكافأة الاشتراك السنوي: 2 → 3 شهور', timestamp: nowMinus(60 * 24 * 12) },
   // Vendors
   { id: 'act_v1', action: 'vendor_commission_recorded', actor: 'النظام', actorEmail: '', actorRole: 'system', target: 'TechFlow Egypt', details: 'تسجيل عمولة للمورد محمود حسن', timestamp: nowMinus(95) },
   { id: 'act_v2', action: 'vendor_payout_transferred', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', actorRole: 'admin', target: 'PO-0003', details: 'الموافقة وتنفيذ التحويل · رقم العملية TRX-88120', timestamp: nowMinus(180) },
