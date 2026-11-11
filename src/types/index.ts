@@ -263,6 +263,8 @@ export type ClientAccountStatus =
 export interface Client {
   id: string;
   companyName: string;
+  /** set when the client came through a vendor; absent means a direct sign-up */
+  vendorId?: number;
   contactName: string;
   email: string;
   phone: string;

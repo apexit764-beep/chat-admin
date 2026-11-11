@@ -524,6 +524,7 @@ export const clients: Client[] = [
   {
     id: 'client_2',
     companyName: 'مطعم البيت العماني',
+    vendorId: 2,
     contactName: 'سالم البلوشي',
     email: 'salim@albeit.om',
     phone: '+96892345678',
@@ -570,6 +571,7 @@ export const clients: Client[] = [
   {
     id: 'client_4',
     companyName: 'مدرسة الفجر الذهبي',
+    vendorId: 3,
     contactName: 'أ. منى الفارسي',
     email: 'admin@alfajr.sa',
     phone: '+966501112222',
@@ -593,6 +595,7 @@ export const clients: Client[] = [
   {
     id: 'client_5',
     companyName: 'عيادة الحياة الطبية',
+    vendorId: 3,
     contactName: 'د. أحمد السعد',
     email: 'a.alsaad@hayat.sa',
     phone: '+966503334444',
@@ -616,6 +619,7 @@ export const clients: Client[] = [
   {
     id: 'client_6',
     companyName: 'TechFlow Egypt',
+    vendorId: 1,
     contactName: 'Ahmed Mostafa',
     email: 'ahmed@techflow.eg',
     phone: '+201001234567',
@@ -686,6 +690,7 @@ export const clients: Client[] = [
   {
     id: 'client_9',
     companyName: 'مكتبة المعرفة',
+    vendorId: 1,
     contactName: 'يوسف الزدجالي',
     email: 'y.alzadjali@maarifa.om',
     phone: '+96893334444',

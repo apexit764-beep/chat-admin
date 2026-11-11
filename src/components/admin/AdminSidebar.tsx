@@ -19,6 +19,10 @@ import {
   X,
   Plug,
   Sparkles,
+  Handshake,
+  HandCoins,
+  SlidersHorizontal,
+  ScrollText,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useUIStore } from '@/store/useUIStore';
@@ -59,6 +63,15 @@ const navGroups: NavGroup[] = [
       { to: '/widget', label: 'إعدادات المساعد الذكي', icon: Sparkles },
       { to: '/plans', label: 'الباقات', icon: Package },
       { to: '/feedback', label: 'الشكاوى والاقتراحات', icon: MessageSquareWarning },
+    ],
+  },
+  {
+    title: 'الموردون',
+    items: [
+      { to: '/vendors', label: 'الموردون', icon: Handshake },
+      { to: '/vendors/payouts', label: 'طلبات السحب', icon: HandCoins },
+      { to: '/vendors/settings', label: 'إعدادات الموردين', icon: SlidersHorizontal },
+      { to: '/vendors/log', label: 'سجل الحركات', icon: ScrollText },
     ],
   },
   {
@@ -173,10 +186,14 @@ function SidebarInner({ collapsed, onToggleCollapse, onNavigate, mobile, onClose
               {group.items.map((item) => {
                 const Icon = item.icon;
                 // the private-assistant pages live under «إعدادات المساعد الذكي»
+                // /vendors has sibling pages (payouts, settings, log): it is active only on the list and a vendor's detail
+                const vendorSub = ['/vendors/payouts', '/vendors/settings', '/vendors/log'];
                 const isActive =
-                  location.pathname === item.to ||
-                  location.pathname.startsWith(item.to + '/') ||
-                  (item.to === '/widget' && location.pathname.startsWith('/ai-balance'));
+                  item.to === '/vendors'
+                    ? location.pathname === '/vendors' || (location.pathname.startsWith('/vendors/') && !vendorSub.includes(location.pathname))
+                    : location.pathname === item.to ||
+                      location.pathname.startsWith(item.to + '/') ||
+                      (item.to === '/widget' && location.pathname.startsWith('/ai-balance'));
                 const linkEl = (
                   <NavLink
                     key={item.to}

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, lazy, Suspense } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useVendorsAdminStore } from '@/store/useVendorsAdminStore';
 import {
   Plus,
   Download,
@@ -83,6 +84,9 @@ export default function AdminClients(): JSX.Element {
   const [statusFilter, setStatusFilter] = useState<'all' | ClientAccountStatus>('all');
   const [countryFilter, setCountryFilter] = useState<'all' | string>('all');
   const [planFilter, setPlanFilter] = useState<'all' | string>('all');
+  const [sourceFilter, setSourceFilter] = useState<'all' | 'direct' | 'vendor'>('all');
+  const [vendorFilter, setVendorFilter] = useState<'all' | string>('all');
+  const vendors = useVendorsAdminStore((s) => s.vendors);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Client | null>(null);
 
@@ -105,9 +109,11 @@ export default function AdminClients(): JSX.Element {
       if (statusFilter !== 'all' && accountStatusOf(c) !== statusFilter) return false;
       if (countryFilter !== 'all' && c.country !== countryFilter) return false;
       if (planFilter !== 'all' && c.planId !== planFilter) return false;
+      if (sourceFilter === 'direct' && c.vendorId) return false;
+      if (sourceFilter === 'vendor' && (!c.vendorId || (vendorFilter !== 'all' && String(c.vendorId) !== vendorFilter))) return false;
       return true;
     });
-  }, [clients, statusFilter, countryFilter, planFilter]);
+  }, [clients, statusFilter, countryFilter, planFilter, sourceFilter, vendorFilter]);
 
   /** one tile per account state, so every client is accounted for, plus the total */
   const statusTiles = useMemo(() => ([
@@ -251,6 +257,25 @@ export default function AdminClients(): JSX.Element {
       cell: (r) => {
         const plan = plans.find((p) => p.id === r.planId);
         return plan ? <span className="text-xs font-medium">{plan.nameAr}</span> : <span className="text-xs text-muted-foreground italic">بدون باقة</span>;
+      },
+    },
+    {
+      key: 'source', header: 'المصدر', accessor: (r) => r.vendorId ?? 0, hideOn: 'md',
+      cell: (r) => {
+        const v = vendors.find((x) => x.id === r.vendorId);
+        return v ? (
+          <span className="inline-flex items-center gap-1.5">
+            <Badge variant="secondary" className="bg-violet-100 text-violet-700">مورد</Badge>
+            <button
+              className="text-xs text-primary hover:underline"
+              onClick={(e) => { e.stopPropagation(); navigate(`/vendors/${v.id}`); }}
+            >
+              {v.name}
+            </button>
+          </span>
+        ) : (
+          <Badge variant="secondary">مباشر</Badge>
+        );
       },
     },
     { key: 'joined', header: 'تاريخ الانضمام', accessor: (r) => r.joinedAt, hideOn: 'lg', cell: (r) => <span className="text-muted-foreground text-xs">{formatDate(r.joinedAt)}</span> },
@@ -456,6 +481,27 @@ export default function AdminClients(): JSX.Element {
                 {countries.map((c) => <SelectItem key={c.code} value={c.code}>{c.flag} {c.nameAr}</SelectItem>)}
               </SelectContent>
             </Select>
+            <Select value={sourceFilter} onValueChange={(v) => { setSourceFilter(v as 'all' | 'direct' | 'vendor'); setVendorFilter('all'); }}>
+              <SelectTrigger className="h-9 w-[140px] rounded-lg text-sm">
+                <SelectValue placeholder="كل المصادر" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">المصدر: الكل</SelectItem>
+                <SelectItem value="direct">مباشر</SelectItem>
+                <SelectItem value="vendor">عن طريق مورد</SelectItem>
+              </SelectContent>
+            </Select>
+            {sourceFilter === 'vendor' && (
+              <Select value={vendorFilter} onValueChange={(v) => setVendorFilter(v)}>
+                <SelectTrigger className="h-9 w-[160px] rounded-lg text-sm">
+                  <SelectValue placeholder="كل الموردين" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">كل الموردين</SelectItem>
+                  {vendors.map((v) => <SelectItem key={v.id} value={String(v.id)}>{v.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            )}
             <Select value={planFilter} onValueChange={(v) => setPlanFilter(v)}>
               <SelectTrigger className="h-9 w-[130px] rounded-lg text-sm">
                 <SelectValue placeholder="كل الباقات" />

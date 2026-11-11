@@ -28,6 +28,11 @@ const AdminPlanRequests = lazy(() => import('@pages/admin/PlanRequests'));
 const AIBalanceSettings = lazy(() => import('@pages/admin/AIBalanceSettings'));
 const AIBalanceClients = lazy(() => import('@pages/admin/AIBalanceClients'));
 const AIBalanceClient = lazy(() => import('@pages/admin/AIBalanceClient'));
+const AdminVendors = lazy(() => import('@pages/admin/Vendors'));
+const AdminVendorDetail = lazy(() => import('@pages/admin/VendorDetail'));
+const AdminVendorPayouts = lazy(() => import('@pages/admin/VendorPayouts'));
+const AdminVendorSettings = lazy(() => import('@pages/admin/VendorSettings'));
+const AdminVendorLog = lazy(() => import('@pages/admin/VendorLog'));
 
 function PageLoader(): JSX.Element {
   return (
@@ -71,6 +76,11 @@ export default function App(): JSX.Element {
           <Route path="/integrations" element={<AdminIntegrations />} />
           <Route path="/industries" element={<AdminIndustries />} />
           <Route path="/widget" element={<AdminWidgetSettings />} />
+          <Route path="/vendors" element={<AdminVendors />} />
+          <Route path="/vendors/payouts" element={<AdminVendorPayouts />} />
+          <Route path="/vendors/settings" element={<AdminVendorSettings />} />
+          <Route path="/vendors/log" element={<AdminVendorLog />} />
+          <Route path="/vendors/:id" element={<AdminVendorDetail />} />
           <Route path="/ai-balance" element={<AIBalanceClients />} />
           <Route path="/ai-balance/settings" element={<AIBalanceSettings />} />
           <Route path="/ai-balance/:id" element={<AIBalanceClient />} />
