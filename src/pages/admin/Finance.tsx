@@ -15,6 +15,7 @@ import { startOfMonth, endOfMonth } from 'date-fns';
 import { StatCard } from '@components/ui';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useSettingsStore } from '@/store/useSettingsStore';
+import { useReferralsStore } from '@/store/useReferralsStore';
 import { useUIStore } from '@/store/useUIStore';
 import { formatMoney, formatUSD, approxUSD, taxRateFor } from '@/utils/money';
 import { formatDate, initials, avatarColor } from '@/utils/format';
@@ -79,6 +80,10 @@ export default function AdminFinance(): JSX.Element {
   const [statusFilter, setStatusFilter] = useState<'all' | InvoiceStatus>('all');
   const [typeFilter, setTypeFilter] = useState<'all' | InvoiceType>('all');
   const [referralFilter, setReferralFilter] = useState<'all' | 'yes' | 'no'>('all');
+  const [clientKind, setClientKind] = useState<'all' | 'normal' | 'referrer'>('all');
+  // a referrer is a client whose referral link brought in at least one person
+  const referrals = useReferralsStore((s) => s.referrals);
+  const referrerIds = useMemo(() => new Set(referrals.map((r) => r.referrerId)), [referrals]);
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date } | undefined>({
     from: startOfMonth(new Date()),
     to: endOfMonth(new Date()),
@@ -126,15 +131,19 @@ export default function AdminFinance(): JSX.Element {
     return dateFiltered.filter((inv) => {
       if (statusFilter !== 'all' && inv.status !== statusFilter) return false;
       if (typeFilter !== 'all' && inv.invoiceType !== typeFilter) return false;
-      if (referralFilter === 'yes' && !inv.referralDiscount) return false;
-      if (referralFilter === 'no' && inv.referralDiscount) return false;
+      if (clientKind === 'normal' && referrerIds.has(inv.clientId)) return false;
+      if (clientKind === 'referrer') {
+        if (!referrerIds.has(inv.clientId)) return false;
+        if (referralFilter === 'yes' && !inv.referralDiscount) return false;
+        if (referralFilter === 'no' && inv.referralDiscount) return false;
+      }
       if (search) {
         const client = clients.find((c) => c.id === inv.clientId);
         if (!inv.number.includes(search) && !(client?.companyName.includes(search) ?? false)) return false;
       }
       return true;
     });
-  }, [dateFiltered, statusFilter, typeFilter, referralFilter, search, clients]);
+  }, [dateFiltered, statusFilter, typeFilter, referralFilter, clientKind, referrerIds, search, clients]);
 
   const totalPages = Math.max(1, Math.ceil(filteredInvoices.length / PAGE_SIZE));
   const paginatedInvoices = filteredInvoices.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
@@ -239,16 +248,28 @@ export default function AdminFinance(): JSX.Element {
               <SelectItem value="upgrade">ترقية</SelectItem>
             </SelectContent>
           </Select>
-          <Select value={referralFilter} onValueChange={(v) => setReferralFilter(v as 'all' | 'yes' | 'no')}>
+          <Select value={clientKind} onValueChange={(v) => { setClientKind(v as 'all' | 'normal' | 'referrer'); setReferralFilter('all'); }}>
             <SelectTrigger className="w-auto min-w-[150px] h-9">
-              <SelectValue placeholder="خصم الإحالة" />
+              <SelectValue placeholder="نوع العميل" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">خصم الإحالة: الكل</SelectItem>
-              <SelectItem value="yes">فيها خصم إحالة</SelectItem>
-              <SelectItem value="no">بدون خصم</SelectItem>
+              <SelectItem value="all">العملاء: الكل</SelectItem>
+              <SelectItem value="normal">عملاء عاديون</SelectItem>
+              <SelectItem value="referrer">عملاء مروّجون</SelectItem>
             </SelectContent>
           </Select>
+          {clientKind === 'referrer' && (
+            <Select value={referralFilter} onValueChange={(v) => setReferralFilter(v as 'all' | 'yes' | 'no')}>
+              <SelectTrigger className="w-auto min-w-[150px] h-9">
+                <SelectValue placeholder="خصم الإحالة" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">خصم الإحالة: الكل</SelectItem>
+                <SelectItem value="yes">فيها خصم إحالة</SelectItem>
+                <SelectItem value="no">بدون خصم</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
           <DateRangePicker value={dateRange} onChange={setDateRange} />
           <Button variant="outline" size="sm" onClick={handleExportInvoices} className="h-9 ms-auto">
             <Download className="h-4 w-4 me-2" /> CSV

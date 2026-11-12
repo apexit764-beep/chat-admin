@@ -993,22 +993,17 @@ const baseInvoices: Invoice[] = clients
     return list;
   });
 
-// a referral reward already applied to one renewal invoice of the referrer (client_2), see useReferralsStore
-const REFERRAL_DISCOUNT_USD = 8;
+// a free referral month already applied to one renewal invoice of the referrer (client_2): the whole month is discounted
 export const invoices: Invoice[] = baseInvoices.map((inv) => {
   if (inv.id !== 'inv_client_2_1') return inv;
-  const c = clients.find((x) => x.id === inv.clientId) as Client;
-  const country = countries.find((x) => x.code === c.country);
-  const disc = Math.round(REFERRAL_DISCOUNT_USD * (country?.usdRate ?? 1) * 1000) / 1000;
-  const amount = Math.round((inv.amount - disc) * 1000) / 1000;
-  const tax = Math.round(amount * ((country?.taxRate ?? 0) / 100) * 1000) / 1000;
+  const disc = inv.amount;
   return {
     ...inv,
-    amount,
-    tax,
-    total: Math.round((amount + tax) * 1000) / 1000,
+    amount: 0,
+    tax: 0,
+    total: 0,
     referralDiscount: disc,
-    items: [...inv.items, { description: 'خصم مكافأة الإحالة (شهر واحد · 50%)', quantity: 1, unitPrice: -disc, total: -disc }],
+    items: [...inv.items, { description: 'خصم مكافأة الإحالة (شهر مجاني)', quantity: 1, unitPrice: -disc, total: -disc }],
   };
 });
 

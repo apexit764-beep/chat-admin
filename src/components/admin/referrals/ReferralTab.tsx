@@ -2,9 +2,8 @@ import { Copy, Gift } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
-import { referralLink, statsFor, useReferralsStore } from '@/store/useReferralsStore';
+import { monthValueUsd, referralLink, statsFor, useReferralsStore } from '@/store/useReferralsStore';
 import { formatDate } from '@/utils/format';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -25,6 +24,8 @@ export function ReferralTab({ clientId }: { clientId: string }): JSX.Element {
   const subs = mine.filter((r) => r.state === 'اشترك');
   const regs = mine.filter((r) => r.state !== 'اشترك');
   const link = referralLink(clientId);
+  /** a free month is worth one month of this client's own plan */
+  const monthValue = monthValueUsd(clientId);
 
   return (
     <div className="space-y-4">
@@ -57,7 +58,7 @@ export function ReferralTab({ clientId }: { clientId: string }): JSX.Element {
         <MiniStat label="سجّلوا من رابطه" value={stats.registered} />
         <MiniStat label="اشتركوا فعلًا" value={stats.subscribed} />
         <MiniStat tone="green" label="الشهور المتبقية" value={stats.remaining} />
-        <MiniStat tone="blue" label="إجمالي الخصم المستخدم" value={usd(stats.usedValue)} />
+        <MiniStat tone="blue" label="الشهور المستخدمة" value={<span>{stats.usedMonths} <small className="text-sm font-normal">(<bdi dir="ltr">{usd(stats.usedMonths * monthValue)}</bdi>)</small></span>} />
       </div>
 
       {mine.length === 0 ? (
@@ -77,7 +78,7 @@ export function ReferralTab({ clientId }: { clientId: string }): JSX.Element {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    {['المشترك', 'تاريخ الاشتراك', 'نوع الاشتراك', 'دفع', 'الشهور المكتسبة', 'قيمة الخصم'].map((h) => (
+                    {['المشترك', 'تاريخ الاشتراك', 'نوع الاشتراك', 'دفع', 'الشهور المكتسبة', 'قيمة الشهور'].map((h) => (
                       <TableHead key={h} className="text-start">{h}</TableHead>
                     ))}
                   </TableRow>
@@ -93,11 +94,10 @@ export function ReferralTab({ clientId }: { clientId: string }): JSX.Element {
                       </TableCell>
                       <TableCell>{formatDate(r.at)}</TableCell>
                       <TableCell>{r.cycle}</TableCell>
-                      <TableCell>{usd(r.paid ?? 0)}</TableCell>
+                      <TableCell><bdi dir="ltr">{usd(r.paid ?? 0)}</bdi></TableCell>
                       <TableCell>{r.months}</TableCell>
                       <TableCell className="whitespace-nowrap">
-                        {r.months > 1 ? `${r.months} × ` : ''}{usd(r.val)}
-                        {r.cap && <Badge variant="warning" className="ms-1.5 text-[10px]">سقف</Badge>}
+                        <bdi dir="ltr">{r.months > 1 ? `${r.months} × ` : ''}{usd(monthValue)}</bdi>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -142,7 +142,7 @@ export function ReferralTab({ clientId }: { clientId: string }): JSX.Element {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    {['الشهر', 'القيمة', 'اكتُسب في', 'الحالة'].map((h) => (
+                    {['الشهر', 'المكافأة', 'اكتُسب في', 'الحالة'].map((h) => (
                       <TableHead key={h} className="text-start">{h}</TableHead>
                     ))}
                   </TableRow>
@@ -151,7 +151,7 @@ export function ReferralTab({ clientId }: { clientId: string }): JSX.Element {
                   {myLots.map((l) => (
                     <TableRow key={l.id}>
                       <TableCell>من {nameOf(l.fromClientId)}</TableCell>
-                      <TableCell>{usd(l.val)}</TableCell>
+                      <TableCell>شهر مجاني (<bdi dir="ltr">{usd(monthValue)}</bdi>)</TableCell>
                       <TableCell>{formatDate(l.earnedAt)}</TableCell>
                       <TableCell>
                         {l.st === 'مستخدم' ? <span className="inline-block whitespace-nowrap rounded-full bg-blue-100 px-2.5 py-0.5 text-[11px] font-bold text-blue-700">استُخدم · {l.inv}</span> : <StatusPill text={l.st} />}
