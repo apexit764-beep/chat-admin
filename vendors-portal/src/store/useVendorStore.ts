@@ -48,6 +48,8 @@ export interface Commission {
   cid: number;
   /** first subscription value in the vendor's currency */
   base: number;
+  /** the vendor's commission rate when this commission was recorded, % */
+  rate: number;
   amt: number;
   st: CommissionState;
   /** days left of the hold period */
@@ -121,7 +123,7 @@ const initialClients: VendorClient[] = [
 const comm = (cid: number, vid: number, cur: Currency, rate: number, st: CommissionState, left = 0): Commission => {
   const c = initialClients.find((x) => x.id === cid) as VendorClient;
   const base = toLocal(planPriceUsd(c.plan, c.cycle), cur);
-  return { id: id(), vid, cid, base, amt: commissionOf(base, rate, cur), st, left };
+  return { id: id(), vid, cid, base, rate, amt: commissionOf(base, rate, cur), st, left };
 };
 
 export const useVendorStore = create<VendorState>((set, get) => ({

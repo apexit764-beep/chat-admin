@@ -36,7 +36,7 @@ export default function VendorSettings(): JSX.Element {
         <CardContent className="space-y-4 pt-6">
           <div className="grid gap-4 md:grid-cols-3">
             <div className="space-y-1.5">
-              <Label>نسبة العمولة الافتراضية</Label>
+              <Label>نسبة العمولة</Label>
               <Input dir="ltr" inputMode="decimal" value={d.rate} onChange={(e) => set('rate', e.target.value)} />
               <FieldHint>مطلوب. رقم أكبر من 0 وحتى 100 (%)، يُحسب من أول اشتراك.</FieldHint>
             </div>

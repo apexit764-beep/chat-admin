@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Check, Eye, FileText, MoreHorizontal, XCircle } from 'lucide-react';
+import { Check, Eye, MoreHorizontal, XCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/store/useUIStore';
 import {
@@ -111,7 +111,19 @@ export function PayoutsTable({ list, showVendor }: { list: Payout[]; showVendor:
                 </TableCell>
                 <TableCell className="text-xs">{p.executedBy || p.reviewedBy || '—'}</TableCell>
                 <TableCell className="whitespace-nowrap">
-                  {p.st !== 'ملغي' && (
+                  {(p.st === 'مرفوض' || p.st === 'تم التحويل') && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground"
+                      aria-label={p.st === 'مرفوض' ? 'عرض سبب الرفض' : 'عرض صورة التحويل'}
+                      title={p.st === 'مرفوض' ? 'عرض سبب الرفض' : 'عرض صورة التحويل'}
+                      onClick={() => setDlg({ kind: p.st === 'مرفوض' ? 'reason' : 'receipt', payout: p })}
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                  )}
+                  {p.st === 'بانتظار المراجعة' && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground" aria-label="الإجراءات">
@@ -119,30 +131,14 @@ export function PayoutsTable({ list, showVendor }: { list: Payout[]; showVendor:
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-48">
-                        {p.st === 'بانتظار المراجعة' && (
-                          <>
-                            <DropdownMenuItem onClick={() => setDlg({ kind: 'approve', payout: p })}>
-                              <Check className="me-2 h-4 w-4 text-emerald-600" />
-                              موافقة
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => setDlg({ kind: 'reject', payout: p })}>
-                              <XCircle className="me-2 h-4 w-4" />
-                              رفض
-                            </DropdownMenuItem>
-                          </>
-                        )}
-                        {p.st === 'تم التحويل' && (
-                          <DropdownMenuItem onClick={() => setDlg({ kind: 'receipt', payout: p })}>
-                            <FileText className="me-2 h-4 w-4" />
-                            صورة التحويل
-                          </DropdownMenuItem>
-                        )}
-                        {p.st === 'مرفوض' && (
-                          <DropdownMenuItem onClick={() => setDlg({ kind: 'reason', payout: p })}>
-                            <Eye className="me-2 h-4 w-4" />
-                            عرض سبب الرفض
-                          </DropdownMenuItem>
-                        )}
+                        <DropdownMenuItem onClick={() => setDlg({ kind: 'approve', payout: p })}>
+                          <Check className="me-2 h-4 w-4 text-emerald-600" />
+                          موافقة
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => setDlg({ kind: 'reject', payout: p })}>
+                          <XCircle className="me-2 h-4 w-4" />
+                          رفض
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   )}

@@ -5,6 +5,7 @@ import { useConfirm } from '@components/ui';
 import { useUIStore } from '@/store/useUIStore';
 import { FX, sumsFor, useVendorsAdminStore, type VCurrency, type Vendor } from '@/store/useVendorsAdminStore';
 import { FieldHint, Note, StatusPill } from '@/components/admin/vendors/VendorBits';
+import { OtpStep } from '@/components/admin/vendors/OtpStep';
 import { isEmail, isIntlPhone, lengthBetween } from '@/utils/vendorValidation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -33,6 +34,26 @@ function VendorFormDialog({ vendor, onClose }: { vendor: Vendor | 'new'; onClose
       : { name: vendor.name, email: vendor.email, phone: vendor.phone, cur: vendor.cur, rate: String(vendor.rate) }
   );
   const set = (k: keyof FormState, v: string): void => setF((s) => ({ ...s, [k]: v }));
+  const [step, setStep] = useState<'form' | 'otp'>('form');
+  const norm = (p: string): string => p.replace(/\s/g, '');
+  const emailChanged = !isNew && f.email.trim().toLowerCase() !== vendor.email.toLowerCase();
+  const phoneChanged = !isNew && norm(f.phone) !== norm(vendor.phone);
+
+  const save = (): void => {
+    const rate = Number(f.rate);
+    const input = { name: f.name.trim(), email: f.email.trim(), phone: f.phone.trim(), cur: f.cur, rate };
+    const r = isNew ? addVendor(input) : editVendor(vendor.id, input);
+    if (!r.ok) {
+      setStep('form');
+      return showToast(r.error, 'error');
+    }
+    showToast(
+      isNew ? 'تمت إضافة المورد وإرسال بريد الدعوة'
+        : emailChanged ? 'تم الحفظ، وسُجّل خروج المورد وأُرسل بريد تأكيد إلى البريد الجديد'
+        : 'تم الحفظ'
+    );
+    onClose();
+  };
 
   const submit = (): void => {
     if (!lengthBetween(f.name, 2, 100)) return showToast('الاسم مطلوب، من حرفين إلى 100 حرف', 'error');
@@ -40,19 +61,24 @@ function VendorFormDialog({ vendor, onClose }: { vendor: Vendor | 'new'; onClose
     if (!isIntlPhone(f.phone)) return showToast('رقم الجوال: يبدأ برمز الدولة مثل +20، أرقام ومسافات من 8 إلى 20 خانة', 'error');
     const rate = Number(f.rate);
     if (!(rate > 0 && rate <= 100)) return showToast('نسبة العمولة يجب أن تكون أكبر من 0 وحتى 100', 'error');
-    const input = { name: f.name.trim(), email: f.email.trim(), phone: f.phone.trim(), cur: f.cur, rate };
-    const r = isNew ? addVendor(input) : editVendor(vendor.id, input);
-    if (!r.ok) return showToast(r.error, 'error');
-    showToast(isNew ? 'تمت إضافة المورد وإرسال بريد الدعوة' : 'تم الحفظ');
-    onClose();
+    // changing the phone number needs a code sent to the new number first
+    if (phoneChanged) {
+      showToast('تم إرسال رمز التأكيد إلى الرقم الجديد');
+      return setStep('otp');
+    }
+    save();
   };
 
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{isNew ? 'إضافة مورد' : 'تعديل بيانات المورد'}</DialogTitle>
+          <DialogTitle>{step === 'otp' ? 'تأكيد رقم الجوال الجديد' : isNew ? 'إضافة مورد' : 'تعديل بيانات المورد'}</DialogTitle>
         </DialogHeader>
+        {step === 'otp' ? (
+          <OtpStep phone={f.phone} onVerified={save} onBack={() => setStep('form')} />
+        ) : (
+          <>
         <div className="space-y-3 py-1">
           <div className="space-y-1.5">
             <Label>الاسم *</Label>
@@ -62,13 +88,19 @@ function VendorFormDialog({ vendor, onClose }: { vendor: Vendor | 'new'; onClose
           <div className="space-y-1.5">
             <Label>البريد الإلكتروني *</Label>
             <Input dir="ltr" value={f.email} onChange={(e) => set('email', e.target.value)} />
-            <FieldHint>مطلوب. بريد إلكتروني بصيغة صحيحة وغير مسجّل لمورد آخر.</FieldHint>
+            <FieldHint>
+              مطلوب. بريد إلكتروني بصيغة صحيحة وغير مسجّل لمورد آخر.
+              {!isNew && ' وعند تغييره يُسجَّل خروج المورد تلقائيًا ويُرسل بريد تأكيد (CONFIRMATION) إلى البريد الجديد.'}
+            </FieldHint>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label>رقم الجوال *</Label>
               <Input dir="ltr" value={f.phone} onChange={(e) => set('phone', e.target.value.replace(/[^\d+\s]/g, ''))} />
-              <FieldHint>مطلوب. يبدأ برمز الدولة مثل ‎+20، أرقام ومسافات من 8 إلى 20 خانة.</FieldHint>
+              <FieldHint>
+                مطلوب. يبدأ برمز الدولة مثل ‎+20، أرقام ومسافات من 8 إلى 20 خانة.
+                {!isNew && ' وتغييره يحتاج رمز تأكيد (OTP) يُرسل إلى الرقم الجديد.'}
+              </FieldHint>
             </div>
             <div className="space-y-1.5">
               <Label>الدولة *</Label>
@@ -95,7 +127,7 @@ function VendorFormDialog({ vendor, onClose }: { vendor: Vendor | 'new'; onClose
           <Note>
             {isNew
               ? 'سيصل إلى المورد بريد لإنشاء كلمة المرور والموافقة على شروط البرنامج.'
-              : 'تُطبق النسبة الجديدة على العملاء الذين يشتركون بعد التعديل فقط. تغيير الدولة يغيّر عملة العمولات الجديدة فقط.'}
+              : 'تغيير نسبة العمولة يُطبَّق على الاشتراكات الجديدة بعد التعديل فقط. وتغيير الدولة يغيّر عملة العمولات الجديدة فقط.'}
           </Note>
         </div>
         <DialogFooter>
@@ -104,6 +136,8 @@ function VendorFormDialog({ vendor, onClose }: { vendor: Vendor | 'new'; onClose
           </Button>
           <Button onClick={submit}>{isNew ? 'إضافة' : 'حفظ'}</Button>
         </DialogFooter>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   );

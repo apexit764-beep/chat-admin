@@ -92,7 +92,7 @@ export default function Payouts(): JSX.Element {
               <FieldHint>مطلوب. رقم أكبر من صفر، من الحد الأدنى ({min} {FX[v.cur].sym}) إلى المتاح ({s.avail} {FX[v.cur].sym})، بحد أقصى 3 خانات عشرية.</FieldHint>
             </div>
             <div className="text-xs leading-relaxed text-muted-foreground">
-              المتاح: <b className="text-foreground"><Money v={s.avail} cur={v.cur} /></b> · الحد الأدنى: <Money v={min} cur={v.cur} />
+              المتاح للسحب = <b className="text-foreground"><Money v={s.avail} cur={v.cur} /></b> ،، الحد الأدنى للسحب = <b className="text-foreground"><Money v={min} cur={v.cur} /></b>
             </div>
           </div>
           {v.accounts.length > 0 && (
@@ -159,16 +159,14 @@ export default function Payouts(): JSX.Element {
                     </TableCell>
                     <TableCell>{p.date}</TableCell>
                     <TableCell>
-                      <span className="inline-flex items-center gap-1.5">
-                        <StatusPill text={p.st} />
-                        {p.reason && (
-                          <Button size="icon" variant="outline" className="h-7 w-7" aria-label="عرض السبب" title="عرض السبب" onClick={() => setReasonOf(p)}>
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </span>
+                      <StatusPill text={p.st} />
                     </TableCell>
                     <TableCell>
+                      {p.reason && (
+                        <Button size="icon" variant="outline" className="h-8 w-8" aria-label="عرض السبب" title="عرض السبب" onClick={() => setReasonOf(p)}>
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                      )}
                       {p.st === 'بانتظار المراجعة' && (
                         <Button size="sm" variant="outline" onClick={() => setCancelOf(p)}>
                           إلغاء الطلب

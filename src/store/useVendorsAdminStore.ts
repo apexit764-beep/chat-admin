@@ -234,7 +234,11 @@ export const useVendorsAdminStore = create<State>((set, get) => {
       }
       const old = get().vendors.find((x) => x.id === id) as Vendor;
       set((s) => ({ vendors: s.vendors.map((x) => (x.id === id ? { ...x, ...v, country: FX[v.cur].country } : x)) }));
-      addLog('vendor_updated', v.name, old.rate !== v.rate ? `تعديل البيانات · النسبة من ${old.rate}% إلى ${v.rate}%` : 'تعديل البيانات');
+      const parts: string[] = [];
+      if (old.rate !== v.rate) parts.push(`النسبة من ${old.rate}% إلى ${v.rate}%`);
+      if (old.email.toLowerCase() !== v.email.toLowerCase()) parts.push('تغيير البريد (سُجّل خروج المورد وأُرسل تأكيد إلى البريد الجديد)');
+      if (old.phone.replace(/\s/g, '') !== v.phone.replace(/\s/g, '')) parts.push('تغيير الجوال (بعد تأكيد الرمز)');
+      addLog('vendor_updated', v.name, parts.length ? `تعديل البيانات · ${parts.join(' · ')}` : 'تعديل البيانات');
       return { ok: true };
     },
     toggleFreeze: (id) => {
