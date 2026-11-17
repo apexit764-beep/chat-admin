@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link2, Plus, RotateCw } from 'lucide-react';
 import { useVendorStore } from '@v/store/useVendorStore';
 import { useUIStore } from '@/store/useUIStore';
@@ -11,6 +11,16 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { DateRangePicker } from '@/components/ui/date-range-picker';
+
+const AR_MONTHS = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+/** «2 أكتوبر 2026» → Date */
+const parseArDate = (d: string): number => {
+  const [day, month, year] = d.split(' ');
+  return new Date(Number(year), AR_MONTHS.indexOf(month), Number(day)).getTime();
+};
+const VIA_OPTIONS: [string, string][] = [['all', 'طريقة الإضافة: الكل'], ['دعوة', 'دعوة'], ['رابط', 'رابط التسجيل']];
+const STATE_OPTIONS: [string, string][] = [['all', 'الحالة: الكل'], ['اشترك', 'اشترك'], ['سجل', 'سجل'], ['دعوة مرسلة', 'دعوة مرسلة'], ['استرد المبلغ', 'استرد المبلغ']];
 
 const CODES = [
   ['+20', '🇪🇬 +20'],
@@ -95,6 +105,23 @@ export default function Clients(): JSX.Element {
   const showToast = useUIStore((s) => s.showToast);
   const v = vendors.find((x) => x.id === meId)!;
   const mine = clients.filter((c) => c.vid === v.id);
+  const [range, setRange] = useState<{ from: Date; to: Date } | undefined>(undefined);
+  const [viaF, setViaF] = useState('all');
+  const [stateF, setStateF] = useState('all');
+  const filtered = useMemo(() => {
+    const from = range ? new Date(range.from).setHours(0, 0, 0, 0) : 0;
+    const to = range ? new Date(range.to).setHours(23, 59, 59, 999) : 0;
+    return mine.filter((c) => {
+      if (viaF !== 'all' && (c.via ?? 'دعوة') !== viaF) return false;
+      if (stateF !== 'all' && c.state !== stateF) return false;
+      if (range) {
+        const t = parseArDate(c.date);
+        if (t < from || t > to) return false;
+      }
+      return true;
+    });
+  }, [mine, range, viaF, stateF]);
+  const filtering = !!range || viaF !== 'all' || stateF !== 'all';
   const [adding, setAdding] = useState(false);
   const [linkOpen, setLinkOpen] = useState(false);
   const [detailId, setDetailId] = useState<number | null>(null);
@@ -132,6 +159,39 @@ export default function Clients(): JSX.Element {
       />
 
       <Card>
+        <CardContent className="flex flex-wrap items-center gap-2 border-b p-4">
+          <DateRangePicker value={range} onChange={setRange} />
+          <Select value={viaF} onValueChange={setViaF}>
+            <SelectTrigger className="h-9 w-auto min-w-[170px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {VIA_OPTIONS.map(([k, t]) => (
+                <SelectItem key={k} value={k}>
+                  {t}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={stateF} onValueChange={setStateF}>
+            <SelectTrigger className="h-9 w-auto min-w-[150px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {STATE_OPTIONS.map(([k, t]) => (
+                <SelectItem key={k} value={k}>
+                  {t}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {filtering && (
+            <Button size="sm" variant="ghost" onClick={() => { setRange(undefined); setViaF('all'); setStateF('all'); }}>
+              مسح الفلاتر
+            </Button>
+          )}
+          <span className="ms-auto text-xs text-muted-foreground">{filtered.length} من {mine.length}</span>
+        </CardContent>
         <CardContent className="p-0">
           <Table>
             <TableHeader>
@@ -144,14 +204,14 @@ export default function Clients(): JSX.Element {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mine.length === 0 && (
+              {filtered.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={8} className="py-10 text-center text-muted-foreground">
-                    لم تُضف أي عميل بعد.
+                    {mine.length === 0 ? 'لم تُضف أي عميل بعد.' : 'لا يوجد عملاء بهذا الفلتر.'}
                   </TableCell>
                 </TableRow>
               )}
-              {mine.map((c) => {
+              {filtered.map((c) => {
                 const k = comms.find((x) => x.cid === c.id);
                 return (
                   <TableRow key={c.id}>
