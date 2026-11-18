@@ -5,7 +5,6 @@ import { cn } from '@/lib/utils';
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -18,16 +17,13 @@ import {
 
 type NavItem = { to: string; label: string; icon: LucideIcon };
 
-const MAIN: NavItem[] = [
+/** every page: the sidebar menu and the header title */
+export const NAV: NavItem[] = [
   { to: '/home', label: 'الرئيسية', icon: Home },
   { to: '/clients', label: 'العملاء', icon: Users },
   { to: '/payouts', label: 'السحب', icon: Wallet },
+  { to: '/account', label: 'حسابي', icon: UserCog },
 ];
-/** pinned to the bottom of the sidebar */
-const ACCOUNT: NavItem = { to: '/account', label: 'حسابي', icon: UserCog };
-
-/** every page, for the header title */
-export const NAV: NavItem[] = [...MAIN, ACCOUNT];
 
 /* larger targets than the shadcn defaults: 40px rows, 20px icons, centred when collapsed */
 const ITEM =
@@ -116,13 +112,10 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>): JSX.Ele
         <SidebarGroup className="px-3 group-data-[collapsible=icon]:px-2">
           <SidebarGroupLabel className="mb-1">القائمة</SidebarGroupLabel>
           <SidebarGroupContent>
-            <NavItems items={MAIN} />
+            <NavItems items={NAV} />
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="border-t border-sidebar-border px-3 py-3 group-data-[collapsible=icon]:px-2">
-        <NavItems items={[ACCOUNT]} />
-      </SidebarFooter>
     </Sidebar>
   );
 }
