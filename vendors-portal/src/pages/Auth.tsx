@@ -3,53 +3,12 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Toast } from '@/components/ui/Toast';
 import { useUIStore } from '@/store/useUIStore';
 import { useVendorStore } from '@v/store/useVendorStore';
 import { FieldHint, Note } from '@v/components/ui-bits';
+import { AuthBox } from '@v/components/auth-layouts';
+import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { isEmail, passwordRules, PASSWORD_CHARSET } from '@v/lib/validation';
-
-function AuthBox({ children }: { children: React.ReactNode }): JSX.Element {
-  return (
-    <div className="grid min-h-svh lg:grid-cols-2">
-      <div className="flex flex-col gap-4 p-6 md:p-10">
-        <div className="flex items-center gap-2.5">
-          <img src="/qhub-icon.svg" alt="" className="h-9 w-9 rounded-lg" />
-          <div className="leading-tight">
-            <div className="font-bold">Qhub Partners</div>
-            <div className="text-xs text-muted-foreground">بوابة الموردين</div>
-          </div>
-        </div>
-        <div className="flex flex-1 items-center justify-center">
-          <div className="w-full max-w-sm">{children}</div>
-        </div>
-        <p className="text-center text-[11px] text-muted-foreground">© Qhub · برنامج الموردين</p>
-      </div>
-      <div className="relative hidden overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-950 lg:block">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.14),transparent_45%),radial-gradient(circle_at_80%_90%,rgba(56,189,248,0.3),transparent_40%)]" />
-        <div className="relative flex h-full flex-col justify-end gap-6 p-12 text-white">
-          <div className="grid max-w-md grid-cols-3 gap-3">
-            {[
-              ['أضف', 'عملاءك'],
-              ['اكسب', 'عمولتك'],
-              ['اسحب', 'أرباحك'],
-            ].map(([a, b]) => (
-              <div key={a} className="rounded-xl border border-white/15 bg-white/10 p-4 backdrop-blur">
-                <div className="text-lg font-bold">{a}</div>
-                <div className="text-xs text-white/70">{b}</div>
-              </div>
-            ))}
-          </div>
-          <div className="max-w-md space-y-2">
-            <h2 className="text-3xl font-bold leading-snug">شريكك في النمو</h2>
-            <p className="text-sm leading-relaxed text-white/75">تابع عملاءك وعمولاتك وطلبات السحب من مكان واحد.</p>
-          </div>
-        </div>
-      </div>
-      <Toast />
-    </div>
-  );
-}
 
 export function Login(): JSX.Element {
   const navigate = useNavigate();
@@ -57,6 +16,7 @@ export function Login(): JSX.Element {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [showPw, setShowPw] = useState(false);
 
   const submit = (): void => {
     if (!isEmail(email)) return setError('أدخل بريدًا إلكترونيًا صحيحًا');
@@ -70,26 +30,50 @@ export function Login(): JSX.Element {
     <AuthBox>
       <h2 className="text-2xl font-semibold tracking-tight">تسجيل الدخول</h2>
       <p className="mb-6 mt-1 text-sm text-muted-foreground">سجّل الدخول بالبريد الإلكتروني وكلمة المرور التي أنشأتها من بريد الدعوة.</p>
-      <div className="space-y-3">
+      <div className="space-y-4">
         <div className="space-y-1.5">
-          <Label>البريد الإلكتروني</Label>
-          <Input dir="ltr" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@company.com" />
+          <Label htmlFor="email">البريد الإلكتروني</Label>
+          <div className="relative">
+            <Mail className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input id="email" dir="ltr" type="email" className="h-11 pr-10" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@company.com" />
+          </div>
           <FieldHint>مطلوب. بريد إلكتروني بصيغة صحيحة، مثل name@company.com.</FieldHint>
         </div>
         <div className="space-y-1.5">
-          <Label>كلمة المرور</Label>
-          <Input dir="ltr" type="password" value={password} onChange={(e) => setPassword(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && submit()} />
+          <div className="flex items-center justify-between">
+            <Label htmlFor="password">كلمة المرور</Label>
+            <button type="button" className="text-xs font-medium text-primary hover:underline" onClick={() => navigate('/forgot')}>
+              نسيت كلمة المرور؟
+            </button>
+          </div>
+          <div className="relative">
+            <Lock className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              id="password"
+              dir="ltr"
+              type={showPw ? 'text' : 'password'}
+              className="h-11 pl-10 pr-10"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && submit()}
+            />
+            <button
+              type="button"
+              aria-label={showPw ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}
+              className="absolute left-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
+              onClick={() => setShowPw((x) => !x)}
+            >
+              {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
           <FieldHint>مطلوبة. هي كلمة المرور التي أنشأتها من رابط الدعوة.</FieldHint>
         </div>
         {error && <Note tone="error">{error}</Note>}
-        <button className="text-xs text-primary" onClick={() => navigate('/forgot')}>
-          نسيت كلمة المرور؟
-        </button>
-        <Button className="w-full" onClick={submit}>
+        <Button className="h-11 w-full text-sm" onClick={submit}>
           تسجيل الدخول
         </Button>
       </div>
-      <Note className="mt-4">
+      <Note className="mt-5">
         نسخة تجريبية: للدخول استخدم mahmoud@agency.com وكلمة المرور Partner2026. ولتجربة دعوة مورد جديد افتح <a className="underline" href="#/invite/4">رابط الدعوة</a>.
       </Note>
     </AuthBox>
