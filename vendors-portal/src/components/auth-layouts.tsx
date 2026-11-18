@@ -1,4 +1,3 @@
-import { useSearchParams } from 'react-router-dom';
 import { ArrowUpLeft, Bell, Clock, UserPlus, Wallet } from 'lucide-react';
 import { Toast } from '@/components/ui/Toast';
 
@@ -8,53 +7,11 @@ const STEPS = [
   { icon: Wallet, title: 'اسحب أرباحك', text: 'اطلب السحب لحسابك البنكي أو محفظتك' },
 ];
 
-const svg = (body: string, w: number, h: number): string =>
-  `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${h}'>${body}</svg>`)}")`;
-
-const C = 'rgba(37,99,235,';
-
-/** background patterns (preview with ?pattern=grid|waves|stars) */
-const PATTERNS: Record<string, { image: string; size: string; mask: string }> = {
-  grid: {
-    image: `linear-gradient(to right, ${C}0.10) 1px, transparent 1px), linear-gradient(to bottom, ${C}0.10) 1px, transparent 1px)`,
-    size: '40px 40px',
-    mask: 'radial-gradient(ellipse 80% 70% at 50% 40%, black 40%, transparent 100%)',
-  },
-  waves: {
-    image: svg(`<path d='M0 20 Q 25 5 50 20 T 100 20' fill='none' stroke='${C}0.16)' stroke-width='1.2'/><path d='M0 40 Q 25 25 50 40 T 100 40' fill='none' stroke='${C}0.10)' stroke-width='1'/>`, 100, 40),
-    size: '100px 40px',
-    mask: 'linear-gradient(to bottom, black 0%, transparent 85%)',
-  },
-  stars: {
-    image: svg(
-      `<g fill='none' stroke='${C}0.14)' stroke-width='1'><rect x='17' y='17' width='22' height='22'/><rect x='17' y='17' width='22' height='22' transform='rotate(45 28 28)'/><circle cx='28' cy='28' r='4'/><path d='M0 0 L11 11 M56 0 L45 11 M0 56 L11 45 M56 56 L45 45'/></g>`,
-      56,
-      56
-    ),
-    size: '56px 56px',
-    mask: 'radial-gradient(ellipse 85% 75% at 50% 45%, black 35%, transparent 100%)',
-  },
-};
-
-function Pattern({ name }: { name: string }): JSX.Element | null {
-  const p = PATTERNS[name];
-  if (!p) return null;
-  return (
-    <div
-      className="pointer-events-none absolute inset-0 dark:opacity-60"
-      style={{ backgroundImage: p.image, backgroundSize: p.size, maskImage: p.mask, WebkitMaskImage: p.mask }}
-    />
-  );
-}
-
 /** frame of the auth pages: light background, form card + the partner journey */
 export function AuthBox({ children }: { children: React.ReactNode }): JSX.Element {
-  const [params] = useSearchParams();
-  const pattern = params.get('pattern') || 'stars';
   return (
     <div className="relative min-h-svh overflow-hidden bg-gradient-to-br from-blue-50 via-white to-sky-50 dark:from-zinc-950 dark:via-background dark:to-zinc-900">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_15%,rgba(59,130,246,0.18),transparent_40%),radial-gradient(circle_at_85%_90%,rgba(56,189,248,0.18),transparent_45%)]" />
-      <Pattern name={pattern} />
 
       <div className="relative mx-auto flex min-h-svh max-w-6xl flex-col gap-8 p-6 md:p-10">
         <div className="flex items-center justify-between">
