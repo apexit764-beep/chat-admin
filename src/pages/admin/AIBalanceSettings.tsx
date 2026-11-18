@@ -59,7 +59,7 @@ export default function AIBalanceSettings(): JSX.Element {
     const u = Number(packInput);
     if (!(u > 0)) return showToast('أدخل مبلغاً أكبر من صفر', 'error');
     if (settings.packs.some((p) => p.usd === u)) return showToast('هذه الباقة موجودة بالفعل', 'error');
-    if (settings.packs.length >= MAX_PACKS) return showToast(`الحد الأقصى ${MAX_PACKS} باقات شحن. احذف باقة لإضافة أخرى`, 'error');
+    if (settings.packs.length >= MAX_PACKS) return showToast(`الحد الأقصى ${MAX_PACKS} باقات شحن. عدّل باقة موجودة بدل إضافة أخرى`, 'error');
     if (u > Number(draft.max)) {
       return showToast(`مبلغ الباقة لا يمكن أن يتجاوز الحد الأقصى للمبلغ الحر (${formatUsd(Number(draft.max))})`, 'error');
     }
