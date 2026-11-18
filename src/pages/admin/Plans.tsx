@@ -303,7 +303,11 @@ export default function AdminPlans(): JSX.Element {
                               value={limitShort(p.limits.accounts)}
                               label="حسابات وأرقام"
                               detail={LIMIT_FIELDS.filter((f) => !['conversations', 'agents', 'accounts'].includes(f.key))
-                                .map((f) => `${f.label}: ${limitText(p.limits[f.key])}`)}
+                                .map((f) => `${f.label}: ${limitText(p.limits[f.key])}`)
+                                .concat(p.requiresContact ? [] : [
+                                  `توكنز مجانية/شهر: ${(p.freeTokensMonthly ?? 0).toLocaleString('en-US')}`,
+                                  `توكنز مجانية/سنة: ${(p.freeTokensYearly ?? 0).toLocaleString('en-US')}`,
+                                ])}
                             />
                           </div>
                         </TableCell>

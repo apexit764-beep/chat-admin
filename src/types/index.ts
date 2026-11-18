@@ -216,6 +216,10 @@ export interface Plan {
   /** keyed by feature key from the catalogue in src/data/planFeatures.ts */
   features: Record<string, FeatureValue>;
   limits: PlanLimits;
+  /** free assistant tokens a subscriber gets each month on a monthly plan; 0 or absent = none */
+  freeTokensMonthly?: number;
+  /** free assistant tokens a subscriber gets each year on a yearly plan; 0 or absent = none */
+  freeTokensYearly?: number;
   /** keyed by country code, plus DEFAULT_PRICE_KEY for the rest of the world */
   pricesPerCountry: Record<string, PlanPrice>;
   popular?: boolean;

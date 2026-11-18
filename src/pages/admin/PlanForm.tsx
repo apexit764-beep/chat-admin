@@ -38,6 +38,8 @@ import { cn } from '@/lib/utils';
 import { ALL_FEATURE_KEYS, FEATURE_CATALOG, FEATURE_LABELS, featureText, isGranted } from '@/data/planFeatures';
 import { LIMIT_FIELDS, isLimitReduced, limitText } from '@/utils/planLimits';
 
+const MAX_FREE_TOKENS = 1_000_000_000;
+
 interface FormState {
   tier: PlanTier;
   name: string;
@@ -45,6 +47,9 @@ interface FormState {
   tagline: string;
   features: Record<string, FeatureValue>;
   limits: PlanLimits;
+  /** kept as text while typing, validated on save */
+  freeTokensMonthly: string;
+  freeTokensYearly: string;
   pricesPerCountry: Record<string, PlanPrice>;
   popular: boolean;
   adminOnly: boolean;
@@ -91,6 +96,8 @@ export default function PlanForm(): JSX.Element {
         tagline: editing.tagline,
         features: { ...editing.features },
         limits: { ...editing.limits },
+        freeTokensMonthly: String(editing.freeTokensMonthly ?? 0),
+        freeTokensYearly: String(editing.freeTokensYearly ?? 0),
         pricesPerCountry: { ...editing.pricesPerCountry },
         popular: editing.popular ?? false,
         adminOnly: editing.adminOnly ?? false,
@@ -109,6 +116,8 @@ export default function PlanForm(): JSX.Element {
         conversations: 3000, messages: -1, accounts: 6, agents: 10,
         contacts: -1, departments: -1, whatsappCampaigns: 6000, emailCampaigns: 6000,
       },
+      freeTokensMonthly: '0',
+      freeTokensYearly: '0',
       pricesPerCountry: defaultPrices,
       popular: false,
       adminOnly: false,
@@ -226,6 +235,15 @@ export default function PlanForm(): JSX.Element {
       }
     }
 
+    if ((Number(form.freeTokensMonthly) || 0) < (editing.freeTokensMonthly ?? 0)) {
+      impact.limitsDecreased = true;
+      impact.decreasedLimits.push('التوكنز المجانية / شهر');
+    }
+    if ((Number(form.freeTokensYearly) || 0) < (editing.freeTokensYearly ?? 0)) {
+      impact.limitsDecreased = true;
+      impact.decreasedLimits.push('التوكنز المجانية / سنة');
+    }
+
     // a feature the client had and no longer has is a downgrade, whatever its value was
     impact.featuresRemoved = ALL_FEATURE_KEYS
       .filter((k) => isGranted(editing.features[k]) && !isGranted(form.features[k]))
@@ -248,6 +266,8 @@ export default function PlanForm(): JSX.Element {
     tagline: form.tagline,
     features: form.features,
     limits: form.limits,
+    freeTokensMonthly: Number(form.freeTokensMonthly) || 0,
+    freeTokensYearly: Number(form.freeTokensYearly) || 0,
     pricesPerCountry: form.pricesPerCountry,
     popular: form.popular,
     adminOnly: form.adminOnly,
@@ -295,6 +315,11 @@ export default function PlanForm(): JSX.Element {
     }
     if (!form.requiresContact && LIMIT_FIELDS.some((f) => form.limits[f.key] === 0)) {
       newErrors.limits = 'يجب تحديد جميع الحدود (-1 = غير محدود)';
+    }
+    if (!form.requiresContact) {
+      const bad = (v: string): boolean => !/^\d+$/.test(v.trim()) || Number(v) > MAX_FREE_TOKENS;
+      if (bad(form.freeTokensMonthly)) newErrors.freeTokensMonthly = 'مطلوب. عدد صحيح من 0 إلى 1,000,000,000 توكن';
+      if (bad(form.freeTokensYearly)) newErrors.freeTokensYearly = 'مطلوب. عدد صحيح من 0 إلى 1,000,000,000 توكن';
     }
     if (ALL_FEATURE_KEYS.every((k) => !isGranted(form.features[k]))) {
       newErrors.features = 'يجب اختيار ميزة واحدة على الأقل';
@@ -410,6 +435,40 @@ export default function PlanForm(): JSX.Element {
                     </p>
                   </div>
                 ))}
+              </div>
+              <div className="mt-4 border-t pt-4">
+                <p className="mb-3 text-sm font-semibold">التوكنز المجانية (المساعد الذكي)</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {([
+                    ['freeTokensMonthly', 'التوكنز المجانية / شهر', 'يحصل عليها المشترك في الباقة الشهرية كل شهر'],
+                    ['freeTokensYearly', 'التوكنز المجانية / سنة', 'يحصل عليها المشترك في الباقة السنوية كل سنة'],
+                  ] as const).map(([k, label, hint]) => (
+                    <div key={k} className="space-y-1.5">
+                      <Label className="flex items-center gap-1.5">
+                        {label}
+                        {!form.requiresContact && <span className="text-destructive ms-0.5">*</span>}
+                      </Label>
+                      {form.requiresContact ? (
+                        <Input value="مخصّص" disabled readOnly />
+                      ) : (
+                        <Input
+                          dir="ltr"
+                          inputMode="numeric"
+                          value={form[k]}
+                          onChange={(e) => {
+                            setForm({ ...form, [k]: e.target.value.replace(/[^\d]/g, '') });
+                            if (errors[k]) setErrors((prev) => { const { [k]: _drop, ...rest } = prev; return rest; });
+                          }}
+                        />
+                      )}
+                      <p className="text-[11px] text-muted-foreground">
+                        {hint}. مطلوب، عدد صحيح من 0 إلى 1,000,000,000 توكن، و0 = بدون توكنز مجانية.
+                        {!form.requiresContact && ` · ${(Number(form[k]) || 0).toLocaleString('en-US')} توكن`}
+                      </p>
+                      {errors[k] && <p className="text-[11px] text-destructive">{errors[k]}</p>}
+                    </div>
+                  ))}
+                </div>
               </div>
             </CardContent>
           </Card>
