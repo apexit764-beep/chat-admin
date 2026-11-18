@@ -11,11 +11,40 @@ import { isEmail, passwordRules, PASSWORD_CHARSET } from '@v/lib/validation';
 
 function AuthBox({ children }: { children: React.ReactNode }): JSX.Element {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-emerald-50 via-muted/40 to-muted/40 p-4">
-      <div className="w-full max-w-[420px] rounded-2xl border bg-card p-7 shadow-lg shadow-black/5">
-        <div className="text-lg font-extrabold text-emerald-900">Qhub Partners</div>
-        <div className="mb-5 text-xs text-muted-foreground">بوابة الموردين</div>
-        {children}
+    <div className="grid min-h-svh lg:grid-cols-2">
+      <div className="flex flex-col gap-4 p-6 md:p-10">
+        <div className="flex items-center gap-2.5">
+          <img src="/qhub-icon.svg" alt="" className="h-9 w-9 rounded-lg" />
+          <div className="leading-tight">
+            <div className="font-bold">Qhub Partners</div>
+            <div className="text-xs text-muted-foreground">بوابة الموردين</div>
+          </div>
+        </div>
+        <div className="flex flex-1 items-center justify-center">
+          <div className="w-full max-w-sm">{children}</div>
+        </div>
+        <p className="text-center text-[11px] text-muted-foreground">© Qhub · برنامج الموردين</p>
+      </div>
+      <div className="relative hidden overflow-hidden bg-gradient-to-br from-emerald-700 via-emerald-800 to-emerald-950 lg:block">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.14),transparent_45%),radial-gradient(circle_at_80%_90%,rgba(16,185,129,0.35),transparent_40%)]" />
+        <div className="relative flex h-full flex-col justify-end gap-6 p-12 text-white">
+          <div className="grid max-w-md grid-cols-3 gap-3">
+            {[
+              ['أضف', 'عملاءك'],
+              ['اكسب', 'عمولتك'],
+              ['اسحب', 'أرباحك'],
+            ].map(([a, b]) => (
+              <div key={a} className="rounded-xl border border-white/15 bg-white/10 p-4 backdrop-blur">
+                <div className="text-lg font-bold">{a}</div>
+                <div className="text-xs text-white/70">{b}</div>
+              </div>
+            ))}
+          </div>
+          <div className="max-w-md space-y-2">
+            <h2 className="text-3xl font-bold leading-snug">شريكك في النمو</h2>
+            <p className="text-sm leading-relaxed text-white/75">تابع عملاءك وعمولاتك وطلبات السحب من مكان واحد.</p>
+          </div>
+        </div>
       </div>
       <Toast />
     </div>
@@ -39,8 +68,8 @@ export function Login(): JSX.Element {
 
   return (
     <AuthBox>
-      <h2 className="text-xl font-bold">تسجيل الدخول</h2>
-      <p className="mb-4 text-sm text-muted-foreground">سجّل الدخول بالبريد الإلكتروني وكلمة المرور التي أنشأتها من بريد الدعوة.</p>
+      <h2 className="text-2xl font-semibold tracking-tight">تسجيل الدخول</h2>
+      <p className="mb-6 mt-1 text-sm text-muted-foreground">سجّل الدخول بالبريد الإلكتروني وكلمة المرور التي أنشأتها من بريد الدعوة.</p>
       <div className="space-y-3">
         <div className="space-y-1.5">
           <Label>البريد الإلكتروني</Label>
@@ -73,8 +102,8 @@ export function Forgot(): JSX.Element {
   const [email, setEmail] = useState('');
   return (
     <AuthBox>
-      <h2 className="text-xl font-bold">نسيت كلمة المرور</h2>
-      <p className="mb-4 text-sm text-muted-foreground">أدخل بريدك الإلكتروني وسنرسل لك رابطًا لإنشاء كلمة مرور جديدة.</p>
+      <h2 className="text-2xl font-semibold tracking-tight">نسيت كلمة المرور</h2>
+      <p className="mb-6 mt-1 text-sm text-muted-foreground">أدخل بريدك الإلكتروني وسنرسل لك رابطًا لإنشاء كلمة مرور جديدة.</p>
       <div className="space-y-3">
         <div className="space-y-1.5">
           <Label>البريد الإلكتروني</Label>
@@ -117,8 +146,8 @@ export function CreatePassword({ mode }: { mode: 'invite' | 'reset' }): JSX.Elem
   if (!vendor || (mode === 'invite' && vendor.status !== 'دعوة مرسلة')) {
     return (
       <AuthBox>
-        <h2 className="text-xl font-bold">انتهت صلاحية الرابط</h2>
-        <p className="mb-4 text-sm text-muted-foreground">
+        <h2 className="text-2xl font-semibold tracking-tight">انتهت صلاحية الرابط</h2>
+        <p className="mb-6 mt-1 text-sm text-muted-foreground">
           {mode === 'reset'
             ? 'تم استخدام هذا الرابط مسبقًا أو مرّت عليه 48 ساعة. اطلب رابطًا جديدًا من "نسيت كلمة المرور".'
             : 'تم استخدام رابط الدعوة مسبقًا أو مرّت عليه 48 ساعة. اطلب من فريق Qhub إرسال دعوة جديدة.'}
@@ -143,8 +172,8 @@ export function CreatePassword({ mode }: { mode: 'invite' | 'reset' }): JSX.Elem
 
   return (
     <AuthBox>
-      <h2 className="text-xl font-bold">{mode === 'invite' ? `أهلًا ${vendor.name}` : 'كلمة مرور جديدة'}</h2>
-      <p className="mb-4 text-sm text-muted-foreground">
+      <h2 className="text-2xl font-semibold tracking-tight">{mode === 'invite' ? `أهلًا ${vendor.name}` : 'كلمة مرور جديدة'}</h2>
+      <p className="mb-6 mt-1 text-sm text-muted-foreground">
         {mode === 'invite' ? 'أنشئ كلمة مرور لحسابك للدخول إلى لوحة الموردين.' : 'أنشئ كلمة مرور جديدة لحسابك.'}
       </p>
       <div className="space-y-3">

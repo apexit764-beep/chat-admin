@@ -1,13 +1,12 @@
 import { useMemo, useState } from 'react';
-import { ChevronLeft, ChevronRight, Eye } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Banknote, Clock, Eye, Hourglass, PiggyBank, Wallet } from 'lucide-react';
 import { useVendorStore, sumsFor, type Payout } from '@v/store/useVendorStore';
 import { FX, toLocal } from '@v/lib/vendorMath';
 import { useUIStore } from '@/store/useUIStore';
-import { FieldHint, Money, Note, PageHeader, Stat, StatusPill } from '@v/components/ui-bits';
+import { FieldHint, FilterTabs, Money, Note, PageHeader, Pager, Stat, StatusPill } from '@v/components/ui-bits';
 import { decimalsAtMost3 } from '@v/lib/validation';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -72,19 +71,20 @@ export default function Payouts(): JSX.Element {
     <div className="space-y-4">
       <PageHeader title="السحب" desc="اطلب سحب الرصيد المتاح، وسيراجعه فريق Qhub ويحوّله إلى حسابك" />
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
-        <Stat label="إجمالي الرصيد" value={<Money v={Math.round((s.avail + s.inReview + s.pending + s.paid) * 1000) / 1000} cur={v.cur} />} />
-        <Stat tone="green" label="متاح للسحب" value={<Money v={s.avail} cur={v.cur} />} />
-        <Stat tone="blue" label="طلبات سحب قيد المراجعة" value={<Money v={s.inReview} cur={v.cur} />} />
-        <Stat tone="amber" label="معلّقة" value={<Money v={s.pending} cur={v.cur} />} />
-        <Stat label="الأرصدة المستلمة" value={<Money v={s.paid} cur={v.cur} />} />
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+        <Stat icon={PiggyBank} label="إجمالي الرصيد" value={<Money v={Math.round((s.avail + s.inReview + s.pending + s.paid) * 1000) / 1000} cur={v.cur} />} />
+        <Stat icon={Wallet} tone="green" label="متاح للسحب" value={<Money v={s.avail} cur={v.cur} />} />
+        <Stat icon={Hourglass} tone="blue" label="طلبات سحب قيد المراجعة" value={<Money v={s.inReview} cur={v.cur} />} />
+        <Stat icon={Clock} tone="amber" label="معلّقة" value={<Money v={s.pending} cur={v.cur} />} />
+        <Stat icon={Banknote} label="الأرصدة المستلمة" value={<Money v={s.paid} cur={v.cur} />} />
       </div>
 
-      <Card>
-        <CardHeader className="pb-3">
+      <Card className="shadow-sm">
+        <CardHeader className="p-5">
           <CardTitle className="text-base">طلب سحب جديد</CardTitle>
+          <CardDescription>يُراجع فريق Qhub الطلب ويحوّل المبلغ إلى الحساب الذي تختاره</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-4 p-5 pt-0">
           <div className="grid items-end gap-3 md:grid-cols-2">
             <div className="space-y-1.5">
               <Label>المبلغ ({FX[v.cur].sym})</Label>
@@ -121,27 +121,28 @@ export default function Payouts(): JSX.Element {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base">طلباتي</CardTitle>
-          <div className="flex flex-wrap gap-1.5 pt-2">
-            {TABS.map(([k, t]) => (
-              <button
-                key={k}
-                onClick={() => { setTab(k); setPage(1); }}
-                className={cn('rounded-lg border px-3 py-1.5 text-xs font-semibold', tab === k ? 'border-primary bg-primary text-primary-foreground' : 'bg-card hover:bg-muted')}
-              >
-                {t} ({mine.filter((p) => k === 'all' || p.st === k).length})
-              </button>
-            ))}
+      <Card className="overflow-hidden shadow-sm">
+        <CardHeader className="flex flex-col gap-3 space-y-0 p-5 lg:flex-row lg:items-center lg:justify-between">
+          <div className="space-y-1">
+            <CardTitle className="text-base">طلباتي</CardTitle>
+            <CardDescription>كل طلبات السحب وحالة كل طلب</CardDescription>
           </div>
+          <FilterTabs
+            tabs={TABS}
+            value={tab}
+            onChange={(k) => {
+              setTab(k);
+              setPage(1);
+            }}
+            count={(k) => mine.filter((p) => k === 'all' || p.st === k).length}
+          />
         </CardHeader>
         <CardContent className="p-0">
           {filtered.length === 0 ? (
-            <p className="p-4 text-sm text-muted-foreground">لا توجد طلبات.</p>
+            <p className="border-t p-8 text-center text-sm text-muted-foreground">لا توجد طلبات.</p>
           ) : (
             <Table>
-              <TableHeader>
+              <TableHeader className="bg-muted/50">
                 <TableRow>
                   {['#', 'المبلغ', 'التاريخ', 'الحالة', ''].map((h, i) => (
                     <TableHead key={i} className="text-start">
@@ -183,22 +184,7 @@ export default function Payouts(): JSX.Element {
               </TableBody>
             </Table>
           )}
-          {filtered.length > PAGE_SIZE && (
-            <div className="flex items-center justify-between gap-2 border-t px-4 py-3 text-xs text-muted-foreground">
-              <span>
-                {(cur - 1) * PAGE_SIZE + 1}–{Math.min(cur * PAGE_SIZE, filtered.length)} من {filtered.length}
-              </span>
-              <div className="flex items-center gap-1.5">
-                <Button size="icon" variant="outline" className="h-8 w-8" aria-label="الصفحة السابقة" disabled={cur === 1} onClick={() => setPage(cur - 1)}>
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-                <span className="px-2 font-semibold text-foreground">صفحة {cur} من {pages}</span>
-                <Button size="icon" variant="outline" className="h-8 w-8" aria-label="الصفحة التالية" disabled={cur === pages} onClick={() => setPage(cur + 1)}>
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          )}
+          <Pager page={cur} pages={pages} total={filtered.length} size={PAGE_SIZE} onPage={setPage} />
         </CardContent>
       </Card>
 

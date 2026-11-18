@@ -5,7 +5,7 @@ import { useUIStore } from '@/store/useUIStore';
 import { FieldHint, Note, PageHeader, StatusPill } from '@v/components/ui-bits';
 import { isAccountNumber, isEmail, isHolderName, isWalletNumber, lengthBetween } from '@v/lib/validation';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -223,8 +223,12 @@ export default function Account(): JSX.Element {
     <div className="space-y-4">
       <PageHeader title="حسابي" desc="بياناتك وطريقة استلام المبالغ" />
 
-      <Card>
-        <CardContent className="grid gap-3 pt-6 md:grid-cols-2">
+      <Card className="shadow-sm">
+        <CardHeader className="p-5">
+          <CardTitle className="text-base">البيانات الشخصية</CardTitle>
+          <CardDescription>لتعديل بياناتك تواصل مع فريق Qhub</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4 p-5 pt-0 md:grid-cols-2">
           {ro('الاسم', v.name)}
           {ro('البريد الإلكتروني', v.email, true)}
           {ro('رقم الجوال', v.phone, true)}
@@ -232,9 +236,12 @@ export default function Account(): JSX.Element {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader className="flex-row items-center justify-between space-y-0 pb-3">
-          <CardTitle className="text-base">حسابات التحويل</CardTitle>
+      <Card className="overflow-hidden shadow-sm">
+        <CardHeader className="flex-row items-center justify-between space-y-0 p-5">
+          <div className="space-y-1">
+            <CardTitle className="text-base">حسابات التحويل</CardTitle>
+            <CardDescription>الحسابات التي تُحوَّل إليها مبالغ السحب</CardDescription>
+          </div>
           <Button size="sm" className="gap-1" onClick={() => setAdding(true)}>
             <Plus className="h-4 w-4" />
             إضافة حساب
@@ -245,7 +252,7 @@ export default function Account(): JSX.Element {
             <p className="px-6 text-sm text-muted-foreground">لم يُضف أي حساب بعد.</p>
           ) : (
             <Table>
-              <TableHeader>
+              <TableHeader className="bg-muted/50">
                 <TableRow>
                   {['النوع', 'البيانات', '', ''].map((h, i) => (
                     <TableHead key={i} className="text-start">

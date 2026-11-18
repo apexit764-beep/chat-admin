@@ -1,0 +1,47 @@
+/* Vendor portal theme: the admin's tokens with the partners' emerald brand.
+ Loaded after the admin's global.css, so these values win for the portal only. */
+:root:not(.dark) {
+  --primary: 161 94% 30%;
+  --primary-foreground: 0 0% 100%;
+  --ring: 161 94% 30%;
+  --radius: 0.625rem;
+  --background: 0 0% 100%;
+  --muted: 150 10% 96%;
+  --accent: 152 40% 95%;
+  --accent-foreground: 163 88% 18%;
+
+  --sidebar-background: 150 14% 97.5%;
+  --sidebar-foreground: 222 30% 18%;
+  --sidebar-primary: 161 94% 30%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 152 45% 92%;
+  --sidebar-accent-foreground: 163 88% 18%;
+  --sidebar-border: 150 10% 90%;
+  --sidebar-ring: 161 94% 30%;
+
+  --chart-1: 161 94% 30%;
+  --chart-2: 158 64% 52%;
+  --chart-3: 38 92% 50%;
+  --chart-4: 217 91% 60%;
+  --chart-5: 262 83% 58%;
+}
+
+:root.dark {
+  --primary: 158 64% 45%;
+  --primary-foreground: 160 90% 8%;
+  --ring: 158 64% 45%;
+  --accent: 160 30% 14%;
+  --accent-foreground: 152 60% 85%;
+
+  --sidebar-background: 225 16% 9%;
+  --sidebar-foreground: 213 31% 91%;
+  --sidebar-primary: 158 64% 45%;
+  --sidebar-primary-foreground: 160 90% 8%;
+  --sidebar-accent: 160 30% 14%;
+  --sidebar-accent-foreground: 152 60% 85%;
+  --sidebar-border: 232 17% 18%;
+  --sidebar-ring: 158 64% 45%;
+
+  --chart-1: 158 64% 45%;
+  --chart-2: 158 50% 65%;
+}

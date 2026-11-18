@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Link2, Plus, RotateCw } from 'lucide-react';
 import { useVendorStore } from '@v/store/useVendorStore';
 import { useUIStore } from '@/store/useUIStore';
@@ -123,6 +124,14 @@ export default function Clients(): JSX.Element {
   }, [mine, range, viaF, stateF]);
   const filtering = !!range || viaF !== 'all' || stateF !== 'all';
   const [adding, setAdding] = useState(false);
+  // «إضافة عميل» from the sidebar / home opens the dialog via ?add=1
+  const [params, setParams] = useSearchParams();
+  useEffect(() => {
+    if (params.get('add') === '1') {
+      setAdding(true);
+      setParams({}, { replace: true });
+    }
+  }, [params, setParams]);
   const [linkOpen, setLinkOpen] = useState(false);
   const [detailId, setDetailId] = useState<number | null>(null);
   const [cancelId, setCancelId] = useState<number | null>(null);
@@ -140,7 +149,7 @@ export default function Clients(): JSX.Element {
   );
 
   return (
-    <div>
+    <div className="space-y-4">
       <PageHeader
         title="العملاء"
         desc="العملاء الذين أضفتهم أو سجّلوا من رابطك، وحالة اشتراك كل منهم"
@@ -158,7 +167,7 @@ export default function Clients(): JSX.Element {
         }
       />
 
-      <Card>
+      <Card className="overflow-hidden shadow-sm">
         <CardContent className="flex flex-wrap items-center gap-2 border-b p-4">
           <DateRangePicker value={range} onChange={setRange} />
           <Select value={viaF} onValueChange={setViaF}>
@@ -194,7 +203,7 @@ export default function Clients(): JSX.Element {
         </CardContent>
         <CardContent className="p-0">
           <Table>
-            <TableHeader>
+            <TableHeader className="bg-muted/50">
               <TableRow>
                 {['العميل', 'طريقة الإضافة', 'تاريخ الإضافة', 'الحالة', 'الباقة', 'الدورة', 'العمولة', 'الإجراءات'].map((h) => (
                   <TableHead key={h} className="text-start">

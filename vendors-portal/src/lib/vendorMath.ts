@@ -24,3 +24,13 @@ export const money = (v: number, cur: Currency): string =>
 
 export const formatDate = (d: Date = new Date()): string =>
   d.toLocaleDateString('ar-u-nu-latn', { day: 'numeric', month: 'long', year: 'numeric' });
+
+export const AR_MONTHS = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+
+/** "15 أكتوبر 2026" → Date (null if the text is not a date, e.g. "—") */
+export const parseArDate = (s: string): Date | null => {
+  const [d, m, y] = s.trim().split(/\s+/);
+  const mi = AR_MONTHS.indexOf(m);
+  if (mi < 0 || !Number(d) || !Number(y)) return null;
+  return new Date(Number(y), mi, Number(d));
+};
