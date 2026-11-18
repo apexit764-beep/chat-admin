@@ -10,6 +10,8 @@ import { AuthBox } from '@v/components/auth-layouts';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { isEmail, passwordRules, PASSWORD_CHARSET } from '@v/lib/validation';
 
+const DEMO = { email: 'mahmoud@agency.com', password: 'Partner2026' };
+
 export function Login(): JSX.Element {
   const navigate = useNavigate();
   const login = useVendorStore((s) => s.login);
@@ -26,6 +28,15 @@ export function Login(): JSX.Element {
     else setError(r.error);
   };
 
+  /** fills the demo account and signs in */
+  const loginDemo = (): void => {
+    setEmail(DEMO.email);
+    setPassword(DEMO.password);
+    const r = login(DEMO.email, DEMO.password);
+    if (r.ok) navigate('/home');
+    else setError(r.error);
+  };
+
   return (
     <AuthBox>
       <h2 className="text-2xl font-semibold tracking-tight">تسجيل الدخول</h2>
@@ -37,7 +48,6 @@ export function Login(): JSX.Element {
             <Mail className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input id="email" dir="ltr" type="email" className="h-11 pr-10" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@company.com" />
           </div>
-          <FieldHint>مطلوب. بريد إلكتروني بصيغة صحيحة، مثل name@company.com.</FieldHint>
         </div>
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
@@ -66,16 +76,35 @@ export function Login(): JSX.Element {
               {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
-          <FieldHint>مطلوبة. هي كلمة المرور التي أنشأتها من رابط الدعوة.</FieldHint>
         </div>
         {error && <Note tone="error">{error}</Note>}
         <Button className="h-11 w-full text-sm" onClick={submit}>
           تسجيل الدخول
         </Button>
       </div>
-      <Note className="mt-5">
-        نسخة تجريبية: للدخول استخدم mahmoud@agency.com وكلمة المرور Partner2026. ولتجربة دعوة مورد جديد افتح <a className="underline" href="#/invite/4">رابط الدعوة</a>.
-      </Note>
+      <div className="mt-6 rounded-xl border border-dashed bg-muted/40 p-4">
+        <div className="mb-3 flex items-center justify-between gap-2">
+          <span className="text-xs font-semibold">حساب تجريبي</span>
+          <a className="text-[11px] text-primary hover:underline" href="#/invite/4">
+            تجربة رابط دعوة
+          </a>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="min-w-0 flex-1 space-y-1 text-xs" dir="ltr">
+            <div className="truncate text-end">
+              <span className="text-muted-foreground">Email: </span>
+              <span className="font-medium">{DEMO.email}</span>
+            </div>
+            <div className="truncate text-end">
+              <span className="text-muted-foreground">Password: </span>
+              <span className="font-medium">{DEMO.password}</span>
+            </div>
+          </div>
+          <Button variant="outline" size="sm" className="shrink-0" onClick={loginDemo}>
+            دخول تجريبي
+          </Button>
+        </div>
+      </div>
     </AuthBox>
   );
 }
