@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { ChevronDown, LogOut, UserCog } from 'lucide-react';
+import { LogOut, UserCog } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -21,9 +21,9 @@ export function UserMenu(): JSX.Element | null {
   if (!me) return null;
 
   const avatar = (size: string): JSX.Element => (
-    <Avatar className={`${size} rounded-lg`}>
+    <Avatar className={`${size} rounded-full`}>
       {me.avatar && <AvatarImage src={me.avatar} alt={me.name} className="object-cover" />}
-      <AvatarFallback className="rounded-lg bg-primary/10 text-xs font-bold text-primary">{initialsOf(me.name)}</AvatarFallback>
+      <AvatarFallback className="rounded-full bg-primary/10 text-xs font-bold text-primary">{initialsOf(me.name)}</AvatarFallback>
     </Avatar>
   );
 
@@ -33,10 +33,9 @@ export function UserMenu(): JSX.Element | null {
         <button
           type="button"
           aria-label="قائمة الحساب"
-          className="flex items-center gap-1.5 rounded-lg p-0.5 pe-1.5 transition-colors hover:bg-muted data-[state=open]:bg-muted"
+          className="rounded-full outline-none ring-offset-background transition-shadow hover:ring-2 hover:ring-primary/30 focus-visible:ring-2 focus-visible:ring-ring data-[state=open]:ring-2 data-[state=open]:ring-primary/40"
         >
           {avatar('h-8 w-8')}
-          <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" sideOffset={6} className="w-60 rounded-lg">
