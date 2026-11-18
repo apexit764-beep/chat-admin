@@ -1,5 +1,5 @@
-import { useLocation } from 'react-router-dom';
-import { Moon, Sun } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { Moon, Sun, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { SidebarTrigger } from '@/components/ui/sidebar';
@@ -19,6 +19,12 @@ export function SiteHeader(): JSX.Element {
         <Separator orientation="vertical" className="mx-2 h-4 md:hidden" />
         <h1 className="text-base font-medium">{title}</h1>
         <div className="ms-auto flex items-center gap-2">
+          <Button asChild size="sm" className="h-8 gap-1.5">
+            <Link to="/clients?add=1">
+              <UserPlus className="h-4 w-4" />
+              <span className="hidden sm:inline">إضافة عميل</span>
+            </Link>
+          </Button>
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={toggle} aria-label="تبديل الوضع">
             {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>

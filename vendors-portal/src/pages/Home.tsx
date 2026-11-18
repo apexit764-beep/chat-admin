@@ -52,14 +52,6 @@ export default function Home(): JSX.Element {
       <PageHeader
         title={`أهلًا ${v.name.split(' ')[0]} 👋`}
         desc={`عمولتك ${v.rate}% من أول اشتراك لكل عميل تضيفه`}
-        actions={
-          <Button asChild className="gap-2">
-            <Link to="/clients?add=1">
-              <UserPlus className="h-4 w-4" />
-              إضافة عميل
-            </Link>
-          </Button>
-        }
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">

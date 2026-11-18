@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,12 +10,15 @@ import { AuthBox } from '@v/components/auth-layouts';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { isEmail, passwordRules, PASSWORD_CHARSET } from '@v/lib/validation';
 
-const DEMO = { email: 'mahmoud@agency.com', password: 'Partner2026' };
-
 export function Login(): JSX.Element {
   const navigate = useNavigate();
   const login = useVendorStore((s) => s.login);
-  const [email, setEmail] = useState('');
+  // the demo vendor; reads the store so a changed email or password still works
+  const demo = useVendorStore((s) => s.vendors.find((v) => v.id === 1));
+  const DEMO = { email: demo?.email ?? '', password: demo?.password ?? '' };
+  // after an email change the portal signs out and lands here with the new email
+  const prefill = (useLocation().state as { email?: string } | null)?.email ?? '';
+  const [email, setEmail] = useState(prefill);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [showPw, setShowPw] = useState(false);

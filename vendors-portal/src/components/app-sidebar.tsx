@@ -1,8 +1,8 @@
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { EllipsisVertical, Home, LogOut, Moon, PanelRightClose, PanelRightOpen, Sun, UserCog, UserPlus, Users, Wallet, type LucideIcon } from 'lucide-react';
+import { EllipsisVertical, Home, LogOut, Moon, PanelRightClose, PanelRightOpen, Sun, UserCog, Users, Wallet, type LucideIcon } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -46,7 +46,6 @@ const initials = (name: string): string =>
 
 function NavMain(): JSX.Element {
   const { pathname } = useLocation();
-  const navigate = useNavigate();
   const { isMobile, setOpenMobile } = useSidebar();
   const close = (): void => {
     if (isMobile) setOpenMobile(false);
@@ -54,26 +53,9 @@ function NavMain(): JSX.Element {
 
   return (
     <SidebarGroup>
-      <SidebarGroupContent className="flex flex-col gap-2">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              tooltip="إضافة عميل"
-              onClick={() => {
-                close();
-                navigate('/clients?add=1');
-              }}
-              className="min-w-8 bg-primary text-primary-foreground duration-200 ease-linear hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground"
-            >
-              <UserPlus />
-              <span>إضافة عميل</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarGroupContent>
-      <SidebarGroupLabel className="mt-2">القائمة</SidebarGroupLabel>
+      <SidebarGroupLabel>القائمة</SidebarGroupLabel>
       <SidebarGroupContent>
-        <SidebarMenu>
+        <SidebarMenu className="group-data-[collapsible=icon]:gap-3">
           {NAV.map(({ to, label, icon: Icon }) => (
             <SidebarMenuItem key={to}>
               <SidebarMenuButton asChild tooltip={label} isActive={pathname.startsWith(to)}>
@@ -99,6 +81,7 @@ function NavUser({ me }: { me: Vendor }): JSX.Element {
   const who = (
     <>
       <Avatar className="h-8 w-8 rounded-lg">
+        {me.avatar && <AvatarImage src={me.avatar} alt={me.name} className="object-cover" />}
         <AvatarFallback className="rounded-lg bg-primary/10 text-xs font-bold text-primary">{initials(me.name)}</AvatarFallback>
       </Avatar>
       <div className="grid flex-1 text-start text-sm leading-tight">
@@ -123,9 +106,7 @@ function NavUser({ me }: { me: Vendor }): JSX.Element {
           <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg" side={isMobile ? 'bottom' : 'left'} align="end" sideOffset={4}>
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-sm">{who}</div>
-              <div className="px-1 pb-1.5 text-xs text-muted-foreground">
-                {me.country} · العملة {FX[me.cur].sym}
-              </div>
+              <div className="px-1 pb-1.5 text-xs text-muted-foreground">العملة {FX[me.cur].sym}</div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>

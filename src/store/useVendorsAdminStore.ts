@@ -35,6 +35,8 @@ export interface Vendor {
   accounts: TransferAccount[];
   /** transfers are frozen for 48h after the vendor changes the transfer details */
   bankLock: boolean;
+  /** profile photo the vendor uploaded from the portal */
+  avatar?: string;
 }
 
 export interface VendorClient {

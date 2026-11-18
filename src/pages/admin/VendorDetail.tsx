@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, UserCheck } from 'lucide-react';
+import { useAdminStore } from '@/store/useAdminStore';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useUIStore } from '@/store/useUIStore';
 import { FX, sumsFor, useVendorsAdminStore, type Commission } from '@/store/useVendorsAdminStore';
 import { FieldHint, MiniStat, Money, Note, PayoutsTable, StatusPill } from '@/components/admin/vendors/VendorBits';
@@ -19,6 +21,7 @@ export default function VendorDetail(): JSX.Element {
   const [cancelOf, setCancelOf] = useState<Commission | null>(null);
   const [reason, setReason] = useState('');
   const v = vendors.find((x) => x.id === Number(id));
+  const activityLog = useAdminStore((st) => st.activityLog);
 
   if (!v) {
     return (
@@ -35,6 +38,9 @@ export default function VendorDetail(): JSX.Element {
   const mine = clients.filter((c) => c.vid === v.id);
   const myComms = comms.filter((c) => c.vid === v.id);
   const myPayouts = payouts.filter((p) => p.vid === v.id);
+  // changes the vendor made to their own profile from the vendor portal
+  const selfEdits = activityLog.filter((a) => a.action === 'vendor_profile_changed' && a.target === v.name);
+  const initials = v.name.split(' ').filter(Boolean).slice(0, 2).map((w) => w[0]).join(' ');
 
   const closeCancel = (): void => {
     setCancelOf(null);
@@ -47,16 +53,46 @@ export default function VendorDetail(): JSX.Element {
         <ArrowRight className="h-4 w-4" />
         الموردون
       </Link>
-      <div>
-        <h2 className="flex items-center gap-2 text-2xl font-bold">
-          {v.name} <StatusPill text={v.status} />
-        </h2>
-        <p className="text-sm text-muted-foreground">
-          {v.country} · {v.email} · <bdi dir="ltr">{v.phone}</bdi>
-        </p>
+      <div className="flex items-center gap-3">
+        <Avatar className="h-14 w-14 rounded-xl">
+          {v.avatar && <AvatarImage src={v.avatar} alt={v.name} className="object-cover" />}
+          <AvatarFallback className="rounded-xl bg-primary/10 font-bold text-primary">{initials}</AvatarFallback>
+        </Avatar>
+        <div>
+          <h2 className="flex items-center gap-2 text-2xl font-bold">
+            {v.name} <StatusPill text={v.status} />
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            {v.country} · {v.email} · <bdi dir="ltr">{v.phone}</bdi>
+          </p>
+        </div>
       </div>
 
       {v.status === 'مجمّد' && <Note tone="error">المورد مجمّد: لا يمكنه طلب سحب، ولا تُسجل له عمولات جديدة.</Note>}
+
+      {selfEdits.length > 0 && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <UserCheck className="h-4 w-4 text-sky-500" />
+              تعديلات المورد على بياناته
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="divide-y text-sm">
+              {selfEdits.slice(0, 5).map((a) => (
+                <li key={a.id} className="flex flex-wrap items-center justify-between gap-2 py-2 first:pt-0 last:pb-0">
+                  <span>{a.details}</span>
+                  <span className="text-xs text-muted-foreground">{new Date(a.timestamp).toLocaleString('ar-u-nu-latn', { dateStyle: 'medium', timeStyle: 'short' })}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-3 text-xs text-muted-foreground">
+              تغيير البريد يتم بعد تأكيده من الرابط المرسل للبريد الجديد، وتغيير الجوال بعد التحقق برمز OTP على الرقم الجديد.
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <MiniStat tone="amber" label="معلّقة (مدة التعليق)" value={<Money v={s.pending} cur={v.cur} />} />

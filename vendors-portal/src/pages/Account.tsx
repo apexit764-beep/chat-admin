@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ProfileCard, SecurityCard } from '@v/components/profile-section';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 /** validation rule shown under each field, per account type and key */
@@ -211,30 +212,12 @@ export default function Account(): JSX.Element {
   const [defOf, setDefOf] = useState<TransferAccount | null>(null);
   const [delOf, setDelOf] = useState<TransferAccount | null>(null);
 
-  const ro = (label: string, value: string, ltr = false): JSX.Element => (
-    <div className="space-y-1.5">
-      <Label>{label}</Label>
-      <Input value={value} disabled dir={ltr ? 'ltr' : undefined} />
-      <FieldHint>للقراءة فقط. للتعديل تواصل مع فريق Qhub.</FieldHint>
-    </div>
-  );
-
   return (
     <div className="space-y-4">
-      <PageHeader title="حسابي" desc="بياناتك وطريقة استلام المبالغ" />
+      <PageHeader title="حسابي" desc="بياناتك، الأمان، وطريقة استلام المبالغ" />
 
-      <Card className="shadow-sm">
-        <CardHeader className="p-5">
-          <CardTitle className="text-base">البيانات الشخصية</CardTitle>
-          <CardDescription>لتعديل بياناتك تواصل مع فريق Qhub</CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-4 p-5 pt-0 md:grid-cols-2">
-          {ro('الاسم', v.name)}
-          {ro('البريد الإلكتروني', v.email, true)}
-          {ro('رقم الجوال', v.phone, true)}
-          {ro('الدولة', v.country)}
-        </CardContent>
-      </Card>
+      <ProfileCard v={v} />
+      <SecurityCard />
 
       <Card className="overflow-hidden shadow-sm">
         <CardHeader className="flex-row items-center justify-between space-y-0 p-5">
