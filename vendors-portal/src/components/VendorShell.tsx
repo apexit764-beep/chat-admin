@@ -17,7 +17,7 @@ export function VendorShell(): JSX.Element {
 
   return (
     <SidebarProvider style={{ '--sidebar-width': '17rem' } as React.CSSProperties}>
-      <AppSidebar me={me} variant="inset" />
+      <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader />
         <div className="flex flex-1 flex-col gap-4 p-4 md:gap-6 md:p-6">

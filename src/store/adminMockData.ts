@@ -1201,6 +1201,8 @@ export type ActivityAction =
   | 'vendor_payout_rejected'
   | 'vendor_payout_transferred'
   | 'vendor_settings_updated'
+  /** the vendor edited their own profile from the vendor portal */
+  | 'vendor_profile_changed'
   | 'referral_settings_updated'
   | 'referral_program_toggled';
 
@@ -1221,6 +1223,9 @@ export const activityLog: ActivityEntry[] = [
   // Referral program
   { id: 'act_r1', action: 'referral_settings_updated', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', actorRole: 'admin', target: 'برنامج المروّجين', details: 'تعديل مكافأة الاشتراك السنوي: 2 → 3 شهور', timestamp: nowMinus(60 * 24 * 12) },
   // Vendors
+  { id: 'act_vp1', action: 'vendor_profile_changed', actor: 'محمود حسن', actorEmail: 'mahmoud@agency.com', actorRole: 'client', target: 'محمود حسن', details: 'الصورة الشخصية · رفع صورة جديدة', timestamp: nowMinus(40) },
+  { id: 'act_vp2', action: 'vendor_profile_changed', actor: 'محمود حسن', actorEmail: 'mahmoud@agency.com', actorRole: 'client', target: 'محمود حسن', details: 'كلمة المرور · تم التغيير', timestamp: nowMinus(1500) },
+  { id: 'act_vp3', action: 'vendor_profile_changed', actor: 'وكالة المدار', actorEmail: 'hello@madar.sa', actorRole: 'client', target: 'وكالة المدار', details: 'رقم الجوال · من +966 55 000 1111 إلى +966 55 123 4567 · تم التحقق برمز OTP', timestamp: nowMinus(4300) },
   { id: 'act_v1', action: 'vendor_commission_recorded', actor: 'النظام', actorEmail: '', actorRole: 'system', target: 'TechFlow Egypt', details: 'تسجيل عمولة للمورد محمود حسن', timestamp: nowMinus(95) },
   { id: 'act_v2', action: 'vendor_payout_transferred', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', actorRole: 'admin', target: 'PO-0003', details: 'الموافقة وتنفيذ التحويل · رقم العملية TRX-88120', timestamp: nowMinus(180) },
   { id: 'act_v3', action: 'vendor_payout_rejected', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', actorRole: 'admin', target: 'PO-0002', details: 'رفض طلب السحب · اسم صاحب الحساب البنكي لا يطابق اسم المورد', timestamp: nowMinus(260) },

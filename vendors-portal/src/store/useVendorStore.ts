@@ -27,6 +27,20 @@ export interface Vendor {
   accounts: TransferAccount[];
   /** transfers are frozen for 48h after the transfer details change */
   bankLock: boolean;
+  /** profile photo as a data URL (the backend will return a file URL) */
+  avatar?: string;
+}
+
+export type ProfileField = 'الاسم' | 'البريد الإلكتروني' | 'رقم الجوال' | 'الصورة الشخصية' | 'كلمة المرور';
+
+/** a change the vendor made to their own profile; the admin sees these on the vendor page and in the activity log */
+export interface ProfileChange {
+  id: number;
+  vid: number;
+  field: ProfileField;
+  from: string;
+  to: string;
+  date: string;
 }
 
 export interface VendorClient {
@@ -97,6 +111,17 @@ interface VendorState {
   setDefaultAccount: (id: number) => void;
   deleteAccount: (id: number) => void;
   refLink: () => string;
+
+  profileChanges: ProfileChange[];
+  updateName: (name: string) => void;
+  updateAvatar: (dataUrl: string | undefined) => void;
+  /** checked before sending the confirmation link; the email changes only once the link is opened */
+  checkNewEmail: (email: string, password: string) => { ok: true } | { ok: false; error: string };
+  /** the confirmation link was opened: apply the new email and sign out */
+  confirmEmailChange: (email: string) => void;
+  /** after the OTP sent to the new number is verified */
+  changePhone: (phone: string) => { ok: true } | { ok: false; error: string };
+  changePassword: (current: string, next: string) => { ok: true } | { ok: false; error: string };
 }
 
 const round3 = (x: number): number => Math.round(x * 1000) / 1000;
@@ -264,7 +289,58 @@ export const useVendorStore = create<VendorState>((set, get) => ({
     })),
 
   refLink: () => `https://qhub.chat/p/v${1000 + (get().meId ?? 0)}`,
+
+  profileChanges: [],
+  updateName: (name) => {
+    const me = get().vendors.find((v) => v.id === get().meId) as Vendor;
+    patchMe(set, get, { name: name.trim() }, { field: 'الاسم', from: me.name, to: name.trim() });
+  },
+  updateAvatar: (dataUrl) => {
+    const me = get().vendors.find((v) => v.id === get().meId) as Vendor;
+    patchMe(set, get, { avatar: dataUrl }, { field: 'الصورة الشخصية', from: me.avatar ? 'صورة سابقة' : '—', to: dataUrl ? 'صورة جديدة' : 'حُذفت' });
+  },
+  checkNewEmail: (email, password) => {
+    const { vendors, meId } = get();
+    const me = vendors.find((v) => v.id === meId) as Vendor;
+    const e = email.trim().toLowerCase();
+    if (e === me.email.toLowerCase()) return { ok: false, error: 'هذا هو بريدك الحالي' };
+    if (vendors.some((v) => v.id !== me.id && v.email.toLowerCase() === e)) return { ok: false, error: 'هذا البريد مستخدم في حساب آخر' };
+    if (me.password !== password) return { ok: false, error: 'كلمة المرور الحالية غير صحيحة' };
+    return { ok: true };
+  },
+  confirmEmailChange: (email) => {
+    const me = get().vendors.find((v) => v.id === get().meId) as Vendor;
+    patchMe(set, get, { email: email.trim() }, { field: 'البريد الإلكتروني', from: me.email, to: email.trim() });
+    set({ meId: null });
+  },
+  changePhone: (phone) => {
+    const { vendors, meId } = get();
+    const me = vendors.find((v) => v.id === meId) as Vendor;
+    if (phone.replace(/\s/g, '') === me.phone.replace(/\s/g, '')) return { ok: false, error: 'هذا هو رقمك الحالي' };
+    patchMe(set, get, { phone }, { field: 'رقم الجوال', from: me.phone, to: phone });
+    return { ok: true };
+  },
+  changePassword: (current, next) => {
+    const me = get().vendors.find((v) => v.id === get().meId) as Vendor;
+    if (me.password !== current) return { ok: false, error: 'كلمة المرور الحالية غير صحيحة' };
+    if (current === next) return { ok: false, error: 'كلمة المرور الجديدة يجب أن تختلف عن الحالية' };
+    // the password itself is never logged
+    patchMe(set, get, { password: next }, { field: 'كلمة المرور', from: '—', to: 'تم التغيير' });
+    return { ok: true };
+  },
 }));
+
+type SetFn = (partial: Partial<VendorState>) => void;
+type GetFn = () => VendorState;
+
+/** updates the signed-in vendor and records the change for the admin */
+function patchMe(set: SetFn, get: GetFn, patch: Partial<Vendor>, change: Omit<ProfileChange, 'id' | 'vid' | 'date'>): void {
+  const { vendors, meId, profileChanges } = get();
+  set({
+    vendors: vendors.map((v) => (v.id === meId ? { ...v, ...patch } : v)),
+    profileChanges: [{ id: id(), vid: meId as number, date: formatDate(), ...change }, ...profileChanges],
+  });
+}
 
 /* ---------- derived values ---------- */
 
