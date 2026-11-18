@@ -72,71 +72,6 @@ function NavMain(): JSX.Element {
   );
 }
 
-function NavUser({ me }: { me: Vendor }): JSX.Element {
-  const navigate = useNavigate();
-  const logout = useVendorStore((s) => s.logout);
-  const { theme, toggle } = useThemeStore();
-  const { isMobile } = useSidebar();
-
-  const who = (
-    <>
-      <Avatar className="h-8 w-8 rounded-lg">
-        {me.avatar && <AvatarImage src={me.avatar} alt={me.name} className="object-cover" />}
-        <AvatarFallback className="rounded-lg bg-primary/10 text-xs font-bold text-primary">{initials(me.name)}</AvatarFallback>
-      </Avatar>
-      <div className="grid flex-1 text-start text-sm leading-tight">
-        <span className="truncate font-medium">{me.name}</span>
-        <span className="truncate text-xs text-muted-foreground" dir="ltr">
-          {me.email}
-        </span>
-      </div>
-    </>
-  );
-
-  return (
-    <SidebarMenu>
-      <SidebarMenuItem>
-        <DropdownMenu dir="rtl">
-          <DropdownMenuTrigger asChild>
-            <SidebarMenuButton size="lg" className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
-              {who}
-              <EllipsisVertical className="ms-auto size-4" />
-            </SidebarMenuButton>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg" side={isMobile ? 'bottom' : 'left'} align="end" sideOffset={4}>
-            <DropdownMenuLabel className="p-0 font-normal">
-              <div className="flex items-center gap-2 px-1 py-1.5 text-sm">{who}</div>
-              <div className="px-1 pb-1.5 text-xs text-muted-foreground">العملة {FX[me.cur].sym}</div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem className="gap-2" onClick={() => navigate('/account')}>
-                <UserCog className="h-4 w-4" />
-                حسابي
-              </DropdownMenuItem>
-              <DropdownMenuItem className="gap-2" onClick={toggle}>
-                {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-                {theme === 'dark' ? 'الوضع الفاتح' : 'الوضع الداكن'}
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className="gap-2 text-destructive focus:text-destructive"
-              onClick={() => {
-                logout();
-                navigate('/login');
-              }}
-            >
-              <LogOut className="h-4 w-4" />
-              تسجيل الخروج
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </SidebarMenuItem>
-    </SidebarMenu>
-  );
-}
-
 /** collapse / expand button, lives inside the sidebar header */
 function CollapseToggle({ className }: { className?: string }): JSX.Element {
   const { state, toggleSidebar } = useSidebar();
@@ -190,7 +125,7 @@ function Brand(): JSX.Element {
   );
 }
 
-export function AppSidebar({ me, ...props }: React.ComponentProps<typeof Sidebar> & { me: Vendor }): JSX.Element {
+export function AppSidebar(props: React.ComponentProps<typeof Sidebar>): JSX.Element {
   return (
     <Sidebar side="right" collapsible="icon" {...props}>
       <SidebarHeader className="flex-row items-center gap-1 group-data-[collapsible=icon]:justify-center">
@@ -199,9 +134,6 @@ export function AppSidebar({ me, ...props }: React.ComponentProps<typeof Sidebar
       <SidebarContent>
         <NavMain />
       </SidebarContent>
-      <SidebarFooter>
-        <NavUser me={me} />
-      </SidebarFooter>
     </Sidebar>
   );
 }

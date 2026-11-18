@@ -5,6 +5,7 @@ import { Separator } from '@/components/ui/separator';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useThemeStore } from '@/store/useThemeStore';
 import { NAV } from './app-sidebar';
+import { UserMenu } from './user-menu';
 
 export function SiteHeader(): JSX.Element {
   const { pathname } = useLocation();
@@ -28,6 +29,8 @@ export function SiteHeader(): JSX.Element {
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={toggle} aria-label="تبديل الوضع">
             {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
+          <Separator orientation="vertical" className="mx-1 h-5" />
+          <UserMenu />
         </div>
       </div>
     </header>
