@@ -123,60 +123,104 @@ function SplitPreview({ children }: { children: React.ReactNode }): JSX.Element 
   );
 }
 
-/* ───────────── C: full gradient with glass card + journey ───────────── */
-function GradientJourney({ children }: { children: React.ReactNode }): JSX.Element {
+/* ───────────── C: full background with card + journey ───────────── */
+type Tone = 'bright' | 'light' | 'slate';
+
+const TONES: Record<Tone, { root: string; glow: string; dots: string; text: string; muted: string; accent: string; chip: string; line: string; card: string; brandLight: boolean }> = {
+  // vivid brand blue, no navy/indigo
+  bright: {
+    root: 'bg-gradient-to-br from-blue-500 via-blue-600 to-sky-500',
+    glow: 'bg-[radial-gradient(circle_at_15%_20%,rgba(255,255,255,0.22),transparent_40%),radial-gradient(circle_at_85%_85%,rgba(125,211,252,0.35),transparent_45%)]',
+    dots: 'bg-[radial-gradient(rgba(255,255,255,0.18)_1px,transparent_1px)]',
+    text: 'text-white',
+    muted: 'text-white/75',
+    accent: 'text-sky-100',
+    chip: 'border-white/25 bg-white/15',
+    line: 'border-white/30',
+    card: 'border-white/30 bg-background shadow-2xl shadow-blue-900/20',
+    brandLight: true,
+  },
+  // light page, blue accents only
+  light: {
+    root: 'bg-gradient-to-br from-blue-50 via-white to-sky-50',
+    glow: 'bg-[radial-gradient(circle_at_15%_15%,rgba(59,130,246,0.18),transparent_40%),radial-gradient(circle_at_85%_90%,rgba(56,189,248,0.18),transparent_45%)]',
+    dots: 'bg-[radial-gradient(rgba(37,99,235,0.14)_1px,transparent_1px)]',
+    text: 'text-foreground',
+    muted: 'text-muted-foreground',
+    accent: 'text-primary',
+    chip: 'border-primary/15 bg-primary/5 text-primary',
+    line: 'border-primary/20',
+    card: 'border bg-card shadow-xl shadow-blue-900/5',
+    brandLight: false,
+  },
+  // neutral charcoal (not navy) with a blue glow
+  slate: {
+    root: 'bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-800',
+    glow: 'bg-[radial-gradient(circle_at_15%_20%,rgba(59,130,246,0.30),transparent_40%),radial-gradient(circle_at_85%_85%,rgba(56,189,248,0.18),transparent_45%)]',
+    dots: 'bg-[radial-gradient(rgba(255,255,255,0.10)_1px,transparent_1px)]',
+    text: 'text-white',
+    muted: 'text-white/65',
+    accent: 'text-blue-300',
+    chip: 'border-white/15 bg-white/5',
+    line: 'border-white/15',
+    card: 'border-white/10 bg-background shadow-2xl',
+    brandLight: true,
+  },
+};
+
+function GradientJourney({ children, tone }: { children: React.ReactNode; tone: Tone }): JSX.Element {
+  const t = TONES[tone];
   return (
-    <div className="relative min-h-svh overflow-hidden bg-gradient-to-br from-indigo-950 via-blue-800 to-blue-600">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(56,189,248,0.25),transparent_40%),radial-gradient(circle_at_85%_85%,rgba(129,140,248,0.3),transparent_45%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.12)_1px,transparent_1px)] bg-[size:22px_22px] [mask-image:linear-gradient(to_bottom,black,transparent)]" />
+    <div className={`relative min-h-svh overflow-hidden ${t.root}`}>
+      <div className={`pointer-events-none absolute inset-0 ${t.glow}`} />
+      <div className={`pointer-events-none absolute inset-0 ${t.dots} bg-[size:22px_22px] [mask-image:linear-gradient(to_bottom,black,transparent)]`} />
 
       <div className="relative mx-auto flex min-h-svh max-w-6xl flex-col gap-8 p-6 md:p-10">
         <div className="flex items-center justify-between">
-          <Brand light />
-          <span className="hidden items-center gap-1.5 text-xs text-white/70 sm:inline-flex">
+          <Brand light={t.brandLight} />
+          <span className={`hidden items-center gap-1.5 text-xs sm:inline-flex ${t.muted}`}>
             <Bell className="h-3.5 w-3.5" /> انضم لأكثر من 120 شريك
           </span>
         </div>
 
         <div className="grid flex-1 items-center gap-10 lg:grid-cols-2">
-          <div className="w-full max-w-md justify-self-center rounded-2xl border border-white/20 bg-background/95 p-7 shadow-2xl backdrop-blur sm:p-8 lg:justify-self-start">
-            {children}
-          </div>
+          <div className={`w-full max-w-md justify-self-center rounded-2xl p-7 sm:p-8 lg:justify-self-start ${t.card}`}>{children}</div>
 
-          <div className="hidden text-white lg:block">
+          <div className={`hidden lg:block ${t.text}`}>
             <h2 className="mb-2 text-4xl font-bold leading-[1.3]">شريكك في النمو</h2>
-            <p className="mb-8 text-sm text-white/70">رحلتك مع Qhub في ثلاث خطوات</p>
-            <ol className="relative space-y-6 border-s border-white/20 ps-8">
+            <p className={`mb-8 text-sm ${t.muted}`}>رحلتك مع Qhub في ثلاث خطوات</p>
+            <ol className={`relative space-y-6 border-s ps-8 ${t.line}`}>
               {STEPS.map(({ icon: Icon, title, text }, i) => (
                 <li key={title} className="relative">
-                  <span className="absolute -start-[49px] flex h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-white/10 backdrop-blur">
+                  <span className={`absolute -start-[49px] flex h-9 w-9 items-center justify-center rounded-full border backdrop-blur ${t.chip}`}>
                     <Icon className="h-4 w-4" />
                   </span>
-                  <div className="text-xs text-sky-200">الخطوة {i + 1}</div>
+                  <div className={`text-xs ${t.accent}`}>الخطوة {i + 1}</div>
                   <div className="font-semibold">{title}</div>
-                  <div className="text-sm text-white/70">{text}</div>
+                  <div className={`text-sm ${t.muted}`}>{text}</div>
                 </li>
               ))}
             </ol>
-            <div className="mt-10 inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-sm backdrop-blur">
-              <ArrowUpLeft className="h-4 w-4 text-sky-200" />
+            <div className={`mt-10 inline-flex items-center gap-2 rounded-xl border px-4 py-3 text-sm backdrop-blur ${t.chip}`}>
+              <ArrowUpLeft className={`h-4 w-4 ${t.accent}`} />
               العمولة تصبح متاحة للسحب بعد 30 يوم من الدفع
             </div>
           </div>
         </div>
 
-        <p className="text-center text-[11px] text-white/50">© Qhub · برنامج الموردين</p>
+        <p className={`text-center text-[11px] ${t.muted}`}>© Qhub · برنامج الموردين</p>
       </div>
       <Toast />
     </div>
   );
 }
 
-/** auth page frame. Preview another design with ?layout=a|b|c */
+/** auth page frame. Preview another design with ?layout=a|b|c and, for c, ?bg=bright|light|slate */
 export function AuthBox({ children }: { children: React.ReactNode }): JSX.Element {
   const [params] = useSearchParams();
-  const layout = (params.get('layout') as AuthLayout) || 'b';
+  const layout = (params.get('layout') as AuthLayout) || 'c';
+  const tone = (params.get('bg') as Tone) || 'bright';
   if (layout === 'a') return <CenteredCard>{children}</CenteredCard>;
-  if (layout === 'c') return <GradientJourney>{children}</GradientJourney>;
+  if (layout === 'c') return <GradientJourney tone={TONES[tone] ? tone : 'bright'}>{children}</GradientJourney>;
   return <SplitPreview>{children}</SplitPreview>;
 }
