@@ -16,7 +16,7 @@ export function VendorShell(): JSX.Element {
   }
 
   return (
-    <SidebarProvider style={{ '--sidebar-width': '17rem' } as React.CSSProperties}>
+    <SidebarProvider style={{ '--sidebar-width': '17rem', '--sidebar-width-icon': '3.5rem' } as React.CSSProperties}>
       <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader />
