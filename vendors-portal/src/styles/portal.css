@@ -1,47 +1,47 @@
-/* Vendor portal theme: the admin's tokens with the partners' emerald brand.
+/* Vendor portal theme: the admin's tokens with the partners' blue brand.
  Loaded after the admin's global.css, so these values win for the portal only. */
 :root:not(.dark) {
-  --primary: 161 94% 30%;
+  --primary: 221 83% 53%;
   --primary-foreground: 0 0% 100%;
-  --ring: 161 94% 30%;
+  --ring: 221 83% 53%;
   --radius: 0.625rem;
   --background: 0 0% 100%;
-  --muted: 150 10% 96%;
-  --accent: 152 40% 95%;
-  --accent-foreground: 163 88% 18%;
+  --muted: 220 14% 96%;
+  --accent: 214 95% 96%;
+  --accent-foreground: 224 76% 33%;
 
-  --sidebar-background: 150 14% 97.5%;
+  --sidebar-background: 220 20% 97.5%;
   --sidebar-foreground: 222 30% 18%;
-  --sidebar-primary: 161 94% 30%;
+  --sidebar-primary: 221 83% 53%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 152 45% 92%;
-  --sidebar-accent-foreground: 163 88% 18%;
-  --sidebar-border: 150 10% 90%;
-  --sidebar-ring: 161 94% 30%;
+  --sidebar-accent: 214 95% 93%;
+  --sidebar-accent-foreground: 224 76% 33%;
+  --sidebar-border: 220 13% 91%;
+  --sidebar-ring: 221 83% 53%;
 
-  --chart-1: 161 94% 30%;
-  --chart-2: 158 64% 52%;
+  --chart-1: 221 83% 53%;
+  --chart-2: 189 85% 45%;
   --chart-3: 38 92% 50%;
-  --chart-4: 217 91% 60%;
-  --chart-5: 262 83% 58%;
+  --chart-4: 262 83% 58%;
+  --chart-5: 340 75% 55%;
 }
 
 :root.dark {
-  --primary: 158 64% 45%;
-  --primary-foreground: 160 90% 8%;
-  --ring: 158 64% 45%;
-  --accent: 160 30% 14%;
-  --accent-foreground: 152 60% 85%;
+  --primary: 217 91% 60%;
+  --primary-foreground: 0 0% 100%;
+  --ring: 217 91% 60%;
+  --accent: 222 40% 18%;
+  --accent-foreground: 214 95% 88%;
 
   --sidebar-background: 225 16% 9%;
   --sidebar-foreground: 213 31% 91%;
-  --sidebar-primary: 158 64% 45%;
-  --sidebar-primary-foreground: 160 90% 8%;
-  --sidebar-accent: 160 30% 14%;
-  --sidebar-accent-foreground: 152 60% 85%;
+  --sidebar-primary: 217 91% 60%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 222 40% 18%;
+  --sidebar-accent-foreground: 214 95% 88%;
   --sidebar-border: 232 17% 18%;
-  --sidebar-ring: 158 64% 45%;
+  --sidebar-ring: 217 91% 60%;
 
-  --chart-1: 158 64% 45%;
-  --chart-2: 158 50% 65%;
+  --chart-1: 217 91% 60%;
+  --chart-2: 189 85% 50%;
 }

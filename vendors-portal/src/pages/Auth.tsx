@@ -25,8 +25,8 @@ function AuthBox({ children }: { children: React.ReactNode }): JSX.Element {
         </div>
         <p className="text-center text-[11px] text-muted-foreground">© Qhub · برنامج الموردين</p>
       </div>
-      <div className="relative hidden overflow-hidden bg-gradient-to-br from-emerald-700 via-emerald-800 to-emerald-950 lg:block">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.14),transparent_45%),radial-gradient(circle_at_80%_90%,rgba(16,185,129,0.35),transparent_40%)]" />
+      <div className="relative hidden overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-950 lg:block">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.14),transparent_45%),radial-gradient(circle_at_80%_90%,rgba(56,189,248,0.3),transparent_40%)]" />
         <div className="relative flex h-full flex-col justify-end gap-6 p-12 text-white">
           <div className="grid max-w-md grid-cols-3 gap-3">
             {[

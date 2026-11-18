@@ -18,7 +18,7 @@ export function EarningsChart({ payouts, clients, cur }: { payouts: Payout[]; cl
 
   const config = {
     paid: { label: `المبالغ المستلمة (${FX[cur].sym})`, color: 'hsl(var(--chart-1))' },
-    clients: { label: 'عملاء جدد', color: 'hsl(var(--chart-4))' },
+    clients: { label: 'عملاء جدد', color: 'hsl(var(--chart-2))' },
   } satisfies ChartConfig;
 
   const data = useMemo(() => {
