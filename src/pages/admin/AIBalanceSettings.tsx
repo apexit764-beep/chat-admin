@@ -79,10 +79,8 @@ export default function AIBalanceSettings(): JSX.Element {
     showToast(pack.active ? 'تم تعطيل الباقة: تختفي عن المشتركين الجدد وتستمر مع الحاليين' : 'تم تفعيل الباقة');
   };
 
-  /** a pack's amount can only change while nobody is subscribed to it */
+  /** any pack can be edited, even with subscribers: the new amount applies to new subscriptions and renewals only */
   const openEdit = (usd: number): void => {
-    const subs = packSubscribers(accounts, usd);
-    if (subs > 0) return showToast(`لا يمكن تعديل الباقة: ${subs} عميل مشترك فيها. عطّلها وأضف باقة جديدة`, 'error');
     setEditFrom(usd);
     setEditValue(String(usd));
   };
@@ -99,7 +97,7 @@ export default function AIBalanceSettings(): JSX.Element {
       packs: settings.packs.map((p) => (p.usd === editFrom ? { ...p, usd: u } : p)).sort((x, y) => x.usd - y.usd),
     });
     setEditFrom(null);
-    showToast('تم تعديل الباقة');
+    showToast('تم تعديل الباقة: يسري المبلغ الجديد على الاشتراكات الجديدة والتجديدات فقط');
   };
 
   const save = (): void => {
@@ -181,9 +179,8 @@ export default function AIBalanceSettings(): JSX.Element {
                   <Switch checked={p.active} onCheckedChange={() => togglePack(p.usd)} aria-label="تفعيل الباقة" />
                   <button
                     onClick={() => openEdit(p.usd)}
-                    disabled={subs > 0}
-                    title={subs > 0 ? 'لا يمكن التعديل: يوجد مشتركون. عطّل الباقة وأضف باقة جديدة' : 'تعديل مبلغ الباقة'}
-                    className="h-5 w-5 rounded-full bg-primary/10 text-primary flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed"
+                    title="تعديل مبلغ الباقة (يسري على الاشتراكات الجديدة والتجديدات فقط)"
+                    className="h-5 w-5 rounded-full bg-primary/10 text-primary flex items-center justify-center"
                     aria-label="تعديل الباقة"
                   >
                     <Pencil className="h-3 w-3" />
@@ -278,7 +275,7 @@ export default function AIBalanceSettings(): JSX.Element {
           <div className="space-y-1.5 py-2">
             <Label>المبلغ ($)</Label>
             <Input dir="ltr" type="number" value={editValue} onChange={(e) => setEditValue(e.target.value)} />
-            <FieldHint>مطلوب. أكبر من صفر، غير مكرر، ولا يتجاوز الحد الأقصى للمبلغ الحر. التعديل مسموح فقط لباقة بلا مشتركين.</FieldHint>
+            <FieldHint>مطلوب. أكبر من صفر، غير مكرر، ولا يتجاوز الحد الأقصى للمبلغ الحر. يسري المبلغ الجديد على الاشتراكات الجديدة والتجديدات فقط، والمشتركون الحاليون يبقون على مبلغهم الحالي.</FieldHint>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditFrom(null)}>
