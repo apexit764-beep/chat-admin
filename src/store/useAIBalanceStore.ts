@@ -3,6 +3,8 @@ import { useAdminStore } from '@/store/useAdminStore';
 import { useNotificationStore } from '@/store/useNotificationStore';
 
 export interface TopupPack {
+  /** stable identity: editing the amount keeps the pack and its subscribers */
+  id: string;
   usd: number;
   active: boolean;
 }
@@ -52,6 +54,8 @@ export interface BalanceAccount {
   usedMonthTokens: number;
   /** amount charged automatically, USD; null when auto-charge is off. Defines which pack (or free amount) the client subscribes to */
   autoChargeUsd: number | null;
+  /** the top-up pack the client subscribes to; null = free amount. An amount change on the pack applies to this client from the next renewal */
+  packId: string | null;
   lots: BalanceLot[];
   tx: BalanceTx[];
 }
@@ -73,7 +77,7 @@ const DEFAULT_SETTINGS: AIBalanceSettings = {
   provider: 'OpenAI · gpt-4.1-mini',
   modelName: 'Qhub AI',
   pricePerMillion: 2,
-  packs: [5, 10, 25, 50].map((usd) => ({ usd, active: true })),
+  packs: [5, 10, 25, 50].map((usd) => ({ id: `pack_${usd}`, usd, active: true })),
   minTopup: 5,
   maxTopup: 200,
   minBalance: 0.5,
@@ -99,6 +103,7 @@ function buildAccounts(): BalanceAccount[] {
     clientId: s.id,
     usedMonthTokens: s.used,
     autoChargeUsd: s.auto,
+    packId: DEFAULT_SETTINGS.packs.find((p) => p.usd === s.topup)?.id ?? null,
     lots: s.left > 0 ? [{ id: `lot_${s.id}_1`, source: 'شحن', usd: s.topup, left: s.left }] : [],
     tx: [
       { id: `tx_${s.id}_2`, date: daysAgo(1), type: 'usage', description: 'ردود المساعد', usd: -(s.used / 1e6) * DEFAULT_SETTINGS.pricePerMillion },
@@ -138,7 +143,7 @@ export const useAIBalanceStore = create<AIBalanceState>((set, get) => ({
       const exists = s.accounts.some((a) => a.clientId === clientId);
       const base: BalanceAccount = exists
         ? (s.accounts.find((a) => a.clientId === clientId) as BalanceAccount)
-        : { clientId, usedMonthTokens: 0, autoChargeUsd: null, lots: [], tx: [] };
+        : { clientId, usedMonthTokens: 0, autoChargeUsd: null, packId: null, lots: [], tx: [] };
       const next: BalanceAccount = {
         ...base,
         lots: [...base.lots, { id: `lot_gift_${++seq}`, source: 'رصيد مجاني', usd, left: usd }],
@@ -155,15 +160,14 @@ export function lastTopupUsd(a: BalanceAccount): number | null {
   return a.tx.find((t) => t.type === 'topup' || t.type === 'auto')?.usd ?? null;
 }
 
-/** clients whose last top-up is exactly this pack */
-export function packSubscribers(accounts: BalanceAccount[], usd: number): number {
-  return accounts.filter((a) => lastTopupUsd(a) === usd).length;
+/** clients subscribed to this pack (by pack identity, not by amount) */
+export function packSubscribers(accounts: BalanceAccount[], packId: string): number {
+  return accounts.filter((a) => a.packId === packId).length;
 }
 
-/** clients whose last top-up is a free amount, i.e. not one of the packs */
-export function isFreeAmountSubscriber(a: BalanceAccount, packs: TopupPack[]): boolean {
-  const last = lastTopupUsd(a);
-  return last !== null && !packs.some((p) => p.usd === last);
+/** clients who top up with a free amount, i.e. not through a pack */
+export function isFreeAmountSubscriber(a: BalanceAccount): boolean {
+  return lastTopupUsd(a) !== null && !a.packId;
 }
 
 export function accountBalance(a: BalanceAccount): number {

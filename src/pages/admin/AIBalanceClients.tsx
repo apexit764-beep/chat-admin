@@ -49,8 +49,8 @@ export default function AIBalanceClients(): JSX.Element {
 
   const visible = rows.filter(({ a }) => {
     if (filter === ALL) return true;
-    if (filter === FREE) return isFreeAmountSubscriber(a, packs);
-    return lastTopupUsd(a) === Number(filter);
+    if (filter === FREE) return isFreeAmountSubscriber(a);
+    return a.packId === filter;
   });
 
   const stats = useMemo(() => {
@@ -121,7 +121,7 @@ export default function AIBalanceClients(): JSX.Element {
             <SelectContent>
               <SelectItem value={ALL}>كل العملاء</SelectItem>
               {packs.map((p) => (
-                <SelectItem key={p.usd} value={String(p.usd)}>
+                <SelectItem key={p.id} value={p.id}>
                   باقة {formatUsd(p.usd)}
                   {p.active ? '' : ' (معطّلة)'}
                 </SelectItem>
@@ -160,7 +160,8 @@ export default function AIBalanceClients(): JSX.Element {
                 const stopped = isStopped(a, minBalance);
                 const local = localAmount(bal, client.country);
                 const country = countries.find((c) => c.code === client.country);
-                const free = isFreeAmountSubscriber(a, packs);
+                const free = isFreeAmountSubscriber(a);
+                const pack = packs.find((p) => p.id === a.packId);
                 const last = lastTopupUsd(a);
                 return (
                   <TableRow
@@ -182,6 +183,11 @@ export default function AIBalanceClients(): JSX.Element {
                         <Badge variant="outline">
                           {free ? 'مبلغ حر' : 'باقة'} · {formatUsd(last)}
                         </Badge>
+                      )}
+                      {last !== null && pack && pack.usd !== last && (
+                        <span className="ms-1.5 text-xs text-muted-foreground">
+                          التجديد القادم {formatUsd(pack.usd)}
+                        </span>
                       )}
                     </TableCell>
                     <TableCell>

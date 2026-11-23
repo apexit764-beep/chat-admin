@@ -63,7 +63,7 @@ export default function AIBalanceSettings(): JSX.Element {
     if (u > Number(draft.max)) {
       return showToast(`مبلغ الباقة لا يمكن أن يتجاوز الحد الأقصى للمبلغ الحر (${formatUsd(Number(draft.max))})`, 'error');
     }
-    updateSettings({ packs: [...settings.packs, { usd: u, active: true }].sort((a, b) => a.usd - b.usd) });
+    updateSettings({ packs: [...settings.packs, { id: `pack_${Date.now()}`, usd: u, active: true }].sort((a, b) => a.usd - b.usd) });
     setPackInput('');
     showToast('تمت إضافة الباقة');
   };
@@ -168,10 +168,10 @@ export default function AIBalanceSettings(): JSX.Element {
         <CardContent className="space-y-3">
           <div className="flex flex-wrap gap-2">
             {settings.packs.map((p) => {
-              const subs = packSubscribers(accounts, p.usd);
+              const subs = packSubscribers(accounts, p.id);
               return (
                 <span
-                  key={p.usd}
+                  key={p.id}
                   className={`inline-flex items-center gap-2 rounded-full border bg-card ps-3 pe-1.5 py-1 text-sm ${p.active ? '' : 'opacity-60'}`}
                 >
                   <b dir="ltr">{formatUsd(p.usd)}</b>
