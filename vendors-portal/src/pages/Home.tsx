@@ -5,7 +5,6 @@ import { useVendorStore, sumsFor } from '@v/store/useVendorStore';
 import { toLocal } from '@v/lib/vendorMath';
 import { FilterTabs, Money, PageHeader, Pager, Stat, StatusPill } from '@v/components/ui-bits';
 import { EarningsChart } from '@v/components/earnings-chart';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
