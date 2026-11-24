@@ -73,7 +73,7 @@ export default function Referrals(): JSX.Element {
   const clients = useAdminStore((s) => s.clients);
   const showToast = useUIStore((s) => s.showToast);
   const [d, setD] = useState<Form>(toForm(settings));
-  const [list, setList] = useState<{ referrerId: string; kind: 'reg' | 'sub' } | null>(null);
+  const [list, setList] = useState<{ referrerId: string; kind: 'reg' | 'sub' | 'pending' } | null>(null);
   useEffect(() => setD(toForm(settings)), [settings]);
 
   // the plans a client can see and buy: no trial, no contact-sales, no internal ones
@@ -108,7 +108,7 @@ export default function Referrals(): JSX.Element {
     showToast(d.on !== settings.on ? (d.on ? 'تم تشغيل البرنامج' : 'تم إيقاف البرنامج') : 'تم الحفظ');
   };
 
-  const dlg = list ? referrals.filter((r: Referral) => r.referrerId === list.referrerId && (list.kind === 'reg' || r.state === 'اشترك')) : [];
+  const dlg = list ? referrals.filter((r: Referral) => r.referrerId === list.referrerId && (list.kind === 'reg' || (list.kind === 'sub') === (r.state === 'اشترك'))) : [];
 
   const rows: RefRow[] = referrerIds.map((id) => {
     const st = statsFor(id, referrals);
@@ -140,6 +140,12 @@ export default function Referrals(): JSX.Element {
       key: 'subscribed', header: 'عدد المشتركين', accessor: (r) => r.subscribed,
       cell: (r) => (
         <button type="button" className={cn(chip, 'bg-success/10 text-success hover:bg-success/20')} onClick={(e) => { e.stopPropagation(); setList({ referrerId: r.id, kind: 'sub' }); }}>{r.subscribed}</button>
+      ),
+    },
+    {
+      key: 'pending', header: 'عدد غير المشتركين', accessor: (r) => r.registered - r.subscribed,
+      cell: (r) => (
+        <button type="button" className={cn(chip, 'bg-warning/10 text-warning hover:bg-warning/20')} onClick={(e) => { e.stopPropagation(); setList({ referrerId: r.id, kind: 'pending' }); }}>{r.registered - r.subscribed}</button>
       ),
     },
     {
@@ -242,7 +248,7 @@ export default function Referrals(): JSX.Element {
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>
-              {list?.kind === 'sub' ? 'المشتركون' : 'المسجّلون'} من رابط {list ? nameOf(list.referrerId) : ''} ({dlg.length})
+              {list?.kind === 'sub' ? 'المشتركون' : list?.kind === 'pending' ? 'غير المشتركين' : 'المسجّلون'} من رابط {list ? nameOf(list.referrerId) : ''} ({dlg.length})
             </DialogTitle>
           </DialogHeader>
           <Table>
@@ -260,7 +266,7 @@ export default function Referrals(): JSX.Element {
                     <Link to={`/clients/${r.clientId}`} className="text-primary hover:underline">{nameOf(r.clientId)}</Link>
                   </TableCell>
                   <TableCell>{formatDate(r.at)}</TableCell>
-                  <TableCell>{r.state === 'اشترك' ? `${tierName(r.tier)} · ${r.cycle ?? ''}` : 'سجّل ولم يشترك بعد'}</TableCell>
+                  <TableCell>{r.state === 'اشترك' ? `${tierName(r.tier)} · ${r.cycle ?? ''}` : 'غير مشترك'}</TableCell>
                   <TableCell><bdi dir="ltr">{r.points ? `+${fmt(r.points)}` : '—'}</bdi></TableCell>
                 </TableRow>
               ))}
