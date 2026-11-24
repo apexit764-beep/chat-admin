@@ -37,6 +37,7 @@ export default function Payouts(): JSX.Element {
   const [amount, setAmount] = useState('');
   const [accId, setAccId] = useState<string>(String(defaultAcc?.id ?? ''));
   const [confirming, setConfirming] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
   const [tab, setTab] = useState('all');
   const [page, setPage] = useState(1);
   const filtered = useMemo(() => mine.filter((p) => tab === 'all' || p.st === tab), [mine, tab]);
@@ -64,12 +65,22 @@ export default function Payouts(): JSX.Element {
     if (amt < min) return showToast('المبلغ أقل من الحد الأدنى', 'error');
     if (amt > s.avail) return showToast('المبلغ أكبر من الرصيد المتاح', 'error');
     if (!account) return showToast('اختر حساب التحويل', 'error');
+    setFormOpen(false);
     setConfirming(true);
   };
 
   return (
     <div className="space-y-4">
-      <PageHeader title="السحب" desc="اطلب سحب الرصيد المتاح، وسيراجعه فريق Qhub ويحوّله إلى حسابك" />
+      <PageHeader
+        title="السحب"
+        desc="اطلب سحب الرصيد المتاح، وسيراجعه فريق Qhub ويحوّله إلى حسابك"
+        actions={
+          <Button className="gap-2" onClick={() => setFormOpen(true)}>
+            <Wallet className="h-4 w-4" />
+            طلب سحب
+          </Button>
+        }
+      />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
         <Stat icon={PiggyBank} label="إجمالي الرصيد" value={<Money v={Math.round((s.avail + s.inReview + s.pending + s.paid) * 1000) / 1000} cur={v.cur} />} />
@@ -78,48 +89,6 @@ export default function Payouts(): JSX.Element {
         <Stat icon={Clock} tone="amber" label="معلّقة" value={<Money v={s.pending} cur={v.cur} />} />
         <Stat icon={Banknote} label="الأرصدة المستلمة" value={<Money v={s.paid} cur={v.cur} />} />
       </div>
-
-      <Card className="shadow-sm">
-        <CardHeader className="p-5">
-          <CardTitle className="text-base">طلب سحب جديد</CardTitle>
-          <CardDescription>يُراجع فريق Qhub الطلب ويحوّل المبلغ إلى الحساب الذي تختاره</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4 p-5 pt-0">
-          <div className="grid items-end gap-3 md:grid-cols-2">
-            <div className="space-y-1.5">
-              <Label>المبلغ ({FX[v.cur].sym})</Label>
-              <Input dir="ltr" inputMode="decimal" disabled={!!why} placeholder={`من ${min} إلى ${s.avail}`} value={amount} onChange={(e) => setAmount(e.target.value.replace(/[^\d.]/g, ''))} />
-              <FieldHint>مطلوب. رقم أكبر من صفر، من الحد الأدنى ({min} {FX[v.cur].sym}) إلى المتاح ({s.avail} {FX[v.cur].sym})، بحد أقصى 3 خانات عشرية.</FieldHint>
-            </div>
-            <div className="text-xs leading-relaxed text-muted-foreground">
-              المتاح للسحب = <b className="text-foreground"><Money v={s.avail} cur={v.cur} /></b> ،، الحد الأدنى للسحب = <b className="text-foreground"><Money v={min} cur={v.cur} /></b>
-            </div>
-          </div>
-          {v.accounts.length > 0 && (
-            <div className="max-w-md space-y-1.5">
-              <Label>التحويل إلى</Label>
-              <Select value={accId} onValueChange={setAccId} disabled={!!why}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {v.accounts.map((a) => (
-                    <SelectItem key={a.id} value={String(a.id)}>
-                      {a.type} · {a.details}
-                      {a.isDefault ? ' (الافتراضي)' : ''}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FieldHint>مطلوب. اختر أحد حسابات التحويل المضافة في صفحة "حسابي"، والافتراضي محدد مسبقًا.</FieldHint>
-            </div>
-          )}
-          {why && <Note tone="warn">{why}</Note>}
-          <Button disabled={!!why} onClick={start}>
-            طلب سحب
-          </Button>
-        </CardContent>
-      </Card>
 
       <Card className="overflow-hidden shadow-sm">
         <CardHeader className="flex flex-col gap-3 space-y-0 p-5 lg:flex-row lg:items-center lg:justify-between">
@@ -188,6 +157,55 @@ export default function Payouts(): JSX.Element {
         </CardContent>
       </Card>
 
+      <Dialog open={formOpen} onOpenChange={setFormOpen}>
+        <DialogContent className="sm:max-w-xl">
+          <DialogHeader>
+            <DialogTitle>طلب سحب جديد</DialogTitle>
+            <p className="text-sm text-muted-foreground">يُراجع فريق Qhub الطلب ويحوّل المبلغ إلى الحساب الذي تختاره</p>
+          </DialogHeader>
+          <div className="space-y-4">
+          <div className="grid items-end gap-3">
+            <div className="space-y-1.5">
+              <Label>المبلغ ({FX[v.cur].sym})</Label>
+              <Input dir="ltr" inputMode="decimal" disabled={!!why} placeholder={`من ${min} إلى ${s.avail}`} value={amount} onChange={(e) => setAmount(e.target.value.replace(/[^\d.]/g, ''))} />
+              <FieldHint>مطلوب. رقم أكبر من صفر، من الحد الأدنى ({min} {FX[v.cur].sym}) إلى المتاح ({s.avail} {FX[v.cur].sym})، بحد أقصى 3 خانات عشرية.</FieldHint>
+            </div>
+            <div className="text-xs leading-relaxed text-muted-foreground">
+              المتاح للسحب = <b className="text-foreground"><Money v={s.avail} cur={v.cur} /></b> ،، الحد الأدنى للسحب = <b className="text-foreground"><Money v={min} cur={v.cur} /></b>
+            </div>
+          </div>
+          {v.accounts.length > 0 && (
+            <div className="space-y-1.5">
+              <Label>التحويل إلى</Label>
+              <Select value={accId} onValueChange={setAccId} disabled={!!why}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {v.accounts.map((a) => (
+                    <SelectItem key={a.id} value={String(a.id)}>
+                      {a.type} · {a.details}
+                      {a.isDefault ? ' (الافتراضي)' : ''}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FieldHint>مطلوب. اختر أحد حسابات التحويل المضافة في صفحة "حسابي"، والافتراضي محدد مسبقًا.</FieldHint>
+            </div>
+          )}
+          {why && <Note tone="warn">{why}</Note>}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setFormOpen(false)}>
+              إلغاء
+            </Button>
+            <Button disabled={!!why} onClick={start}>
+              طلب سحب
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={confirming} onOpenChange={setConfirming}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -199,8 +217,8 @@ export default function Payouts(): JSX.Element {
           </div>
           <Note>يراجع فريق Qhub الطلب، وبعد الموافقة يتم التحويل وتصلك صورة التحويل.</Note>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setConfirming(false)}>
-              إلغاء
+            <Button variant="outline" onClick={() => { setConfirming(false); setFormOpen(true); }}>
+              رجوع
             </Button>
             <Button
               onClick={() => {
