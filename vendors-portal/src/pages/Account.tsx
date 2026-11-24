@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ProfileCard, SecurityCard } from '@v/components/profile-section';
+import { PhoneCodeSelect, countryOfPhone, dialOf } from '@v/components/phone-code-select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 /** validation rule shown under each field, per account type and key */
@@ -31,13 +32,6 @@ const FIELDS: Record<AccountType, [string, string][]> = {
   'حساب بنكي': [['b', 'اسم البنك'], ['n', 'رقم الحساب أو IBAN'], ['h', 'اسم صاحب الحساب']],
   'محفظة إلكترونية': [['b', 'اسم المحفظة (مثل: فودافون كاش، STC Pay)'], ['n', 'رقم المحفظة']],
 };
-const WALLET_CODES = [
-  ['+20', '🇪🇬 +20'],
-  ['+968', '🇴🇲 +968'],
-  ['+966', '🇸🇦 +966'],
-  ['+970', '🇵🇸 +970'],
-  ['+971', '🇦🇪 +971'],
-];
 const OTP = '123456'; // demo code; the real one is sent by SMS from the backend
 
 const OTP_RESEND_SECONDS = 30;
@@ -120,15 +114,15 @@ function AddAccountDialog({ open, onClose }: { open: boolean; onClose: () => voi
   const [type, setType] = useState<AccountType>('حساب بنكي');
   const [vals, setVals] = useState<Record<string, string>>({});
   // the wallet number is a tel input: dial code + digits; the code defaults to the vendor's own country
-  const ownCode = WALLET_CODES.find(([c]) => phone.trim().startsWith(c + ' '))?.[0] ?? '+20';
-  const [walletCode, setWalletCode] = useState(ownCode);
+  const ownIso = countryOfPhone(phone)?.iso ?? 'EG';
+  const [walletIso, setWalletIso] = useState<string>(ownIso);
   const fields = FIELDS[type];
   const isWalletNo = (k: string): boolean => type === 'محفظة إلكترونية' && k === 'n';
 
   const reset = (): void => {
     setVals({});
     setType('حساب بنكي');
-    setWalletCode(ownCode);
+    setWalletIso(ownIso);
     setStep('form');
     onClose();
   };
@@ -150,7 +144,7 @@ function AddAccountDialog({ open, onClose }: { open: boolean; onClose: () => voi
   };
 
   const confirm = (): void => {
-    const r = addAccount(type, fields.map(([k]) => (isWalletNo(k) ? `${walletCode} ${vals[k].trim()}` : vals[k].trim())).join(' · '));
+    const r = addAccount(type, fields.map(([k]) => (isWalletNo(k) ? `${dialOf(walletIso)} ${vals[k].trim()}` : vals[k].trim())).join(' · '));
     if (!r.ok) {
       showToast(r.error, 'error');
       return setStep('form');
@@ -195,18 +189,7 @@ function AddAccountDialog({ open, onClose }: { open: boolean; onClose: () => voi
                   <Label>{label} *</Label>
                   {isWalletNo(k) ? (
                     <div className="flex gap-2" dir="ltr">
-                      <Select value={walletCode} onValueChange={setWalletCode}>
-                        <SelectTrigger className="w-[150px] [&>span]:overflow-visible">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {WALLET_CODES.map(([c, l]) => (
-                            <SelectItem key={c} value={c}>
-                              {l}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <PhoneCodeSelect value={walletIso} onChange={setWalletIso} />
                       <Input type="tel" dir="ltr" inputMode="numeric" placeholder="95550000" value={vals[k] ?? ''} onChange={(e) => setVals({ ...vals, [k]: e.target.value.replace(/\D/g, '') })} />
                     </div>
                   ) : (

@@ -7,6 +7,7 @@ import { FieldHint, Money, Note, PageHeader, StatusPill } from '@v/components/ui
 import { isEmail, isPhoneDigits, lengthBetween } from '@v/lib/validation';
 import { FX, planPriceUsd, toLocal, type Currency } from '@v/lib/vendorMath';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { PhoneCodeSelect, countryOfPhone, dialOf } from '@v/components/phone-code-select';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -25,19 +26,11 @@ const parseArDate = (d: string): number => {
 const VIA_OPTIONS: [string, string][] = [['all', 'طريقة الإضافة: الكل'], ['دعوة', 'دعوة'], ['رابط', 'رابط التسجيل']];
 const STATE_OPTIONS: [string, string][] = [['all', 'حالة الحساب: الكل'], ['اشترك', 'اشترك'], ['سجل', 'سجل'], ['دعوة مرسلة', 'دعوة مرسلة'], ['استرد المبلغ', 'استرد المبلغ']];
 
-const CODES = [
-  ['+20', '🇪🇬 +20'],
-  ['+968', '🇴🇲 +968'],
-  ['+966', '🇸🇦 +966'],
-  ['+970', '🇵🇸 +970'],
-  ['+971', '🇦🇪 +971'],
-];
 
-const COUNTRY_BY_CODE: Record<string, string> = { '+20': 'مصر', '+968': 'عمان', '+966': 'السعودية', '+970': 'فلسطين', '+971': 'الإمارات' };
 /** the client's country follows the dial code of the phone number */
-const countryOf = (phone: string): string => COUNTRY_BY_CODE[phone.trim().split(/\s+/)[0]] ?? '—';
+const countryOf = (phone: string): string => countryOfPhone(phone)?.name ?? '—';
 /** currency a client pays in, by country (only the currencies the portal knows) */
-const CURRENCY_BY_COUNTRY: Record<string, Currency> = { 'مصر': 'EGP', 'عمان': 'OMR', 'السعودية': 'SAR', 'الإمارات': 'AED', 'فلسطين': 'ILS' };
+const CURRENCY_BY_ISO: Record<string, Currency> = { EG: 'EGP', OM: 'OMR', SA: 'SAR', AE: 'AED', PS: 'ILS' };
 const num = (n: number, d: number): string => n.toLocaleString('en-US', { maximumFractionDigits: d });
 
 /** how the client was added: an invitation sent by the marketer, or the registration link */
@@ -57,14 +50,14 @@ function AddClientDialog({ open, onClose }: { open: boolean; onClose: () => void
   const showToast = useUIStore((s) => s.showToast);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [code, setCode] = useState('+20');
+  const [iso, setIso] = useState('EG');
   const [phone, setPhone] = useState('');
 
   const submit = (): void => {
     if (!lengthBetween(name, 2, 100)) return showToast('اسم الشركة مطلوب، من حرفين إلى 100 حرف', 'error');
     if (!isEmail(email)) return showToast('أدخل بريدًا إلكترونيًا صحيحًا', 'error');
     if (!isPhoneDigits(phone)) return showToast('رقم الجوال أرقام فقط، من 6 إلى 15 رقمًا', 'error');
-    const r = addClient({ name: name.trim(), email: email.trim(), phone: `${code} ${phone.trim()}` });
+    const r = addClient({ name: name.trim(), email: email.trim(), phone: `${dialOf(iso)} ${phone.trim()}` });
     if (!r.ok) return showToast(r.error, 'error');
     showToast('تم إرسال الدعوة');
     setName('');
@@ -93,18 +86,7 @@ function AddClientDialog({ open, onClose }: { open: boolean; onClose: () => void
           <div className="space-y-1.5">
             <Label>رقم الجوال *</Label>
             <div className="flex gap-2" dir="ltr">
-              <Select value={code} onValueChange={setCode}>
-                <SelectTrigger className="w-[150px] [&>span]:overflow-visible">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {CODES.map(([v, l]) => (
-                    <SelectItem key={v} value={v}>
-                      {l}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <PhoneCodeSelect value={iso} onChange={setIso} />
               <Input dir="ltr" inputMode="numeric" placeholder="1001234567" value={phone} onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))} />
             </div>
             <FieldHint>مطلوب. أرقام فقط، من 6 إلى 15 رقمًا، بدون رمز الدولة. رمز الدولة يُختار من القائمة.</FieldHint>
@@ -133,7 +115,7 @@ export default function Clients(): JSX.Element {
   /** why the commission came out this way: the client's country and the exchange rate against the vendor's currency */
   const commissionTip = (c: (typeof mine)[number], k: { base: number; rate: number; amt: number }): JSX.Element => {
     const country = countryOf(c.phone);
-    const clientCur = CURRENCY_BY_COUNTRY[country];
+    const clientCur = CURRENCY_BY_ISO[countryOfPhone(c.phone)?.iso ?? ''];
     const foreign = !!clientCur && clientCur !== v.cur;
     const usd = planPriceUsd(c.plan, c.cycle);
     // each figure is an isolated left-to-right run: currency on the left of the amount, and the sum reads right to left
