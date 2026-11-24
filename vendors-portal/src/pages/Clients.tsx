@@ -33,6 +33,20 @@ const countryOf = (phone: string): string => countryOfPhone(phone)?.name ?? '—
 const CURRENCY_BY_ISO: Record<string, Currency> = { EG: 'EGP', OM: 'OMR', SA: 'SAR', AE: 'AED', PS: 'ILS' };
 const num = (n: number, d: number): string => n.toLocaleString('en-US', { maximumFractionDigits: d });
 
+/** a row laid out left to right as separate boxes, so the Arabic currency symbols never reorder the numbers around them:
+ *  on screen the currency sits on the LEFT of its amount, and a sum like «ج.م 553 = 30% × ج.م 1,843» reads from the right */
+function Row({ children }: { children: React.ReactNode }): JSX.Element {
+  return <span dir="ltr" className="inline-flex flex-wrap items-baseline gap-x-1.5">{children}</span>;
+}
+function Amt({ n, cur, d }: { n: number; cur: Currency; d?: number }): JSX.Element {
+  return (
+    <span dir="ltr" className="inline-flex items-baseline gap-1">
+      <span>{FX[cur].sym}</span>
+      <span>{num(n, d ?? FX[cur].decimals)}</span>
+    </span>
+  );
+}
+
 /** how the client was added: an invitation sent by the marketer, or the registration link */
 function ViaBadge({ via }: { via: string }): JSX.Element {
   const link = via === 'رابط';
@@ -114,24 +128,21 @@ export default function Clients(): JSX.Element {
   const [stateF, setStateF] = useState('all');
   /** why the commission came out this way: the client's country and the exchange rate against the vendor's currency */
   const commissionTip = (c: (typeof mine)[number], k: { base: number; rate: number; amt: number }): JSX.Element => {
-    const country = countryOf(c.phone);
     const clientCur = CURRENCY_BY_ISO[countryOfPhone(c.phone)?.iso ?? ''];
     const foreign = !!clientCur && clientCur !== v.cur;
     const usd = planPriceUsd(c.plan, c.cycle);
-    // each figure is an isolated left-to-right run: currency on the left of the amount, and the sum reads right to left
-    const amt = (n: number, cur: Currency): string => `${FX[cur].sym} ${num(n, FX[cur].decimals)}`;
+    const perUnit = foreign ? FX[clientCur].rate / FX[v.cur].rate : 1;
     return (
       <>
         {foreign && (
           <>
-            <div>العميل من <b>{country}</b>، وسعر الاشتراك يختلف حسب دولته.</div>
-            <div>قيمة الاشتراك: <bdi dir="ltr">{amt(toLocal(usd, clientCur), clientCur)}</bdi></div>
-            <div>سعر الصرف: <bdi dir="ltr">{FX[clientCur].sym} {num(FX[clientCur].rate / FX[v.cur].rate, FX[clientCur].rate / FX[v.cur].rate < 1 ? 4 : 2)} = {FX[v.cur].sym} 1</bdi></div>
-            <div>قيمة الاشتراك بعملتك: <bdi dir="ltr">{amt(k.base, v.cur)}</bdi></div>
+            <div>قيمة الاشتراك: <Amt n={toLocal(usd, clientCur)} cur={clientCur} /></div>
+            <div>سعر الصرف: <Row><Amt n={perUnit} cur={clientCur} d={perUnit < 1 ? 4 : 2} /><span>=</span><Amt n={1} cur={v.cur} d={0} /></Row></div>
+            <div>قيمة الاشتراك بعملتك: <Amt n={k.base} cur={v.cur} /></div>
           </>
         )}
-        {!foreign && <div>قيمة الاشتراك: <bdi dir="ltr">{amt(k.base, v.cur)}</bdi></div>}
-        <div>العمولة: <bdi dir="ltr">{amt(k.amt, v.cur)} = {k.rate}% × {amt(k.base, v.cur)}</bdi></div>
+        {!foreign && <div>قيمة الاشتراك: <Amt n={k.base} cur={v.cur} /></div>}
+        <div>العمولة: <Row><Amt n={k.amt} cur={v.cur} /><span>=</span><span dir="ltr">{k.rate}%</span><span>×</span><Amt n={k.base} cur={v.cur} /></Row></div>
       </>
     );
   };
