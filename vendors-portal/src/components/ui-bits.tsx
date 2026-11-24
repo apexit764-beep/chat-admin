@@ -27,7 +27,6 @@ const TONE_OF: Record<string, Tone> = {
   'الافتراضي': 'green',
   'حساب بنكي': 'blue',
   'محفظة إلكترونية': 'green',
-  PayPal: 'violet',
 };
 
 const DOT: Record<Tone, string> = {

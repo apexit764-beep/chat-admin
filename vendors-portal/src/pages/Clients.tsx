@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Link2, Plus, RotateCw } from 'lucide-react';
+import { Eye, Link2, Plus, RotateCw } from 'lucide-react';
 import { useVendorStore } from '@v/store/useVendorStore';
 import { useUIStore } from '@/store/useUIStore';
 import { FieldHint, Money, Note, PageHeader, StatusPill } from '@v/components/ui-bits';
 import { isEmail, isPhoneDigits, lengthBetween } from '@v/lib/validation';
+import { FX, planPriceUsd, toLocal, type Currency } from '@v/lib/vendorMath';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -21,7 +23,7 @@ const parseArDate = (d: string): number => {
   return new Date(Number(year), AR_MONTHS.indexOf(month), Number(day)).getTime();
 };
 const VIA_OPTIONS: [string, string][] = [['all', 'طريقة الإضافة: الكل'], ['دعوة', 'دعوة'], ['رابط', 'رابط التسجيل']];
-const STATE_OPTIONS: [string, string][] = [['all', 'الحالة: الكل'], ['اشترك', 'اشترك'], ['سجل', 'سجل'], ['دعوة مرسلة', 'دعوة مرسلة'], ['استرد المبلغ', 'استرد المبلغ']];
+const STATE_OPTIONS: [string, string][] = [['all', 'حالة الحساب: الكل'], ['اشترك', 'اشترك'], ['سجل', 'سجل'], ['دعوة مرسلة', 'دعوة مرسلة'], ['استرد المبلغ', 'استرد المبلغ']];
 
 const CODES = [
   ['+20', '🇪🇬 +20'],
@@ -34,6 +36,9 @@ const CODES = [
 const COUNTRY_BY_CODE: Record<string, string> = { '+20': 'مصر', '+968': 'عمان', '+966': 'السعودية', '+970': 'فلسطين', '+971': 'الإمارات' };
 /** the client's country follows the dial code of the phone number */
 const countryOf = (phone: string): string => COUNTRY_BY_CODE[phone.trim().split(/\s+/)[0]] ?? '—';
+/** currency a client pays in, by country (only the currencies the portal knows) */
+const CURRENCY_BY_COUNTRY: Record<string, Currency> = { 'مصر': 'EGP', 'عمان': 'OMR', 'السعودية': 'SAR' };
+const num = (n: number, d: number): string => n.toLocaleString('en-US', { maximumFractionDigits: d });
 
 function AddClientDialog({ open, onClose }: { open: boolean; onClose: () => void }): JSX.Element {
   const addClient = useVendorStore((s) => s.addClient);
@@ -77,7 +82,7 @@ function AddClientDialog({ open, onClose }: { open: boolean; onClose: () => void
             <Label>رقم الجوال *</Label>
             <div className="flex gap-2" dir="ltr">
               <Select value={code} onValueChange={setCode}>
-                <SelectTrigger className="w-[130px]">
+                <SelectTrigger className="w-[150px] [&>span]:overflow-visible">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -113,6 +118,28 @@ export default function Clients(): JSX.Element {
   const [range, setRange] = useState<{ from: Date; to: Date } | undefined>(undefined);
   const [viaF, setViaF] = useState('all');
   const [stateF, setStateF] = useState('all');
+  /** why the commission came out this way: the client's country and the exchange rate against the vendor's currency */
+  const commissionTip = (c: (typeof mine)[number], k: { base: number; rate: number; amt: number }): JSX.Element => {
+    const country = countryOf(c.phone);
+    const clientCur = CURRENCY_BY_COUNTRY[country];
+    const foreign = !!clientCur && clientCur !== v.cur;
+    const usd = planPriceUsd(c.plan, c.cycle);
+    return (
+      <>
+        {foreign && (
+          <>
+            <div>العميل من <b>{country}</b>، وسعر الاشتراك يختلف حسب دولته.</div>
+            <div>قيمة الاشتراك: <bdi dir="ltr">{num(toLocal(usd, clientCur), FX[clientCur].decimals)} {FX[clientCur].sym}</bdi></div>
+            <div>سعر الصرف: <bdi dir="ltr">1 {FX[v.cur].sym} = {num(FX[clientCur].rate / FX[v.cur].rate, 2)} {FX[clientCur].sym}</bdi></div>
+            <div>قيمة الاشتراك بعملتك: <bdi dir="ltr">{num(k.base, FX[v.cur].decimals)} {FX[v.cur].sym}</bdi></div>
+          </>
+        )}
+        {!foreign && <div>قيمة الاشتراك: <bdi dir="ltr">{num(k.base, FX[v.cur].decimals)} {FX[v.cur].sym}</bdi></div>}
+        <div>العمولة: <bdi dir="ltr">{k.rate}% × {num(k.base, FX[v.cur].decimals)} = {num(k.amt, FX[v.cur].decimals)} {FX[v.cur].sym}</bdi></div>
+      </>
+    );
+  };
+
   const filtered = useMemo(() => {
     const from = range ? new Date(range.from).setHours(0, 0, 0, 0) : 0;
     const to = range ? new Date(range.to).setHours(23, 59, 59, 999) : 0;
@@ -209,7 +236,7 @@ export default function Clients(): JSX.Element {
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow>
-                {['العميل', 'الدولة', 'طريقة الإضافة', 'تاريخ الإضافة', 'الحالة', 'الباقة', 'الدورة', 'العمولة', 'الإجراءات'].map((h) => (
+                {['العميل', 'الدولة', 'طريقة الإضافة', 'تاريخ الإضافة', 'حالة الحساب', 'الباقة', 'الدورة', 'العمولة', 'حالة العمولة', 'الإجراءات'].map((h) => (
                   <TableHead key={h} className="text-start">
                     {h}
                   </TableHead>
@@ -219,7 +246,7 @@ export default function Clients(): JSX.Element {
             <TableBody>
               {filtered.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={9} className="py-10 text-center text-muted-foreground">
+                  <TableCell colSpan={10} className="py-10 text-center text-muted-foreground">
                     {mine.length === 0 ? 'لم تُضف أي عميل بعد.' : 'لا يوجد عملاء بهذا الفلتر.'}
                   </TableCell>
                 </TableRow>
@@ -244,8 +271,23 @@ export default function Clients(): JSX.Element {
                     <TableCell>{c.cycle}</TableCell>
                     <TableCell>
                       {k ? (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="cursor-help border-b border-dotted border-muted-foreground/60">
+                              <Money v={k.amt} cur={v.cur} />
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-xs space-y-1 text-start leading-relaxed">{commissionTip(c, k)}</TooltipContent>
+                        </Tooltip>
+                      ) : (
+                        '—'
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {k ? (
                         <span className="inline-flex items-center gap-1.5">
-                          <Money v={k.amt} cur={v.cur} /> <StatusPill text={k.st} />
+                          <StatusPill text={k.st} />
+                          {k.st === 'معلّقة' && <small className="text-xs text-muted-foreground">باقي {k.left} يوم</small>}
                         </span>
                       ) : (
                         '—'
@@ -272,8 +314,8 @@ export default function Clients(): JSX.Element {
                           </Button>
                         </span>
                       ) : (
-                        <Button size="sm" variant="outline" onClick={() => setDetailId(c.id)}>
-                          التفاصيل
+                        <Button size="icon" variant="outline" className="h-8 w-8" aria-label="التفاصيل" title="التفاصيل" onClick={() => setDetailId(c.id)}>
+                          <Eye className="h-4 w-4" />
                         </Button>
                       )}
                     </TableCell>
@@ -319,7 +361,7 @@ export default function Clients(): JSX.Element {
               {row('الدولة', countryOf(detail.phone))}
               {row('طريقة الإضافة', detail.via === 'رابط' ? 'رابط التسجيل' : 'دعوة')}
               {row('تاريخ الإضافة', detail.date)}
-              {row('الحالة', <StatusPill text={detail.state} />)}
+              {row('حالة الحساب', <StatusPill text={detail.state} />)}
               {row('الباقة', detail.plan)}
               {row('الدورة', detail.cycle)}
               {row('قيمة أول اشتراك', detailComm ? <Money v={detailComm.base} cur={v.cur} /> : '—')}

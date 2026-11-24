@@ -5,7 +5,7 @@ export type VendorStatus = 'نشط' | 'مجمّد' | 'دعوة مرسلة';
 export type ClientState = 'اشترك' | 'دعوة مرسلة' | 'سجل' | 'استرد المبلغ';
 export type CommissionState = 'معلّقة' | 'متاحة' | 'ملغاة';
 export type PayoutState = 'بانتظار المراجعة' | 'مرفوض' | 'تم التحويل' | 'ملغي';
-export type AccountType = 'حساب بنكي' | 'محفظة إلكترونية' | 'PayPal';
+export type AccountType = 'حساب بنكي' | 'محفظة إلكترونية';
 
 export interface TransferAccount {
   id: number;
@@ -143,6 +143,8 @@ const initialClients: VendorClient[] = [
   { id: 10, vid: 1, name: 'مركز الإبداع التعليمي', email: 'info@ibdaa-center.com', phone: '+20 111 654 3210', plan: 'الاحترافي', cycle: 'سنوي', state: 'اشترك', via: 'دعوة', date: '9 سبتمبر 2026' },
   { id: 11, vid: 1, name: 'متجر الأناقة', email: 'shop@anaqa.com', phone: '+20 122 987 6543', plan: 'الأعمال', cycle: 'شهري', state: 'اشترك', via: 'رابط', date: '14 سبتمبر 2026' },
   { id: 6, vid: 3, name: 'متجر السحاب', email: 'sahab@store.sa', phone: '+966 53 333 4444', plan: 'الأعمال', cycle: 'سنوي', state: 'اشترك', date: '12 سبتمبر 2026' },
+  { id: 12, vid: 2, name: 'شركة الرؤية الرقمية', email: 'info@roya-digital.com', phone: '+20 100 555 6677', plan: 'الأعمال', cycle: 'سنوي', state: 'اشترك', via: 'رابط', date: '10 نوفمبر 2026' },
+  { id: 13, vid: 2, name: 'مؤسسة الخليج للخدمات', email: 'hello@gulf-services.sa', phone: '+966 55 888 9900', plan: 'الاحترافي', cycle: 'شهري', state: 'اشترك', via: 'دعوة', date: '12 نوفمبر 2026' },
 ];
 
 const comm = (cid: number, vid: number, cur: Currency, rate: number, st: CommissionState, left = 0): Commission => {
@@ -183,6 +185,8 @@ export const useVendorStore = create<VendorState>((set, get) => ({
     comm(10, 1, 'EGP', 30, 'متاحة'),
     comm(11, 1, 'EGP', 30, 'متاحة'),
     comm(4, 2, 'OMR', 25, 'متاحة'),
+    comm(12, 2, 'OMR', 25, 'معلّقة', 20),
+    comm(13, 2, 'OMR', 25, 'متاحة'),
     comm(5, 3, 'SAR', 30, 'متاحة'),
     comm(6, 3, 'SAR', 30, 'متاحة'),
   ],
@@ -203,7 +207,7 @@ export const useVendorStore = create<VendorState>((set, get) => ({
     { id: 15, vid: 1, amt: 560, st: 'تم التحويل', date: '20 أغسطس 2026', reason: '', ref: 'VC-5300917', fname: 'vcash-5300917.png', acct: 'محفظة إلكترونية · فودافون كاش · 010 0123 4567' },
     { id: 16, vid: 1, amt: 510, st: 'تم التحويل', date: '10 أغسطس 2026', reason: '', ref: 'TRX-58877', fname: 'transfer-58877.pdf', acct: 'حساب بنكي · بنك مصر · EG12 0002 0001 2345' },
     { id: 1, vid: 2, amt: 20, st: 'بانتظار المراجعة', date: '2 نوفمبر 2026', reason: '', ref: '', fname: '', acct: 'حساب بنكي · بنك مسقط · OM81 0270 0000 1111' },
-    { id: 17, vid: 2, amt: 15, st: 'تم التحويل', date: '12 أكتوبر 2026', reason: '', ref: 'PP-9X41-22A', fname: 'paypal-9x41.pdf', acct: 'PayPal · info@ufuq.om' },
+    { id: 17, vid: 2, amt: 15, st: 'تم التحويل', date: '12 أكتوبر 2026', reason: '', ref: 'OM-9X41-22A', fname: 'wallet-9x41.pdf', acct: 'محفظة إلكترونية · أوريدو موبايل ماني · +968 9555 0000' },
     { id: 18, vid: 2, amt: 5, st: 'مرفوض', date: '8 أكتوبر 2026', reason: 'المبلغ أقل من الحد الأدنى للسحب وقتها', ref: '', fname: '', acct: 'حساب بنكي · بنك مسقط · OM81 0270 0000 1111' },
     { id: 4, vid: 3, amt: 200, st: 'بانتظار المراجعة', date: '1 نوفمبر 2026', reason: '', ref: '', fname: '', acct: 'حساب بنكي · مصرف الراجحي · SA44 2000 0001 2345' },
     { id: 3, vid: 3, amt: 300, st: 'تم التحويل', date: '20 أكتوبر 2026', reason: '', ref: 'TRX-88120', fname: 'transfer-88120.pdf', acct: 'حساب بنكي · مصرف الراجحي · SA44 2000 0001 2345' },

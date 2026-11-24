@@ -3,7 +3,7 @@ import { Plus } from 'lucide-react';
 import { useVendorStore, type AccountType, type TransferAccount } from '@v/store/useVendorStore';
 import { useUIStore } from '@/store/useUIStore';
 import { FieldHint, Note, PageHeader, StatusPill } from '@v/components/ui-bits';
-import { isAccountNumber, isEmail, isHolderName, isWalletNumber, lengthBetween } from '@v/lib/validation';
+import { isAccountNumber, isHolderName, isWalletNumber, lengthBetween } from '@v/lib/validation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -22,17 +22,22 @@ const HINTS: Record<AccountType, Record<string, string>> = {
   },
   'محفظة إلكترونية': {
     b: 'مطلوب. من حرفين إلى 40 حرفًا.',
-    n: 'مطلوب. أرقام فقط، من 8 إلى 15 رقمًا.',
+    n: 'مطلوب. أرقام فقط، من 8 إلى 15 رقمًا، بدون رمز الدولة. رمز الدولة يُختار من القائمة.',
   },
-  PayPal: { n: 'مطلوب. بريد إلكتروني بصيغة صحيحة.' },
 };
 
 /** fields per account type: [key, label] */
 const FIELDS: Record<AccountType, [string, string][]> = {
   'حساب بنكي': [['b', 'اسم البنك'], ['n', 'رقم الحساب أو IBAN'], ['h', 'اسم صاحب الحساب']],
   'محفظة إلكترونية': [['b', 'اسم المحفظة (مثل: فودافون كاش، STC Pay)'], ['n', 'رقم المحفظة']],
-  PayPal: [['n', 'البريد الإلكتروني لحساب PayPal']],
 };
+const WALLET_CODES = [
+  ['+20', '🇪🇬 +20'],
+  ['+968', '🇴🇲 +968'],
+  ['+966', '🇸🇦 +966'],
+  ['+970', '🇵🇸 +970'],
+  ['+971', '🇦🇪 +971'],
+];
 const OTP = '123456'; // demo code; the real one is sent by SMS from the backend
 
 const OTP_RESEND_SECONDS = 30;
@@ -114,11 +119,16 @@ function AddAccountDialog({ open, onClose }: { open: boolean; onClose: () => voi
   const [step, setStep] = useState<'form' | 'otp'>('form');
   const [type, setType] = useState<AccountType>('حساب بنكي');
   const [vals, setVals] = useState<Record<string, string>>({});
+  // the wallet number is a tel input: dial code + digits; the code defaults to the vendor's own country
+  const ownCode = WALLET_CODES.find(([c]) => phone.trim().startsWith(c + ' '))?.[0] ?? '+20';
+  const [walletCode, setWalletCode] = useState(ownCode);
   const fields = FIELDS[type];
+  const isWalletNo = (k: string): boolean => type === 'محفظة إلكترونية' && k === 'n';
 
   const reset = (): void => {
     setVals({});
     setType('حساب بنكي');
+    setWalletCode(ownCode);
     setStep('form');
     onClose();
   };
@@ -126,7 +136,6 @@ function AddAccountDialog({ open, onClose }: { open: boolean; onClose: () => voi
   const next = (): void => {
     if (fields.some(([k]) => !vals[k]?.trim())) return showToast('أكمل كل الحقول المطلوبة', 'error');
     const v = (k: string): string => (vals[k] ?? '').trim();
-    if (type === 'PayPal' && !isEmail(v('n'))) return showToast('أدخل بريدًا إلكترونيًا صحيحًا', 'error');
     if (type === 'حساب بنكي') {
       if (!lengthBetween(v('b'), 2, 60)) return showToast('اسم البنك من حرفين إلى 60 حرفًا', 'error');
       if (!isAccountNumber(v('n'))) return showToast('رقم الحساب أو IBAN: حروف إنجليزية وأرقام فقط، من 8 إلى 34 خانة', 'error');
@@ -141,7 +150,7 @@ function AddAccountDialog({ open, onClose }: { open: boolean; onClose: () => voi
   };
 
   const confirm = (): void => {
-    const r = addAccount(type, fields.map(([k]) => vals[k].trim()).join(' · '));
+    const r = addAccount(type, fields.map(([k]) => (isWalletNo(k) ? `${walletCode} ${vals[k].trim()}` : vals[k].trim())).join(' · '));
     if (!r.ok) {
       showToast(r.error, 'error');
       return setStep('form');
@@ -179,12 +188,30 @@ function AddAccountDialog({ open, onClose }: { open: boolean; onClose: () => voi
                     ))}
                   </SelectContent>
                 </Select>
-                <FieldHint>مطلوب. حساب بنكي أو محفظة إلكترونية أو PayPal، وتتغير الحقول التالية حسب النوع.</FieldHint>
+                <FieldHint>مطلوب. حساب بنكي أو محفظة إلكترونية، وتتغير الحقول التالية حسب النوع.</FieldHint>
               </div>
               {fields.map(([k, label]) => (
                 <div key={k} className="space-y-1.5">
                   <Label>{label} *</Label>
-                  <Input dir={k === 'n' ? 'ltr' : undefined} value={vals[k] ?? ''} onChange={(e) => setVals({ ...vals, [k]: e.target.value })} />
+                  {isWalletNo(k) ? (
+                    <div className="flex gap-2" dir="ltr">
+                      <Select value={walletCode} onValueChange={setWalletCode}>
+                        <SelectTrigger className="w-[150px] [&>span]:overflow-visible">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {WALLET_CODES.map(([c, l]) => (
+                            <SelectItem key={c} value={c}>
+                              {l}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Input type="tel" dir="ltr" inputMode="numeric" placeholder="95550000" value={vals[k] ?? ''} onChange={(e) => setVals({ ...vals, [k]: e.target.value.replace(/\D/g, '') })} />
+                    </div>
+                  ) : (
+                    <Input dir={k === 'n' ? 'ltr' : undefined} value={vals[k] ?? ''} onChange={(e) => setVals({ ...vals, [k]: e.target.value })} />
+                  )}
                   <FieldHint>{HINTS[type][k]}</FieldHint>
                 </div>
               ))}

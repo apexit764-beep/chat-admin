@@ -18,7 +18,7 @@ export const PLAN_USD: Record<string, number> = { المبتدئ: 6, الاحت�
 
 export interface TransferAccount {
   id: number;
-  type: 'حساب بنكي' | 'محفظة إلكترونية' | 'PayPal';
+  type: 'حساب بنكي' | 'محفظة إلكترونية';
   details: string;
   isDefault: boolean;
 }
@@ -175,7 +175,7 @@ export const useVendorsAdminStore = create<State>((set, get) => {
       { id: 2, name: 'شركة الأفق للتسويق', email: 'info@ufuq.om', phone: '+968 9123 0000', country: 'عمان', cur: 'OMR', rate: 25, status: 'نشط', bankLock: false,
         accounts: [
           { id: 2, type: 'حساب بنكي', details: 'بنك مسقط · OM81 0270 0000 1111', isDefault: true },
-          { id: 5, type: 'PayPal', details: 'info@ufuq.om', isDefault: false },
+          { id: 5, type: 'محفظة إلكترونية', details: 'أوريدو موبايل ماني · +968 9555 0000', isDefault: false },
         ] },
       { id: 3, name: 'وكالة المدار', email: 'hello@madar.sa', phone: '+966 55 123 4567', country: 'السعودية', cur: 'SAR', rate: 30, status: 'نشط', bankLock: false,
         accounts: [
@@ -211,8 +211,8 @@ export const useVendorsAdminStore = create<State>((set, get) => {
       { id: 8, vid: 1, amt: 2000, st: 'تم التحويل', date: '15 أكتوبر 2026', acct: 'حساب بنكي · بنك مصر · EG12 0002 0001 2345', ...emptyPayout, ref: 'TRX-77410', fileName: 'transfer-77410.png', reviewedBy: 'محمد الكندي', executedBy: 'محمد الكندي' },
       { id: 9, vid: 1, amt: 1500, st: 'تم التحويل', date: '5 أكتوبر 2026', acct: 'محفظة إلكترونية · فودافون كاش · 010 0123 4567', ...emptyPayout, ref: 'VC-5521908', fileName: 'vcash-5521908.jpg', reviewedBy: 'محمد الكندي', executedBy: 'محمد الكندي' },
       { id: 10, vid: 1, amt: 600, st: 'مرفوض', date: '25 أكتوبر 2026', acct: 'محفظة إلكترونية · فودافون كاش · 010 0123 4567', ...emptyPayout, reason: 'رقم المحفظة غير مسجل باسم المسوق بالعمولة', reviewedBy: 'محمد الكندي' },
-      { id: 11, vid: 2, amt: 8.5, st: 'ملغي', date: '4 نوفمبر 2026', acct: 'PayPal · info@ufuq.om', ...emptyPayout, reviewedBy: 'المسوق بالعمولة' },
-      { id: 12, vid: 2, amt: 15, st: 'تم التحويل', date: '12 أكتوبر 2026', acct: 'PayPal · info@ufuq.om', ...emptyPayout, ref: 'PP-9X41-22A', fileName: 'paypal-9x41.pdf', reviewedBy: 'محمد الكندي', executedBy: 'محمد الكندي' },
+      { id: 11, vid: 2, amt: 8.5, st: 'ملغي', date: '4 نوفمبر 2026', acct: 'محفظة إلكترونية · أوريدو موبايل ماني · +968 9555 0000', ...emptyPayout, reviewedBy: 'المسوق بالعمولة' },
+      { id: 12, vid: 2, amt: 15, st: 'تم التحويل', date: '12 أكتوبر 2026', acct: 'محفظة إلكترونية · أوريدو موبايل ماني · +968 9555 0000', ...emptyPayout, ref: 'OM-9X41-22A', fileName: 'paypal-9x41.pdf', reviewedBy: 'محمد الكندي', executedBy: 'محمد الكندي' },
       { id: 13, vid: 2, amt: 5, st: 'مرفوض', date: '8 أكتوبر 2026', acct: 'حساب بنكي · بنك مسقط · OM81 0270 0000 1111', ...emptyPayout, reason: 'المبلغ أقل من الحد الأدنى للسحب', reviewedBy: 'محمد الكندي' },
       { id: 14, vid: 3, amt: 150, st: 'ملغي', date: '5 نوفمبر 2026', acct: 'محفظة إلكترونية · STC Pay · 055 123 4567', ...emptyPayout, reviewedBy: 'المسوق بالعمولة' },
       { id: 15, vid: 3, amt: 250, st: 'تم التحويل', date: '10 أكتوبر 2026', acct: 'حساب بنكي · مصرف الراجحي · SA44 2000 0001 2345', ...emptyPayout, ref: 'TRX-66302', fileName: 'transfer-66302.pdf', reviewedBy: 'محمد الكندي', executedBy: 'محمد الكندي' },
