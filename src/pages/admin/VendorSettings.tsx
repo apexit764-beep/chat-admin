@@ -29,8 +29,8 @@ export default function VendorSettings(): JSX.Element {
   return (
     <div className="p-4 lg:p-6 space-y-4 page-fade">
       <div>
-        <h2 className="text-2xl font-bold">إعدادات الموردين</h2>
-        <p className="text-sm text-muted-foreground">القيم الافتراضية لأي مورد جديد</p>
+        <h2 className="text-2xl font-bold">إعدادات المسوقين بالعمولة</h2>
+        <p className="text-sm text-muted-foreground">القيم الافتراضية لأي مسوق بالعمولة جديد</p>
       </div>
       <Card>
         <CardContent className="space-y-4 pt-6">
@@ -48,7 +48,7 @@ export default function VendorSettings(): JSX.Element {
             <div className="space-y-1.5">
               <Label>الحد الأدنى للسحب</Label>
               <Input dir="ltr" inputMode="decimal" value={d.min} onChange={(e) => set('min', e.target.value)} />
-              <FieldHint>مطلوب. رقم أكبر من 0 بالدولار، ويظهر للمورد بعملة دولته.</FieldHint>
+              <FieldHint>مطلوب. رقم أكبر من 0 بالدولار، ويظهر للمسوق بالعمولة بعملة دولته.</FieldHint>
             </div>
           </div>
           <Note>يُطبق التغيير على العمولات الجديدة فقط.</Note>

@@ -73,12 +73,12 @@ const navGroups: NavGroup[] = [
     items: [
       {
         to: '/vendors',
-        label: 'الموردون',
+        label: 'المسوقون بالعمولة',
         icon: Handshake,
         children: [
-          { to: '/vendors', label: 'قائمة الموردين', icon: Users },
+          { to: '/vendors', label: 'قائمة المسوقين بالعمولة', icon: Users },
           { to: '/vendors/payouts', label: 'طلبات السحب', icon: HandCoins },
-          { to: '/vendors/settings', label: 'إعدادات الموردين', icon: SlidersHorizontal },
+          { to: '/vendors/settings', label: 'إعدادات المسوقين بالعمولة', icon: SlidersHorizontal },
         ],
       },
       { to: '/referrals', label: 'برنامج المروّجين', icon: Gift },

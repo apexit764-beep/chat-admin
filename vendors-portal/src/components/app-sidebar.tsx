@@ -94,7 +94,7 @@ function Brand(): JSX.Element {
         <img src="/qhub-icon.svg" alt="Qhub" className="h-10 w-10 shrink-0 rounded-xl" />
         <div className="grid min-w-0 leading-tight">
           <span className="truncate text-base font-bold">Qhub Partners</span>
-          <span className="truncate text-xs text-muted-foreground">بوابة الموردين</span>
+          <span className="truncate text-xs text-muted-foreground">بوابة المسوقين بالعمولة</span>
         </div>
       </NavLink>
       {!isMobile && <CollapseToggle />}

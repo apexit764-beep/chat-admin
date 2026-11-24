@@ -190,7 +190,7 @@ export function CreatePassword({ mode }: { mode: 'invite' | 'reset' }): JSX.Elem
     <AuthBox>
       <h2 className="text-2xl font-semibold tracking-tight">{mode === 'invite' ? `أهلًا ${vendor.name}` : 'كلمة مرور جديدة'}</h2>
       <p className="mb-6 mt-1 text-sm text-muted-foreground">
-        {mode === 'invite' ? 'أنشئ كلمة مرور لحسابك للدخول إلى لوحة الموردين.' : 'أنشئ كلمة مرور جديدة لحسابك.'}
+        {mode === 'invite' ? 'أنشئ كلمة مرور لحسابك للدخول إلى لوحة المسوقين بالعمولة.' : 'أنشئ كلمة مرور جديدة لحسابك.'}
       </p>
       <div className="space-y-3">
         <div className="space-y-1.5">
@@ -218,7 +218,7 @@ export function CreatePassword({ mode }: { mode: 'invite' | 'reset' }): JSX.Elem
         {mode === 'invite' && (
           <label className="flex items-start gap-2 text-xs leading-relaxed">
             <input type="checkbox" className="mt-1" checked={terms} onChange={(e) => setTerms(e.target.checked)} />
-            أوافق على شروط وأحكام برنامج الموردين (إلزامي للمتابعة)
+            أوافق على شروط وأحكام برنامج المسوقين بالعمولة (إلزامي للمتابعة)
           </label>
         )}
         <Button className="w-full" disabled={!valid} onClick={submit}>

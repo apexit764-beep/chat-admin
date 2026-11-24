@@ -200,21 +200,21 @@ export const useVendorsAdminStore = create<State>((set, get) => {
     ],
     payouts: [
       { id: 1, vid: 2, amt: 20, st: 'بانتظار المراجعة', date: '2 نوفمبر 2026', acct: 'حساب بنكي · بنك مسقط · OM81 0270 0000 1111', ...emptyPayout },
-      { id: 21, vid: 1, amt: 800, st: 'ملغي', date: '2 نوفمبر 2026', acct: 'حساب بنكي · بنك مصر · EG12 0002 0001 2345', ...emptyPayout, reviewedBy: 'المورد' },
-      { id: 22, vid: 1, amt: 600, st: 'ملغي', date: '20 أكتوبر 2026', acct: 'محفظة إلكترونية · فودافون كاش · 010 0123 4567', ...emptyPayout, reviewedBy: 'المورد' },
-      { id: 2, vid: 1, amt: 500, st: 'مرفوض', date: '29 أكتوبر 2026', acct: 'حساب بنكي · بنك مصر · EG12 0002 0001 2345', ...emptyPayout, reason: 'اسم صاحب الحساب البنكي لا يطابق اسم المورد', reviewedBy: 'محمد الكندي' },
+      { id: 21, vid: 1, amt: 800, st: 'ملغي', date: '2 نوفمبر 2026', acct: 'حساب بنكي · بنك مصر · EG12 0002 0001 2345', ...emptyPayout, reviewedBy: 'المسوق بالعمولة' },
+      { id: 22, vid: 1, amt: 600, st: 'ملغي', date: '20 أكتوبر 2026', acct: 'محفظة إلكترونية · فودافون كاش · 010 0123 4567', ...emptyPayout, reviewedBy: 'المسوق بالعمولة' },
+      { id: 2, vid: 1, amt: 500, st: 'مرفوض', date: '29 أكتوبر 2026', acct: 'حساب بنكي · بنك مصر · EG12 0002 0001 2345', ...emptyPayout, reason: 'اسم صاحب الحساب البنكي لا يطابق اسم المسوق بالعمولة', reviewedBy: 'محمد الكندي' },
       { id: 3, vid: 3, amt: 300, st: 'تم التحويل', date: '20 أكتوبر 2026', acct: 'حساب بنكي · مصرف الراجحي · SA44 2000 0001 2345', ...emptyPayout, ref: 'TRX-88120', fileName: 'transfer-88120.pdf', reviewedBy: 'محمد الكندي', executedBy: 'محمد الكندي' },
       { id: 4, vid: 3, amt: 200, st: 'بانتظار المراجعة', date: '1 نوفمبر 2026', acct: 'حساب بنكي · مصرف الراجحي · SA44 2000 0001 2345', ...emptyPayout },
-      { id: 5, vid: 1, amt: 700, st: 'ملغي', date: '3 نوفمبر 2026', acct: 'محفظة إلكترونية · فودافون كاش · 010 0123 4567', ...emptyPayout, reviewedBy: 'المورد' },
+      { id: 5, vid: 1, amt: 700, st: 'ملغي', date: '3 نوفمبر 2026', acct: 'محفظة إلكترونية · فودافون كاش · 010 0123 4567', ...emptyPayout, reviewedBy: 'المسوق بالعمولة' },
       { id: 6, vid: 1, amt: 1200, st: 'بانتظار المراجعة', date: '4 نوفمبر 2026', acct: 'حساب بنكي · بنك مصر · EG12 0002 0001 2345', ...emptyPayout },
-      { id: 7, vid: 1, amt: 900, st: 'ملغي', date: '5 نوفمبر 2026', acct: 'محفظة إلكترونية · فودافون كاش · 010 0123 4567', ...emptyPayout, reviewedBy: 'المورد' },
+      { id: 7, vid: 1, amt: 900, st: 'ملغي', date: '5 نوفمبر 2026', acct: 'محفظة إلكترونية · فودافون كاش · 010 0123 4567', ...emptyPayout, reviewedBy: 'المسوق بالعمولة' },
       { id: 8, vid: 1, amt: 2000, st: 'تم التحويل', date: '15 أكتوبر 2026', acct: 'حساب بنكي · بنك مصر · EG12 0002 0001 2345', ...emptyPayout, ref: 'TRX-77410', fileName: 'transfer-77410.png', reviewedBy: 'محمد الكندي', executedBy: 'محمد الكندي' },
       { id: 9, vid: 1, amt: 1500, st: 'تم التحويل', date: '5 أكتوبر 2026', acct: 'محفظة إلكترونية · فودافون كاش · 010 0123 4567', ...emptyPayout, ref: 'VC-5521908', fileName: 'vcash-5521908.jpg', reviewedBy: 'محمد الكندي', executedBy: 'محمد الكندي' },
-      { id: 10, vid: 1, amt: 600, st: 'مرفوض', date: '25 أكتوبر 2026', acct: 'محفظة إلكترونية · فودافون كاش · 010 0123 4567', ...emptyPayout, reason: 'رقم المحفظة غير مسجل باسم المورد', reviewedBy: 'محمد الكندي' },
-      { id: 11, vid: 2, amt: 8.5, st: 'ملغي', date: '4 نوفمبر 2026', acct: 'PayPal · info@ufuq.om', ...emptyPayout, reviewedBy: 'المورد' },
+      { id: 10, vid: 1, amt: 600, st: 'مرفوض', date: '25 أكتوبر 2026', acct: 'محفظة إلكترونية · فودافون كاش · 010 0123 4567', ...emptyPayout, reason: 'رقم المحفظة غير مسجل باسم المسوق بالعمولة', reviewedBy: 'محمد الكندي' },
+      { id: 11, vid: 2, amt: 8.5, st: 'ملغي', date: '4 نوفمبر 2026', acct: 'PayPal · info@ufuq.om', ...emptyPayout, reviewedBy: 'المسوق بالعمولة' },
       { id: 12, vid: 2, amt: 15, st: 'تم التحويل', date: '12 أكتوبر 2026', acct: 'PayPal · info@ufuq.om', ...emptyPayout, ref: 'PP-9X41-22A', fileName: 'paypal-9x41.pdf', reviewedBy: 'محمد الكندي', executedBy: 'محمد الكندي' },
       { id: 13, vid: 2, amt: 5, st: 'مرفوض', date: '8 أكتوبر 2026', acct: 'حساب بنكي · بنك مسقط · OM81 0270 0000 1111', ...emptyPayout, reason: 'المبلغ أقل من الحد الأدنى للسحب', reviewedBy: 'محمد الكندي' },
-      { id: 14, vid: 3, amt: 150, st: 'ملغي', date: '5 نوفمبر 2026', acct: 'محفظة إلكترونية · STC Pay · 055 123 4567', ...emptyPayout, reviewedBy: 'المورد' },
+      { id: 14, vid: 3, amt: 150, st: 'ملغي', date: '5 نوفمبر 2026', acct: 'محفظة إلكترونية · STC Pay · 055 123 4567', ...emptyPayout, reviewedBy: 'المسوق بالعمولة' },
       { id: 15, vid: 3, amt: 250, st: 'تم التحويل', date: '10 أكتوبر 2026', acct: 'حساب بنكي · مصرف الراجحي · SA44 2000 0001 2345', ...emptyPayout, ref: 'TRX-66302', fileName: 'transfer-66302.pdf', reviewedBy: 'محمد الكندي', executedBy: 'محمد الكندي' },
       { id: 16, vid: 3, amt: 120, st: 'تم التحويل', date: '2 أكتوبر 2026', acct: 'محفظة إلكترونية · STC Pay · 055 123 4567', ...emptyPayout, ref: 'STC-310778', fileName: 'stc-310778.png', reviewedBy: 'محمد الكندي', executedBy: 'محمد الكندي' },
       { id: 17, vid: 3, amt: 90, st: 'مرفوض', date: '27 سبتمبر 2026', acct: 'حساب بنكي · مصرف الراجحي · SA44 2000 0001 2345', ...emptyPayout, reason: 'رقم الآيبان غير صحيح، يرجى تصحيحه وإعادة الطلب', reviewedBy: 'محمد الكندي' },
@@ -222,23 +222,23 @@ export const useVendorsAdminStore = create<State>((set, get) => {
 
     addVendor: (v) => {
       if (get().vendors.some((x) => x.email.toLowerCase() === v.email.toLowerCase())) {
-        return { ok: false, error: 'هذا البريد الإلكتروني مسجل لمورد آخر' };
+        return { ok: false, error: 'هذا البريد الإلكتروني مسجل لمسوق بالعمولة آخر' };
       }
       set((s) => ({
         vendors: [...s.vendors, { id: nid(), ...v, country: FX[v.cur].country, status: 'دعوة مرسلة', bankLock: false, accounts: [] }],
       }));
-      addLog('vendor_created', v.name, 'إضافة مورد جديد وإرسال دعوة له');
+      addLog('vendor_created', v.name, 'إضافة مسوق بالعمولة جديد وإرسال دعوة له');
       return { ok: true };
     },
     editVendor: (id, v) => {
       if (get().vendors.some((x) => x.id !== id && x.email.toLowerCase() === v.email.toLowerCase())) {
-        return { ok: false, error: 'هذا البريد الإلكتروني مسجل لمورد آخر' };
+        return { ok: false, error: 'هذا البريد الإلكتروني مسجل لمسوق بالعمولة آخر' };
       }
       const old = get().vendors.find((x) => x.id === id) as Vendor;
       set((s) => ({ vendors: s.vendors.map((x) => (x.id === id ? { ...x, ...v, country: FX[v.cur].country } : x)) }));
       const parts: string[] = [];
       if (old.rate !== v.rate) parts.push(`النسبة من ${old.rate}% إلى ${v.rate}%`);
-      if (old.email.toLowerCase() !== v.email.toLowerCase()) parts.push('تغيير البريد (سُجّل خروج المورد وأُرسل تأكيد إلى البريد الجديد)');
+      if (old.email.toLowerCase() !== v.email.toLowerCase()) parts.push('تغيير البريد (سُجّل خروج المسوق بالعمولة وأُرسل تأكيد إلى البريد الجديد)');
       if (old.phone.replace(/\s/g, '') !== v.phone.replace(/\s/g, '')) parts.push('تغيير الجوال (بعد تأكيد الرمز)');
       addLog('vendor_updated', v.name, parts.length ? `تعديل البيانات · ${parts.join(' · ')}` : 'تعديل البيانات');
       return { ok: true };
@@ -247,7 +247,7 @@ export const useVendorsAdminStore = create<State>((set, get) => {
       const v = get().vendors.find((x) => x.id === id) as Vendor;
       const freezing = v.status === 'نشط';
       set((s) => ({ vendors: s.vendors.map((x) => (x.id === id ? { ...x, status: freezing ? 'مجمّد' : 'نشط' } : x)) }));
-      addLog(freezing ? 'vendor_frozen' : 'vendor_unfrozen', v.name, freezing ? 'تجميد المورد' : 'إلغاء تجميد المورد');
+      addLog(freezing ? 'vendor_frozen' : 'vendor_unfrozen', v.name, freezing ? 'تجميد المسوق بالعمولة' : 'إلغاء تجميد المسوق بالعمولة');
     },
     resendInvite: (id) => {
       const v = get().vendors.find((x) => x.id === id) as Vendor;
@@ -274,7 +274,7 @@ export const useVendorsAdminStore = create<State>((set, get) => {
     },
     saveSettings: (settings) => {
       set({ settings });
-      addLog('vendor_settings_updated', 'إعدادات الموردين', 'تعديل القيم الافتراضية');
+      addLog('vendor_settings_updated', 'إعدادات المسوقين بالعمولة', 'تعديل القيم الافتراضية');
     },
   };
 });

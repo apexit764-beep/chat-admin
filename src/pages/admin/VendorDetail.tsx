@@ -26,9 +26,9 @@ export default function VendorDetail(): JSX.Element {
   if (!v) {
     return (
       <div className="p-6 space-y-3">
-        <p className="text-muted-foreground">المورد غير موجود.</p>
+        <p className="text-muted-foreground">المسوق بالعمولة غير موجود.</p>
         <Button asChild variant="outline">
-          <Link to="/vendors">العودة إلى الموردين</Link>
+          <Link to="/vendors">العودة إلى المسوقين بالعمولة</Link>
         </Button>
       </div>
     );
@@ -51,7 +51,7 @@ export default function VendorDetail(): JSX.Element {
     <div className="p-4 lg:p-6 space-y-4 page-fade">
       <Link to="/vendors" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
         <ArrowRight className="h-4 w-4" />
-        الموردون
+        المسوقون بالعمولة
       </Link>
       <div className="flex items-center gap-3">
         <Avatar className="h-14 w-14 rounded-xl">
@@ -68,14 +68,14 @@ export default function VendorDetail(): JSX.Element {
         </div>
       </div>
 
-      {v.status === 'مجمّد' && <Note tone="error">المورد مجمّد: لا يمكنه طلب سحب، ولا تُسجل له عمولات جديدة.</Note>}
+      {v.status === 'مجمّد' && <Note tone="error">المسوق بالعمولة مجمّد: لا يمكنه طلب سحب، ولا تُسجل له عمولات جديدة.</Note>}
 
       {selfEdits.length > 0 && (
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base">
               <UserCheck className="h-4 w-4 text-sky-500" />
-              تعديلات المورد على بياناته
+              تعديلات المسوق بالعمولة على بياناته
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -129,7 +129,7 @@ export default function VendorDetail(): JSX.Element {
           </CardHeader>
           <CardContent className="space-y-1.5 text-sm">
             <div>نسبة العمولة: <b>{v.rate}%</b> من أول اشتراك</div>
-            <div className="text-muted-foreground">العملة: {FX[v.cur].sym} (عملة دولة المورد)</div>
+            <div className="text-muted-foreground">العملة: {FX[v.cur].sym} (عملة دولة المسوق بالعمولة)</div>
           </CardContent>
         </Card>
       </div>

@@ -48,8 +48,8 @@ function VendorFormDialog({ vendor, onClose }: { vendor: Vendor | 'new'; onClose
       return showToast(r.error, 'error');
     }
     showToast(
-      isNew ? 'تمت إضافة المورد وإرسال بريد الدعوة'
-        : emailChanged ? 'تم الحفظ، وسُجّل خروج المورد وأُرسل بريد تأكيد إلى البريد الجديد'
+      isNew ? 'تمت إضافة المسوق بالعمولة وإرسال بريد الدعوة'
+        : emailChanged ? 'تم الحفظ، وسُجّل خروج المسوق بالعمولة وأُرسل بريد تأكيد إلى البريد الجديد'
         : 'تم الحفظ'
     );
     onClose();
@@ -73,7 +73,7 @@ function VendorFormDialog({ vendor, onClose }: { vendor: Vendor | 'new'; onClose
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{step === 'otp' ? 'تأكيد رقم الجوال الجديد' : isNew ? 'إضافة مورد' : 'تعديل بيانات المورد'}</DialogTitle>
+          <DialogTitle>{step === 'otp' ? 'تأكيد رقم الجوال الجديد' : isNew ? 'إضافة مسوق بالعمولة' : 'تعديل بيانات المسوق بالعمولة'}</DialogTitle>
         </DialogHeader>
         {step === 'otp' ? (
           <OtpStep phone={f.phone} onVerified={save} onBack={() => setStep('form')} />
@@ -89,8 +89,8 @@ function VendorFormDialog({ vendor, onClose }: { vendor: Vendor | 'new'; onClose
             <Label>البريد الإلكتروني *</Label>
             <Input dir="ltr" value={f.email} onChange={(e) => set('email', e.target.value)} />
             <FieldHint>
-              مطلوب. بريد إلكتروني بصيغة صحيحة وغير مسجّل لمورد آخر.
-              {!isNew && ' وعند تغييره يُسجَّل خروج المورد تلقائيًا ويُرسل بريد تأكيد (CONFIRMATION) إلى البريد الجديد.'}
+              مطلوب. بريد إلكتروني بصيغة صحيحة وغير مسجّل لمسوق بالعمولة آخر.
+              {!isNew && ' وعند تغييره يُسجَّل خروج المسوق بالعمولة تلقائيًا ويُرسل بريد تأكيد (CONFIRMATION) إلى البريد الجديد.'}
             </FieldHint>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
@@ -126,7 +126,7 @@ function VendorFormDialog({ vendor, onClose }: { vendor: Vendor | 'new'; onClose
           </div>
           <Note>
             {isNew
-              ? 'سيصل إلى المورد بريد لإنشاء كلمة المرور والموافقة على شروط البرنامج.'
+              ? 'سيصل إلى المسوق بالعمولة بريد لإنشاء كلمة المرور والموافقة على شروط البرنامج.'
               : 'تغيير نسبة العمولة يُطبَّق على الاشتراكات الجديدة بعد التعديل فقط. وتغيير الدولة يغيّر عملة العمولات الجديدة فقط.'}
           </Note>
         </div>
@@ -172,33 +172,33 @@ export default function Vendors(): JSX.Element {
     const ok = await confirm({
       title: freezing ? `تجميد ${v.name}؟` : `إلغاء تجميد ${v.name}؟`,
       message: freezing
-        ? 'لن يتمكن المورد من طلب سحب أو إضافة عملاء ولا تُسجل له عمولات جديدة، وسيصله بريد بذلك.'
+        ? 'لن يتمكن المسوق بالعمولة من طلب سحب أو إضافة عملاء ولا تُسجل له عمولات جديدة، وسيصله بريد بذلك.'
         : 'سيعود حسابه نشطًا ويصله بريد بذلك.',
       variant: freezing ? 'warning' : undefined,
       confirmText: freezing ? 'تجميد' : 'إلغاء التجميد',
     });
     if (!ok) return;
     toggleFreeze(v.id);
-    showToast(freezing ? 'تم تجميد المورد' : 'تم إلغاء تجميد المورد');
+    showToast(freezing ? 'تم تجميد المسوق بالعمولة' : 'تم إلغاء تجميد المسوق بالعمولة');
   };
 
   return (
     <div className="p-4 lg:p-6 space-y-4 page-fade">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-bold">الموردون</h2>
+          <h2 className="text-2xl font-bold">المسوقون بالعمولة</h2>
           <p className="text-sm text-muted-foreground">مسوّقون من خارج النظام يجلبون عملاء ويحصلون على عمولة عن أول اشتراك</p>
         </div>
         <Button className="gap-2" onClick={() => setForm('new')}>
           <Plus className="h-4 w-4" />
-          إضافة مورد
+          إضافة مسوق بالعمولة
         </Button>
       </div>
 
       <Card>
         <CardContent className="space-y-3 p-4">
           <div className="flex flex-wrap gap-2">
-            <Input className="min-w-[220px] flex-1" placeholder="ابحث باسم المورد أو البريد الإلكتروني..." value={q} onChange={(e) => setQ(e.target.value)} />
+            <Input className="min-w-[220px] flex-1" placeholder="ابحث باسم المسوق بالعمولة أو البريد الإلكتروني..." value={q} onChange={(e) => setQ(e.target.value)} />
             <FilterSelect value={status} onChange={setStatus} options={[['all', 'الحالة: الكل'], ['نشط', 'نشط'], ['مجمّد', 'مجمّد'], ['دعوة مرسلة', 'دعوة مرسلة']]} />
             <FilterSelect value={country} onChange={setCountry} options={[['all', 'الدولة: الكل'], ...[...new Set(vendors.map((v) => v.country))].map((c): [string, string] => [c, c])]} />
             <FilterSelect value={balance} onChange={setBalance} options={[['all', 'الرصيد: الكل'], ['avail', 'لديه رصيد متاح'], ['open', 'لديه طلب سحب مفتوح']]} />
@@ -208,7 +208,7 @@ export default function Vendors(): JSX.Element {
           <Table>
             <TableHeader>
               <TableRow>
-                {['اسم المورد', 'رقم الجوال', 'البريد الإلكتروني', 'الدولة', 'العمولة', 'العملاء', 'الاشتراكات', 'الحالة', ''].map((h, i) => (
+                {['اسم المسوق بالعمولة', 'رقم الجوال', 'البريد الإلكتروني', 'الدولة', 'العمولة', 'العملاء', 'الاشتراكات', 'الحالة', ''].map((h, i) => (
                   <TableHead key={i} className="text-start">
                     {h}
                   </TableHead>
@@ -219,7 +219,7 @@ export default function Vendors(): JSX.Element {
               {list.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={9} className="py-10 text-center text-muted-foreground">
-                    لا يوجد موردون بهذا الفلتر.
+                    لا يوجد مسوقون بالعمولة بهذا الفلتر.
                   </TableCell>
                 </TableRow>
               )}
@@ -256,7 +256,7 @@ export default function Vendors(): JSX.Element {
                             إعادة إرسال الدعوة
                           </Button>
                         ) : (
-                          <Switch checked={v.status === 'نشط'} onCheckedChange={() => void onToggle(v)} aria-label="تجميد المورد" />
+                          <Switch checked={v.status === 'نشط'} onCheckedChange={() => void onToggle(v)} aria-label="تجميد المسوق بالعمولة" />
                         )}
                       </span>
                     </TableCell>

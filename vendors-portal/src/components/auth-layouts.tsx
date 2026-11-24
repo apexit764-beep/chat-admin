@@ -19,7 +19,7 @@ export function AuthBox({ children }: { children: React.ReactNode }): JSX.Elemen
             <img src="/qhub-icon.svg" alt="" className="h-9 w-9 rounded-lg" />
             <div className="leading-tight">
               <div className="font-bold">Qhub Partners</div>
-              <div className="text-xs text-muted-foreground">بوابة الموردين</div>
+              <div className="text-xs text-muted-foreground">بوابة المسوقين بالعمولة</div>
             </div>
           </div>
           <span className="hidden items-center gap-1.5 text-xs text-muted-foreground sm:inline-flex">
@@ -52,7 +52,7 @@ export function AuthBox({ children }: { children: React.ReactNode }): JSX.Elemen
           </div>
         </div>
 
-        <p className="text-center text-[11px] text-muted-foreground">© Qhub · برنامج الموردين</p>
+        <p className="text-center text-[11px] text-muted-foreground">© Qhub · برنامج المسوقين بالعمولة</p>
       </div>
       <Toast />
     </div>

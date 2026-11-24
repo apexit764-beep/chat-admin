@@ -280,7 +280,7 @@ export default function AdminClients(): JSX.Element {
         }
         return v ? (
           <span className="inline-flex items-center gap-1.5">
-            <Badge variant="secondary" className="bg-violet-100 text-violet-700">مورد</Badge>
+            <Badge variant="secondary" className="bg-violet-100 text-violet-700">مسوق</Badge>
             <button
               className="text-xs text-primary hover:underline"
               onClick={(e) => { e.stopPropagation(); navigate(`/vendors/${v.id}`); }}
@@ -504,16 +504,16 @@ export default function AdminClients(): JSX.Element {
                 <SelectItem value="all">المصدر: الكل</SelectItem>
                 <SelectItem value="direct">مباشر</SelectItem>
                 <SelectItem value="referrer">عن طريق مروّج</SelectItem>
-                <SelectItem value="vendor">عن طريق مورد</SelectItem>
+                <SelectItem value="vendor">عن طريق مسوق بالعمولة</SelectItem>
               </SelectContent>
             </Select>
             {sourceFilter === 'vendor' && (
               <Select value={vendorFilter} onValueChange={(v) => setVendorFilter(v)}>
                 <SelectTrigger className="h-9 w-[160px] rounded-lg text-sm">
-                  <SelectValue placeholder="كل الموردين" />
+                  <SelectValue placeholder="كل المسوقين بالعمولة" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">كل الموردين</SelectItem>
+                  <SelectItem value="all">كل المسوقين بالعمولة</SelectItem>
                   {vendors.map((v) => <SelectItem key={v.id} value={String(v.id)}>{v.name}</SelectItem>)}
                 </SelectContent>
               </Select>

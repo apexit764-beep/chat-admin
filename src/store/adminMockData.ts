@@ -1226,9 +1226,9 @@ export const activityLog: ActivityEntry[] = [
   { id: 'act_vp1', action: 'vendor_profile_changed', actor: 'محمود حسن', actorEmail: 'mahmoud@agency.com', actorRole: 'client', target: 'محمود حسن', details: 'الصورة الشخصية · رفع صورة جديدة', timestamp: nowMinus(40) },
   { id: 'act_vp2', action: 'vendor_profile_changed', actor: 'محمود حسن', actorEmail: 'mahmoud@agency.com', actorRole: 'client', target: 'محمود حسن', details: 'كلمة المرور · تم التغيير', timestamp: nowMinus(1500) },
   { id: 'act_vp3', action: 'vendor_profile_changed', actor: 'وكالة المدار', actorEmail: 'hello@madar.sa', actorRole: 'client', target: 'وكالة المدار', details: 'رقم الجوال · من +966 55 000 1111 إلى +966 55 123 4567 · تم التحقق برمز OTP', timestamp: nowMinus(4300) },
-  { id: 'act_v1', action: 'vendor_commission_recorded', actor: 'النظام', actorEmail: '', actorRole: 'system', target: 'TechFlow Egypt', details: 'تسجيل عمولة للمورد محمود حسن', timestamp: nowMinus(95) },
+  { id: 'act_v1', action: 'vendor_commission_recorded', actor: 'النظام', actorEmail: '', actorRole: 'system', target: 'TechFlow Egypt', details: 'تسجيل عمولة للمسوق بالعمولة محمود حسن', timestamp: nowMinus(95) },
   { id: 'act_v2', action: 'vendor_payout_transferred', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', actorRole: 'admin', target: 'PO-0003', details: 'الموافقة وتنفيذ التحويل · رقم العملية TRX-88120', timestamp: nowMinus(180) },
-  { id: 'act_v3', action: 'vendor_payout_rejected', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', actorRole: 'admin', target: 'PO-0002', details: 'رفض طلب السحب · اسم صاحب الحساب البنكي لا يطابق اسم المورد', timestamp: nowMinus(260) },
+  { id: 'act_v3', action: 'vendor_payout_rejected', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', actorRole: 'admin', target: 'PO-0002', details: 'رفض طلب السحب · اسم صاحب الحساب البنكي لا يطابق اسم المسوق بالعمولة', timestamp: nowMinus(260) },
   // Global admin actions
   { id: 'act_1', action: 'admin_login', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', actorRole: 'admin', timestamp: nowMinus(2), ip: '185.69.144.12' },
   { id: 'act_7', action: 'plan_updated', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', actorRole: 'admin', target: 'الاحترافي', details: 'تحديث حدود المحادثات: 5,000 → 10,000', timestamp: nowMinus(420) },

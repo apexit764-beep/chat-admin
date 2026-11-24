@@ -88,7 +88,7 @@ export function PayoutsTable({ list, showVendor }: { list: Payout[]; showVendor:
       <Table>
         <TableHeader>
           <TableRow>
-            {['#', ...(showVendor ? ['المورد'] : []), 'المبلغ', 'التاريخ', 'الحالة', 'المنفّذ', ''].map((h, i) => (
+            {['#', ...(showVendor ? ['المسوق بالعمولة'] : []), 'المبلغ', 'التاريخ', 'الحالة', 'المنفّذ', ''].map((h, i) => (
               <TableHead key={i} className="text-start">
                 {h}
               </TableHead>
@@ -176,7 +176,7 @@ function ApproveDialog({ payout, vendor, onClose, onApproved }: { payout: Payout
           <DialogTitle>موافقة على طلب السحب · {poNo(payout.id)}</DialogTitle>
         </DialogHeader>
         <div className="space-y-1.5 rounded-xl border p-4 text-sm">
-          <div>المورد: <b>{vendor.name}</b></div>
+          <div>المسوق بالعمولة: <b>{vendor.name}</b></div>
           <div>المبلغ: <b><Money v={payout.amt} cur={vendor.cur} /></b></div>
           <div>تاريخ الطلب: <b>{payout.date}</b></div>
           <div>طريقة التحويل: <b>{payout.acct}</b></div>
@@ -206,9 +206,9 @@ function RejectDialog({ payout, onClose }: { payout: Payout; onClose: () => void
         <div className="space-y-1.5">
           <Label>سبب الرفض *</Label>
           <Textarea rows={3} maxLength={300} value={reason} onChange={(e) => setReason(e.target.value)} />
-          <FieldHint>مطلوب. من 3 إلى 300 حرف، ويظهر للمورد كما كُتب.</FieldHint>
+          <FieldHint>مطلوب. من 3 إلى 300 حرف، ويظهر للمسوق بالعمولة كما كُتب.</FieldHint>
         </div>
-        <Note>يعود المبلغ "متاح" لدى المورد، ويرى سبب الرفض.</Note>
+        <Note>يعود المبلغ "متاح" لدى المسوق بالعمولة، ويرى سبب الرفض.</Note>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
             إلغاء
@@ -242,7 +242,7 @@ function ExecuteDialog({ payout, vendor, onClose }: { payout: Payout; vendor: Ve
     if (file.size > MAX_RECEIPT_MB * 1024 * 1024) return showToast(`حجم الملف يتجاوز ${MAX_RECEIPT_MB} ميجابايت`, 'error');
     const done = (img: string): void => {
       execute(payout.id, ref.trim(), file.name, img);
-      showToast('تم، وسيرى المورد صورة التحويل');
+      showToast('تم، وسيرى المسوق بالعمولة صورة التحويل');
       onClose();
     };
     if (file.type.startsWith('image/')) {
@@ -259,7 +259,7 @@ function ExecuteDialog({ payout, vendor, onClose }: { payout: Payout; vendor: Ve
           <DialogTitle>تنفيذ التحويل</DialogTitle>
         </DialogHeader>
         <div className="text-sm">
-          المورد: <b>{vendor.name}</b> · <b><Money v={payout.amt} cur={vendor.cur} /></b>
+          المسوق بالعمولة: <b>{vendor.name}</b> · <b><Money v={payout.amt} cur={vendor.cur} /></b>
           <div className="text-muted-foreground">إلى: {payout.acct}</div>
         </div>
         <div className="space-y-1.5">
