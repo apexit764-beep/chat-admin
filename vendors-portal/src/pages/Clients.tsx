@@ -31,6 +31,10 @@ const CODES = [
   ['+971', '🇦🇪 +971'],
 ];
 
+const COUNTRY_BY_CODE: Record<string, string> = { '+20': 'مصر', '+968': 'عمان', '+966': 'السعودية', '+970': 'فلسطين', '+971': 'الإمارات' };
+/** the client's country follows the dial code of the phone number */
+const countryOf = (phone: string): string => COUNTRY_BY_CODE[phone.trim().split(/\s+/)[0]] ?? '—';
+
 function AddClientDialog({ open, onClose }: { open: boolean; onClose: () => void }): JSX.Element {
   const addClient = useVendorStore((s) => s.addClient);
   const showToast = useUIStore((s) => s.showToast);
@@ -205,7 +209,7 @@ export default function Clients(): JSX.Element {
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow>
-                {['العميل', 'طريقة الإضافة', 'تاريخ الإضافة', 'الحالة', 'الباقة', 'الدورة', 'العمولة', 'الإجراءات'].map((h) => (
+                {['العميل', 'الدولة', 'طريقة الإضافة', 'تاريخ الإضافة', 'الحالة', 'الباقة', 'الدورة', 'العمولة', 'الإجراءات'].map((h) => (
                   <TableHead key={h} className="text-start">
                     {h}
                   </TableHead>
@@ -215,7 +219,7 @@ export default function Clients(): JSX.Element {
             <TableBody>
               {filtered.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={8} className="py-10 text-center text-muted-foreground">
+                  <TableCell colSpan={9} className="py-10 text-center text-muted-foreground">
                     {mine.length === 0 ? 'لم تُضف أي عميل بعد.' : 'لا يوجد عملاء بهذا الفلتر.'}
                   </TableCell>
                 </TableRow>
@@ -228,6 +232,7 @@ export default function Clients(): JSX.Element {
                       {c.name}
                       <div className="text-xs text-muted-foreground">{c.email}</div>
                     </TableCell>
+                    <TableCell>{countryOf(c.phone)}</TableCell>
                     <TableCell>
                       <StatusPill text={c.via ?? 'دعوة'} />
                     </TableCell>
@@ -311,6 +316,7 @@ export default function Clients(): JSX.Element {
             <div>
               {row('البريد الإلكتروني', detail.email)}
               {row('رقم الجوال', <bdi dir="ltr">{detail.phone}</bdi>)}
+              {row('الدولة', countryOf(detail.phone))}
               {row('طريقة الإضافة', detail.via === 'رابط' ? 'رابط التسجيل' : 'دعوة')}
               {row('تاريخ الإضافة', detail.date)}
               {row('الحالة', <StatusPill text={detail.state} />)}
