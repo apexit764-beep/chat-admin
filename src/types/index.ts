@@ -352,8 +352,6 @@ export interface Invoice {
   status: InvoiceStatus;
   dueDate: string;
   paidAt?: string;
-  /** referral reward applied to this invoice, in the invoice currency (already deducted from the amount) */
-  referralDiscount?: number;
   items: Array<{ description: string; quantity: number; unitPrice: number; total: number }>;
   notes?: string;
   createdAt: string;

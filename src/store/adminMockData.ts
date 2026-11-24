@@ -643,6 +643,7 @@ export const clients: Client[] = [
   {
     id: 'client_7',
     companyName: 'الفجيرة للسياحة',
+    referredBy: 'client_3',
     contactName: 'علياء النعيمي',
     email: 'a.alnuaimi@fuj-tourism.ae',
     phone: '+971502223333',
@@ -667,6 +668,7 @@ export const clients: Client[] = [
   {
     id: 'client_8',
     companyName: 'Royal Auto Kuwait',
+    referredBy: 'client_3',
     contactName: 'عبدالعزيز السبيعي',
     email: 'a.alsubaie@royal-auto.kw',
     phone: '+965999888777',
@@ -736,6 +738,7 @@ export const clients: Client[] = [
   {
     id: 'client_11',
     companyName: 'صالون لمسة جمال',
+    referredBy: 'client_5',
     contactName: 'هدى الجابري',
     email: 'h.aljabri@lamsa.bh',
     phone: '+97333445566',
@@ -760,6 +763,7 @@ export const clients: Client[] = [
   {
     id: 'client_12',
     companyName: 'مزرعة البركة',
+    referredBy: 'client_5',
     contactName: 'محمد العنزي',
     email: 'm.alenezi@baraka.jo',
     phone: '+962777889900',
@@ -808,6 +812,7 @@ export const clients: Client[] = [
   {
     id: 'client_14',
     companyName: 'وكالة سما للتصميم',
+    referredBy: 'client_6',
     contactName: 'نورة القحطاني',
     email: 'n.alqahtani@sama.sa',
     phone: '+966505556666',
@@ -832,6 +837,7 @@ export const clients: Client[] = [
   {
     id: 'client_15',
     companyName: 'مطعم بيت الكرم',
+    referredBy: 'client_6',
     contactName: 'عمر الحسيني',
     email: 'o.alhusseini@karam.jo',
     phone: '+962791234567',
@@ -993,19 +999,7 @@ const baseInvoices: Invoice[] = clients
     return list;
   });
 
-// a free referral month already applied to one renewal invoice of the referrer (client_2): the whole month is discounted
-export const invoices: Invoice[] = baseInvoices.map((inv) => {
-  if (inv.id !== 'inv_client_2_1') return inv;
-  const disc = inv.amount;
-  return {
-    ...inv,
-    amount: 0,
-    tax: 0,
-    total: 0,
-    referralDiscount: disc,
-    items: [...inv.items, { description: 'خصم مكافأة الإحالة (شهر مجاني)', quantity: 1, unitPrice: -disc, total: -disc }],
-  };
-});
+export const invoices: Invoice[] = baseInvoices;
 
 // =====================================================================
 // Transactions
@@ -1221,7 +1215,7 @@ export interface ActivityEntry {
 
 export const activityLog: ActivityEntry[] = [
   // Referral program
-  { id: 'act_r1', action: 'referral_settings_updated', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', actorRole: 'admin', target: 'برنامج المروّجين', details: 'تعديل مكافأة الاشتراك السنوي: 2 → 3 شهور', timestamp: nowMinus(60 * 24 * 12) },
+  { id: 'act_r1', action: 'referral_settings_updated', actor: 'محمد الكندي', actorEmail: 'admin@apexes.click', actorRole: 'admin', target: 'برنامج المروّجين', details: 'تعديل النقاط · نقاط باقة الأعمال (شهري): 1000 → 1500', timestamp: nowMinus(60 * 24 * 12) },
   // Vendors
   { id: 'act_vp1', action: 'vendor_profile_changed', actor: 'محمود حسن', actorEmail: 'mahmoud@agency.com', actorRole: 'client', target: 'محمود حسن', details: 'الصورة الشخصية · رفع صورة جديدة', timestamp: nowMinus(40) },
   { id: 'act_vp2', action: 'vendor_profile_changed', actor: 'محمود حسن', actorEmail: 'mahmoud@agency.com', actorRole: 'client', target: 'محمود حسن', details: 'كلمة المرور · تم التغيير', timestamp: nowMinus(1500) },

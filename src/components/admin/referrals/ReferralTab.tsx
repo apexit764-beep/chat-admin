@@ -2,34 +2,33 @@ import { Copy, Gift } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
-import { monthValueUsd, referralLink, statsFor, useReferralsStore } from '@/store/useReferralsStore';
+import { TIERS, referralLink, statsFor, useReferralsStore } from '@/store/useReferralsStore';
 import { formatDate } from '@/utils/format';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { MiniStat, Note, StatusPill } from '@/components/admin/vendors/VendorBits';
+import { MiniStat, Note } from '@/components/admin/vendors/VendorBits';
 
 const usd = (n: number): string => `$${n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
-/** the «الترويج» tab of a client: its referral link, the people who signed up through it, and its reward months */
+/** the «الترويج» tab of a client: its referral link, the people who signed up through it, and the points it earned */
 export function ReferralTab({ clientId }: { clientId: string }): JSX.Element {
   const navigate = useNavigate();
   const clients = useAdminStore((s) => s.clients);
   const showToast = useUIStore((s) => s.showToast);
-  const { settings, referrals, lots } = useReferralsStore();
+  const { settings, referrals } = useReferralsStore();
   const mine = referrals.filter((r) => r.referrerId === clientId);
-  const myLots = lots.filter((l) => l.referrerId === clientId);
-  const stats = statsFor(clientId, referrals, lots);
+  const stats = statsFor(clientId, referrals);
   const nameOf = (id: string): string => clients.find((c) => c.id === id)?.companyName ?? '—';
   const subs = mine.filter((r) => r.state === 'اشترك');
   const regs = mine.filter((r) => r.state !== 'اشترك');
   const link = referralLink(clientId);
-  /** a free month is worth one month of this client's own plan */
-  const monthValue = monthValueUsd(clientId);
+  const tierName = (t?: string): string => TIERS.find(([k]) => k === t)?.[1] ?? '—';
+  const fmt = (n: number): string => n.toLocaleString('en-US');
 
   return (
     <div className="space-y-4">
-      {!settings.on && <Note tone="warn">برنامج المروّجين متوقف، فلا يظهر رابط الإحالة للعميل. وتستمر المكافآت المكتسبة سابقًا بشكل طبيعي.</Note>}
+      {!settings.on && <Note tone="warn">برنامج المروّجين متوقف، فلا يظهر رابط الإحالة للعميل. وتبقى النقاط المكتسبة سابقًا كما هي.</Note>}
 
       <Card>
         <CardHeader className="pb-3">
@@ -57,8 +56,8 @@ export function ReferralTab({ clientId }: { clientId: string }): JSX.Element {
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <MiniStat label="سجّلوا من رابطه" value={stats.registered} />
         <MiniStat label="اشتركوا فعلًا" value={stats.subscribed} />
-        <MiniStat tone="green" label="الشهور المتبقية" value={stats.remaining} />
-        <MiniStat tone="blue" label="الشهور المستخدمة" value={<span>{stats.usedMonths} <small className="text-sm font-normal">(<bdi dir="ltr">{usd(stats.usedMonths * monthValue)}</bdi>)</small></span>} />
+        <MiniStat tone="green" label="رصيد النقاط" value={fmt(stats.points)} />
+        <MiniStat tone="blue" label="متوسط النقاط لكل مشترك" value={stats.subscribed ? fmt(Math.round(stats.points / stats.subscribed)) : '—'} />
       </div>
 
       {mine.length === 0 ? (
@@ -78,7 +77,7 @@ export function ReferralTab({ clientId }: { clientId: string }): JSX.Element {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    {['المشترك', 'تاريخ الاشتراك', 'نوع الاشتراك', 'دفع', 'الشهور المكتسبة', 'قيمة الشهور'].map((h) => (
+                    {['المشترك', 'تاريخ الاشتراك', 'الباقة', 'نوع الاشتراك', 'دفع', 'النقاط المكتسبة'].map((h) => (
                       <TableHead key={h} className="text-start">{h}</TableHead>
                     ))}
                   </TableRow>
@@ -93,12 +92,10 @@ export function ReferralTab({ clientId }: { clientId: string }): JSX.Element {
                         <button className="text-primary hover:underline" onClick={() => navigate(`/clients/${r.clientId}`)}>{nameOf(r.clientId)}</button>
                       </TableCell>
                       <TableCell>{formatDate(r.at)}</TableCell>
+                      <TableCell>{tierName(r.tier)}</TableCell>
                       <TableCell>{r.cycle}</TableCell>
                       <TableCell><bdi dir="ltr">{usd(r.paid ?? 0)}</bdi></TableCell>
-                      <TableCell>{r.months}</TableCell>
-                      <TableCell className="whitespace-nowrap">
-                        <bdi dir="ltr">{r.months > 1 ? `${r.months} × ` : ''}{usd(monthValue)}</bdi>
-                      </TableCell>
+                      <TableCell className="whitespace-nowrap font-semibold text-emerald-700"><bdi dir="ltr">+{fmt(r.points)}</bdi></TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -136,26 +133,24 @@ export function ReferralTab({ clientId }: { clientId: string }): JSX.Element {
 
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-base">سجل الشهور</CardTitle>
+              <CardTitle className="text-base">سجل النقاط</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    {['الشهر', 'المكافأة', 'اكتُسب في', 'الحالة'].map((h) => (
+                    {['المصدر', 'النقاط', 'اكتُسبت في', 'الباقة'].map((h) => (
                       <TableHead key={h} className="text-start">{h}</TableHead>
                     ))}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {myLots.map((l) => (
-                    <TableRow key={l.id}>
-                      <TableCell>من {nameOf(l.fromClientId)}</TableCell>
-                      <TableCell>شهر مجاني (<bdi dir="ltr">{usd(monthValue)}</bdi>)</TableCell>
-                      <TableCell>{formatDate(l.earnedAt)}</TableCell>
-                      <TableCell>
-                        {l.st === 'مستخدم' ? <span className="inline-block whitespace-nowrap rounded-full bg-blue-100 px-2.5 py-0.5 text-[11px] font-bold text-blue-700">استُخدم · {l.inv}</span> : <StatusPill text={l.st} />}
-                      </TableCell>
+                  {subs.map((r) => (
+                    <TableRow key={r.id}>
+                      <TableCell>من {nameOf(r.clientId)}</TableCell>
+                      <TableCell className="font-semibold text-emerald-700"><bdi dir="ltr">+{fmt(r.points)}</bdi></TableCell>
+                      <TableCell>{formatDate(r.at)}</TableCell>
+                      <TableCell>{tierName(r.tier)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

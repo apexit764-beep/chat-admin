@@ -79,7 +79,6 @@ export default function AdminFinance(): JSX.Element {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | InvoiceStatus>('all');
   const [typeFilter, setTypeFilter] = useState<'all' | InvoiceType>('all');
-  const [referralFilter, setReferralFilter] = useState<'all' | 'yes' | 'no'>('all');
   const [clientKind, setClientKind] = useState<'all' | 'normal' | 'referrer'>('all');
   // a referrer is a client whose referral link brought in at least one person
   const referrals = useReferralsStore((s) => s.referrals);
@@ -119,31 +118,20 @@ export default function AdminFinance(): JSX.Element {
     [dateFiltered]
   );
 
-  const referralTotal = useMemo(
-    () => dateFiltered
-      .filter((inv) => inv.status !== 'scheduled')
-      .reduce((acc, inv) => acc + approxUSD(inv.referralDiscount ?? 0, inv.currency), 0),
-    [dateFiltered]
-  );
-
   const filteredInvoices = useMemo(() => {
     setCurrentPage(1);
     return dateFiltered.filter((inv) => {
       if (statusFilter !== 'all' && inv.status !== statusFilter) return false;
       if (typeFilter !== 'all' && inv.invoiceType !== typeFilter) return false;
       if (clientKind === 'normal' && referrerIds.has(inv.clientId)) return false;
-      if (clientKind === 'referrer') {
-        if (!referrerIds.has(inv.clientId)) return false;
-        if (referralFilter === 'yes' && !inv.referralDiscount) return false;
-        if (referralFilter === 'no' && inv.referralDiscount) return false;
-      }
+      if (clientKind === 'referrer' && !referrerIds.has(inv.clientId)) return false;
       if (search) {
         const client = clients.find((c) => c.id === inv.clientId);
         if (!inv.number.includes(search) && !(client?.companyName.includes(search) ?? false)) return false;
       }
       return true;
     });
-  }, [dateFiltered, statusFilter, typeFilter, referralFilter, clientKind, referrerIds, search, clients]);
+  }, [dateFiltered, statusFilter, typeFilter, clientKind, referrerIds, search, clients]);
 
   const totalPages = Math.max(1, Math.ceil(filteredInvoices.length / PAGE_SIZE));
   const paginatedInvoices = filteredInvoices.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
@@ -159,7 +147,6 @@ export default function AdminFinance(): JSX.Element {
           'النوع': invTypeLabel[inv.invoiceType],
           'المبلغ (USD)': Math.round(approxUSD(inv.amount, inv.currency) * 100) / 100,
           'الضريبة (USD)': Math.round(approxUSD(inv.tax, inv.currency) * 100) / 100,
-          'خصم الإحالة (USD)': Math.round(approxUSD(inv.referralDiscount ?? 0, inv.currency) * 100) / 100,
           'الإجمالي (USD)': Math.round(approxUSD(inv.total, inv.currency) * 100) / 100,
           'الحالة': invStatusLabel[inv.status],
           'تاريخ الاستحقاق': formatDate(inv.dueDate),
@@ -206,11 +193,10 @@ export default function AdminFinance(): JSX.Element {
         <p className="text-sm text-muted-foreground">إدارة الفواتير والتحصيل</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <StatCard label="إجمالي الفواتير" value={`$${Math.round(totalInvoices).toLocaleString('en-US')}`} icon={<Receipt className="h-5 w-5" />} iconBg="bg-primary/15" iconColor="text-primary" />
         <StatCard label="المحصّل" value={`$${Math.round(paidTotal).toLocaleString('en-US')}`} icon={<CheckCircle2 className="h-5 w-5" />} iconBg="bg-success/15" iconColor="text-success" />
         <StatCard label="فواتير فاشلة" value={`$${Math.round(failedTotal).toLocaleString('en-US')}`} icon={<AlertTriangle className="h-5 w-5" />} iconBg="bg-danger/15" iconColor="text-danger" />
-        <StatCard label="خصومات الإحالة" value={`$${(Math.round(referralTotal * 100) / 100).toLocaleString('en-US')}`} icon={<Gift className="h-5 w-5" />} iconBg="bg-violet-100" iconColor="text-violet-700" />
       </div>
 
       <Card className="overflow-hidden">
@@ -248,7 +234,7 @@ export default function AdminFinance(): JSX.Element {
               <SelectItem value="upgrade">ترقية</SelectItem>
             </SelectContent>
           </Select>
-          <Select value={clientKind} onValueChange={(v) => { setClientKind(v as 'all' | 'normal' | 'referrer'); setReferralFilter('all'); }}>
+          <Select value={clientKind} onValueChange={(v) => setClientKind(v as 'all' | 'normal' | 'referrer')}>
             <SelectTrigger className="w-auto min-w-[150px] h-9">
               <SelectValue placeholder="نوع العميل" />
             </SelectTrigger>
@@ -258,18 +244,6 @@ export default function AdminFinance(): JSX.Element {
               <SelectItem value="referrer">عملاء مروّجون</SelectItem>
             </SelectContent>
           </Select>
-          {clientKind === 'referrer' && (
-            <Select value={referralFilter} onValueChange={(v) => setReferralFilter(v as 'all' | 'yes' | 'no')}>
-              <SelectTrigger className="w-auto min-w-[150px] h-9">
-                <SelectValue placeholder="خصم الإحالة" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">خصم الإحالة: الكل</SelectItem>
-                <SelectItem value="yes">فيها خصم إحالة</SelectItem>
-                <SelectItem value="no">بدون خصم</SelectItem>
-              </SelectContent>
-            </Select>
-          )}
           <DateRangePicker value={dateRange} onChange={setDateRange} />
           <Button variant="outline" size="sm" onClick={handleExportInvoices} className="h-9 ms-auto">
             <Download className="h-4 w-4 me-2" /> CSV
@@ -303,7 +277,6 @@ export default function AdminFinance(): JSX.Element {
                   <TableHead className="text-start">رقم الفاتورة</TableHead>
                   <TableHead className="text-start">العميل</TableHead>
                   <TableHead className="text-start">النوع</TableHead>
-                  <TableHead className="text-start">خصم الإحالة</TableHead>
                   <TableHead className="text-start">الإجمالي (USD)</TableHead>
                   <TableHead className="text-start hidden lg:table-cell">تاريخ الاستحقاق</TableHead>
                   <TableHead className="text-start">الحالة</TableHead>
@@ -329,9 +302,6 @@ export default function AdminFinance(): JSX.Element {
                         <Badge variant={invTypeVariant[inv.invoiceType]} className="text-[10px]">
                           {invTypeLabel[inv.invoiceType]}
                         </Badge>
-                      </TableCell>
-                      <TableCell className="text-sm">
-                        {inv.referralDiscount ? <b className="text-emerald-700"><bdi dir="ltr">-{formatUSD(inv.referralDiscount, inv.currency)}</bdi></b> : <span className="text-muted-foreground">—</span>}
                       </TableCell>
                       <TableCell className="font-semibold">{formatUSD(inv.total, inv.currency)}</TableCell>
                       <TableCell className="hidden lg:table-cell text-sm text-muted-foreground">{formatDate(inv.dueDate)}</TableCell>
