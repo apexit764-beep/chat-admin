@@ -73,7 +73,7 @@ export function EarningsChart({ payouts, clients, cur }: { payouts: Payout[]; cl
             </defs>
             <CartesianGrid vertical={false} />
             <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={8} reversed />
-            <YAxis yAxisId="paid" orientation="right" tickLine={false} axisLine={false} width={48} tickFormatter={(v: number) => v.toLocaleString('en-US')} />
+            <YAxis yAxisId="paid" orientation="right" tickLine={false} axisLine={false} width={84} tickFormatter={(v: number) => `${v.toLocaleString('en-US')} ${FX[cur].sym}`} />
             <YAxis yAxisId="clients" orientation="left" hide allowDecimals={false} domain={[0, (max: number) => Math.max(4, max * 2)]} />
             <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
             <Area yAxisId="clients" dataKey="clients" type="natural" fill="url(#fillClients)" stroke="var(--color-clients)" />
