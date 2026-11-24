@@ -1,10 +1,12 @@
-export type Currency = 'EGP' | 'OMR' | 'SAR';
+export type Currency = 'EGP' | 'OMR' | 'SAR' | 'AED' | 'ILS';
 
 /** USD → vendor currency, for display only (same rates as the admin demo) */
 export const FX: Record<Currency, { sym: string; rate: number; decimals: number }> = {
   EGP: { sym: 'ج.م', rate: 48.5, decimals: 2 },
   OMR: { sym: 'ر.ع', rate: 0.385, decimals: 3 },
   SAR: { sym: 'ر.س', rate: 3.75, decimals: 2 },
+  AED: { sym: 'د.إ', rate: 3.6725, decimals: 2 },
+  ILS: { sym: 'ش.ج', rate: 3.7, decimals: 2 },
 };
 
 export const PLANS: Record<string, number> = { المبتدئ: 6, الاحترافي: 16, الأعمال: 38 };

@@ -145,6 +145,11 @@ const initialClients: VendorClient[] = [
   { id: 6, vid: 3, name: 'متجر السحاب', email: 'sahab@store.sa', phone: '+966 53 333 4444', plan: 'الأعمال', cycle: 'سنوي', state: 'اشترك', date: '12 سبتمبر 2026' },
   { id: 12, vid: 2, name: 'شركة الرؤية الرقمية', email: 'info@roya-digital.com', phone: '+20 100 555 6677', plan: 'الأعمال', cycle: 'سنوي', state: 'اشترك', via: 'رابط', date: '10 نوفمبر 2026' },
   { id: 13, vid: 2, name: 'مؤسسة الخليج للخدمات', email: 'hello@gulf-services.sa', phone: '+966 55 888 9900', plan: 'الاحترافي', cycle: 'شهري', state: 'اشترك', via: 'دعوة', date: '12 نوفمبر 2026' },
+  { id: 14, vid: 1, name: 'شركة النخيل للتجارة', email: 'info@nakheel-trade.om', phone: '+968 9345 1122', plan: 'الأعمال', cycle: 'سنوي', state: 'اشترك', via: 'دعوة', date: '8 نوفمبر 2026' },
+  { id: 15, vid: 1, name: 'مجموعة الصقر التقنية', email: 'hello@saqr-tech.sa', phone: '+966 50 777 8899', plan: 'الاحترافي', cycle: 'سنوي', state: 'اشترك', via: 'رابط', date: '11 نوفمبر 2026' },
+  { id: 16, vid: 1, name: 'متجر لؤلؤة دبي', email: 'sales@lulua-dubai.ae', phone: '+971 50 123 4567', plan: 'الأعمال', cycle: 'شهري', state: 'اشترك', via: 'دعوة', date: '7 نوفمبر 2026' },
+  { id: 17, vid: 1, name: 'مركز رام الله للتدريب', email: 'info@ramallah-training.ps', phone: '+970 59 222 3344', plan: 'الاحترافي', cycle: 'شهري', state: 'اشترك', via: 'رابط', date: '13 نوفمبر 2026' },
+  { id: 18, vid: 1, name: 'مطعم ذوق الرياض', email: 'order@zawq-riyadh.sa', phone: '+966 55 444 5566', plan: 'الأعمال', cycle: 'شهري', state: 'اشترك', via: 'دعوة', date: '5 نوفمبر 2026' },
 ];
 
 const comm = (cid: number, vid: number, cur: Currency, rate: number, st: CommissionState, left = 0): Commission => {
@@ -184,6 +189,11 @@ export const useVendorStore = create<VendorState>((set, get) => ({
     comm(9, 1, 'EGP', 30, 'متاحة'),
     comm(10, 1, 'EGP', 30, 'متاحة'),
     comm(11, 1, 'EGP', 30, 'متاحة'),
+    comm(14, 1, 'EGP', 30, 'متاحة'),
+    comm(15, 1, 'EGP', 30, 'معلّقة', 9),
+    comm(16, 1, 'EGP', 30, 'متاحة'),
+    comm(17, 1, 'EGP', 30, 'معلّقة', 24),
+    comm(18, 1, 'EGP', 30, 'متاحة'),
     comm(4, 2, 'OMR', 25, 'متاحة'),
     comm(12, 2, 'OMR', 25, 'معلّقة', 20),
     comm(13, 2, 'OMR', 25, 'متاحة'),

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Eye, Link2, Plus, RotateCw } from 'lucide-react';
+import { Eye, Link2, Mail, Plus, RotateCw } from 'lucide-react';
 import { useVendorStore } from '@v/store/useVendorStore';
 import { useUIStore } from '@/store/useUIStore';
 import { FieldHint, Money, Note, PageHeader, StatusPill } from '@v/components/ui-bits';
@@ -37,8 +37,20 @@ const COUNTRY_BY_CODE: Record<string, string> = { '+20': 'مصر', '+968': 'عم
 /** the client's country follows the dial code of the phone number */
 const countryOf = (phone: string): string => COUNTRY_BY_CODE[phone.trim().split(/\s+/)[0]] ?? '—';
 /** currency a client pays in, by country (only the currencies the portal knows) */
-const CURRENCY_BY_COUNTRY: Record<string, Currency> = { 'مصر': 'EGP', 'عمان': 'OMR', 'السعودية': 'SAR' };
+const CURRENCY_BY_COUNTRY: Record<string, Currency> = { 'مصر': 'EGP', 'عمان': 'OMR', 'السعودية': 'SAR', 'الإمارات': 'AED', 'فلسطين': 'ILS' };
 const num = (n: number, d: number): string => n.toLocaleString('en-US', { maximumFractionDigits: d });
+
+/** how the client was added: an invitation sent by the marketer, or the registration link */
+function ViaBadge({ via }: { via: string }): JSX.Element {
+  const link = via === 'رابط';
+  const Icon = link ? Link2 : Mail;
+  return (
+    <span className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-md px-2 py-1 text-xs font-medium ${link ? 'bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-300' : 'bg-slate-100 text-slate-700 dark:bg-slate-500/15 dark:text-slate-300'}`}>
+      <Icon className="h-3.5 w-3.5" />
+      {link ? 'رابط التسجيل' : 'دعوة بريدية'}
+    </span>
+  );
+}
 
 function AddClientDialog({ open, onClose }: { open: boolean; onClose: () => void }): JSX.Element {
   const addClient = useVendorStore((s) => s.addClient);
@@ -124,18 +136,20 @@ export default function Clients(): JSX.Element {
     const clientCur = CURRENCY_BY_COUNTRY[country];
     const foreign = !!clientCur && clientCur !== v.cur;
     const usd = planPriceUsd(c.plan, c.cycle);
+    // each figure is an isolated left-to-right run: currency on the left of the amount, and the sum reads right to left
+    const amt = (n: number, cur: Currency): string => `${FX[cur].sym} ${num(n, FX[cur].decimals)}`;
     return (
       <>
         {foreign && (
           <>
             <div>العميل من <b>{country}</b>، وسعر الاشتراك يختلف حسب دولته.</div>
-            <div>قيمة الاشتراك: <bdi dir="ltr">{num(toLocal(usd, clientCur), FX[clientCur].decimals)} {FX[clientCur].sym}</bdi></div>
-            <div>سعر الصرف: <bdi dir="ltr">1 {FX[v.cur].sym} = {num(FX[clientCur].rate / FX[v.cur].rate, 2)} {FX[clientCur].sym}</bdi></div>
-            <div>قيمة الاشتراك بعملتك: <bdi dir="ltr">{num(k.base, FX[v.cur].decimals)} {FX[v.cur].sym}</bdi></div>
+            <div>قيمة الاشتراك: <bdi dir="ltr">{amt(toLocal(usd, clientCur), clientCur)}</bdi></div>
+            <div>سعر الصرف: <bdi dir="ltr">{FX[clientCur].sym} {num(FX[clientCur].rate / FX[v.cur].rate, FX[clientCur].rate / FX[v.cur].rate < 1 ? 4 : 2)} = {FX[v.cur].sym} 1</bdi></div>
+            <div>قيمة الاشتراك بعملتك: <bdi dir="ltr">{amt(k.base, v.cur)}</bdi></div>
           </>
         )}
-        {!foreign && <div>قيمة الاشتراك: <bdi dir="ltr">{num(k.base, FX[v.cur].decimals)} {FX[v.cur].sym}</bdi></div>}
-        <div>العمولة: <bdi dir="ltr">{k.rate}% × {num(k.base, FX[v.cur].decimals)} = {num(k.amt, FX[v.cur].decimals)} {FX[v.cur].sym}</bdi></div>
+        {!foreign && <div>قيمة الاشتراك: <bdi dir="ltr">{amt(k.base, v.cur)}</bdi></div>}
+        <div>العمولة: <bdi dir="ltr">{amt(k.amt, v.cur)} = {k.rate}% × {amt(k.base, v.cur)}</bdi></div>
       </>
     );
   };
@@ -261,7 +275,7 @@ export default function Clients(): JSX.Element {
                     </TableCell>
                     <TableCell>{countryOf(c.phone)}</TableCell>
                     <TableCell>
-                      <StatusPill text={c.via ?? 'دعوة'} />
+                      <ViaBadge via={c.via ?? 'دعوة'} />
                     </TableCell>
                     <TableCell>{c.date}</TableCell>
                     <TableCell>
@@ -285,7 +299,7 @@ export default function Clients(): JSX.Element {
                     </TableCell>
                     <TableCell>
                       {k ? (
-                        <span className="inline-flex items-center gap-1.5">
+                        <span className="inline-flex flex-col items-start gap-1">
                           <StatusPill text={k.st} />
                           {k.st === 'معلّقة' && <small className="text-xs text-muted-foreground">باقي {k.left} يوم</small>}
                         </span>
