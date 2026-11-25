@@ -16,9 +16,12 @@ export function ReferralTab({ clientId }: { clientId: string }): JSX.Element {
   const navigate = useNavigate();
   const clients = useAdminStore((s) => s.clients);
   const showToast = useUIStore((s) => s.showToast);
-  const { settings, referrals } = useReferralsStore();
+  const { settings, referrals, redemptions } = useReferralsStore();
   const mine = referrals.filter((r) => r.referrerId === clientId);
-  const stats = statsFor(clientId, referrals);
+  const stats = statsFor(clientId, referrals, redemptions);
+  const plans = useAdminStore((s) => s.plans);
+  const myRedemptions = redemptions.filter((d) => d.referrerId === clientId);
+  const planNameOf = (id: string): string => plans.find((p) => p.id === id)?.nameAr ?? '—';
   const nameOf = (id: string): string => clients.find((c) => c.id === id)?.companyName ?? '—';
   const subs = mine.filter((r) => r.state === 'اشترك');
   const regs = mine.filter((r) => r.state !== 'اشترك');
@@ -53,11 +56,12 @@ export function ReferralTab({ clientId }: { clientId: string }): JSX.Element {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
         <MiniStat label="سجّلوا من رابطه" value={stats.registered} />
         <MiniStat label="اشتركوا فعلًا" value={stats.subscribed} />
-        <MiniStat tone="green" label="رصيد النقاط" value={fmt(stats.points)} />
-        <MiniStat tone="blue" label="متوسط النقاط لكل مشترك" value={stats.subscribed ? fmt(Math.round(stats.points / stats.subscribed)) : '—'} />
+        <MiniStat tone="green" label="النقاط المكتسبة" value={fmt(stats.points)} />
+        <MiniStat tone="blue" label="النقاط المتبقية" value={fmt(stats.remaining)} />
+        <MiniStat label="متوسط النقاط لكل مشترك" value={stats.subscribed ? fmt(Math.round(stats.points / stats.subscribed)) : '—'} />
       </div>
 
       {mine.length === 0 ? (
@@ -139,12 +143,20 @@ export function ReferralTab({ clientId }: { clientId: string }): JSX.Element {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    {['المصدر', 'النقاط', 'اكتُسبت في', 'الباقة'].map((h) => (
+                    {['المصدر', 'النقاط', 'التاريخ', 'الباقة'].map((h) => (
                       <TableHead key={h} className="text-start">{h}</TableHead>
                     ))}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
+                  {myRedemptions.map((d) => (
+                    <TableRow key={d.id}>
+                      <TableCell>اشتراك بالنقاط</TableCell>
+                      <TableCell className="font-semibold text-destructive"><bdi dir="ltr">−{fmt(d.points)}</bdi></TableCell>
+                      <TableCell>{formatDate(d.at)}</TableCell>
+                      <TableCell>{planNameOf(d.planId)} · {d.cycle}</TableCell>
+                    </TableRow>
+                  ))}
                   {subs.map((r) => (
                     <TableRow key={r.id}>
                       <TableCell>من {nameOf(r.clientId)}</TableCell>

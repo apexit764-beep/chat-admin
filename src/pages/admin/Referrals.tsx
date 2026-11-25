@@ -64,11 +64,11 @@ function PointsGrid({ rows, onChange, empty }: { rows: GridRow[]; onChange: (key
   );
 }
 
-interface RefRow { id: string; name: string; email: string; registered: number; subscribed: number; points: number }
+interface RefRow { id: string; name: string; email: string; registered: number; subscribed: number; points: number; remaining: number }
 
 export default function Referrals(): JSX.Element {
   const navigate = useNavigate();
-  const { settings, referrals, saveSettings } = useReferralsStore();
+  const { settings, referrals, redemptions, saveSettings } = useReferralsStore();
   const plans = useAdminStore((s) => s.plans);
   const clients = useAdminStore((s) => s.clients);
   const showToast = useUIStore((s) => s.showToast);
@@ -111,8 +111,8 @@ export default function Referrals(): JSX.Element {
   const dlg = list ? referrals.filter((r: Referral) => r.referrerId === list.referrerId && (list.kind === 'reg' || (list.kind === 'sub') === (r.state === 'اشترك'))) : [];
 
   const rows: RefRow[] = referrerIds.map((id) => {
-    const st = statsFor(id, referrals);
-    return { id, name: nameOf(id), email: clients.find((c) => c.id === id)?.email ?? '', registered: st.registered, subscribed: st.subscribed, points: st.points };
+    const st = statsFor(id, referrals, redemptions);
+    return { id, name: nameOf(id), email: clients.find((c) => c.id === id)?.email ?? '', registered: st.registered, subscribed: st.subscribed, points: st.points, remaining: st.remaining };
   });
   const chip = 'inline-flex min-w-9 items-center justify-center rounded-full px-2.5 py-1 text-sm font-semibold transition-colors';
   const columns: Column<RefRow>[] = [
@@ -153,11 +153,12 @@ export default function Referrals(): JSX.Element {
       cell: (r) => <span className="text-sm text-muted-foreground"><bdi dir="ltr">{r.registered ? Math.round((r.subscribed / r.registered) * 100) : 0}%</bdi></span>,
     },
     { key: 'points', header: 'النقاط المكتسبة', accessor: (r) => r.points, cell: (r) => <span className="font-semibold text-emerald-700"><bdi dir="ltr">{fmt(r.points)}</bdi></span> },
+    { key: 'remaining', header: 'النقاط المتبقية', accessor: (r) => r.remaining, cell: (r) => <span className="font-semibold text-primary"><bdi dir="ltr">{fmt(r.remaining)}</bdi></span> },
   ];
 
   const totals = referrerIds.reduce(
     (t, id) => {
-      const st = statsFor(id, referrals);
+      const st = statsFor(id, referrals, redemptions);
       return { reg: t.reg + st.registered, sub: t.sub + st.subscribed, pts: t.pts + st.points };
     },
     { reg: 0, sub: 0, pts: 0 },

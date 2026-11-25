@@ -43,12 +43,24 @@ export interface Referral {
   points: number;
 }
 
+/** points a referrer spent to subscribe to a plan with them */
+export interface Redemption {
+  id: string;
+  referrerId: string;
+  planId: string;
+  cycle: 'شهري' | 'سنوي';
+  points: number;
+  at: string;
+}
+
 const daysAgo = (d: number): string => new Date(Date.now() - d * 86400000).toISOString();
 export const referralLink = (clientId: string): string => `qhub.chat/r/c${clientId.replace(/\D/g, '')}`;
 
 interface State {
   settings: ReferralSettings;
   referrals: Referral[];
+  /** points the referrers spent on plans (redemption is not built yet, so this is demo data) */
+  redemptions: Redemption[];
   saveSettings: (s: ReferralSettings) => void;
 }
 
@@ -91,6 +103,9 @@ export const useReferralsStore = create<State>((set, get) => {
       { id: 'rf9', referrerId: 'client_6', clientId: 'client_14', at: daysAgo(3), state: 'سجل', points: 0 },
       { id: 'rf10', referrerId: 'client_6', clientId: 'client_15', at: daysAgo(30), state: 'اشترك', tier: 'business', cycle: 'شهري', paid: 32, points: 1500 },
     ],
+    redemptions: [
+      { id: 'rd1', referrerId: 'client_2', planId: 'plan_starter', cycle: 'شهري', points: 3000, at: daysAgo(6) },
+    ],
     saveSettings: (next) => {
       const old = get().settings;
       set({ settings: next });
@@ -118,13 +133,21 @@ export interface ReferralStats {
   subscribed: number;
   /** all the points the referrer earned */
   points: number;
+  /** points spent on plans */
+  spent: number;
+  /** points not used yet: earned minus spent */
+  remaining: number;
 }
 
-export function statsFor(referrerId: string, referrals: Referral[]): ReferralStats {
+export function statsFor(referrerId: string, referrals: Referral[], redemptions: Redemption[] = []): ReferralStats {
   const mine = referrals.filter((r) => r.referrerId === referrerId);
+  const points = mine.reduce((sum, r) => sum + r.points, 0);
+  const spent = redemptions.filter((d) => d.referrerId === referrerId).reduce((sum, d) => sum + d.points, 0);
   return {
     registered: mine.length,
     subscribed: mine.filter((r) => r.state === 'اشترك').length,
-    points: mine.reduce((sum, r) => sum + r.points, 0),
+    points,
+    spent,
+    remaining: Math.max(0, points - spent),
   };
 }
