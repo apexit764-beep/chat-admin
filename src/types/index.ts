@@ -193,6 +193,8 @@ export interface PlanLimits {
   departments: number;
   whatsappCampaigns: number;
   emailCampaigns: number;
+  /** OTP messages per month sent through the developers API; 0 = the plan does not include the service */
+  otpMessages: number;
 }
 
 export const UNLIMITED = -1;

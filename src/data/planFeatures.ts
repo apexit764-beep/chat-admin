@@ -1,4 +1,4 @@
-import { Bot, MessageCircle, Inbox, Megaphone, UsersRound, BarChart3, Layers, Contact, LifeBuoy } from 'lucide-react';
+import { Bot, MessageCircle, Inbox, Megaphone, UsersRound, BarChart3, Layers, Contact, LifeBuoy, Code2 } from 'lucide-react';
 import type { FeatureValue } from '@/types';
 
 export interface CatalogFeature {
@@ -113,6 +113,13 @@ export const FEATURE_CATALOG: FeatureGroup[] = [
       { key: 'rep_performance', label: "تقارير الأداء" },
       { key: 'rep_first_response', label: "متوسط زمن أول رد" },
       { key: 'rep_peak_hours', label: "ساعات الذروة" },
+    ],
+  },
+  {
+    label: "المطورين",
+    icon: Code2,
+    items: [
+      { key: 'dev_otp_api', label: "خدمة OTP API (إرسال رمز التحقق عبر واتساب)" },
     ],
   },
   {

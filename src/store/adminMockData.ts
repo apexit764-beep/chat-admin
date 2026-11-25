@@ -82,6 +82,7 @@ const BUSINESS_LIMITS: PlanLimits = {
   departments: UNLIMITED,
   whatsappCampaigns: 20000,
   emailCampaigns: 20000,
+  otpMessages: 10000,
 };
 
 /**
@@ -110,6 +111,7 @@ export const plans: Plan[] = [
       departments: 20,
       whatsappCampaigns: 100,
       emailCampaigns: 100,
+      otpMessages: 0,
     },
     features: {
       mobile_app: true,
@@ -178,6 +180,7 @@ export const plans: Plan[] = [
       departments: -1,
       whatsappCampaigns: 2000,
       emailCampaigns: 2000,
+      otpMessages: 0,
     },
     features: {
       mobile_app: true,
@@ -253,6 +256,7 @@ export const plans: Plan[] = [
       departments: -1,
       whatsappCampaigns: 6000,
       emailCampaigns: 6000,
+      otpMessages: 2000,
     },
     features: {
       mobile_app: true,
@@ -296,6 +300,7 @@ export const plans: Plan[] = [
       rep_performance: true,
       rep_first_response: true,
       rep_peak_hours: true,
+      dev_otp_api: true,
       sup_support: "شات",
       sup_tickets: true,
       sup_onboarding: "جلسة إعداد 30 دقيقة",
@@ -364,6 +369,7 @@ export const plans: Plan[] = [
       rep_performance: true,
       rep_first_response: true,
       rep_peak_hours: true,
+      dev_otp_api: true,
       sup_support: "شات بأولوية",
       sup_tickets: true,
       sup_onboarding: "تدريب مباشر للفريق",
@@ -399,6 +405,7 @@ export const plans: Plan[] = [
       departments: -1,
       whatsappCampaigns: -2,
       emailCampaigns: -2,
+      otpMessages: -2,
     },
     features: {
       mobile_app: true,
@@ -442,6 +449,7 @@ export const plans: Plan[] = [
       rep_performance: true,
       rep_first_response: true,
       rep_peak_hours: true,
+      dev_otp_api: true,
       sup_support: "مدير حساب مخصص",
       sup_tickets: true,
       sup_onboarding: "إعداد كامل مخصص",
@@ -485,7 +493,7 @@ export const plans: Plan[] = [
     nameAr: 'انتهاء الاشتراك',
     tagline: 'تُسند للعميل بعد انتهاء اشتراكه — بلا رسوم',
     features: Object.fromEntries(ALL_FEATURE_KEYS.map((k) => [k, true])),
-    limits: { conversations: -2, messages: -1, accounts: -2, agents: -2, contacts: -1, departments: -1, whatsappCampaigns: -2, emailCampaigns: -2 },
+    limits: { conversations: -2, messages: -1, accounts: -2, agents: -2, contacts: -1, departments: -1, whatsappCampaigns: -2, emailCampaigns: -2, otpMessages: -2 },
     // priced per deal from the plans page, like المؤسسات
     pricesPerCountry: {},
     adminOnly: true,

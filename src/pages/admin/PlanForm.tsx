@@ -115,6 +115,7 @@ export default function PlanForm(): JSX.Element {
       limits: {
         conversations: 3000, messages: -1, accounts: 6, agents: 10,
         contacts: -1, departments: -1, whatsappCampaigns: 6000, emailCampaigns: 6000,
+        otpMessages: 2000,
       },
       freeTokensMonthly: '0',
       freeTokensYearly: '0',
@@ -313,7 +314,7 @@ export default function PlanForm(): JSX.Element {
     if (!form.name.trim()) {
       newErrors.name = 'الاسم بالإنجليزية مطلوب';
     }
-    if (!form.requiresContact && LIMIT_FIELDS.some((f) => form.limits[f.key] === 0)) {
+    if (!form.requiresContact && LIMIT_FIELDS.some((f) => !f.allowZero && form.limits[f.key] === 0)) {
       newErrors.limits = 'يجب تحديد جميع الحدود (-1 = غير محدود)';
     }
     if (!form.requiresContact) {

@@ -1,7 +1,11 @@
 import { CUSTOM_LIMIT, UNLIMITED, type PlanLimits } from '@/types';
 
-/** The eight allowances, in the order the approved sheet lists them. */
-export const LIMIT_FIELDS: Array<{ key: keyof PlanLimits; label: string; hint?: string }> = [
+/**
+ * The nine allowances, in the order the approved sheet lists them.
+ * `allowZero`: for this one 0 is a real value (the plan does not include the service),
+ * not «not filled in».
+ */
+export const LIMIT_FIELDS: Array<{ key: keyof PlanLimits; label: string; hint?: string; allowZero?: boolean }> = [
   { key: 'conversations', label: 'المحادثات / شهر', hint: 'الوحدة = عميل × قناة × شهر ميلادي' },
   { key: 'messages', label: 'الرسائل', hint: 'الرسائل داخل المحادثة' },
   { key: 'accounts', label: 'الحسابات والأرقام المربوطة', hint: 'عدد الحسابات لا أنواع القنوات' },
@@ -10,6 +14,7 @@ export const LIMIT_FIELDS: Array<{ key: keyof PlanLimits; label: string; hint?: 
   { key: 'departments', label: 'الأقسام' },
   { key: 'whatsappCampaigns', label: 'حملات واتساب / شهر' },
   { key: 'emailCampaigns', label: 'حملات بريد / شهر' },
+  { key: 'otpMessages', label: 'رسائل OTP / شهر', hint: 'خدمة المطورين: 0 = الباقة لا تشملها', allowZero: true },
 ];
 
 export const LIMIT_LABELS: Record<keyof PlanLimits, string> = Object.fromEntries(

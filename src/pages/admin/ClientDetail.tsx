@@ -34,6 +34,7 @@ import {
   Send,
   Upload,
   Gift,
+  Code2,
 } from 'lucide-react';
 import { useAdminStore, TRIAL_DAYS } from '@/store/useAdminStore';
 import { useUIStore } from '@/store/useUIStore';
@@ -42,6 +43,7 @@ import { formatDate, timeAgo, initials, avatarColor } from '@/utils/format';
 import { cn } from '@/lib/utils';
 import { useConfirm } from '@components/ui';
 import { ReferralTab } from '@/components/admin/referrals/ReferralTab';
+import { ClientDevelopersTab } from '@/components/admin/ClientDevelopersTab';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -418,6 +420,7 @@ export default function ClientDetail(): JSX.Element {
               { value: 'audit', label: 'السجل', icon: Shield },
               { value: 'attachments', label: 'المرفقات', icon: Paperclip },
               { value: 'referrals', label: 'الترويج', icon: Gift },
+              { value: 'developers', label: 'المطورين', icon: Code2 },
             ].map((tab) => (
               <TabsTrigger
                 key={tab.value}
@@ -917,6 +920,11 @@ export default function ClientDetail(): JSX.Element {
           {/* Referrals Tab */}
           <TabsContent value="referrals" className="mt-5">
             <ReferralTab clientId={client.id} />
+          </TabsContent>
+
+          {/* Developers Tab: OTP API support view */}
+          <TabsContent value="developers" className="mt-5">
+            <ClientDevelopersTab clientId={client.id} plan={plan} />
           </TabsContent>
         </Tabs>
 
